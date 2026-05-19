@@ -187,7 +187,6 @@ def evaluate(
                         "label": label,  # may be None on unlabeled rows
                         "top1": res.top1,
                         "margin": res.margin,
-                        "nll_prompt": res.nll_prompt,
                         "pmass_format": res.pmass_format,
                         "think_tokens": res.think_tokens,
                         "emitted_close": res.emitted_close,
@@ -300,11 +299,6 @@ def evaluate(
         "mean_nll": mean_nll,
         "median_nll": median_nll,
         "median_nll_T": median_nll_T,
-        # Mean prompt NLL across rows (nats/token, teacher-forcing on the
-        # rendered chat). Free degradation probe; unsteered baseline gives
-        # the model's "natural" surprise on prompt text.
-        "mean_nll_prompt": float(np.mean([r["nll_prompt"] for r in per_row]))
-            if per_row else None,
         # Mean pmass_format: average prob mass on the K foundation answer
         # tokens at the JSON answer slot, across rows × framings. In [0, 1].
         # Direct coherence canary for forced-choice — drops when the model

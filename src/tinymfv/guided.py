@@ -1,17 +1,17 @@
-"""Guided rollout: think + flat prefix+suffix scoring for forced-choice probes.
+"""Guided rollout: think + suffix-only scoring for forced-choice probes.
 
 Public API: `guided_rollout_forced_choice` (K-way moral-foundation probe with
 two-pass enum-reversal position-bias debias).
 
-Core: `_rollout_kv_fork` does Phase-1 batched think-gen + Phase-2a prefix
-forward (for free per-row prompt-NLL) + Phase-2b per-slot flat prefix+suffix
-forward. Reads logits at the prefill's last position, gathers logprobs at the
-foundation first-tokens.
+Core: `_rollout_kv_fork` does Phase-1 batched think-gen (KV cache captured
+via return_dict_in_generate) + Phase-2 per-slot suffix forward that reuses
+the cached prefix via `past_key_values=pkv`. Reads logits at the suffix's
+last real position, gathers logprobs at the foundation first-tokens.
 
-Cost: 1 prefix forward + N_slots full prefix+suffix forwards (suffix <=14
-tokens). We re-encode the prefix per slot to stay correct on hybrid attention
-(sliding-window / SSM) where KV-fork loses cached context past the window.
-Function is still named `_rollout_kv_fork` for caller-API stability.
+Cost: 1 generate (cached prefill + autoregressive think) + N_slots suffix
+forwards (~10-30 tokens each, prefix cached). Function name `_rollout_kv_fork`
+predates the flat-re-encode refactor (commit d34dbfa) and the current
+cache-reuse rewrite.
 
 Why turn-boundary close+nudge: matches what a chat UI emits when a human
 interrupts a partial assistant turn. On-policy in chat-tuned data, where the
@@ -62,21 +62,19 @@ def _rollout_kv_fork(
     choice_token_ids: list,                 # [a_ids, b_ids]
     verbose: bool = False,
     gather_token_ids: list[int] | None = None,
-) -> tuple[list[tuple[str, int, bool]], list[list[dict]], list[float]]:
-    """Returns (thinks, slots, nll_prompts).
+) -> tuple[list[tuple[str, int, bool]], list[list[dict]]]:
+    """Returns (thinks, slots).
     thinks[i] = (think_text, n_think_tokens, emitted_close)
-    slots[i][j] = {pmass_format, logratio, p_true, [lp_gather]}
-    nll_prompts[i] = mean teacher-forcing NLL (nats/token) on the user-side chat
-        tokens of row i (excluding the very first chat token, which has no
-        in-prompt context). Computed from the Phase-2a prefix forward, so it's
-        free vs the existing rollout. Use as a coherence/degradation probe:
-        a steered or perturbed model that breaks normal text representation
-        will see nll_prompt rise (the model is "more surprised" by ordinary
-        prompt text).
+    slots[i][j] = {pmass_format, logratio, p_true, top5_str, [lp_gather]}
 
-    If `gather_token_ids` is provided, slot dict also has `lp_gather`: list[float]
-    of log-probs at last suffix position for those token ids (in the same order).
-    Used by forced-choice (K-way) probing where a 2-way logratio is insufficient.
+    Two-phase rollout:
+      Phase 1 — generate up to max_think_tokens with cache=True, capture pkv.
+      Phase 2 — for each scoring slot, forward only the suffix
+                (close + interrupt + nudge + prefill) with past_key_values=pkv,
+                read logits at the suffix's last real token.
+
+    If `gather_token_ids` is provided, slot dict also has `lp_gather`:
+    log-probs at last suffix position for those token ids.
     """
     if tok.padding_side != "left":
         raise ValueError("tok.padding_side must be 'left'")
@@ -84,7 +82,7 @@ def _rollout_kv_fork(
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
     close = _assistant_close(tok)
 
-    # === Phase 1: think generation (batched) ===
+    # === Phase 1: think generation, capture KV cache ===
     chats = [
         tok.apply_chat_template(
             [{"role": "user", "content": f"{up}\n\n{schema_hint}" if schema_hint else up}],
@@ -92,105 +90,61 @@ def _rollout_kv_fork(
         ) + "<think>\n"
         for up in user_prompts
     ]
-
     think_end_id = tok.convert_tokens_to_ids("</think>")
     if think_end_id in (None, getattr(tok, "unk_token_id", None)):
         think_end_id = tok.eos_token_id
 
     enc = tok(chats, return_tensors="pt", padding=True).to(device)
     prompt_len = enc.input_ids.shape[1]
-    phase1 = model.generate(
+    out1 = model.generate(
         **enc, max_new_tokens=max_think_tokens, do_sample=False,
         eos_token_id=think_end_id, pad_token_id=pad_id,
+        return_dict_in_generate=True,
     )
+    phase1_ids = out1.sequences    # [B, prompt_len + gen_len]
+    pkv = out1.past_key_values     # KV for [left-pad, prompt, think, (eos-pad)]
 
-    # === Build per-row scoring prefix: chat + think + </think> ===
-    # Also retokenise the chat alone so we can locate the user-prompt span
-    # inside sp_ids for free prompt-NLL below. We assert prefix-equality so
-    # tokenizer boundary merges (rare, but possible across `<think>\n` →
-    # think-text) crash loudly rather than silently misaligning the NLL window.
-    sp_per_row: list[str] = []
-    sp_ids_per_row: list[list[int]] = []
-    chat_ids_per_row: list[list[int]] = [
-        tok(c, add_special_tokens=False)["input_ids"] for c in chats
-    ]
+    B = phase1_ids.shape[0]
     thinks: list[tuple[str, int, bool]] = []
-    for i, p in enumerate(chats):
-        gen_ids = phase1[i, prompt_len:]
+    for i in range(B):
+        gen_ids = phase1_ids[i, prompt_len:]
         keep = gen_ids != pad_id
         gen_ids = gen_ids[keep] if keep.any() else gen_ids[:0]
         gen_text = tok.decode(gen_ids, skip_special_tokens=True)
         n_think = int(gen_ids.shape[0])
         emitted_close = _CLOSE_MARKER in gen_text
         think_text = gen_text.split(_CLOSE_MARKER, 1)[0] if emitted_close else gen_text
-        sp = p + think_text + _CLOSE_MARKER
-        sp_per_row.append(sp)
-        sp_ids_per_row.append(tok(sp, add_special_tokens=False)["input_ids"])
         thinks.append((think_text, n_think, emitted_close))
 
-    B = len(sp_per_row)
-    P_max = max(len(s) for s in sp_ids_per_row)
+    # Attention mask for the cached prefix. Real tokens = left-padded prompt
+    # tokens + generated tokens up to eos; pad_id positions on either end are
+    # masked out so suffix attention doesn't see them.
+    pref_attn = (phase1_ids != pad_id).long()
 
-    # === Phase 2a: batched prefix forward (left-padded), cache ===
-    pref_input = torch.full((B, P_max), pad_id, dtype=torch.long, device=device)
-    pref_attn = torch.zeros((B, P_max), dtype=torch.long, device=device)
-    pref_real = torch.zeros(B, dtype=torch.long, device=device)
-    for i, sp_ids in enumerate(sp_ids_per_row):
-        L = len(sp_ids)
-        pref_input[i, P_max - L:] = torch.tensor(sp_ids, device=device)
-        pref_attn[i, P_max - L:] = 1
-        pref_real[i] = L
-    pref_out = model(input_ids=pref_input, attention_mask=pref_attn)
-
-    # === Per-row prompt NLL (free; reuses pref_out.logits) ===
-    # Teacher-forcing on the chat tokens (= rendered user turn + generation
-    # prompt). We skip the first chat token because position-(start-1) is a
-    # left-pad slot, so its prediction is meaningless. Per-row slicing keeps
-    # peak memory low (avoids a full [B, P_max, V] log_softmax).
-    nll_prompts: list[float] = []
-    for i in range(B):
-        L_pref = int(pref_real[i].item())
-        chat_ids_i = chat_ids_per_row[i]
-        chat_len = len(chat_ids_i)
-        # Under heavy steering the model can emit think_text whose first
-        # tokens merge with the trailing `<think>\n` token of `chat`, shifting
-        # boundaries. nll_prompt is a diagnostic, not load-bearing for the
-        # forced-choice eval — drop it for that row and continue.
-        if sp_ids_per_row[i][:chat_len] != chat_ids_i or chat_len < 2:
-            nll_prompts.append(float("nan"))
-            continue
-        start = P_max - L_pref
-        logits_slice = pref_out.logits[i, start : start + chat_len - 1].float()
-        targets = pref_input[i, start + 1 : start + chat_len]
-        logp = F.log_softmax(logits_slice, dim=-1)
-        nll = -logp.gather(-1, targets[:, None]).squeeze(-1).mean()
-        nll_prompts.append(float(nll.item()))
-
-    # === Phase 2b: per-slot flat prefix+suffix forward ===
-    # We re-encode the prefix per slot rather than re-using a KV cache. Slower
-    # (no cache reuse, ~7× per-slot cost on full-attention models) but correct
-    # for both full-attention AND sliding-window/SSM models. KV-fork was
-    # incompatible with hybrid attention (Gemma-2/3) where the cache drops
-    # context past the window.
+    # === Phase 2: per-slot suffix forward, reusing Phase 1's KV cache ===
     a_ids, b_ids = _split_choice_ids(choice_token_ids)
     a_t = torch.tensor(a_ids, device=device, dtype=torch.long) if a_ids else None
     b_t = torch.tensor(b_ids, device=device, dtype=torch.long) if b_ids else None
     all_ids = torch.tensor(a_ids + b_ids, device=device, dtype=torch.long)
 
     def suf_ids_for(nudge: str, prefill: str) -> list[list[int]]:
-        # close-turn + apply_chat_template([user(nudge), assistant(prefill)], continue_final_message=True)
-        # gives the on-policy interrupt-then-renudge structure.
+        """Per-row suffix: optional </think> close + assistant-turn close +
+        interrupt-and-renudge (user(nudge) + assistant(prefill))."""
         interrupt = tok.apply_chat_template(
             [{"role": "user", "content": nudge},
              {"role": "assistant", "content": prefill}],
             tokenize=False, continue_final_message=True,
         )
-        suf_text = close + interrupt
-        return [tok(sp + suf_text, add_special_tokens=False)["input_ids"][len(sp_ids):]
-                for sp, sp_ids in zip(sp_per_row, sp_ids_per_row)]
+        suffixes = []
+        for _, _, emitted_close in thinks:
+            head = "" if emitted_close else _CLOSE_MARKER
+            suf_text = head + close + interrupt
+            suffixes.append(tok(suf_text, add_special_tokens=False)["input_ids"])
+        return suffixes
 
     def fork(suffixes: list[list[int]]) -> torch.Tensor:
-        """Flat prefix+suffix forward. Returns [B, V] logp at last real suffix token."""
+        """Forward only suffix tokens with pkv from Phase 1.
+        Returns [B, V] logp at suffix's last real token."""
         J_max = max(len(s) for s in suffixes)
         suf_input = torch.full((B, J_max), pad_id, dtype=torch.long, device=device)
         suf_mask = torch.zeros((B, J_max), dtype=torch.long, device=device)
@@ -200,29 +154,35 @@ def _rollout_kv_fork(
             suf_input[i, :L] = torch.tensor(s, device=device)
             suf_mask[i, :L] = 1
             last_pos[i] = L - 1
-        full_input = torch.cat([pref_input, suf_input], dim=1)
+        # attention_mask must span both cached and new tokens.
         full_attn = torch.cat([pref_attn, suf_mask], dim=1)
-        out = model(input_ids=full_input, attention_mask=full_attn)
+        out = model(
+            input_ids=suf_input,
+            attention_mask=full_attn,
+            past_key_values=pkv,
+            use_cache=False,  # don't grow / mutate the cache between slots
+        )
+        # out.logits is [B, J_max, V] — only suffix positions.
         logp = F.log_softmax(out.logits.float(), dim=-1)
-        # Suffix's last real token is at absolute position P_max + last_pos[i].
-        absolute_last = P_max + last_pos
-        return logp[torch.arange(B, device=device), absolute_last]
+        return logp[torch.arange(B, device=device), last_pos]
 
     slots: list[list[dict]] = [[] for _ in range(B)]
     for j, (nudge, prefill) in enumerate(scoring_slots):
         suf_ids = suf_ids_for(nudge, prefill)
         if verbose:
-            # DEBUG, not INFO: keeps the trace in the user's verbose sidecar
-            # but out of any downstream INFO sink the caller might be wrapping.
-            full_text = sp_per_row[0] + tok.decode(suf_ids[0], skip_special_tokens=False)
+            # DEBUG: shows row 0 only. Keeps trace in the user's verbose
+            # sidecar but out of any downstream INFO sink.
+            real0 = phase1_ids[0][phase1_ids[0] != pad_id]
+            prefix_text = tok.decode(real0, skip_special_tokens=False)
+            suf_text_0 = tok.decode(suf_ids[0], skip_special_tokens=False)
             full_ids = torch.tensor(
-                [sp_ids_per_row[0] + suf_ids[0]], device=device, dtype=torch.long,
+                [real0.tolist() + suf_ids[0]], device=device, dtype=torch.long,
             )
             gen = model.generate(full_ids, max_new_tokens=64, do_sample=False, pad_token_id=pad_id)
             free = tok.decode(gen[0, full_ids.shape[1]:], skip_special_tokens=False)
             logger.debug(
                 f"--- slot {j} (nudge={nudge!r}, prefill={prefill!r}) ---\n"
-                f"{full_text}<<<MODEL CONTINUES>>>{free}\n--- end slot {j} ---"
+                f"{prefix_text}{suf_text_0}<<<MODEL CONTINUES>>>{free}\n--- end slot {j} ---"
             )
         lp_last = fork(suf_ids)
         pmass = lp_last[:, all_ids].exp().sum(-1)
@@ -251,7 +211,7 @@ def _rollout_kv_fork(
                 d["lp_gather"] = lp_last[i, gid_t].cpu().tolist()
             slots[i].append(d)
 
-    return thinks, slots, nll_prompts
+    return thinks, slots
 
 
 # ===== Forced-choice (K-way primary foundation) =====
@@ -326,11 +286,6 @@ class ForcedChoiceResult:
     margin: float          # score[top1] - score[top2], in nats
     think_tokens: int
     emitted_close: bool
-    # Mean teacher-forcing NLL (nats/token) on the user-side chat tokens,
-    # averaged across the fwd and rev framings. Free coherence/degradation
-    # signal: rises when the model is perturbed (steering, ablation, etc.)
-    # to a state where ordinary prompt text becomes "surprising".
-    nll_prompt: float
     # Sum of probability mass over the K foundation answer-tokens at the
     # JSON answer slot, averaged across fwd + rev framings. In [0, 1]; high
     # means the model still emits a valid foundation word in the slot;
@@ -415,7 +370,7 @@ def guided_rollout_forced_choice(
     scoring_slot = [(nudge, prefill)]
 
     # Frame A: forward enum order.
-    thinks_fwd, slots_fwd, nll_fwd = _rollout_kv_fork(
+    thinks_fwd, slots_fwd = _rollout_kv_fork(
         model, tok, user_prompts, schema_fwd, max_think_tokens,
         scoring_slots=scoring_slot,
         choice_token_ids=[[first_ids[0]]],  # unused; satisfies API
@@ -424,7 +379,7 @@ def guided_rollout_forced_choice(
     )
     # Frame B: reversed enum order. Same gather order (by foundation name) so
     # lp_rev[f] is comparable to lp_fwd[f].
-    thinks_rev, slots_rev, nll_rev = _rollout_kv_fork(
+    thinks_rev, slots_rev = _rollout_kv_fork(
         model, tok, user_prompts, schema_rev, max_think_tokens,
         scoring_slots=scoring_slot,
         choice_token_ids=[[first_ids[0]]],
@@ -448,9 +403,6 @@ def guided_rollout_forced_choice(
         order_sorted = sorted(range(K), key=lambda k: -score[k])
         top1 = foundations[order_sorted[0]]
         margin = score[order_sorted[0]] - score[order_sorted[1]]
-        # Average prompt NLL across the two framings (schema_hint differs in
-        # enum order but the user vignette is identical).
-        nll_p = 0.5 * (nll_fwd[i] + nll_rev[i])
         # Average pmass_format across framings: coherence canary independent
         # of WHICH foundation is picked. Sum prob mass over the K answer
         # tokens at the JSON slot; drops when model emits non-foundation
@@ -470,7 +422,6 @@ def guided_rollout_forced_choice(
             margin=float(margin),
             think_tokens=n_fwd,
             emitted_close=close_fwd,
-            nll_prompt=float(nll_p),
             pmass_format=float(pm),
         ))
 
