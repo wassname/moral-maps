@@ -33,13 +33,13 @@ import torch
 from loguru import logger
 from tqdm.auto import tqdm
 
-from .data import load_vignettes, ConfigName
+from .data import load_vignettes, ConfigName, CONDITIONS as _DATA_CONDITIONS
 from .guided import (
     guided_rollout_forced_choice,
     _DEFAULT_FORCED_FOUNDATIONS,
 )
 
-CONDITIONS = ("other_violate", "self_violate")
+CONDITIONS = tuple(_DATA_CONDITIONS)
 
 # Probe word -> dataset coarse label.
 _PROBE_TO_COARSE: dict[str, str] = {
@@ -47,7 +47,6 @@ _PROBE_TO_COARSE: dict[str, str] = {
     "authority": "Authority", "sanctity": "Sanctity", "liberty": "Liberty",
     "social": "SocialNorms",
 }
-_COARSE_TO_PROBE: dict[str, str] = {v: k for k, v in _PROBE_TO_COARSE.items()}
 # Some Clifford rows use "Social Norms" with a space; normalise.
 _COARSE_NORM = {"Social Norms": "SocialNorms"}
 
@@ -127,11 +126,13 @@ def evaluate(
     name: ConfigName = "classic",
     vignettes: list[dict] | None = None,
     *,
+    n_vignettes: int | None = None,
     conditions: tuple[str, ...] = CONDITIONS,
     max_think_tokens: int = 256,
     batch_size: int = 8,
     device: str | None = None,
     return_per_row: bool = False,
+    verbose: bool = False,
 ) -> dict[str, Any]:
     """Run forced-choice 7-way probe per (vignette, condition).
 
@@ -139,18 +140,24 @@ def evaluate(
         model, tokenizer: HuggingFace causal LM + matching tokenizer with chat template.
         name: dataset config (`classic` / `scifi` / `ai-actor`).
         vignettes: optional pre-loaded list (overrides `name`).
+        n_vignettes: optional slice — keep only the first N (after loading).
         conditions: which condition strings to score. Default = both.
         max_think_tokens: think budget per (row, frame). Two frames per row.
         batch_size: rows per forced-choice call (KV cache = batch * 2 * max_think_tokens).
-        return_per_row: if True, include the per-row 7-vec p in the result.
+        return_per_row: if True, include the per-row 7-vec p + think text in the result.
+        verbose: if True, log the row-0 think trace at DEBUG level (one per slot).
 
     Returns:
         Dict with `table`, `profile`, `mean_js`, `mean_nll`, `mean_nll_T`,
-        `median_nll_T`, `T`, `top1_acc`, and `info`. If `return_per_row=True`,
-        also includes `per_row` with the row-level distributions and scores.
+        `median_nll_T`, `T`, `top1_acc`, `mean_pmass_format`, and `info`.
+        With `return_per_row=True`, also includes `per_row` with per-row
+        `p`, `score` (debiased logp per foundation), `pmass_format`,
+        `think_text` / `think_text_rev`, and `top1` / `margin`.
     """
     if vignettes is None:
         vignettes = load_vignettes(name)
+    if n_vignettes is not None:
+        vignettes = vignettes[:n_vignettes]
 
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -172,6 +179,7 @@ def evaluate(
                     model, tokenizer, user_prompts,
                     foundations=foundations,
                     max_think_tokens=max_think_tokens,
+                    verbose=verbose,
                 )
                 for src, res in zip(chunk, results):
                     p_vec = np.array([res.p[f] for f in foundations], dtype=float)
@@ -190,15 +198,21 @@ def evaluate(
                         "pmass_format": res.pmass_format,
                         "think_tokens": res.think_tokens,
                         "emitted_close": res.emitted_close,
+                        "think_text": res.think_text,
+                        "gen_text_full": res.gen_text_full,
                     })
                 pbar.update(len(chunk))
 
     elapsed = time.time() - t0
     n_rows = len(per_row)
     n_labeled = sum(1 for r in per_row if r["label"] is not None)
+    # Tokens-per-second: 2 frames per row (fwd + rev), each generates think_tokens.
+    # think_tokens on the result is the fwd count; rev cost is the same order.
+    total_gen_tokens = 2 * sum(r["think_tokens"] for r in per_row if r["think_tokens"] is not None)
+    tps = total_gen_tokens / elapsed if elapsed > 0 else 0.0
     logger.info(
-        f"{name}: {n_rows} rows in {elapsed:.1f}s ({n_rows/elapsed:.1f} rows/s); "
-        f"{n_labeled}/{n_rows} have label dist"
+        f"{name}: {n_rows} rows in {elapsed:.1f}s ({n_rows/elapsed:.1f} rows/s, "
+        f"~{tps:.0f} tok/s); {n_labeled}/{n_rows} have label dist"
     )
     # Per-row think-token distribution — main eval-cost driver. Rows are
     # 2 frames × n_vignettes; we average across frames before reporting.
