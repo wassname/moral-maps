@@ -33,7 +33,7 @@ import json
 from pathlib import Path
 from typing import Literal
 
-ROOT = Path(__file__).resolve().parents[2]
+_DATA_DIR = Path(__file__).with_name("data")
 HF_REPO = "wassname/tiny-mfv"
 CONDITIONS = ["other_violate", "self_violate"]
 
@@ -44,7 +44,7 @@ ConfigName = Literal["classic", "scifi", "ai-actor", "all"]
 
 
 def _local_path(name: str, condition: str) -> Path:
-    return ROOT / "data" / f"vignettes_{name}_{condition}.jsonl"
+    return _DATA_DIR / f"vignettes_{name}_{condition}.jsonl"
 
 
 def _load_jsonl(p: Path) -> list[dict]:
