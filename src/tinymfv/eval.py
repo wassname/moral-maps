@@ -15,6 +15,11 @@ Labels:
 
 Headline metrics:
 - top1_acc:  argmax model == argmax label, fraction of rows.
+- informedness: macro Youden's J of model argmax vs human argmax, in [-1, 1].
+             Chance-corrected (0 = base-rate guessing), argmax-only so it moves
+             when the answer flips, not when confidence shifts. Discrete
+             companion to mean_nll; same flip-informedness family as
+             steering-lite's surgical informedness.
 - mean_nll:  mean soft cross-entropy -sum_f p_human[f] log p_model[f], in nats.
 - mean_nll_T: same metric after fitting one temperature on the scored set.
 - mean_js:   legacy mean Jensen-Shannon divergence between model and label dist
@@ -92,6 +97,40 @@ def _soft_nll(p_human: np.ndarray, p_model: np.ndarray) -> float:
     return float(-(p_human * np.log(p_model)).sum())
 
 
+def _informedness(y_true: np.ndarray, y_pred: np.ndarray, n_classes: int) -> float:
+    """Macro bookmaker informedness (multi-class Youden's J), in [-1, 1].
+
+    Discrete companion to `mean_nll`: it reads only the argmax answer (which
+    foundation the model would pick), so it moves when the *answer flips*, not
+    when confidence shifts on an already-decided row. Less sensitive than the
+    nats signal but better aligned with qualitative "the model changed its
+    mind" reads, and the same flip-informedness family as `steering-lite`'s
+    surgical informedness (there it anchors on a base model; here on the human
+    argmax label). See https://github.com/wassname/steering-lite
+
+    Per class f, one-vs-rest: J_f = TPR_f - FPR_f, where
+      TPR_f = #(true==f & pred==f) / #(true==f)   (sensitivity)
+      FPR_f = #(true!=f & pred==f) / #(true!=f)   (1 - specificity)
+    Macro-averaged over classes present in `y_true`. 0 = chance (base-rate
+    guessing), 1 = perfect; chance-corrected, unlike top1_acc which a model
+    can inflate by always picking the majority foundation.
+
+    Reference: Powers 2011, "Evaluation: from precision, recall and F-measure
+    to ROC, informedness, markedness and correlation".
+    """
+    js = []
+    for f in range(n_classes):
+        pos = y_true == f
+        n_pos = int(pos.sum())
+        if n_pos == 0:
+            continue  # class absent from labels -> undefined TPR, skip
+        neg = ~pos
+        tpr = float((y_pred[pos] == f).mean())
+        fpr = float((y_pred[neg] == f).mean()) if neg.any() else 0.0
+        js.append(tpr - fpr)
+    return float(np.mean(js)) if js else float("nan")
+
+
 def _fit_temperature(
     scores: np.ndarray,           # [N, K] pre-softmax scores (sum of fwd+rev logprobs / 2)
     p_human: np.ndarray,          # [N, K] target distributions, rows sum to 1
@@ -146,7 +185,7 @@ def evaluate(
 
     Returns:
         Dict with `table`, `profile`, `mean_js`, `mean_nll`, `mean_nll_T`,
-        `median_nll_T`, `T`, `top1_acc`, and `info`. If `return_per_row=True`,
+        `median_nll_T`, `T`, `top1_acc`, `informedness`, and `info`. If `return_per_row=True`,
         also includes `per_row` with the row-level distributions and scores.
     """
     if vignettes is None:
@@ -246,9 +285,11 @@ def evaluate(
         js_vals = np.array([_js_divergence(r["p"], r["label"]) for r in labeled_rows])
         mean_js = float(js_vals.mean())
         median_js = float(np.median(js_vals))
-        top1_acc = float(np.mean([
-            np.argmax(r["p"]) == np.argmax(r["label"]) for r in labeled_rows
-        ]))
+        y_pred = np.array([np.argmax(r["p"]) for r in labeled_rows])
+        y_true = np.array([np.argmax(r["label"]) for r in labeled_rows])
+        top1_acc = float(np.mean(y_pred == y_true))
+        # Chance-corrected, argmax-only flip metric (see _informedness).
+        informedness = _informedness(y_true, y_pred, len(foundations))
 
         # Soft NLL at T=1 (raw, overconfident-dominated).
         nll_raw = np.array([_soft_nll(r["label"], r["p"]) for r in labeled_rows])
@@ -280,7 +321,7 @@ def evaluate(
             "model_T": p_scaled.mean(axis=0),
         })
     else:
-        mean_js = median_js = top1_acc = None
+        mean_js = median_js = top1_acc = informedness = None
         mean_nll = median_nll = mean_nll_T = median_nll_T = None
         T = None
         profile = None
@@ -299,6 +340,10 @@ def evaluate(
         "mean_nll": mean_nll,
         "median_nll": median_nll,
         "median_nll_T": median_nll_T,
+        # Macro bookmaker informedness (Youden's J) of model argmax vs human
+        # argmax, in [-1, 1]. Discrete answer-flip metric; 0 = chance,
+        # chance-corrected unlike top1_acc. See _informedness.
+        "informedness": informedness,
         # Mean pmass_format: average prob mass on the K foundation answer
         # tokens at the JSON answer slot, across rows × framings. In [0, 1].
         # Direct coherence canary for forced-choice — drops when the model
@@ -317,6 +362,7 @@ def evaluate(
         "median_nll_T": median_nll_T,
         "T": T,                # fitted temperature (>1 = model is overconfident)
         "top1_acc": top1_acc,
+        "informedness": informedness,  # macro Youden's J, model vs human argmax, in [-1, 1]
         "mean_pmass_format": mean_pmass_format,
         "info": info,
     }

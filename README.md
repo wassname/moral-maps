@@ -163,6 +163,16 @@ We report two scalars on `classic`, plus a per-class breakdown.
 
 - *Top-1 agreement*: model argmax `==` human modal label. Calibration-free,
   interpretable. Qwen3-4B: 82.6% (chance is 14.3% for 7-way choice).
+- *Informedness*: macro Youden's J of model argmax vs human argmax, in
+  `[-1, 1]`. Chance-corrected top-1 agreement (`0` = base-rate guessing,
+  `1` = perfect), so a model that just always picks the majority foundation
+  scores `0` where top-1 would look respectable. Reads only the argmax, so it
+  moves when the *answer flips*, not when confidence shifts on an
+  already-decided row. This is the discrete companion to soft NLL: less
+  sensitive, but closer to the qualitative "did the model change its mind"
+  read, and the same flip-informedness used as the headline in
+  [wassname/steering-lite](https://github.com/wassname/steering-lite) (which
+  anchors flips on a base model rather than on the human label).
 - *Mean soft NLL*: `-Σ_f p_human[f] log p_model[f]` in nats, the standard
   quantity for matching a predicted distribution to a soft-labelled
   target. Unbounded and sensitive (a single confident-wrong row can add
@@ -210,6 +220,12 @@ When the model is steered towards foundation `f`, we expect
 `Δ log p[f] = log p_steered[f] - log p_base[f]` to be positive on `f`
 and larger in magnitude on `f` than on the other six foundations. If
 that holds, the eval is reading the intervention as intended.
+
+The steering vectors are trained on paired contrastive data, not on these
+vignettes, so the eval stays held-out:
+[wassname/moral_stories_foundations](https://huggingface.co/datasets/wassname/moral_stories_foundations)
+provides foundation-labelled (moral / immoral) action pairs for extracting a
+per-foundation steering direction.
 
 > TODO: drop the steering-deltas table here once the steering-lite runs
 > are in. Expected shape: one row per intervention, 7 columns of
