@@ -83,7 +83,7 @@ def main() -> None:
                 "label": (None if r["label"] is None
                           else {f: float(r["label"][i]) for i, f in enumerate(_DEFAULT_FORCED_FOUNDATIONS)}),
                 "top1": r["top1"],
-                "margin": float(r["margin"]),
+                "margin": float(r["margin"])
             }
             f.write(json.dumps(rec) + "\n")
     logger.info(f"wrote {len(out['per_row'])} rows to {out_path}")
@@ -103,6 +103,8 @@ def main() -> None:
     print(f"  median_nll_T = {out['median_nll_T']}    (temperature-scaled, nats)")
     print(f"  T = {out['T']}")
     print(f"  mean_js  = {out['mean_js']}    (max possible = ln 2 = 0.693)")
+    print(f"  mean_pmass_allowed = {out['mean_pmass_allowed']}    (valid-token mass)")
+    print(f"  mean_nll_json = {out['mean_nll_json']}    (assistant prefill, nats/tok)")
 
     if out["profile"] is not None:
         print("\n=== mean profile (human vs model) ===")
@@ -113,6 +115,14 @@ def main() -> None:
     print(f"\n  p_top1 min/median/mean/max: {p_top1.min():.3f} / "
           f"{np.median(p_top1):.3f} / {p_top1.mean():.3f} / {p_top1.max():.3f}")
     print("  SHOULD: median > 0.4 (clear winner per row); <0.2 -> probe broken")
+
+    # JSON-prefill NLL degradation probe (teacher-forced on assistant prefill).
+    nll = np.array([float(r["nll_json"]) for r in out["per_row"]])
+    nll = nll[np.isfinite(nll)]
+    if len(nll):
+        print(f"\n  nll_json (nats/tok) min/median/mean/max: "
+              f"{nll.min():.3f} / {np.median(nll):.3f} / {nll.mean():.3f} / {nll.max():.3f}")
+        print("  SHOULD: stable across runs at fixed model; rises under steering/ablation -> JSON-prefill degradation")
 
 
 if __name__ == "__main__":

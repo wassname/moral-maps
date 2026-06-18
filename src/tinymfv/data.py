@@ -10,23 +10,17 @@ Side artifact (not used by eval, kept for human-correlation sanity check):
 
 Each row: {id, foundation, foundation_coarse, wrong, text}.
 
-Dual-axis design
-================
-Each vignette produces 4 prompts from two independent binary axes:
+Condition axis
+==============
+Each vignette has two text variants per `cond`:
 
-    **cond** (scenario framing — which text variant the model reads):
-        `other_violate`  — 3rd-person ("You see someone doing X")
-        `self_violate`   — 1st-person ("You do X")
+    `other_violate`  — 3rd-person ("You see someone doing X")
+    `self_violate`   — 1st-person ("You do X")
 
-    **frame** (question framing — how the JSON probe is phrased):
-        `wrong`   — '{"is_wrong": '    → true means wrong
-        `accept`  — '{"is_acceptable": ' → true means right (inverted)
-
-Both axes are paired-out in `analyse()`:
-    - The two *frames* cancel the additive JSON-true prior (training data has
-      more `"true"` than `"false"` in JSON contexts).
-    - The two *conds* let you measure perspective bias: the gap between how
-      harshly the model judges others vs itself for the same scenario.
+Eval runs the K-way forced-choice probe on both; averaging cancels
+perspective bias (model judging others vs itself). The probe itself is
+a single JSON-pseudo-schema with the 7 foundations as enum options —
+not a binary wrong/accept frame.
 """
 from __future__ import annotations
 import json
@@ -35,6 +29,7 @@ from typing import Literal
 
 _DATA_DIR = Path(__file__).with_name("data")
 HF_REPO = "wassname/tiny-mfv"
+ROOT = Path(__file__).resolve().parents[2]
 CONDITIONS = ["other_violate", "self_violate"]
 
 # Canonical config names.

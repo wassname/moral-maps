@@ -38,13 +38,13 @@ import torch
 from loguru import logger
 from tqdm.auto import tqdm
 
-from .data import load_vignettes, ConfigName
+from .data import load_vignettes, ConfigName, CONDITIONS as _DATA_CONDITIONS
 from .guided import (
     guided_rollout_forced_choice,
     _DEFAULT_FORCED_FOUNDATIONS,
 )
 
-CONDITIONS = ("other_violate", "self_violate")
+CONDITIONS = tuple(_DATA_CONDITIONS)
 
 # Probe word -> dataset coarse label.
 _PROBE_TO_COARSE: dict[str, str] = {
@@ -52,7 +52,6 @@ _PROBE_TO_COARSE: dict[str, str] = {
     "authority": "Authority", "sanctity": "Sanctity", "liberty": "Liberty",
     "social": "SocialNorms",
 }
-_COARSE_TO_PROBE: dict[str, str] = {v: k for k, v in _PROBE_TO_COARSE.items()}
 # Some Clifford rows use "Social Norms" with a space; normalise.
 _COARSE_NORM = {"Social Norms": "SocialNorms"}
 
@@ -166,11 +165,17 @@ def evaluate(
     name: ConfigName = "classic",
     vignettes: list[dict] | None = None,
     *,
-    conditions: tuple[str, ...] = CONDITIONS,
-    max_think_tokens: int = 256,
+    n_vignettes: int | None = None,
+    conditions: tuple[str, ...] = ("other_violate",),
+    max_think_tokens: int = 64,
+    n_samples: int = 1,
+    temperature: float = 0.0,
+    top_p: float = 1.0,
+    skip_special_tokens: bool = False,
     batch_size: int = 8,
     device: str | None = None,
     return_per_row: bool = False,
+    verbose: bool = False,
 ) -> dict[str, Any]:
     """Run forced-choice 7-way probe per (vignette, condition).
 
@@ -178,18 +183,39 @@ def evaluate(
         model, tokenizer: HuggingFace causal LM + matching tokenizer with chat template.
         name: dataset config (`classic` / `scifi` / `ai-actor`).
         vignettes: optional pre-loaded list (overrides `name`).
-        conditions: which condition strings to score. Default = both.
+        n_vignettes: optional slice — keep only the first N (after loading).
+        conditions: which condition strings to score. Default =
+            ("other_violate",) to match Clifford 2015 classic, which is
+            other-violation only. Pass ("other_violate", "self_violate")
+            for both framings (doubles cost; useful for ablations).
         max_think_tokens: think budget per (row, frame). Two frames per row.
+        n_samples: rollouts per direction. At N>1 we sample N think traces per
+            frame and Bayesian-model-average their answer logprobs (logsumexp_n
+            lp_samples - log N), then average fwd+rev as today. Requires
+            `temperature > 0`. At N=1 the call is greedy (current behaviour).
+        temperature: Phase-1 sampling temperature. 0 = greedy. Must be > 0 when
+            n_samples > 1.
+        top_p: nucleus-sampling threshold for Phase 1 (ignored when greedy).
+        skip_special_tokens: passed to `tok.decode` when building `gen_text`
+            for each result. Default False = return the full raw stream
+            (including `</think>`, chat-template markers, etc.). Set True if
+            you want the stripped text.
         batch_size: rows per forced-choice call (KV cache = batch * 2 * max_think_tokens).
-        return_per_row: if True, include the per-row 7-vec p in the result.
+        return_per_row: if True, include the per-row 7-vec p + think text in the result.
+        verbose: if True, log the row-0 think trace at DEBUG level (one per slot).
 
     Returns:
         Dict with `table`, `profile`, `mean_js`, `mean_nll`, `mean_nll_T`,
-        `median_nll_T`, `T`, `top1_acc`, `informedness`, and `info`. If `return_per_row=True`,
-        also includes `per_row` with the row-level distributions and scores.
+        `median_nll_T`, `T`, `top1_acc`, `mean_pmass_allowed`, `mean_nll_json`, and `info`.
+        With `return_per_row=True`, also includes `per_row` with per-row
+        `p`, `score` (debiased logp per foundation), `pmass_allowed`,
+        `nll_json`, `gen_text` / `gen_text_rev` (full decoded gen, no stripping),
+        and `top1` / `margin`.
     """
     if vignettes is None:
         vignettes = load_vignettes(name)
+    if n_vignettes is not None:
+        vignettes = vignettes[:n_vignettes]
 
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -211,6 +237,11 @@ def evaluate(
                     model, tokenizer, user_prompts,
                     foundations=foundations,
                     max_think_tokens=max_think_tokens,
+                    n_samples=n_samples,
+                    temperature=temperature,
+                    top_p=top_p,
+                    skip_special_tokens=skip_special_tokens,
+                    verbose=verbose,
                 )
                 for src, res in zip(chunk, results):
                     p_vec = np.array([res.p[f] for f in foundations], dtype=float)
@@ -222,28 +253,40 @@ def evaluate(
                         "condition": cond,
                         "foundation_coarse": coarse,
                         "p": p_vec,
-                        "score": score_vec,  # pre-softmax averaged logprobs, for temperature fit
+                        "score": score_vec,  # pre-softmax BMA'd + fwd/rev-averaged logprobs, for temperature fit
                         "label": label,  # may be None on unlabeled rows
                         "top1": res.top1,
                         "margin": res.margin,
-                        "pmass_format": res.pmass_format,
-                        "think_tokens": res.think_tokens,
-                        "emitted_close": res.emitted_close,
+                        "pmass_allowed": res.pmass_allowed,
+                        "nll_json": res.nll_json,
+                        "think_tokens": res.think_tokens,           # list[int], length N
+                        "think_tokens_rev": res.think_tokens_rev,   # list[int], length N
+                        "emitted_close": res.emitted_close,         # list[bool], length N
+                        "emitted_close_rev": res.emitted_close_rev, # list[bool], length N
+                        "gen_text": res.gen_text,           # list[str], length N
+                        "gen_text_rev": res.gen_text_rev,   # list[str], length N
+                        "lp_fwd_samples": res.lp_fwd_samples,  # [N, K]
+                        "lp_rev_samples": res.lp_rev_samples,  # [N, K]
                     })
                 pbar.update(len(chunk))
 
     elapsed = time.time() - t0
     n_rows = len(per_row)
     n_labeled = sum(1 for r in per_row if r["label"] is not None)
-    logger.info(
-        f"{name}: {n_rows} rows in {elapsed:.1f}s ({n_rows/elapsed:.1f} rows/s); "
-        f"{n_labeled}/{n_rows} have label dist"
+    # Tokens-per-second: per row, sum N samples × (fwd + rev) think lengths.
+    total_gen_tokens = sum(
+        sum(r["think_tokens"]) + sum(r["think_tokens_rev"])
+        for r in per_row
     )
-    # Per-row think-token distribution — main eval-cost driver. Rows are
-    # 2 frames × n_vignettes; we average across frames before reporting.
-    # If most rows are well below max_think_tokens, the cap can be lowered.
-    nt = sorted(r["think_tokens"] for r in per_row if r["think_tokens"] is not None)
-    n_closed = sum(1 for r in per_row if r["emitted_close"])
+    tps = total_gen_tokens / elapsed if elapsed > 0 else 0.0
+    logger.info(
+        f"{name}: {n_rows} rows in {elapsed:.1f}s ({n_rows/elapsed:.1f} rows/s, "
+        f"~{tps:.0f} tok/s); {n_labeled}/{n_rows} have label dist"
+    )
+    # Per-sample think-token distribution across all (row × frame × sample).
+    # If most samples are well below max_think_tokens, the cap can be lowered.
+    nt = sorted(t for r in per_row for t in r["think_tokens"] + r["think_tokens_rev"])
+    n_closed = sum(sum(r["emitted_close"]) + sum(r["emitted_close_rev"]) for r in per_row)
     if nt:
         n = len(nt)
         def _q(p): return nt[min(n - 1, int(p * n))]
@@ -326,8 +369,12 @@ def evaluate(
         T = None
         profile = None
 
-    mean_pmass_format = (
-        float(np.mean([r["pmass_format"] for r in per_row]))
+    mean_pmass_allowed = (
+        float(np.mean([r["pmass_allowed"] for r in per_row]))
+        if per_row else None
+    )
+    mean_nll_json = (
+        float(np.mean([r["nll_json"] for r in per_row]))
         if per_row else None
     )
     info = {
@@ -350,7 +397,10 @@ def evaluate(
         # emits non-foundation tokens (gibberish, refusal, format collapse),
         # independent of which foundation is picked. Higher = more
         # "in-format"; a sharp drop after steering signals coherence loss.
-        "mean_pmass_format": mean_pmass_format,
+        "mean_pmass_allowed": mean_pmass_allowed,
+        # Mean NLL in nats/token over the assistant prefill content. Perplexity
+        # is exp(mean_nll_json).
+        "mean_nll_json": mean_nll_json,
     }
 
     out: dict[str, Any] = {
@@ -364,6 +414,8 @@ def evaluate(
         "top1_acc": top1_acc,
         "informedness": informedness,  # macro Youden's J, model vs human argmax, in [-1, 1]
         "mean_pmass_format": mean_pmass_format,
+        "mean_pmass_allowed": mean_pmass_allowed,
+        "mean_nll_json": mean_nll_json,
         "info": info,
     }
     if return_per_row:
