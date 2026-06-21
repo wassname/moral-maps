@@ -333,24 +333,26 @@ _DEFAULT_FORCED_FOUNDATIONS: tuple[str, ...] = (
     "care", "fairness", "loyalty", "authority", "sanctity", "liberty", "social",
 )
 
-# VERBATIM the "(e.g., ...)" parentheticals from Clifford et al. (2015) response options.
-# Clifford deliberately kept this option vocabulary DISJOINT from the vignette text ("we did
-# not use any of the words from the descriptions ... in the actual vignettes ... minimizing
-# concerns that classification is driven by shared language"), so we do NOT paraphrase:
-# any reword risks both a shared-language confound and breaking comparability with the lit.
-# Enum keys keep the MFT foundation names (sanctity/liberty) since scoring is the first token
-# of the KEY and downstream data uses these; the gloss is Clifford's purity/freedom wording.
-# (Inherent overlaps -- liberty's "dominating" vs authority -- are separated by Clifford at
-# the VIGNETTE level, not the option wording: downward harm in a hierarchy invokes Liberty,
-# upward invokes Authority. So we do not engineer the option text to reduce overlap.)
+# VERBATIM the full Clifford et al. (2015) response-option sentences -- the model sees exactly
+# what Clifford's human raters chose between. Clifford deliberately kept this option vocabulary
+# DISJOINT from the vignette text ("we did not use any of the words from the descriptions ... in
+# the actual vignettes ... minimizing concerns that classification is driven by shared language"),
+# so we do NOT paraphrase: any reword risks a shared-language confound and breaks comparability.
+# The enum KEY stays a single MFT foundation token (sanctity/liberty) because scoring reads the
+# first token of the key and downstream data uses these names; the full sentence is the # gloss.
+# (Alternative: number the options and score the digit -- frees the key from carrying meaning AND
+# the reverse-enum pass would average each foundation over two different digits, debiasing the
+# per-token prior that name-keys leave intact; but a small model must then bind number->comment
+# to answer meaningfully, where name-keys carry meaning even if the comment is ignored. Tradeoff
+# left for the rubric-verification pass.)
 _FORCED_FOUNDATION_DESCS: dict[str, str] = {
-    "care":      "unkindness, causing pain to another",
-    "fairness":  "cheating or reducing equality",
-    "loyalty":   "betrayal of a group",
-    "authority": "subversion, lack of respect for tradition",
-    "sanctity":  "degrading or disgusting acts",
-    "liberty":   "bullying, dominating",
-    "social":    "not morally wrong; does not apply to any of the provided choices",
+    "care":      "It violates norms of harm or care (e.g., unkindness, causing pain to another)",
+    "fairness":  "It violates norms of fairness or justice (e.g., cheating or reducing equality)",
+    "loyalty":   "It violates norms of loyalty (e.g., betrayal of a group)",
+    "authority": "It violates norms of respecting authority (e.g., subversion, lack of respect for tradition)",
+    "sanctity":  "It violates norms of purity (e.g., degrading or disgusting acts)",
+    "liberty":   "It violates norms of freedom (e.g., bullying, dominating)",
+    "social":    "It is not morally wrong and does not apply to any of the provided choices",
 }
 
 
@@ -363,12 +365,13 @@ def _format_options(foundations: list[str]) -> str:
 
 
 # Schema hint (shown ONCE in the user-side prompt that precedes the think).
-# JSON-pseudo-schema with enum + per-option comments puts the description
-# right at the option, not in separate prose. The prefill
+# Labelled as a JSON schema so the model treats it as a constrained answer
+# space; enum + per-option `# comments` (Clifford et al. 2015 option vocabulary)
+# put the gloss right at the option, not in separate prose. The prefill
 # `This is wrong because {"violation": "` then forces a single-token answer.
 def _make_forced_hint(foundations: list[str]) -> str:
     return (
-        "This is wrong because:\n"
+        "Here is the JSON schema for the answer. This is wrong because:\n"
         "  {\n"
         '    "properties": {\n'
         '      "violation": {\n'
