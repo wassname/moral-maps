@@ -338,13 +338,18 @@ _DEFAULT_FORCED_FOUNDATIONS: tuple[str, ...] = (
 # DISJOINT from the vignette text ("we did not use any of the words from the descriptions ... in
 # the actual vignettes ... minimizing concerns that classification is driven by shared language"),
 # so we do NOT paraphrase: any reword risks a shared-language confound and breaks comparability.
-# The enum KEY stays a single MFT foundation token (sanctity/liberty) because scoring reads the
-# first token of the key and downstream data uses these names; the full sentence is the # gloss.
-# (Alternative: number the options and score the digit -- frees the key from carrying meaning AND
-# the reverse-enum pass would average each foundation over two different digits, debiasing the
-# per-token prior that name-keys leave intact; but a small model must then bind number->comment
-# to answer meaningfully, where name-keys carry meaning even if the comment is ignored. Tradeoff
-# left for the rubric-verification pass.)
+#
+# The ANSWER is the option INDEX (a digit), not the foundation word -- see _format_options. Why:
+# scoring reads the first token after the prefill `"`, and the foundation words tokenize into
+# UNEVEN first pieces on Qwen3 (care/authority/social score on the whole word; fairness->"fair",
+# loyalty->"loy", sanctity->"san", liberty->"lib" score on a rare subword fragment). Those pieces
+# have very different unconditional priors, the bias is tied to the word so it is CONSTANT across
+# the fwd/rev frames, and the position-debias cannot remove it -- it leaks into the selectivity
+# softmax. Digits "0".."6" are clean single distinct tokens; with index = LISTING POSITION the
+# reversed-enum pass scores each foundation on two different digits, so digit-magnitude AND
+# position bias both cancel in the fwd/rev mean. It also closes Clifford's shared-language channel
+# (no foundation word in the scored token at all). The dict keys stay foundation names: they are
+# the canonical identity used downstream and to look up the gloss; only the EMITTED value is a digit.
 _FORCED_FOUNDATION_DESCS: dict[str, str] = {
     "care":      "It violates norms of harm or care (e.g., unkindness, causing pain to another)",
     "fairness":  "It violates norms of fairness or justice (e.g., cheating or reducing equality)",
@@ -357,10 +362,12 @@ _FORCED_FOUNDATION_DESCS: dict[str, str] = {
 
 
 def _format_options(foundations: list[str]) -> str:
-    """JSON-schema-style enum lines with `# description` comments per option."""
+    """JSON enum lines: value = option INDEX (the scored digit), `# comment` = the
+    verbatim Clifford option sentence. Index is the position in THIS listing, so the
+    reversed-enum frame relabels each foundation with a different digit (the debias)."""
     return "\n".join(
-        f'          "{f}", # {_FORCED_FOUNDATION_DESCS.get(f, f)}'
-        for f in foundations
+        f'          "{k}", # {_FORCED_FOUNDATION_DESCS[f]}'
+        for k, f in enumerate(foundations)
     )
 
 
@@ -436,12 +443,13 @@ class ForcedChoiceResult:
 
 
 def _resolve_first_token_ids(tok, words: list[str]) -> tuple[list[int], dict[str, int]]:
-    """Return (ids_in_order, word->id). Each id is the first token of the word
-    when it appears immediately after a `"` in JSON, i.e. with no leading space.
-    Asserts the K first-tokens are distinct.
+    """Return (ids_in_order, str->id). Each id is the first token of the string when
+    it appears immediately after a `"` in JSON, i.e. with no leading space. Asserts the
+    first-tokens are distinct.
 
-    The forced-choice prefill is `... "violates": "` so the model's
-    next token is the first BPE piece of the foundation word with no space prefix."""
+    Called with the option-index labels "0".."K-1": the forced-choice prefill ends
+    `... "violation": "` so the model's next token is the first piece of the quoted
+    value, which for a single-digit index is the whole digit (clean single token)."""
     ids: list[int] = []
     mapping: dict[str, int] = {}
     for w in words:
@@ -473,15 +481,18 @@ def guided_rollout_forced_choice(
 
     Why K-way: pairwise yes/no probes (multibool) leak a global "badness" prior
     across foundations, collapsing per-foundation discrimination. A K-way
-    softmax over foundation-name first-tokens forces exactly one and sidesteps
-    that prior.
+    softmax over the option-index answer digits forces exactly one and sidesteps
+    that prior. The answer is the digit, not the foundation word, because the words
+    tokenize into uneven first pieces (fragments like "fair"/"san"/"lib") whose
+    per-word prior is constant across frames and so survives the debias.
 
     Why two passes (forward + reversed enum):
     - Position bias is real: models often favour the first option listed.
     - If foundation `f` is at position `i` in the forward enum, it's at position
-      `K-1-i` in the reversed enum. Averaging logprobs across the two frames
-      makes the position contribution `(P[i] + P[K-1-i]) / 2` -- a constant
-      independent of `f`, so it falls out of the softmax over foundations.
+      `K-1-i` in the reversed enum (and is labelled with digit `i` then `K-1-i`).
+      Averaging logprobs across the two frames makes both the position contribution
+      AND the digit-magnitude prior `(P[i] + P[K-1-i]) / 2` -- a constant
+      independent of `f`, so they fall out of the softmax over foundations.
     - Two SEPARATE thinks (one per ordering) keep the framing internally
       consistent. We don't try to share KV across orderings since the schema
       text itself differs.
@@ -507,7 +518,12 @@ def guided_rollout_forced_choice(
     schema_fwd = schema_hint if schema_hint is not None else _make_forced_hint(foundations)
     schema_rev = _make_forced_hint(foundations_rev)
 
-    first_ids, _ = _resolve_first_token_ids(tok, foundations)
+    # Scored answer token is the option-INDEX digit (see _format_options), not the
+    # foundation word. Same digit set both frames; index = listing position, so in the
+    # forward frame digit k == foundations[k] and in the reversed frame digit k ==
+    # foundations_rev[k] == foundations[K-1-k] (the rev gather is flipped back below).
+    position_labels = [str(k) for k in range(K)]
+    first_ids, _ = _resolve_first_token_ids(tok, position_labels)
 
     nudge = "Just answer"
     prefill = 'This is wrong because {"violation": "'
@@ -552,9 +568,13 @@ def guided_rollout_forced_choice(
         n_rev_list = [thinks_rev[j][1] for j in idx]
         close_rev_list = [thinks_rev[j][2] for j in idx]
 
-        # Raw per-sample logprob matrices, shape [N, K].
+        # Raw per-sample logprob matrices, shape [N, K], in foundation order.
+        # Forward frame: digit k == foundations[k], so the gather is already in order.
         lp_f_samples = [slots_fwd[j][0]["lp_gather"] for j in idx]
-        lp_r_samples = [slots_rev[j][0]["lp_gather"] for j in idx]
+        # Reversed frame: digit k == foundations[K-1-k], so reverse each gather vector
+        # back to canonical foundation order. (Position AND digit-magnitude bias then
+        # cancel in the fwd/rev mean, since each foundation is scored on two different digits.)
+        lp_r_samples = [list(reversed(slots_rev[j][0]["lp_gather"])) for j in idx]
         log_N = math.log(N)
         # BMA per direction: logsumexp_n lp_samples[n, k] - log(N).
         def _bma(samples: list[list[float]]) -> list[float]:
