@@ -28,6 +28,7 @@ Headline metrics:
              - mean p[f] (self_violate). Detects perspective bias.
 """
 from __future__ import annotations
+import json
 import math
 import time
 from typing import Any
@@ -175,7 +176,7 @@ def evaluate(
     batch_size: int = 8,
     device: str | None = None,
     return_per_row: bool = False,
-    verbose: bool = False,
+    verbose: bool = True,
 ) -> dict[str, Any]:
     """Run forced-choice 7-way probe per (vignette, condition).
 
@@ -202,7 +203,10 @@ def evaluate(
             you want the stripped text.
         batch_size: rows per forced-choice call (KV cache = batch * 2 * max_think_tokens).
         return_per_row: if True, include the per-row 7-vec p + think text in the result.
-        verbose: if True, log the row-0 think trace at DEBUG level (one per slot).
+        verbose: default True. Logs the first row's FULL trace (special tokens
+            shown), the model-vs-human profile table, and a one-line aux-stats
+            dict. The per-slot rollout trace (DEBUG) is emitted only for the
+            first batch to avoid spam. Set False inside sweeps/loops.
 
     Returns:
         Dict with `table`, `profile`, `mean_js`, `mean_nll`, `mean_nll_T`,
@@ -241,7 +245,7 @@ def evaluate(
                     temperature=temperature,
                     top_p=top_p,
                     skip_special_tokens=skip_special_tokens,
-                    verbose=verbose,
+                    verbose=verbose and i == 0 and cond == conditions[0],
                 )
                 for src, res in zip(chunk, results):
                     p_vec = np.array([res.p[f] for f in foundations], dtype=float)
@@ -377,6 +381,33 @@ def evaluate(
         float(np.mean([r["nll_json"] for r in per_row]))
         if per_row else None
     )
+
+    # --- verbose readout (default on): the first FULL trace, the profile table,
+    # and a one-line aux-stats dict. Lets a reader confirm format-following and
+    # see results inline without opening a separate file (token-efficient-logging). ---
+    if verbose and per_row:
+        # The full prompt+think+answer-slot trace already printed above (rollout,
+        # first batch). Here: how that first row scored, then the profile + aux.
+        r0 = per_row[0]
+        logger.info(
+            f"first row [{name}] id={r0['id']} cond={r0['condition']} scored p "
+            "(fwd+rev BMA, renormalized over the 7 foundations):\n"
+            "SHOULD: mass concentrates on the violated foundation; if it is flat or "
+            "pmass_allowed~0 the model did not answer in-format and the row is noise.\n"
+            + "  ".join(f"{f}={p:.3f}" for f, p in zip(foundations, r0["p"]))
+            + f"\n  top1={r0['top1']}  pmass_allowed={r0['pmass_allowed']:.3f}  nll_json={r0['nll_json']:.3f}"
+        )
+        if profile is not None:
+            logger.info(
+                "profile (mean p over vignettes; model vs human on the same 7-simplex):\n"
+                + profile.to_string(index=False, float_format=lambda v: f"{v:.3f}")
+            )
+        aux = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in {
+            "top1_acc": top1_acc, "mean_js": mean_js, "mean_nll_T": mean_nll_T,
+            "T": T, "informedness": informedness, "mean_pmass_allowed": mean_pmass_allowed,
+        }.items() if v is not None}
+        logger.info("aux stats: " + json.dumps(aux))
+
     info = {
         "name": name,
         "n_rows": n_rows,

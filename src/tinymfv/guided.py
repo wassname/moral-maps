@@ -244,7 +244,10 @@ def _rollout_natural_or_forced(
             real0 = phase1_ids[0][phase1_ids[0] != pad_id]
             prefix0_text = tok.decode(real0, skip_special_tokens=False)
             suf0 = tok.decode(prefix_ids + prefill_ids, skip_special_tokens=False)
-            logger.debug(
+            # INFO not DEBUG: this is the full first trace (prompt + think + answer
+            # slot, special tokens shown). evaluate() gates verbose to the first
+            # batch, so it fires once per run and shows on the console by default.
+            logger.info(
                 f"--- slot {slot_idx} (nudge={nudge!r}, prefill={prefill!r}) ---\n"
                 f"window[0]={windows[0]}  emitted_close[0]={thinks[0][2]}\n"
                 f"{prefix0_text}{suf0}\n--- end slot {slot_idx} ---"
