@@ -42,6 +42,7 @@ from tqdm.auto import tqdm
 from .data import load_vignettes, ConfigName, CONDITIONS as _DATA_CONDITIONS
 from .guided import (
     guided_rollout_forced_choice,
+    free_generation_demo,
     _DEFAULT_FORCED_FOUNDATIONS,
 )
 
@@ -385,6 +386,7 @@ def evaluate(
     # --- verbose readout (default on): the first FULL trace, the profile table,
     # and a one-line aux-stats dict. Lets a reader confirm format-following and
     # see results inline without opening a separate file (token-efficient-logging). ---
+    demos: dict[str, Any] | None = None
     if verbose and per_row:
         # The full prompt+think+answer-slot trace already printed above (rollout,
         # first batch). Here: how that first row scored, then the profile + aux.
@@ -407,6 +409,34 @@ def evaluate(
             "T": T, "informedness": informedness, "mean_pmass_allowed": mean_pmass_allowed,
         }.items() if v is not None}
         logger.info("aux stats: " + json.dumps(aux))
+
+        # DEMO B: free reasoning on a single vignette (bs=1, one time). The readout
+        # (DEMO A, traced in guided.py) prefills the answer slot so it shows no real
+        # reasoning; this lets the chain-of-thought run to completion. bs=1 frees the
+        # batch memory, so spend a generous think budget (scaled by the dropped batch,
+        # floored so even think=1 reasons, capped so big batches don't explode).
+        demo_budget = min(2048, max(512, max_think_tokens * batch_size))
+        demo_prompt, demo_gen = free_generation_demo(
+            model, tokenizer, vignettes[0][conditions[0]],
+            foundations=foundations, max_think_tokens=demo_budget,
+            temperature=temperature, top_p=top_p,
+        )
+        logger.info(
+            f"--- DEMO B: free reasoning (bs=1, think budget={demo_budget}, "
+            f"temp={temperature}) [{name}] id={per_row[0]['id']} ---\n"
+            f"{demo_prompt}{demo_gen}\n"
+            "SHOULD: a real chain-of-thought that ends in a moral-foundation choice. "
+            "If it is empty or degenerate the model is not reasoning at this budget; "
+            "if it answers a different foundation than DEMO A's top1, the readout and "
+            "free reasoning disagree (worth noting).\n--- end DEMO B ---"
+        )
+        demos = {
+            "forced_think": per_row[0]["gen_text"][0],   # DEMO A think (degenerate at low budget)
+            "forced_top1": per_row[0]["top1"],
+            "free_prompt": demo_prompt,
+            "free_gen": demo_gen,
+            "free_think_budget": demo_budget,
+        }
 
     info = {
         "name": name,
@@ -447,6 +477,7 @@ def evaluate(
         "mean_pmass_allowed": mean_pmass_allowed,
         "mean_nll_json": mean_nll_json,
         "info": info,
+        "demos": demos,   # DEMO A (forced think + top1) + DEMO B (free reasoning); None if not verbose
     }
     if return_per_row:
         out["per_row"] = per_row

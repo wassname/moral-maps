@@ -248,9 +248,13 @@ def _rollout_natural_or_forced(
             # slot, special tokens shown). evaluate() gates verbose to the first
             # batch, so it fires once per run and shows on the console by default.
             logger.info(
-                f"--- slot {slot_idx} (nudge={nudge!r}, prefill={prefill!r}) ---\n"
+                f"--- DEMO A: forced-choice readout (what's measured), slot {slot_idx} "
+                f"(nudge={nudge!r}, prefill={prefill!r}) ---\n"
+                f"SHOULD: the answer slot is prefilled to read calibrated logprobs, so the "
+                f"reasoning shown is only whatever fit the think budget (degenerate at think=1). "
+                f"See DEMO B for free reasoning.\n"
                 f"window[0]={windows[0]}  emitted_close[0]={thinks[0][2]}\n"
-                f"{prefix0_text}{suf0}\n--- end slot {slot_idx} ---"
+                f"{prefix0_text}{suf0}\n--- end DEMO A slot {slot_idx} ---"
             )
 
         for i in range(B):
@@ -587,4 +591,41 @@ def guided_rollout_forced_choice(
         ))
 
     return results
+
+
+@torch.no_grad()
+def free_generation_demo(
+    model, tok, user_prompt: str, *,
+    foundations: list[str] | None = None,
+    max_think_tokens: int = 512,
+    temperature: float = 0.0,
+    top_p: float = 1.0,
+) -> tuple[str, str]:
+    """One bs=1 free generation on a single vignette, for qualitative inspection.
+
+    The forced-choice readout (guided_rollout_forced_choice) prefills the answer
+    slot to read calibrated logprobs, so it shows no real reasoning -- at a small
+    think budget its trace is just prompt + a token + the slot. This instead lets
+    the model think to completion and answer naturally (no forced suffix, EOS
+    allowed), so you see the chain-of-thought the metric never reveals. Same
+    vignette + schema as the readout, so the reasoning is about the same task.
+
+    Returns (prompt_text, gen_text), both with special tokens shown."""
+    if foundations is None:
+        foundations = list(_DEFAULT_FORCED_FOUNDATIONS)
+    schema = _make_forced_hint(foundations)
+    prompt_text = tok.apply_chat_template(
+        [{"role": "user", "content": f"{user_prompt}\n\n{schema}"}],
+        tokenize=False, add_generation_prompt=True) + "<think>\n"
+    device = next(model.parameters()).device
+    enc = tok(prompt_text, return_tensors="pt", add_special_tokens=False).to(device)
+    pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
+    gen_kwargs = dict(max_new_tokens=max_think_tokens, pad_token_id=pad_id)
+    if temperature > 0.0:
+        gen_kwargs.update(do_sample=True, temperature=temperature, top_p=top_p)
+    else:
+        gen_kwargs.update(do_sample=False)
+    out = model.generate(**enc, **gen_kwargs)
+    gen_text = tok.decode(out[0, enc.input_ids.shape[1]:], skip_special_tokens=False)
+    return prompt_text, gen_text
 
