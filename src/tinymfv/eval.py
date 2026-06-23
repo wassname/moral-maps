@@ -177,7 +177,7 @@ def evaluate(
     batch_size: int = 8,
     device: str | None = None,
     return_per_row: bool = False,
-    verbose: bool = True,
+    verbose: int = 1,
 ) -> dict[str, Any]:
     """Run forced-choice 7-way probe per (vignette, condition).
 
@@ -204,10 +204,12 @@ def evaluate(
             you want the stripped text.
         batch_size: rows per forced-choice call (KV cache = batch * 2 * max_think_tokens).
         return_per_row: if True, include the per-row 7-vec p + think text in the result.
-        verbose: default True. Logs the first row's FULL trace (special tokens
-            shown), the model-vs-human profile table, and a one-line aux-stats
-            dict. The per-slot rollout trace (DEBUG) is emitted only for the
-            first batch to avoid spam. Set False inside sweeps/loops.
+        verbose: log level (int). 0 = silent (sweeps/loops). 1 (default) = terse:
+            one-line aux-stats dict + the free-reasoning DEMO B generation only,
+            collapsed to 64 chars (no prompt), bracketed by blank lines so it
+            stands apart from the steer demos. 2 = full: also the first row's FULL
+            forced-choice trace (special tokens shown), the model-vs-human profile
+            table, and the complete DEMO B (prompt + generation + SHOULD note).
 
     Returns:
         Dict with `table`, `profile`, `mean_js`, `mean_nll`, `mean_nll_T`,
@@ -246,7 +248,7 @@ def evaluate(
                     temperature=temperature,
                     top_p=top_p,
                     skip_special_tokens=skip_special_tokens,
-                    verbose=verbose and i == 0 and cond == conditions[0],
+                    verbose=(verbose >= 2) and i == 0 and cond == conditions[0],
                 )
                 for src, res in zip(chunk, results):
                     p_vec = np.array([res.p[f] for f in foundations], dtype=float)
@@ -383,53 +385,59 @@ def evaluate(
         if per_row else None
     )
 
-    # --- verbose readout (default on): the first FULL trace, the profile table,
-    # and a one-line aux-stats dict. Lets a reader confirm format-following and
-    # see results inline without opening a separate file (token-efficient-logging). ---
+    # --- verbose readout: level 1 (default) = one-line aux stats + a 64-char free-form
+    # generation, bracketed by blank lines; level 2 = the full first-row trace, profile
+    # table, and complete DEMO B. Inline so a reader confirms format-following without
+    # opening a separate file (token-efficient-logging). ---
     demos: dict[str, Any] | None = None
     if verbose and per_row:
-        # The full prompt+think+answer-slot trace already printed above (rollout,
-        # first batch). Here: how that first row scored, then the profile + aux.
         r0 = per_row[0]
-        logger.info(
-            f"first row [{name}] id={r0['id']} cond={r0['condition']} scored p "
-            "(fwd+rev BMA, renormalized over the 7 foundations):\n"
-            "SHOULD: mass concentrates on the violated foundation; if it is flat or "
-            "pmass_allowed~0 the model did not answer in-format and the row is noise.\n"
-            + "  ".join(f"{f}={p:.3f}" for f, p in zip(foundations, r0["p"]))
-            + f"\n  top1={r0['top1']}  pmass_allowed={r0['pmass_allowed']:.3f}  nll_json={r0['nll_json']:.3f}"
-        )
-        if profile is not None:
-            logger.info(
-                "profile (mean p over vignettes; model vs human on the same 7-simplex):\n"
-                + profile.to_string(index=False, float_format=lambda v: f"{v:.3f}")
-            )
+        # one-line quantitative readout, kept at every verbose level (it IS the signal)
         aux = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in {
             "top1_acc": top1_acc, "mean_js": mean_js, "mean_nll_T": mean_nll_T,
             "T": T, "informedness": informedness, "mean_pmass_allowed": mean_pmass_allowed,
         }.items() if v is not None}
         logger.info("aux stats: " + json.dumps(aux))
+        if verbose >= 2:
+            # full first-row score dump + profile table (DEMO A trace already printed
+            # above in the rollout, first batch).
+            logger.info(
+                f"first row [{name}] id={r0['id']} cond={r0['condition']} scored p "
+                "(fwd+rev BMA, renormalized over the 7 foundations):\n"
+                "SHOULD: mass concentrates on the violated foundation; if it is flat or "
+                "pmass_allowed~0 the model did not answer in-format and the row is noise.\n"
+                + "  ".join(f"{f}={p:.3f}" for f, p in zip(foundations, r0["p"]))
+                + f"\n  top1={r0['top1']}  pmass_allowed={r0['pmass_allowed']:.3f}  nll_json={r0['nll_json']:.3f}"
+            )
+            if profile is not None:
+                logger.info(
+                    "profile (mean p over vignettes; model vs human on the same 7-simplex):\n"
+                    + profile.to_string(index=False, float_format=lambda v: f"{v:.3f}")
+                )
 
-        # DEMO B: free reasoning on a single vignette (bs=1, one time). The readout
-        # (DEMO A, traced in guided.py) prefills the answer slot so it shows no real
-        # reasoning; this lets the chain-of-thought run to completion. bs=1 frees the
-        # batch memory, so spend a generous think budget (scaled by the dropped batch,
-        # floored so even think=1 reasons, capped so big batches don't explode).
+        # DEMO B: free reasoning on a single vignette (bs=1, one time). The forced
+        # readout (DEMO A) prefills the answer slot so it shows no real reasoning; this
+        # lets the chain-of-thought run to completion. bs=1 frees the batch memory, so
+        # spend a generous think budget (scaled by dropped batch, floored, capped).
         demo_budget = min(2048, max(512, max_think_tokens * batch_size))
         demo_prompt, demo_gen = free_generation_demo(
             model, tokenizer, vignettes[0][conditions[0]],
             foundations=foundations, max_think_tokens=demo_budget,
             temperature=temperature, top_p=top_p,
         )
-        logger.info(
-            f"--- DEMO B: free reasoning (bs=1, think budget={demo_budget}, "
-            f"temp={temperature}) [{name}] id={per_row[0]['id']} ---\n"
-            f"{demo_prompt}{demo_gen}\n"
-            "SHOULD: a real chain-of-thought that ends in a moral-foundation choice. "
-            "If it is empty or degenerate the model is not reasoning at this budget; "
-            "if it answers a different foundation than DEMO A's top1, the readout and "
-            "free reasoning disagree (worth noting).\n--- end DEMO B ---"
-        )
+        if verbose >= 2:
+            logger.info(
+                f"\n--- DEMO B: free reasoning (bs=1, think budget={demo_budget}, "
+                f"temp={temperature}) [{name}] id={r0['id']} ---\n"
+                f"{demo_prompt}{demo_gen}\n"
+                "SHOULD: a real chain-of-thought that ends in a moral-foundation choice. "
+                "If it is empty or degenerate the model is not reasoning at this budget; "
+                "if it answers a different foundation than DEMO A's top1, the readout and "
+                "free reasoning disagree (worth noting).\n--- end DEMO B ---\n"
+            )
+        else:  # terse default: generation only, whitespace-collapsed to 64 chars, bracketed
+            gen64 = " ".join(demo_gen.split())[:64]
+            logger.info(f"\nfree-form [{name}] id={r0['id']}: {gen64!r}\n")
         demos = {
             "forced_think": per_row[0]["gen_text"][0],   # DEMO A think (degenerate at low budget)
             "forced_top1": per_row[0]["top1"],
