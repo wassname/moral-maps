@@ -156,11 +156,40 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
 
 # --- per-vector steer range ---------------------------------------------------------------------
 
+def draw_steer(ax, xs: float, cs: list[float], yv: np.ndarray, base_y: float,
+               ms: float = 3.5, lw: float = 2.0, head: float = 7.0, dx: float = 0.06,
+               dots: bool = True) -> None:
+    """Draw the steer c-sweep at column x=xs as TWO arms fanning out FROM the base (the unsteered
+    model at c=0): a red arm to the +c pole, a blue arm to the -c pole. Each arm is a line plus a
+    triangle HEAD MARKER at the pole pointing AWAY from base (^ if the pole is above base, v if below),
+    so the head flips to point down on factors the steer lowers. This matches plot_ipsative_pca's
+    base->pole arrows -- the unsteered model is the origin, NOT the -c pole.
+
+    The head is the ONLY marker at each pole (no dot under it) and is a constant-size marker, NOT a
+    FancyArrow: FancyArrowPatch shrinks and can flip its head once the shaft is shorter than the head,
+    which is exactly the near-collapsed-pole case here. `dots` adds the intermediate per-c step dots
+    (the zoom labels them c=X and wants them; the main range does not -- there they only clutter a short
+    arm into a blob). The +c arm is nudged +dx in x and the -c arm -dx, so a NON-bidirectional steer
+    (both poles the same side of base) reads as two short PARALLEL arms rather than overlapping."""
+    ax.plot(xs, base_y, "o", ms=ms, color="black", zorder=7)            # base: the unsteered model
+    if dots:
+        for c, y in zip(cs, yv):
+            if c == 0 or c == cs[0] or c == cs[-1]:                     # base drawn above; poles = head only
+                continue
+            ax.plot(xs + (dx if c > 0 else -dx), float(y), "o", ms=ms * 0.85, zorder=7,
+                    color=POS_COL if c > 0 else NEG_COL)
+    for pole_y, col, xo in [(float(yv[-1]), POS_COL, xs + dx), (float(yv[0]), NEG_COL, xs - dx)]:
+        if abs(pole_y - base_y) > 1e-9:
+            ax.plot([xo, xo], [base_y, pole_y], color=col, lw=lw, zorder=6, solid_capstyle="round")
+            ax.plot(xo, pole_y, marker=("^" if pole_y >= base_y else "v"), color=col, ms=head,
+                    markeredgecolor="none", zorder=8)
+
+
 def draw_range_panel(ax, instr: Instrument, dims: list[str], cs: list[float], prof: dict,
                      humans: dict, cloud: np.ndarray | None, vec: str) -> tuple[float, float]:
     """One vector's range panel: respondent cloud + named society dots + the steer c-sweep drawn as
-    a directed -c->+c axis (tail dot at -c, interior dots, single arrowhead at +c). The widest steer
-    carries a '-N {vec} / base / +N {vec}' in-plot key. Returns the cropped (ymin, ymax)."""
+    two arrows fanning out from the base dot (red to the +c pole, blue to the -c pole). The widest
+    steer carries a '-N {vec} / base / +N {vec}' in-plot key. Returns the cropped (ymin, ymax)."""
     rng = np.random.default_rng(0)
     ys: list[float] = []
     spans = [float(np.ptp([prof[c][i] for c in cs])) for i in range(len(dims))]
@@ -187,28 +216,29 @@ def draw_range_panel(ax, instr: Instrument, dims: list[str], cs: list[float], pr
         xs = gx + DX_STEER
         yv = np.array([prof[c][i] for c in cs])
         ys += yv.tolist()
-        for ca, cb, ya, yb in zip(cs[:-1], cs[1:], yv[:-1], yv[1:]):
-            ax.plot([xs, xs], [ya, yb], color=(NEG_COL if cb <= 0 else POS_COL),
-                    lw=2.0, zorder=6, solid_capstyle="round")
-        for k, (c, y) in enumerate(zip(cs, yv)):                   # tail + interior get dots; +c end is the arrowhead
-            if k == len(cs) - 1:
-                continue
-            ax.plot(xs, y, "o", ms=3.5, zorder=7,
-                    color="black" if c == 0 else (POS_COL if c > 0 else NEG_COL))
-        if len(cs) >= 2:
-            ax.plot(xs, yv[-1], marker=("^" if yv[-1] >= yv[-2] else "v"),
-                    color=POS_COL, ms=6.5, markeredgecolor="none", zorder=8)
+        base_y = float(yv[list(cs).index(0.0)])
+        draw_steer(ax, xs, cs, yv, base_y, dots=False)             # main range: arms only, no step dots
         if i == label_i:
-            base_y = float(yv[list(cs).index(0.0)])
-            for c_end, y_end in [(cs[0], yv[0]), (0.0, base_y), (cs[-1], yv[-1])]:
-                txt = "base" if c_end == 0 else f"{int(c_end):+d} {vec}"
-                ax.annotate(txt, (xs + 0.10, y_end), fontsize=6.8, ha="left", va="center",
-                            color=(MEDIAN_GREY if c_end == 0 else (POS_COL if c_end > 0 else NEG_COL)), zorder=9)
+            # Only the two pole labels, to the RIGHT of the steer column. No 'base' tag: the black dot
+            # between the two coloured arms is self-evidently the unsteered model, and on a near-collapsed
+            # pole (e.g. humor affiliative, +c ~ base) a 'base' tag overprints the +c tag.
+            for c_end, y_end, col in [(cs[-1], yv[-1], POS_COL), (cs[0], yv[0], NEG_COL)]:
+                ax.annotate(f"{int(c_end):+d} {vec}", (xs + 0.30, y_end), fontsize=6.8,
+                            ha="left", va="center", color=col, zorder=9)
 
     pad = 0.10 * (max(ys) - min(ys))
-    ax.set_ylim(min(ys) - pad, max(ys) + pad)
-    ax.set_title(f"steer c-sweep {int(min(cs)):+d}..{int(max(cs)):+d} (coherent only); "
-                 f"tail = -c, arrow = +c (more {vec})", fontsize=9)
+    ax.set_ylim(min(ys) - pad, max(ys) + 1.7 * pad)               # top headroom for the human/AI strip
+    # Direct labels (show, not tell): bracket the FIRST group's two columns as the human society strip
+    # vs the AI steer, so the grey-dots / arms encoding is read once off the data rather than a caption.
+    # Pinned to a fixed strip at the top of the panel (axes-fraction y) so it always clears the data.
+    from matplotlib.transforms import blended_transform_factory
+    trans = blended_transform_factory(ax.transData, ax.transAxes)
+    ybar = 0.965
+    for x0, txt, col, half in [(DX_HUMAN, "human", COUNTRY_GREY, 0.20), (DX_STEER, "AI", MEDIAN_GREY, 0.10)]:
+        ax.plot([x0 - half, x0 - half, x0 + half, x0 + half], [ybar - 0.03, ybar, ybar, ybar - 0.03],
+                transform=trans, color=col, lw=0.8, clip_on=False, zorder=10)
+        ax.text(x0, ybar + 0.012, txt, transform=trans, fontsize=7.5, ha="center", va="bottom",
+                fontweight="bold", color=col, zorder=10, clip_on=False)
     ax.set_xticks(np.arange(len(dims)) * GROUP_PITCH)
     ax.set_xticklabels(dims, rotation=30, ha="right", fontsize=8)
     ax.set_xlim(-0.6, (len(dims) - 1) * GROUP_PITCH + 0.6)
@@ -218,13 +248,17 @@ def draw_range_panel(ax, instr: Instrument, dims: list[str], cs: list[float], pr
 
 
 def plot_range(instr: Instrument, dims: list[str], cs: list[float], prof: dict, humans: dict,
-               cloud: np.ndarray | None, vec: str, key_text: str):
-    """Single-axes range figure for one steering vector. Returns the Figure."""
+               cloud: np.ndarray | None, vec: str):
+    """Single-axes range figure for one steering vector. Returns the Figure.
+
+    The dot/line encoding legend belongs in the figure CAPTION, not the image: a paragraph of
+    legend text in the suptitle forces the figure wide to fit one line and squashes the panel.
+    The axes title already names the geometry (tail=-c, arrow=+c)."""
     figw = max(6.4, 1.5 * len(dims) + 1.5)
     fig, ax = plt.subplots(figsize=(figw, 4.8))
     draw_range_panel(ax, instr, dims, cs, prof, humans, cloud, vec)
     ax.set_ylabel(f"{instr.display} mean (1-{instr.scale_max})")
-    fig.suptitle(f"Steered {instr.display} range: {vec}\n{key_text}", fontsize=7.5, y=1.0)
+    fig.suptitle(f"Steered {instr.display}: {vec}", fontsize=11)
     fig.tight_layout()
     return fig
 
@@ -261,15 +295,8 @@ def plot_range_zoom(instr: Instrument, dims: list[str], cs: list[float], prof: d
             ax.plot([-0.60, -0.24], [med, med], color=MEDIAN_GREY, lw=1.2, zorder=4)
 
         xs = 0.30
-        for ca, cb, ya, yb in zip(cs[:-1], cs[1:], yv[:-1], yv[1:]):
-            ax.plot([xs, xs], [ya, yb], color=(NEG_COL if cb <= 0 else POS_COL), lw=2.4, zorder=6, solid_capstyle="round")
-        for k, (c, y) in enumerate(zip(cs, yv)):                   # tail + interior get dots; +c end is the arrowhead
-            if k != len(cs) - 1:
-                ax.plot(xs, y, "o", ms=4.5, color="black" if c == 0 else (POS_COL if c > 0 else NEG_COL), zorder=7)
-        if len(cs) >= 2:
-            ax.plot(xs, yv[-1], marker=("^" if yv[-1] >= yv[-2] else "v"), color=POS_COL, ms=7, markeredgecolor="none", zorder=8)
-
         base_y = float(yv[list(cs).index(0.0)])
+        draw_steer(ax, xs, cs, yv, base_y, ms=4.5, lw=2.4, head=9.0, dx=0.10)
         named = {}
         if near:
             name_xy = {nm: (float(x), v) for (nm, v), x in zip(near, soc_x)}
@@ -308,8 +335,6 @@ def plot_range_zoom(instr: Instrument, dims: list[str], cs: list[float], prof: d
         ax.spines[["top", "right", "bottom"]].set_visible(False)
     for k in range(n, nrow * ncol):
         axes[k // ncol][k % ncol].axis("off")
-    fig.suptitle(f"Steered {instr.display}, zoomed per subscale: {vec}\n"
-                 f"grey = nearby societies (named: nearest the base / +end / -end; corner ^v = the 2 off-range "
-                 f"extremes); coloured line = steer (tail = -c, arrow = +c); each panel has its OWN y-axis", fontsize=8)
+    fig.suptitle(f"Steered {instr.display}, zoomed per subscale: {vec}", fontsize=11)
     fig.tight_layout()
     return fig
