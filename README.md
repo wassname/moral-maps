@@ -187,11 +187,84 @@ Agreement, Qwen3-4B on `classic`:
 Per-class top-1 recall is uneven (Care/Fairness/Sanctity ~1.0; Loyalty 0.56, Liberty 0.53). The
 weak spots match the usual MFT pattern: binding foundations cluster, liberty overlaps care/harm.
 
-Sensitivity to steering: when steered toward foundation `f`, `Δ log p[f]` should be positive and
-largest on `f`. Steering vectors are trained on held-out paired data
-([wassname/moral_stories_foundations](https://huggingface.co/datasets/wassname/moral_stories_foundations),
-foundation-labelled moral/immoral action pairs), not on these vignettes, so the eval stays
-held-out. (Delta table lands with the steering-lite rerun.)
+Sensitivity to steering: a small calibrated vector should register as a clean shift in `Δ log p[f]`
+before it would ever change a sampled argmax. We take one [steering-lite](https://github.com/wassname/steering-lite)
+mean-diff vector (an Authority/Care persona axis), iso-KL calibrated once to `C = +0.38` (KL p95 =
+0.49), and evaluate Qwen3.5-4B on the MFV vignettes at base, `+C`, and `-C`:
+
+![MFV per-foundation delta-logit: -C raises violation-logits +6 to +9 nats across all seven foundations](docs/img/showcase/mfv/foundation_dlogit.png)
+
+| foundation | base logit | `+C` Δ | `-C` Δ |
+|---|---:|---:|---:|
+| Care | -2.83 | +0.52 | +6.70 |
+| Sanctity | -5.32 | +0.70 | +8.85 |
+| Authority | -4.72 | +0.71 | +8.41 |
+| Loyalty | -5.79 | +0.59 | +9.27 |
+| Fairness | -4.55 | +0.57 | +8.25 |
+| Liberty | -4.23 | +0.74 | +8.10 |
+| Social Norms | -0.43 | -2.16 | +5.83 |
+
+The signal is strongly asymmetric. The `-C` pole lifts every violation-logit by 6 to 9 nats, turning a
+model that rarely flags a violation (base logits all negative) into one that flags readily across all
+seven foundations: an undifferentiated "everything is a violation" stance no human distribution
+matches, the moral-alien case the eval is built to catch. The `+C` pole is near-inert except on Social
+Norms, which it drops 2.16 nats (it stops using the "merely unusual, not wrong" escape hatch). The
+8-nat swing is large because the prefilled-slot logprob readout is sensitive by design (a shift in
+nats long before a sampled answer would flip). Steering vectors are calibrated on held-out persona
+prompts, not on these vignettes, so the eval stays held-out.
+
+## One vector across every instrument
+
+The same calibrated Authority/Care vector, administered through every instrument tinymfv supports
+(`scripts/plot_steer_showcase.py` over a [steering-lite](https://github.com/wassname/steering-lite)
+`run_allinstr_showcase` run). The ordinal surveys read the same vector as a gentle global shift; the
+nominal vignettes (above) read it as a dramatic asymmetric one. Same vector, different facets,
+because the two eval paths ask different questions. Coherence stayed high throughout (`pmass` >= 0.998
+on every pole, so the steer never broke the readout).
+
+How to read a range: grey dots are the human societies (two extremes named, the short dash is their
+median); the black dot is the unsteered model, the red arrow its `+C` pole and the blue arrow its
+`-C` pole. When an arrowhead clears the grey strip, no human society scores there: the model is off
+the human map.
+
+### MFQ-2: the clearest ordinal signal
+
+![ipsative PCA culture map: Qwen3.5-4B base and its two steered poles among 19 human societies](docs/img/showcase/mfq2/map_pca_ipsative.png)
+
+The culture map (each society's profile row-centred then PCA'd, so the axes are relative emphasis, not
+overall level). Baseline sits near the centre of the human cloud, between France and South Africa; the
+`+C` and `-C` poles move only a short way off it and stay among the human societies. Because the
+steer's main effect is a near-uniform shift in level (next plot), most of it cancels under
+row-centring, leaving a small residual re-weighting here.
+
+![steered MFQ-2 range: +C lowers every foundation, -C raises every foundation, against the human strip](docs/img/showcase/mfq2/range.png)
+
+The range view shows why: `+C` (red) lowers endorsement on all six foundations and `-C` (blue) raises
+it, a near-uniform global shift rather than a re-ordering. Every pole stays inside the human band. The
+base model sits just below the human median on all six foundations (e.g. care 3.90 vs median 3.96,
+authority 3.33 vs 3.84), so `+C` pushes it toward the low end of human variation and `-C` back toward
+the median, neither one leaving the envelope. On the survey this vector is moderate, not alien.
+
+### Side instruments: the off-axis nulls
+
+![steered Big Five range: tiny arms, the Authority/Care vector barely touches personality](docs/img/showcase/big5/range.png)
+
+Big Five. The Authority/Care vector barely moves the personality profile (every arm is short): a clean
+off-axis null showing the eval is not manufacturing motion.
+
+![steered 16PF range: 15 factors, almost every arm short](docs/img/showcase/16pf/range.png)
+
+16PF across 15 factors, the same near-null. A handful of factors (reasoning, self-reliance) twitch
+under `-C`, most do not move.
+
+![steered Humor Styles range: base model an outlier low on affiliative humor, steer does not pull it back](docs/img/showcase/humor_styles/range.png)
+
+Humor Styles, the most distinctive base: the model sits at the bottom of the human strip on
+affiliative (warm) humor, near the lowest society, and the Authority/Care steer does not pull it back
+up. The base profile is the outlier here, not the steer.
+
+Each instrument also has an ipsative culture map and a per-subscale zoom under
+`docs/img/showcase/<instrument>/`.
 
 ## Used in
 
