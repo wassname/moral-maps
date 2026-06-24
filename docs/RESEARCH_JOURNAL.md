@@ -715,3 +715,13 @@ the current core gives 0.788 (probe_word_readout.py). So this model's MFV top-1 
 0.780); the 82.6% was a stale/erroneous table entry, not a reachable target. 0.773
 is the canonical (digit) value. Switching the showcase to Qwen3-4B gave the
 cleaner, fully-coherent, bidirectional result.
+
+Coherent-C sweep (job 234, csweep_coherent_c.py, mfq2 Qwen3-4B): the ordinal
+readout stays fully coherent (pmass 1.000 at BOTH poles) all the way to C=3.0,
+with the steer growing monotonically -- mean|profile delta| 0.129 (C=0.5), 0.215
+(1.0), 0.265 (1.5), 0.296 (2.0), 0.324 (3.0). So the showcase's fixed C=1 is well
+inside the coherent range, not at its edge; the headline path tolerates much
+stronger steering. The binding constraint on a joint-coherent C across all five
+instruments is the side instruments' -C neutral-degeneracy (profile pins to 3.0,
+already at C=1; pmass stays ~1.0), a model property, not an ordinal coherence
+break. C=1 stands as a valid, coherent real coefficient.
