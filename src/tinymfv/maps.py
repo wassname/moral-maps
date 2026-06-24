@@ -349,7 +349,10 @@ def plot_range_zoom(instr: Instrument, dims: list[str], cs: list[float], prof: d
         soc = humans[d]
         soc_vals = np.array([m for _, m in soc])
         q1, q3 = np.percentile(soc_vals, [25, 75])
-        lo, hi = min(yv.min(), q1), max(yv.max(), q3)
+        # nanmin/nanmax: a collapsed pole reads NaN (read.py NaN-at-collapse, "do not compare"). The
+        # base (c=0) is always finite, so the axis still frames the un-collapsed cells; draw_steer
+        # skips the NaN arm on its own (the abs(NaN-base) test is False).
+        lo, hi = min(np.nanmin(yv), q1), max(np.nanmax(yv), q3)
         m = max(0.10, 0.30 * (hi - lo))
         ylo, yhi = lo - m, hi + m
         near = [(name, v) for name, v in soc if ylo <= v <= yhi]
