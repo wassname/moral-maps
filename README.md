@@ -199,9 +199,10 @@ figure below shows the two arms moving apart.
 
 The same calibrated Authority/Care vector, administered through every instrument tinymfv supports
 (`scripts/plot_steer_showcase.py` over a [steering-lite](https://github.com/wassname/steering-lite)
-`run_allinstr_showcase` run). The ordinal surveys read the vector as a gentle global shift and stay
-coherent on every pole (`pmass` ~1.0 at base, `+C`, and `-C`). The nominal MFV vignettes (last
-section) are coherent throughout too, with `+C` and `-C` moving the foundation deltas apart.
+`run_allinstr_showcase` run). The readout stays coherent on every pole (`pmass` ~1.0). MFQ-2 and the
+nominal MFV vignettes show a genuine bidirectional steer (`+C` and `-C` move apart); the side
+instruments (Big Five, 16PF, Humor) move under `+C` but their `-C` pole collapses to the neutral
+midpoint, so there the informative arm is `+C`.
 
 How to read a range: grey dots are the human societies (two extremes named, the short dash is their
 median); the black dot is the unsteered model, the red arrow its `+C` pole and the blue arrow its
@@ -227,35 +228,36 @@ stays coherent (`pmass` ~1.0) and inside the human band. The base model sits nea
 
 ### Side instruments: a broad persona axis
 
-The same vector also shifts the off-target instruments, so on this model it reads as a broad persona
-axis, not an MFT-only steer.
+The off-target instruments behave asymmetrically: `+C` produces a differentiated shift (so the vector
+reaches personality and humor, a broad persona axis), but `-C` collapses these three to the neutral
+midpoint 3.0 (the model answers "3" to everything). The readout stays coherent (`pmass` ~1.0) at both
+poles; it is the `-C` *profile* that goes degenerate, only on these instruments, not on mfq2.
 
-![steered Big Five range: the Authority/Care vector moves agreeableness most, both poles](docs/img/showcase/big5/range.png)
+![steered Big Five range: +C moves agreeableness most; -C collapses every factor to the neutral 3.0](docs/img/showcase/big5/range.png)
 
-Big Five. Agreeableness moves most (base 3.13, `+C` 3.55, `-C` 2.85), with conscientiousness and
-extraversion following; neuroticism and openness barely budge. The Care/Authority direction loading
-onto agreeableness is the expected cross-talk, not noise.
+Big Five. At `+C` agreeableness moves most (base 3.14 -> 3.54), with conscientiousness and extraversion
+following and neuroticism/openness barely budging, the expected Care/Authority cross-talk onto
+agreeableness. At `-C` every factor pins to exactly 3.0: the negative pole is degenerate here.
 
-![steered 16PF range: several factors move, emotional-stability and rule-consciousness most](docs/img/showcase/16pf/range.png)
+![steered 16PF range: +C moves several factors; -C pins most to the midpoint](docs/img/showcase/16pf/range.png)
 
-16PF across 16 factors: not a null either. Emotional-stability (`+C` +0.49), rule-consciousness,
-openness-to-change, dominance and sensitivity each move 0.3 to 0.6 nats across the two poles; the rest
-stay short.
+16PF across 16 factors: at `+C`, emotional-stability (+0.49), dominance and sensitivity move while the
+rest stay short; at `-C` almost every factor sits at ~3.0, the same neutral collapse as Big Five.
 
-![steered Humor Styles range: +C raises affiliative humor, -C lowers it](docs/img/showcase/humor_styles/range.png)
+![steered Humor Styles range: +C lifts affiliative humor; -C settles near the midpoint](docs/img/showcase/humor_styles/range.png)
 
-Humor Styles: the base sits in the lower half of the human strip on affiliative (warm) humor (3.19),
-and the steer is bidirectional, `+C` lifts it toward the human median (3.46) while `-C` pushes it to
-the low edge (3.05). So the vector reaches humor too.
+Humor Styles: the base sits in the lower half of the human strip on affiliative (warm) humor (3.20),
+`+C` lifts it toward the human median (3.47); `-C` settles the styles near 3.0 (affiliative 3.08), the
+same midpoint pull. So `+C` reaches humor, `-C` flattens it.
 
 ### MFV vignettes: the nominal readout
 
 ![steered MFV foundation deltas: +C raises violations across foundations, -C lowers them and raises "not wrong"](docs/img/showcase/mfv/foundation_dlogit.png)
 
 The nominal forced-choice path, `Δ logit(violation)` vs the unsteered model per foundation. `+C` (red)
-raises perceived violations on most foundations (Care +0.65, Loyalty +0.40, Liberty +0.38 nats) while
+raises perceived violations on most foundations (Care +0.65, Loyalty +0.41, Liberty +0.37 nats) while
 lowering Social Norms (-0.24, the model calls fewer scenarios "not wrong"). `-C` (blue) is the mirror:
-foundations drop (Care -0.31, Authority -0.45) and Social Norms jumps +1.52. Both poles stay coherent
+foundations drop (Care -0.31, Authority -0.43) and Social Norms jumps +1.52. Both poles stay coherent
 (`emitted_close` <= 9/264), so this is a clean bidirectional moral-salience steer rather than a
 collapse. The effect is modest at fixed C=1; a C-sweep for the largest coherent coefficient would
 sharpen it.
