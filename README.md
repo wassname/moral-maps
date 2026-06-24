@@ -188,40 +188,22 @@ Agreement, Qwen3-4B on `classic`:
 Per-class top-1 recall is uneven (Care/Fairness/Sanctity ~1.0; Loyalty 0.56, Liberty 0.53). The
 weak spots match the usual MFT pattern: binding foundations cluster, liberty overlaps care/harm.
 
-Sensitivity to steering: a small calibrated vector should register as a clean shift in `Δ log p[f]`
-before it would ever change a sampled argmax. We take one [steering-lite](https://github.com/wassname/steering-lite)
-mean-diff vector (an Authority/Care persona axis), iso-KL calibrated once to `C = +0.38` (KL p95 =
-0.49), and evaluate Qwen3.5-4B on the MFV vignettes at base, `+C`, and `-C`:
-
-![MFV per-foundation delta-logit: -C raises violation-logits +6 to +9 nats across all seven foundations](docs/img/showcase/mfv/foundation_dlogit.png)
-
-| foundation | base logit | `+C` Δ | `-C` Δ |
-|---|---:|---:|---:|
-| Care | -2.83 | +0.52 | +6.70 |
-| Sanctity | -5.32 | +0.70 | +8.85 |
-| Authority | -4.72 | +0.71 | +8.41 |
-| Loyalty | -5.79 | +0.59 | +9.27 |
-| Fairness | -4.55 | +0.57 | +8.25 |
-| Liberty | -4.23 | +0.74 | +8.10 |
-| Social Norms | -0.43 | -2.16 | +5.83 |
-
-The signal is strongly asymmetric. The `-C` pole lifts every violation-logit by 6 to 9 nats, turning a
-model that rarely flags a violation (base logits all negative) into one that flags readily across all
-seven foundations: an undifferentiated "everything is a violation" stance no human distribution
-matches, the moral-alien case the eval is built to catch. The `+C` pole is near-inert except on Social
-Norms, which it drops 2.16 nats (it stops using the "merely unusual, not wrong" escape hatch). The
-8-nat swing is large because the prefilled-slot logprob readout is sensitive by design (a shift in
-nats long before a sampled answer would flip). Steering vectors are calibrated on held-out persona
-prompts, not on these vignettes, so the eval stays held-out.
+Sensitivity to steering: a small calibrated vector should register as a clean shift in `Δ log p[f]`.
+This is not yet shown on a model where the MFV readout is coherent. On the Qwen3.5-4B showcase run the
+base MFV eval failed its own coherence canary (`mean_pmass_allowed` = 0.42, `top1_acc` = 0.28 vs the
+0.826 above, `mean_js`/`mean_nll_T` = NaN, demo profile `p[f]` = NaN), so the nominal-vignette deltas
+from that run are an artifact of the readout collapsing, not a steering effect, and are not reported
+here. The ordinal showcase below (which uses a different, coherent readout, `pmass` >= 0.998) stands;
+the MFV sensitivity delta lands once the vignette readout is coherent on the showcase model.
 
 ## One vector across every instrument
 
 The same calibrated Authority/Care vector, administered through every instrument tinymfv supports
 (`scripts/plot_steer_showcase.py` over a [steering-lite](https://github.com/wassname/steering-lite)
-`run_allinstr_showcase` run). The ordinal surveys read the same vector as a gentle global shift; the
-nominal vignettes (above) read it as a dramatic asymmetric one. Same vector, different facets,
-because the two eval paths ask different questions. Coherence stayed high throughout (`pmass` >= 0.998
-on every pole, so the steer never broke the readout).
+`run_allinstr_showcase` run). The ordinal surveys read the same vector as a gentle global shift, and
+they stayed coherent throughout (`pmass` >= 0.998 on every pole, so the steer never broke the
+readout). The nominal MFV path is excluded from this run: its base readout was incoherent on this
+model (see "Validating the eval" above), so only the ordinal results stand.
 
 How to read a range: grey dots are the human societies (two extremes named, the short dash is their
 median); the black dot is the unsteered model, the red arrow its `+C` pole and the blue arrow its
