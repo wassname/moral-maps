@@ -180,13 +180,21 @@ Agreement, Qwen3-4B on `classic`:
 
 | check | result | interpretation |
 |---|---:|---|
-| top-1 vs human modal | 77.3% | chance is 14.3% for 7-way choice (was 82.6% on an earlier eval build) |
+| top-1 vs human modal | 77.3% | chance is 14.3% for 7-way choice (see note below) |
 | mean soft NLL (T=1) | TODO nats | raw, dominated by overconfident misses |
 | mean soft NLL (T*) | TODO nats | after temperature scaling |
 | median top-1 probability | 1.00 | model usually commits to one foundation |
 
 Per-class top-1 recall is uneven (Care/Fairness/Sanctity ~1.0; Loyalty 0.56, Liberty 0.53). The
 weak spots match the usual MFT pattern: binding foundations cluster, liberty overlaps care/harm.
+
+An earlier build reported 82.6% on the same model. That number used the old readout that scored the
+first token of each foundation *word*; the canonical eval now scores the option *index digit* instead,
+deliberately, because the words tokenize into uneven first pieces (`fair`, `loy`, `san`) whose unequal
+priors leaked into the softmax (see `guided.py`). The digit readout is less biased but reads ~5 points
+lower top-1. Config levers within the current (digit) readout do not recover the gap: top-1 is 0.72 at
+think=64, 0.77 at 256 (512 collapses), and BMA over 8 stochastic thinks is 0.72, so 0.773 is the
+honest ceiling for the debiased eval. The 82.6% is a method artifact, not a regression to chase.
 
 Sensitivity to steering: a small calibrated vector registers as a shift in `Δ log p[f]`. On the
 Qwen3-4B showcase the base MFV readout is coherent (`emitted_close` 4/264, `pmass` >= 0.985, top-1

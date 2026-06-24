@@ -701,7 +701,14 @@ over-steer collapse plus a separate demo fragility; base+`+C` were coherent the
 whole time (confirmed: demos-off run produced byte-identical MFV data). Lesson:
 read the specific eval's own `pmass`, don't pattern-match one line.
 
-The README's old 82.6% top-1 (Qwen3-4B) does not reproduce on the current eval
-(0.72-0.77); refreshed to 77.3%. The ~6-pt drop predates this work and may be an
-eval-version regression worth a look. Switching the showcase to Qwen3-4B (the
-validation model) gave the cleaner, fully-coherent, bidirectional result.
+The README's old 82.6% top-1 (Qwen3-4B) does not reproduce on the current eval.
+Cause (confirmed against the 2026-05-08 entry): that number used the old readout
+that scored the first token of each foundation *word*; the canonical eval now
+scores the option *index digit* (deliberately, to drop the uneven-first-piece
+word prior, guided.py:345). The digit readout reads ~5 pts lower. Config levers
+within the digit readout do NOT recover it: top-1 0.72 (think 64), 0.77 (256),
+0.72 (BMA n_samples=8, temp 0.7) -- so 0.773 is the honest ceiling for the
+debiased eval. Reaching 0.83 needs the superseded word readout, which would be a
+method change for the sake of a number (research poison), so 0.773 stands as the
+correct current value. Switching the showcase to Qwen3-4B (the validation model)
+gave the cleaner, fully-coherent, bidirectional result.
