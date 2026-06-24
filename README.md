@@ -188,22 +188,23 @@ Agreement, Qwen3-4B on `classic`:
 Per-class top-1 recall is uneven (Care/Fairness/Sanctity ~1.0; Loyalty 0.56, Liberty 0.53). The
 weak spots match the usual MFT pattern: binding foundations cluster, liberty overlaps care/harm.
 
-Sensitivity to steering: a small calibrated vector should register as a clean shift in `Δ log p[f]`.
-This is not yet shown on a model where the MFV readout is coherent. On the Qwen3.5-4B showcase run the
-base MFV eval failed its own coherence canary (`mean_pmass_allowed` = 0.42, `top1_acc` = 0.28 vs the
-0.826 above, `mean_js`/`mean_nll_T` = NaN, demo profile `p[f]` = NaN), so the nominal-vignette deltas
-from that run are an artifact of the readout collapsing, not a steering effect, and are not reported
-here. The ordinal showcase below (which uses a different, coherent readout, `pmass` >= 0.998) stands;
-the MFV sensitivity delta lands once the vignette readout is coherent on the showcase model.
+Sensitivity to steering: a small calibrated vector registers as a shift in `Δ log p[f]`. On the
+Qwen3.5-4B showcase the base MFV readout is coherent (`emitted_close` 4/264, the base profile
+discriminates: Social Norms `logit` -0.43, i.e. often "not wrong", down to Loyalty -5.79, rarely the
+answer, a clear spread rather than the uniform ~-1.79 of a collapsed readout). `+C` is a moderate,
+coherent steer; `-C` (the strong negative pole at fixed C=1) over-steers into a readout collapse,
+shifting every foundation by a near-uniform +10 nats ("everything is a violation"). That collapse is
+real over-steering, not a base-eval bug, and it mirrors the `-C` instability on the ordinal surveys
+(NaN at collapse). The MFV figure below shows both arms.
 
 ## One vector across every instrument
 
 The same calibrated Authority/Care vector, administered through every instrument tinymfv supports
 (`scripts/plot_steer_showcase.py` over a [steering-lite](https://github.com/wassname/steering-lite)
-`run_allinstr_showcase` run). The ordinal surveys read the same vector as a gentle global shift, and
-they stayed coherent throughout (`pmass` >= 0.998 on every pole, so the steer never broke the
-readout). The nominal MFV path is excluded from this run: its base readout was incoherent on this
-model (see "Validating the eval" above), so only the ordinal results stand.
+`run_allinstr_showcase` run). The ordinal surveys read the vector as a gentle global shift and stay
+coherent at base and `+C` (`pmass` >= 0.94); the strong `-C` pole collapses a couple of factors (NaN,
+shown as a missing arm). The nominal MFV vignettes (last section) are coherent at base and `+C` and
+over-steer into collapse at `-C`, the same pattern.
 
 How to read a range: grey dots are the human societies (two extremes named, the short dash is their
 median); the black dot is the unsteered model, the red arrow its `+C` pole and the blue arrow its
@@ -245,6 +246,18 @@ under `-C`, most do not move.
 Humor Styles, the most distinctive base: the model sits at the bottom of the human strip on
 affiliative (warm) humor, near the lowest society, and the Authority/Care steer does not pull it back
 up. The base profile is the outlier here, not the steer.
+
+### MFV vignettes: the nominal readout
+
+![steered MFV foundation deltas: +C a moderate coherent steer, -C collapses every foundation to "violation"](docs/img/showcase/mfv/foundation_dlogit.png)
+
+The nominal forced-choice path, `Δ logit(violation)` vs the unsteered model per foundation. `+C` (red)
+is a moderate, differentiated steer: most foundations move +1.5 to +3.3 nats while Social Norms drops
+(the model calls fewer scenarios "not wrong"). `-C` (blue) is the over-steer: every foundation jumps a
+near-uniform +9 to +12 nats, the readout collapsing into "everything is a violation" (`emitted_close`
+220/264 at this pole). So the coherent, readable steer is the `+C` arm; the `-C` arm marks where fixed
+C=1 is too strong for this direction, the same boundary the ordinal `-C` pole hits. A C-sweep for the
+largest jointly-coherent coefficient is the natural next step.
 
 Each instrument also has an ipsative culture map and a per-subscale zoom under
 `docs/img/showcase/<instrument>/`.
