@@ -216,8 +216,11 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     ax.scatter(P[:, 0], P[:, 1], s=26, c=C_HUM, alpha=0.7, edgecolors="white", linewidths=0.5, zorder=3)
     if ta is not None:
         try:
+            # draw_lines=False: 2-letter ISO codes sit beside their dot (textalloc only nudges to avoid
+            # label-label overlap), no leader-line spider-web -- the small displacement keeps each code
+            # unambiguously next to its point in almost all cases.
             ta.allocate_text(fig, ax, P[:, 0], P[:, 1], countries, x_scatter=P[:, 0], y_scatter=P[:, 1],
-                             textsize=7.5, linecolor="#c2bca8", linewidth=0.5, textcolor="#555555")
+                             textsize=7.5, textcolor="#555555", draw_lines=False)
         except Exception:
             ta = None
     if ta is None:
