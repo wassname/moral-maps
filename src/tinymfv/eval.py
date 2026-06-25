@@ -286,7 +286,7 @@ def evaluate(
         for r in per_row
     )
     tps = total_gen_tokens / elapsed if elapsed > 0 else 0.0
-    logger.info(
+    logger.debug(
         f"{name}: {n_rows} rows in {elapsed:.1f}s ({n_rows/elapsed:.1f} rows/s, "
         f"~{tps:.0f} tok/s); {n_labeled}/{n_rows} have label dist"
     )
@@ -297,7 +297,7 @@ def evaluate(
     if nt:
         n = len(nt)
         def _q(p): return nt[min(n - 1, int(p * n))]
-        logger.info(
+        logger.debug(
             f"  think_tokens: median={_q(0.5)} p75={_q(0.75)} p90={_q(0.9)} "
             f"p99={_q(0.99)} max={nt[-1]}  emitted_close={n_closed}/{n}"
         )
@@ -397,11 +397,11 @@ def evaluate(
             "top1_acc": top1_acc, "mean_js": mean_js, "mean_nll_T": mean_nll_T,
             "T": T, "informedness": informedness, "mean_pmass_allowed": mean_pmass_allowed,
         }.items() if v is not None}
-        logger.info("aux stats: " + json.dumps(aux))
+        logger.debug("aux stats: " + json.dumps(aux))
         if verbose >= 2:
             # full first-row score dump + profile table (DEMO A trace already printed
             # above in the rollout, first batch).
-            logger.info(
+            logger.debug(
                 f"first row [{name}] id={r0['id']} cond={r0['condition']} scored p "
                 "(fwd+rev BMA, renormalized over the 7 foundations):\n"
                 "SHOULD: mass concentrates on the violated foundation; if it is flat or "
@@ -410,7 +410,7 @@ def evaluate(
                 + f"\n  top1={r0['top1']}  pmass_allowed={r0['pmass_allowed']:.3f}  nll_json={r0['nll_json']:.3f}"
             )
             if profile is not None:
-                logger.info(
+                logger.debug(
                     "profile (mean p over vignettes; model vs human on the same 7-simplex):\n"
                     + profile.to_string(index=False, float_format=lambda v: f"{v:.3f}")
                 )
@@ -426,7 +426,7 @@ def evaluate(
             temperature=temperature, top_p=top_p,
         )
         if verbose >= 2:
-            logger.info(
+            logger.debug(
                 f"\n--- DEMO B: free reasoning (bs=1, think budget={demo_budget}, "
                 f"temp={temperature}) [{name}] id={r0['id']} ---\n"
                 f"{demo_prompt}{demo_gen}\n"
@@ -437,7 +437,7 @@ def evaluate(
             )
         else:  # terse default: generation only, whitespace-collapsed to 64 chars, bracketed
             gen64 = " ".join(demo_gen.split())[:64]
-            logger.info(f"\nfree-form [{name}] id={r0['id']}: {gen64!r}\n")
+            logger.debug(f"\nfree-form [{name}] id={r0['id']}: {gen64!r}\n")
         demos = {
             "forced_think": per_row[0]["gen_text"][0],   # DEMO A think (degenerate at low budget)
             "forced_top1": per_row[0]["top1"],

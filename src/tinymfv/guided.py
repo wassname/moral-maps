@@ -247,10 +247,11 @@ def _rollout_natural_or_forced(
             real0 = phase1_ids[0][phase1_ids[0] != pad_id]
             prefix0_text = tok.decode(real0, skip_special_tokens=False)
             suf0 = tok.decode(prefix_ids + prefill_ids, skip_special_tokens=False)
-            # INFO not DEBUG: this is the full first trace (prompt + think + answer
-            # slot, special tokens shown). evaluate() gates verbose to the first
-            # batch, so it fires once per run and shows on the console by default.
-            logger.info(
+            # DEBUG: the full first trace (prompt + think + answer slot, special
+            # tokens shown). evaluate() gates verbose to the first batch, so it
+            # fires at most once per eval call -- but a consumer runs evaluate()
+            # ~47x per run, so even once-per-call is spam at INFO.
+            logger.debug(
                 f"--- DEMO A: forced-choice readout (what's measured), slot {slot_idx} "
                 f"(nudge={nudge!r}, prefill={prefill!r}) ---\n"
                 f"SHOULD: the answer slot is prefilled to read calibrated logprobs, so the "
