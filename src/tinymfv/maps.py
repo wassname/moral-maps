@@ -142,6 +142,7 @@ def _axis_gloss(load1: np.ndarray, dims: list[str], n: int = 2) -> str:
 def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], M: np.ndarray,
                       base: np.ndarray, pos: np.ndarray | None, neg: np.ndarray | None,
                       *, respondents: np.ndarray | None = None, haze: np.ndarray | None = None,
+                      traj: dict[float, np.ndarray] | None = None, traj_incoherent: set | None = None,
                       boots: dict | None = None, pad=(0.18, 0.16),
                       labels: tuple[str, str, str] = ("baseline (c=0)", "honest (c=+2)", "dishonest (c=-2)")):
     """Ipsative culture map. M is societies x K (0-1 fraction); base / pos / neg are the length-K
@@ -153,7 +154,11 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     for the crop -- separate from the fit so instruments with only society-level mean+sd (big5/16pf/
     humor: a marginal resample) get a backdrop without that resample dictating the axes. mfq2 passes
     real `respondents` (also used as the haze when `haze` is None). With neither, fit on M, pad-crop,
-    no backdrop. `boots` optionally maps 'base'/'honest'/'dis' -> (n x K) bootstrap matrices. Returns
+    no backdrop. `traj` (signed c-multiplier -> length-K fraction vector) draws the full steer SWEEP
+    as a connected path through PC space, so a multi-C run shows where the steer leaves the human
+    cloud and curves into incoherence (the base/pos/neg arrows stay as the headline +-C anchors).
+    `traj_incoherent` is the subset of those c whose admin pmass fell below the coherence floor --
+    drawn hollow. `boots` optionally maps 'base'/'honest'/'dis' -> (n x K) bootstrap matrices. Returns
     the Figure."""
     try:
         import textalloc as ta
@@ -203,11 +208,35 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         ax.scatter(*pt, s=120, c=col, marker=mk, edgecolors="white", linewidths=1.2, zorder=7)
         ax.annotate(lab, pt, xytext=dxy, textcoords="offset points", fontsize=9, color=col,
                     fontweight="bold", ha=ha, va="center", zorder=8)
-    compass(ax, Vt[:2].T, dims, title=f"{instr.display} compass")
+    traj_pts = None
+    if traj:
+        inco = traj_incoherent or set()
+        cs_sorted = sorted(traj)
+        cmax = max(abs(c) for c in cs_sorted) or 1.0
+        traj_pts = np.array([proj(traj[c]) for c in cs_sorted])
+        # two arms fanning from base (c=0): +c red, -c blue. Marker grows with |c|; a point whose
+        # admin pmass fell below the coherence floor is hollow (the steer is no longer measuring).
+        for lo, hi in [(0.0, max(cs_sorted)), (min(cs_sorted), 0.0)]:
+            arm = [(c, proj(traj[c])) for c in cs_sorted if lo <= c <= hi]
+            if len(arm) < 2:
+                continue
+            xy = np.array([p for _, p in arm])
+            ax.plot(xy[:, 0], xy[:, 1], "-", color="0.55", lw=0.9, zorder=4, alpha=0.8)
+            for c, p in arm:
+                if c == 0:
+                    continue
+                col = POS_COL if c > 0 else NEG_COL
+                ax.scatter(p[0], p[1], s=14 + 26 * abs(c) / cmax, c="none" if c in inco else col,
+                           edgecolors=col, linewidths=1.0, zorder=6)
+            cend, pend = arm[-1] if hi > 0 else arm[0]
+            ax.annotate(f"c={cend:+.0f}", pend, xytext=(4, 4), textcoords="offset points",
+                        fontsize=7, color=POS_COL if cend > 0 else NEG_COL, zorder=8,
+                        bbox=dict(boxstyle="round,pad=0.1", fc="#faf8f2", ec="none", alpha=0.7))
     if cloud is not None:
         # crop to the human-cloud core (2-98 pct) unioned with every anchor, so societies +
         # poles fill the frame instead of being buried in one corner of the full cloud.
-        anc = np.vstack([P] + [p for p in (pb, ph, pf) if p is not None])
+        anc_extra = [traj_pts] if traj_pts is not None else []
+        anc = np.vstack([P] + [p for p in (pb, ph, pf) if p is not None] + anc_extra)
         cx, cy = np.percentile(Pi[:, 0], [2, 98]), np.percentile(Pi[:, 1], [2, 98])
         wx0, wx1 = min(cx[0], anc[:, 0].min()), max(cx[1], anc[:, 0].max())
         wy0, wy1 = min(cy[0], anc[:, 1].min()), max(cy[1], anc[:, 1].max())
@@ -217,6 +246,17 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     else:
         x0, x1 = ax.get_xlim(); y0, y1 = ax.get_ylim()  # modest top-right headroom for the compass inset
         ax.set_xlim(x0, x1 + pad[0] * (x1 - x0)); ax.set_ylim(y0, y1 + pad[1] * (y1 - y0))
+    # compass last, in the least-crowded corner: the +c trajectory often heads toward the same
+    # loading the compass shows (e.g. +authority), so a fixed top-right box collides with it.
+    xlo, xhi = ax.get_xlim(); ylo, yhi = ax.get_ylim()
+    allpts = np.vstack([P] + [p for p in (pb, ph, pf) if p is not None]
+                       + ([traj_pts] if traj_pts is not None else []))
+    fx = (allpts[:, 0] - xlo) / (xhi - xlo); fy = (allpts[:, 1] - ylo) / (yhi - ylo)
+    corners = {"TR": (0.62, 0.70), "TL": (0.04, 0.70), "BR": (0.62, 0.03), "BL": (0.04, 0.03)}
+    def crowd(bx, by):
+        return int(((fx >= bx) & (fx <= bx + 0.30) & (fy >= by) & (fy <= by + 0.27)).sum())
+    bx, by = min(corners.values(), key=lambda b: crowd(*b))
+    compass(ax, Vt[:2].T, dims, title=f"{instr.display} compass", box=(bx, by, 0.30, 0.27))
     ax.set_xlabel(f"PC1 ({var[0]*100:.0f}% var) · {_axis_gloss(Vt[0], dims)}")
     ax.set_ylabel(f"PC2 ({var[1]*100:.0f}% var) · {_axis_gloss(Vt[1], dims)}")
     ax.set_title(f"{instr.name}: ipsative culture map ({len(countries)} societies)", fontsize=10)

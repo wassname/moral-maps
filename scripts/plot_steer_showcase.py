@@ -89,23 +89,31 @@ def human_strip(instr) -> dict[str, list[tuple[str, float]]]:
     return strip
 
 
-def read_profiles(run_dir: Path, name: str, dims: list[str]) -> dict[str, np.ndarray]:
-    """{pole: profile-vector in instrument factor order} from <name>_profiles.csv (model-scale means)."""
-    by_pole: dict[str, dict[str, float]] = {}
+def read_profiles(run_dir: Path, name: str, dims: list[str]) -> tuple[dict[float, np.ndarray], dict[float, float]]:
+    """({c: profile-vector in factor order}, {c: pmass}) from <name>_profiles.csv. `c` is the signed
+    multiplier of calibrated C (0 = base); a single-multiplier run yields just {-1, 0, +1}."""
+    by_c: dict[float, dict[str, float]] = {}
+    pmass: dict[float, float] = {}
     with open(run_dir / f"{name}_profiles.csv", newline="") as fh:
         for r in csv.DictReader(fh):
-            by_pole.setdefault(r["pole"], {})[r["foundation"]] = float(r["mean"])
-    return {pole: np.array([d[f] for f in dims]) for pole, d in by_pole.items()}
+            c = float(r["c"])
+            by_c.setdefault(c, {})[r["foundation"]] = float(r["mean"])
+            pmass[c] = float(r["pmass"])
+    return {c: np.array([d[f] for f in dims]) for c, d in by_c.items()}, pmass
 
 
 def plot_ordinal(run_dir: Path, out: Path, name: str, vec_label: str, C: float) -> list[Path]:
     instr = get_instrument(name)
     dims = instr.dimensions
-    prof_pole = read_profiles(run_dir, name, dims)
-    base, pos, neg = prof_pole["base"], prof_pole["pos"], prof_pole["neg"]
+    prof_c, pmass = read_profiles(run_dir, name, dims)
+    cs = sorted(prof_c)
+    base = prof_c[0.0]
+    # headline arrows = the calibrated coefficient (c=+-1); the trajectory dots at |c|>1 extend
+    # BEYOND the arrowheads, so a multi-C run shows deployment point + where stronger steer drifts.
+    pos = prof_c[1.0] if 1.0 in prof_c else prof_c[max(cs)]
+    neg = prof_c[-1.0] if -1.0 in prof_c else prof_c[min(cs)]
     humans = human_strip(instr)
-    cs = [-1.0, 0.0, 1.0]
-    prof = {-1.0: neg, 0.0: base, 1.0: pos}
+    prof = prof_c
 
     countries, Mfrac = human_matrix(instr)
     labels = (f"base (c=0)", f"+C={C:+.2f}", f"-C={-C:+.2f}")
@@ -117,10 +125,13 @@ def plot_ordinal(run_dir: Path, out: Path, name: str, vec_label: str, C: float) 
         respondents, haze = T.maps.respondent_profiles(dims, instr.scale_max), None
     else:
         respondents, haze = None, human_haze(instr)
+    # trajectory overlay only when the run swept more than the 3-point base/+-C (else the arrows suffice)
+    traj = {c: _frac(prof_c[c], instr.scale_max) for c in cs} if len(cs) > 3 else None
+    traj_inco = {c for c, pm in pmass.items() if pm < 0.9} if traj else None
     figm = T.maps.plot_ipsative_pca(instr, dims, countries, Mfrac,
                                     _frac(base, instr.scale_max), _frac(pos, instr.scale_max),
                                     _frac(neg, instr.scale_max), respondents=respondents, haze=haze,
-                                    labels=labels)
+                                    traj=traj, traj_incoherent=traj_inco, labels=labels)
     paths = [T.maps.save_both(figm, out / name, "map_pca_ipsative")]
     plt.close(figm)
 
