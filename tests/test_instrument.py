@@ -1,106 +1,96 @@
-"""Unit tests for the instrument abstraction's pure functions (no model needed).
+"""Minimal functional tests for the pure instrument layer.
 
-Covers the panel's flagged risks: frame canonicalization, the keying-vs-framing composition
-(NOT a double-flip), renormalized p, ordinal expectation, nominal choice frequency, and the
-negative control.
+The model smoke test is the real integration gate. These tests cover the pure pieces the smoke test
+does not isolate cleanly: nominal vs ordinal reducers, frame canonicalization/keying, readout names,
+and packaged data integrity.
 """
+from __future__ import annotations
+
+import unittest
+
 import numpy as np
 
+from tinymfv.data import CONFIGS, CONDITIONS, load_vignettes
 from tinymfv.instrument import (
-    Instrument, InstrItem, canonicalize_to_forward, per_item_categorical,
-    reduce_ordinal, shuffle_dimensions,
+    Instrument,
+    canonicalize_to_forward,
+    per_item_categorical,
+    reduce_nominal,
+    reduce_ordinal,
 )
-
-M = 5
-ONEHOT = {d: np.eye(M)[d - 1] for d in range(1, M + 1)}  # ONEHOT[4] = mass on scale point 4
+from tinymfv.readouts import expected_score, logit_contrast, logodds_agree
 
 
-def _E(p, scale_max):  # expected scale point; reduce_ordinal computes this inline now
-    return float((np.asarray(p) * np.arange(1, scale_max + 1)).sum())
+class InstrumentFlowTest(unittest.TestCase):
+    def test_nominal_flow_reduces_answer_categories_to_profile(self) -> None:
+        instr = Instrument(
+            "mfv", "salience", "nominal",
+            ["care", "fairness", "social"],
+            ["Care", "Fairness", "SocialNorms"],
+            items=[],
+            prefill='This is wrong because {"violation": "',
+            answer_to_dim={"care": "Care", "fairness": "Fairness", "social": "SocialNorms"},
+        )
+        rows = [
+            {"id": "a", "frame": "forward", "lp": np.log([0.80, 0.15, 0.05]),
+             "p": np.array([0.80, 0.15, 0.05]), "pmass_allowed": 0.95,
+             "dimension": None, "sign": 1, "human_label": None},
+            {"id": "b", "frame": "forward", "lp": np.log([0.20, 0.50, 0.30]),
+             "p": np.array([0.20, 0.50, 0.30]), "pmass_allowed": 0.90,
+             "dimension": None, "sign": 1, "human_label": None},
+        ]
 
+        items = per_item_categorical(rows, instr.kind)
 
-def _ord_instr(items):
-    return Instrument("t", "endorsement", "ordinal", ["1", "2", "3", "4", "5"],
-                      ["care", "authority"], items, prefill="(")
+        self.assertTrue(np.allclose(reduce_nominal(items, instr), [0.50, 0.325, 0.175]))
+        self.assertAlmostEqual(items["a"]["pmass"], 0.95)
+        self.assertEqual(items["a"]["n_frames"], 1)
 
-
-def test_canonicalize():
-    # forward + nominal -> identity; ordinal inverted/negated -> reversed vector
-    p = ONEHOT[5]
-    assert np.array_equal(canonicalize_to_forward(p, "forward", "ordinal"), p)
-    assert np.array_equal(canonicalize_to_forward(p, "inverted", "ordinal"), ONEHOT[1])
-    assert np.array_equal(canonicalize_to_forward(p, "negated", "ordinal"), ONEHOT[1])
-    assert np.array_equal(canonicalize_to_forward(p, "inverted", "nominal"), p)  # nominal identity
-
-
-def test_forward_expectation():
-    rows = [{"id": "1", "frame": "forward", "p": ONEHOT[4], "pmass_allowed": 1.0,
-             "dimension": "care", "sign": 1, "human_label": None}]
-    items = per_item_categorical(rows, "ordinal")
-    assert abs(_E(items["1"]["p"], M) - 4.0) < 1e-9
-    prof = reduce_ordinal(items, _ord_instr([]))
-    assert abs(prof[0] - 4.0) < 1e-9  # care
-    assert np.isnan(prof[1])          # authority has no items
-
-
-def test_frame_consistency():
-    # Same item, forward vs inverted: after canonicalization the per-item categorical must agree.
-    fwd = [{"id": "1", "frame": "forward", "p": ONEHOT[1], "pmass_allowed": 1.0,
-            "dimension": "care", "sign": 1, "human_label": None}]
-    inv = [{"id": "1", "frame": "inverted", "p": ONEHOT[5], "pmass_allowed": 1.0,
-            "dimension": "care", "sign": 1, "human_label": None}]
-    e_fwd = _E(per_item_categorical(fwd, "ordinal")["1"]["p"], M)
-    e_inv = _E(per_item_categorical(inv, "ordinal")["1"]["p"], M)
-    assert abs(e_fwd - 1.0) < 1e-9 and abs(e_inv - 1.0) < 1e-9  # canonicalization makes them agree
-
-
-def test_keying_is_not_double_flip():
-    # Reverse-keyed item ("I keep in the background", sign=-1) on an INVERTED scale.
-    # Model puts mass on presented "5". Panel claimed frame+keying double-corrects; show it does not.
-    # inverted: presented 5 -> canonical 1 (disagrees with the item) -> E_canon = 1.
-    # keying sign<0 (pool-reflect): agreement = M+1 - 1 = 5 = HIGH on the factor. Correct:
-    # disagreeing with "I keep in the background" == extraverted.
-    rows = [{"id": "x", "frame": "inverted", "p": ONEHOT[5], "pmass_allowed": 1.0,
-             "dimension": "care", "sign": -1, "human_label": None}]
-    items = per_item_categorical(rows, "ordinal")
-    assert abs(_E(items["x"]["p"], M) - 1.0) < 1e-9      # canonical agreement-with-item = 1
-    prof = reduce_ordinal(items, _ord_instr([]))
-    assert abs(prof[0] - 5.0) < 1e-9                                 # keyed factor score = 5, not 1 (no double flip)
-
-    # And it matches the SAME reverse-keyed item shown forward with the mirrored answer (mass on 1):
-    rows_fwd = [{"id": "x", "frame": "forward", "p": ONEHOT[1], "pmass_allowed": 1.0,
-                 "dimension": "care", "sign": -1, "human_label": None}]
-    prof_fwd = reduce_ordinal(per_item_categorical(rows_fwd, "ordinal"), _ord_instr([]))
-    assert abs(prof[0] - prof_fwd[0]) < 1e-9
-
-
-def test_frame_spread_diagnostic():
-    # forward mass on 1, inverted mass on presented 1 (-> canonical 5): canonical frames disagree
-    # maximally -> frame_spread = 2.0 (L1 between two disjoint one-hots).
-    rows = [{"id": "1", "frame": "forward", "p": ONEHOT[1], "pmass_allowed": 1.0,
+    def test_ordinal_flow_canonicalizes_frames_then_keys_profile(self) -> None:
+        instr = Instrument(
+            "likert", "endorsement", "ordinal",
+            ["1", "2", "3", "4", "5"],
+            ["care", "authority"],
+            items=[],
+            prefill="(",
+        )
+        onehot = {d: np.eye(5)[d - 1] for d in range(1, 6)}
+        rows = [
+            {"id": "care", "frame": "forward", "lp": np.log(onehot[4] + 1e-9),
+             "p": onehot[4], "pmass_allowed": 1.0,
              "dimension": "care", "sign": 1, "human_label": None},
-            {"id": "1", "frame": "inverted", "p": ONEHOT[1], "pmass_allowed": 1.0,
-             "dimension": "care", "sign": 1, "human_label": None}]
-    items = per_item_categorical(rows, "ordinal")
-    assert abs(items["1"]["frame_spread"] - 2.0) < 1e-9
+            {"id": "authority", "frame": "inverted", "lp": np.log(onehot[5] + 1e-9),
+             "p": onehot[5], "pmass_allowed": 1.0,
+             "dimension": "authority", "sign": -1, "human_label": None},
+        ]
+
+        items = per_item_categorical(rows, instr.kind)
+        profile = reduce_ordinal(items, instr)
+
+        self.assertTrue(np.array_equal(canonicalize_to_forward(onehot[5], "inverted", "ordinal"), onehot[1]))
+        self.assertAlmostEqual(expected_score(items["care"]["p"], 5), 4.0)
+        self.assertAlmostEqual(profile[0], 4.0)
+        self.assertAlmostEqual(profile[1], 5.0)
+        self.assertAlmostEqual(
+            logit_contrast(items["care"]["lp"] + 100.0, 5),
+            logit_contrast(items["care"]["lp"], 5),
+        )
+        self.assertTrue(np.isfinite(logodds_agree(items["care"]["lp"], 5)))
+
+    def test_packaged_vignettes_have_aligned_conditions_and_labels(self) -> None:
+        required_human = {
+            "human_Care", "human_Fairness", "human_Loyalty", "human_Authority",
+            "human_Sanctity", "human_Liberty", "human_SocialNorms",
+        }
+        for cfg in CONFIGS:
+            rows = load_vignettes(cfg)
+            self.assertGreaterEqual(len(rows), 100)
+            self.assertEqual({r["set"] for r in rows}, {cfg})
+            for row in rows:
+                self.assertTrue({"id", "foundation", "foundation_coarse", *CONDITIONS} <= set(row))
+                self.assertTrue(required_human <= set(row))
+                self.assertGreater(sum(float(row[k]) for k in required_human), 0.0)
 
 
-def test_negative_control_shuffle():
-    rng = np.random.default_rng(0)
-    rows = [{"id": str(i), "frame": "forward", "p": ONEHOT[(i % 5) + 1], "pmass_allowed": 1.0,
-             "dimension": "care" if i < 5 else "authority", "sign": 1, "human_label": None}
-            for i in range(10)]
-    items = per_item_categorical(rows, "ordinal")
-    shuffled = shuffle_dimensions(items, rng)
-    # same item ids, dimensions permuted
-    assert set(shuffled) == set(items)
-    assert [shuffled[k]["dimension"] for k in items] != [items[k]["dimension"] for k in items]
-
-
-def test_cross_scale_guard():
-    # HSQ-like: human on 1-7, model on 1-5, with a human_label attached -> must raise.
-    import pytest
-    items = [InstrItem("1", "q", dimension="care", human_label=np.ones(5) / 5)]
-    with pytest.raises(AssertionError):
-        Instrument("hsq", "endorsement", "ordinal", ["1", "2", "3", "4", "5"],
-                   ["care"], items, prefill="(", human_scale_max=7)
+if __name__ == "__main__":
+    unittest.main()
