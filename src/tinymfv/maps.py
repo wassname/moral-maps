@@ -147,7 +147,8 @@ def compass(ax_main, L: np.ndarray, labels: list[str], title: str = "compass",
 def _minimap(ax_main, cloud_full: np.ndarray, societies: np.ndarray, base_pt, view, box) -> None:
     """Macro overview inset: the FULL human cloud + all societies + the model base, with a red
     rectangle marking the zoomed main frame -- so a tightly-cropped map still shows where its
-    window sits in the whole space (and any off-frame society stays visible here)."""
+    window sits in the whole space (and any off-frame society stays visible here). No labels: the
+    inset is too small to letter without clutter; orientation comes from the rectangle alone."""
     from matplotlib.patches import Rectangle
     xlo, xhi, ylo, yhi = view
     mm = ax_main.inset_axes(list(box))
@@ -214,19 +215,20 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         ax.scatter(Pi[:, 0], Pi[:, 1], s=4, c="#8f8a7e", alpha=0.14, edgecolors="none",
                    zorder=1, rasterized=True)
     ax.scatter(P[:, 0], P[:, 1], s=26, c=C_HUM, alpha=0.7, edgecolors="white", linewidths=0.5, zorder=3)
-    if ta is not None:
-        try:
-            # draw_lines=False: 2-letter ISO codes sit beside their dot (textalloc only nudges to avoid
-            # label-label overlap), no leader-line spider-web -- the small displacement keeps each code
-            # unambiguously next to its point in almost all cases.
-            ta.allocate_text(fig, ax, P[:, 0], P[:, 1], countries, x_scatter=P[:, 0], y_scatter=P[:, 1],
-                             textsize=7.5, textcolor="#555555", draw_lines=False)
-        except Exception:
-            ta = None
-    if ta is None:
-        for i, c in enumerate(countries):
-            ax.annotate(c, (P[i, 0], P[i, 1]), fontsize=7, color="#555555",
-                        xytext=(3, 2), textcoords="offset points")
+    # Society labels: each 2-letter ISO code is pinned RIGHT NEXT to its dot (small fixed offset, no
+    # leader line). A label is dropped entirely if its box would collide with an already-placed one --
+    # better an omitted code than one flung far from its point. No relocation, no arrows.
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    placed_boxes = []
+    for i in np.argsort(P[:, 0]):                      # left-to-right; leftmost wins contested space
+        t = ax.annotate(countries[i], (P[i, 0], P[i, 1]), fontsize=7, color="#555555",
+                        xytext=(3, 2), textcoords="offset points", zorder=6)
+        bb = t.get_window_extent(renderer)
+        if any(bb.overlaps(b) for b in placed_boxes):
+            t.remove()
+        else:
+            placed_boxes.append(bb)
     for key, col, pt in [("base", C_BASE, pb), ("honest", C_HON, ph), ("dis", C_DIS, pf)]:
         if boots and key in boots and pt is not None:
             bp = (np.asarray(boots[key]) @ Pc - mu) @ Vt[:2].T
@@ -268,17 +270,15 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
             ax.annotate(f"c={cend:+.0f}", pend, xytext=(4, 4), textcoords="offset points",
                         fontsize=7, color=POS_COL if cend > 0 else NEG_COL, zorder=8,
                         bbox=dict(boxstyle="round,pad=0.1", fc="#faf8f2", ec="none", alpha=0.7))
-    # The synthetic haze (big5/16pf/humor: independent-marginal resample) is far wider than the
-    # societies, so cropping to its 2-98 pct buries the societies + steer in a tiny central blob.
-    # There we zoom to the SOCIETIES + steer anchors (the haze still scatters but clips) and add a
-    # minimap showing where that frame sits in the full human cloud. mfq2's cloud is real
-    # per-respondent spread (well-conditioned), so it stays the crop reference.
-    synthetic = haze is not None and respondents is None
+    # Crop to the SOCIETIES + steer anchors for EVERY instrument. The human cloud (mfq2's real
+    # per-respondent spread, or big5/16pf/humor's independent-marginal resample) is far wider than the
+    # societies, so letting it set the frame buries the societies + steer in a tiny central blob. The
+    # cloud still scatters as a backdrop (clipped at the frame); the minimap below shows where this
+    # tight frame sits in the full cloud, so the macro spread is not lost.
     if cloud is not None:
         anc_extra = [traj_pts] if traj_pts is not None else []
         anc = np.vstack([P] + [p for p in (pb, ph, pf) if p is not None] + anc_extra)
-        ref = P if synthetic else Pi
-        cx, cy = np.percentile(ref[:, 0], [2, 98]), np.percentile(ref[:, 1], [2, 98])
+        cx, cy = np.percentile(P[:, 0], [2, 98]), np.percentile(P[:, 1], [2, 98])
         wx0, wx1 = min(cx[0], np.nanmin(anc[:, 0])), max(cx[1], np.nanmax(anc[:, 0]))
         wy0, wy1 = min(cy[0], np.nanmin(anc[:, 1])), max(cy[1], np.nanmax(anc[:, 1]))
         sx, sy = wx1 - wx0, wy1 - wy0
@@ -298,7 +298,7 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         bx, by = corners[name]
         return int(((fx >= bx) & (fx <= bx + 0.30) & (fy >= by) & (fy <= by + 0.27)).sum())
     ranked = sorted(corners, key=crowd)
-    want_minimap = synthetic and cloud is not None
+    want_minimap = cloud is not None
     comp_corner = ranked[1] if want_minimap else ranked[0]
     if want_minimap:
         mb = corners[ranked[0]]
@@ -371,8 +371,16 @@ def plot_splom(instr: Instrument, dims: list[str], cloud: np.ndarray, M: np.ndar
             ax = axes[r][c]
             ax.tick_params(labelsize=6, length=2)
             if r == c:                                          # marginal + AI rules
-                ax.hist(cloud_n[:, fr], bins=22, range=rng[fr], color=CLOUD_GREY,
-                        alpha=0.55, edgecolor="none")
+                if zoom:
+                    # the zoom window is too narrow for a histogram (it slices the marginal into a few
+                    # solid blocks); show society means as a visible mid-panel rug instead, so the
+                    # society context + AI steer rules both read in the tight window.
+                    ax.scatter(M_n[:, fr], np.full(M_n.shape[0], 0.5), s=70, marker="|",
+                               color=COUNTRY_GREY, alpha=0.85, linewidths=0.8, zorder=3)
+                    ax.set_ylim(0, 1)
+                else:
+                    ax.hist(cloud_n[:, fr], bins=22, range=rng[fr], color=CLOUD_GREY,
+                            alpha=0.55, edgecolor="none")
                 for cc in cs:
                     if not np.isfinite(prof_n[cc][fr]):
                         continue
