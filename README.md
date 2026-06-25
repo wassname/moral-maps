@@ -1,16 +1,25 @@
 # tinymfv (tiny moral/value eval for local LLMs)
 
-A fast, sensitive eval that measures a local model's moral profile and whether an intervention
-(weight steering, a prompt, a fine-tune) moves it. Instead of sampling and parsing an answer, it
-prefills the answer slot and reads the next-token logprobs over the seven moral foundations, so a
-small steering vector shows up as a shift in nats long before it would flip a sampled argmax.
+tinymfv reads answer-token logprobs from local chat LMs and turns them into moral/value profiles.
+It is meant for fast steering experiments: prefill the answer slot, read the next-token
+distribution, and compare base vs steered runs in nats instead of waiting for sampled answers to
+flip.
 
-The default instrument is the Clifford moral-foundation vignettes (MFV): 132 scenarios, each with a
-human distribution over the foundations care / fairness / loyalty / authority / sanctity / liberty /
-social (Clifford et al. 2015). Three configs (`classic`, `scifi`, `ai-actor`), two framings each
-(`other_violate`, `self_violate`). [[HF dataset](https://huggingface.co/datasets/wassname/tiny-mfv)]
+There are two instrument kinds:
 
-![LLM vs 19 human societies on the moral-foundations map](docs/img/showcase/mfq2/map_pca_ipsative.png)
+- Nominal MFV vignettes: the answer is a foundation category. The profile is the mean probability
+  of care / fairness / loyalty / authority / sanctity / liberty / social.
+- Ordinal questionnaires: the answer is a scale point 1..M. MFQ-2, Big Five, 16PF, and Humor Styles
+  all use the same reader and reduce to per-factor Likert profiles.
+
+The default nominal instrument is the Clifford moral-foundation vignettes (MFV): 132 scenarios, each
+with a human distribution over foundations (Clifford et al. 2015). Three configs (`classic`,
+`scifi`, `ai-actor`), two framings each (`other_violate`, `self_violate`).
+[[HF dataset](https://huggingface.co/datasets/wassname/tiny-mfv)]
+
+![MFQ-2 culture map: LLM base and steered points against human societies](docs/img/showcase/mfq2/map_pca_ipsative.png)
+
+![MFQ-2 range plot: human society ranges beside the model steer path](docs/img/showcase/mfq2/range.png)
 
 ## Install
 
@@ -18,7 +27,24 @@ social (Clifford et al. 2015). Three configs (`classic`, `scifi`, `ai-actor`), t
 uv pip install git+https://github.com/wassname/tinymfv
 ```
 
-## Core API
+For maps:
+
+```bash
+uv pip install "tiny-mfv[maps] @ git+https://github.com/wassname/tinymfv"
+```
+
+For repo development:
+
+```bash
+git clone https://github.com/wassname/tinymfv
+cd tinymfv
+uv sync --extra maps --dev
+just smoke
+```
+
+## Use it
+
+Nominal MFV vignettes use `evaluate`:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -28,55 +54,120 @@ tok = AutoTokenizer.from_pretrained("Qwen/Qwen3-4B")
 model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen3-4B").cuda()
 
 vignettes = load_vignettes("classic")              # list[dict], one per scenario
-report = evaluate(model, tok, vignettes=vignettes) # dev mode: N=1, 64 think tokens
-print(report["top1_acc"], report["mean_pmass_allowed"])
-print(report["profile"])                           # mean p[foundation] vs the human profile
+report = evaluate(model, tok, vignettes=vignettes, return_per_row=True)
+print(report["mean_pmass_allowed"])
+print(report["per_row"][0]["score"])               # logprob score per foundation, nats
+print(report["profile"])                           # mean p[foundation], easier to read
 ```
 
-`load_vignettes(name)` returns the scenarios (each a dict with the prompt per framing and the human
-label distribution). `evaluate(model, tok, ...)` runs a forced-choice probe per (vignette,
-condition) and returns a dict with:
+Ordinal questionnaires use `administer`:
 
-- `profile`: mean `p[foundation]` across vignettes, on the same 7-way simplex as the human profile.
-- `top1_acc`, `informedness`, `mean_nll_T`: agreement vs the human label (None if the config is unlabeled).
-- `mean_pmass_allowed`: mean full-vocab probability mass on the allowed answer tokens at the answer
-  slot. This is answer-slot format coherence: it drops when the model wants to emit prose, refusal,
-  punctuation, or another out-of-space token, independent of which valid answer is top.
-- `mean_nll_prefill`: mean NLL/token of the forced assistant prefill that leads into the answer slot.
-- `per_row` (with `return_per_row=True`): the per-row 7-vec `p`, raw `score` (nats), `pmass_allowed`,
-  `nll_prefill`, `top1`, `margin`. This is what the steering metrics below consume.
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from tinymfv import administer, get_instrument
 
-To measure a steering intervention, run `evaluate` twice (base vs steered, same vignettes) and diff
-the reports. The steering-lite package wraps this as `evaluate_with_vector(model, tok, vector=v)`,
-which returns `raw_logratios[vid|cond][foundation] = logit(p[foundation])` for the two metrics below.
+tok = AutoTokenizer.from_pretrained("Qwen/Qwen3-4B")
+model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen3-4B").cuda()
 
-## The two steering metrics
+instr = get_instrument("mfq2")       # "mfq2", "big5", "16pf", or "humor_styles"
+report = administer(model, tok, instr)
+print(report["dimensions"])
+print(report["per_item_frame"][0]["lp"])           # raw logprobs for the answer tokens
+print(report["profile_E"])           # human-comparable factor means
+print(report["profile_C"])           # steer-sensitive logit contrast per factor
+print(report["mean_pmass_allowed"])
+```
 
-Both compare a steered report against a base report, per foundation.
+From a checkout, the small functional run is:
 
-**dlogit / dlogprob** (`dlogit_per_foundation`). The paired delta in the logit of the foundation
-probability:
+```bash
+just smoke
+just eval Qwen/Qwen3-0.6B classic
+```
 
-$$\Delta(\text{vid},\text{cond},f) = \mathrm{logit}\,p_{\text{steer}}[f] - \mathrm{logit}\,p_{\text{base}}[f]$$
+The plotting helpers live in `tinymfv.maps`; `scripts/plot_steer_showcase.py` shows the current
+map/range pipeline for steering-lite outputs.
 
-averaged over all (vignette, condition) pairs. Units are nats. Positive means the steer made the
-model more likely to call that foundation the violation; negative, less likely. It is paired
-(same vignette base vs steer) and calibration-free, so it does not saturate the way a probability
-delta would near 0 or 1. This is the continuous effect-size signal.
+## Reader math
 
-**SI -- Surgical Informedness** (`si_per_foundation` in steering-lite, the canonical implementation).
-A bidirectional, reference-anchored score that asks "did the steer move the model toward the intended
-direction at `+C` and away from it at `-C`, without breaking the rows that were already right?" Per
-foundation:
+For an answer set $A = \{a_1,\ldots,a_K\}$, tinymfv gathers the full-vocab logprobs at the answer
+tokens:
+
+$$\ell_k = \log P(a_k \mid \text{prompt}, \text{think trace}, \text{assistant prefill})$$
+
+The raw gathered vector $\ell$ is the primitive. Everything else is a pure readout:
+
+$$\mathrm{pmass\_allowed} = \sum_{k=1}^{K} \exp(\ell_k)$$
+
+$$p_k = \frac{\exp(\ell_k)}{\mathrm{pmass\_allowed}}$$
+
+`pmass_allowed` is answer-format coherence: high means the model put probability mass on valid
+answer tokens at the answer slot. Low means it wanted prose, punctuation, a refusal, or another
+out-of-space token. It does not say which valid answer is right.
+
+`nll_prefill` measures whether the forced assistant prefill itself fits the model:
+
+$$\mathrm{nll\_prefill} = -\frac{1}{J}\sum_{j=1}^{J} \log P(u_j \mid \text{context}, u_{<j})$$
+
+where $u_1,\ldots,u_J$ are the prefill tokens before the answer token. This catches scaffold
+friction before the answer slot; `pmass_allowed` catches the slot itself.
+
+## What to use
+
+Most research code should use the logprob-level outputs. They are sensitive and easy to interpret
+in relative terms: positive means the steer moved the answer up on that axis, negative means down,
+and the units are nats. For MFV, use per-row `score` or the paired `dlogit_per_foundation`. For
+ordinal questionnaires, use raw per-frame `lp` when you want the primitive, or `profile_C` when you
+want a factor-level steer readout.
+
+The value summaries are less sensitive but easier to interpret. MFV `profile` is mean
+foundation probability. Ordinal `profile_E` is the expected Likert score, in the human scale
+direction:
+
+$$E = \sum_{k=1}^{M} k p_k$$
+
+For reverse-keyed items, `keyed_E = M + 1 - E`. `E` is bounded, so it is good for comparing to human
+survey means but can hide small steering effects near confident answers. That is why the ordinal
+steering readout is the rank-centered logit contrast:
+
+$$C = \sum_{k=1}^{M} \left(k - \frac{M + 1}{2}\right)\ell_k$$
+
+The weights sum to zero, so any constant shift in the logprobs cancels. $C$ is invariant to
+renormalizing over the allowed answer tokens and linear in logprob changes:
+
+$$\Delta C = \sum_{k=1}^{M} \left(k - \frac{M + 1}{2}\right)(\ell^{\mathrm{steer}}_k - \ell^{\mathrm{base}}_k)$$
+
+For MFV, the equivalent sensitive readout is the paired change in foundation logit:
+
+$$\Delta_f(i,c) = \mathrm{logit}\,p^{\mathrm{steer}}_{i,c,f} - \mathrm{logit}\,p^{\mathrm{base}}_{i,c,f}$$
+
+averaged over vignette $i$ and condition $c$. Positive means the steer made the model more likely to
+call foundation $f$ the violation; negative means less likely.
+
+`logodds_agree` is the easier ordinal direction summary:
+
+$$\mathrm{logodds\_agree} =
+\log\sum_{k \in \mathrm{agree}} \exp(\ell_k)
+-
+\log\sum_{k \in \mathrm{disagree}} \exp(\ell_k)$$
+
+It drops the neutral middle option on odd scales. It is more readable than $C$, but it throws away
+rank information.
+
+Full return schemas live in the `TypedDict`s in `src/tinymfv/eval.py` and
+`src/tinymfv/administer.py`.
+
+## Steering plots
+
+![MFV steer effect: per-foundation delta logit for positive and negative poles](docs/img/showcase/mfv/foundation_dlogit.png)
+
+`si_per_foundation` lives in steering-lite. It is a stricter, thresholded flip metric: did the steer
+move rows toward the intended foundation at `+C` and away at `-C`, while penalizing rows that were
+already right and got broken?
 
 $$\mathrm{SI} = \mathrm{mean}(\mathrm{SI_{fwd}}, \mathrm{SI_{rev}}) \times \text{pmass\_scale}$$
 
-where `SI_fwd = fix_rate - k * broke_rate` (fixes are rows the steer flipped toward intent; broke are
-rows it flipped away, penalized `k`x), and `SI_rev` is the same on the `-C` pole. The reference is the
-base model's per-row decision at threshold logit=0 (p=0.5), so SI > 0 always means "moved toward
-intent at `+C` and away at `-C`". `pmass_scale = tanh(min margin)^2` softly drops methods whose K-way
-decision has collapsed. SI moves only when an answer flips, so it is less sensitive than dlogit but
-more robust: use dlogit for effect size, SI for "did the steer do the intended surgical thing".
+Use delta logit or delta $C$ for effect size. Use SI only when you care about thresholded decisions.
 
 ## Design notes
 
@@ -99,6 +190,13 @@ The reader is answer-space-agnostic: it gathers logprobs over answer tokens at a
   probability.
 - Ordinal instruments, MFQ-2 / Big-Five / 16PF / humor-styles, read a 1..M scale point and reduce to
   keyed expected score `E`, logit contrast `C`, `logodds_agree`, entropy, and `pmass_allowed`.
+
+The bundled public map references are:
+
+- `docs/img/showcase/mfq2/map_pca_ipsative.png`: culture map, model base and steer poles against
+  human societies.
+- `docs/img/showcase/mfq2/range.png`: per-factor human ranges beside the model steer path.
+- `docs/img/showcase/mfv/foundation_dlogit.png`: MFV per-foundation steer effect in nats.
 
 ## Scope
 

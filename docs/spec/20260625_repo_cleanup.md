@@ -15,6 +15,7 @@ Out: rewriting the model rollout core, changing steering-lite metrics.
 - R5: Python files compile. Done means: `python -m py_compile src/tinymfv/*.py scripts/*.py`. UAT: `/tmp/tinymfv_pycompile_cleanup.log`.
 - R6: The main functional path still runs. Done means: `just smoke` loads a real tiny HF model, evaluates 5 vignettes, and writes a result JSONL. UAT: `/tmp/tinymfv_smoke_cleanup.log` and `data/results/forced_choice_classic.jsonl`.
 - R7: Public prose avoids obvious AI-generated phrasing. Done means: humanizer lint has no OVER checks on README/spec. UAT: `/tmp/tinymfv_humanizer_lint_final.log`.
+- R8: README explains what tinymfv measures, how to run it, why logprob readouts are the main research handle, and how the map/range figures relate to the easier summaries. Done means: README contains `evaluate`, `administer`, `pmass_allowed`, `nll_prefill`, `score`, `lp`, `profile_E`, `profile_C`, `dlogit_per_foundation`, `si_per_foundation`, and tracked image links. UAT: `/tmp/tinymfv_readme_docs_check.log`.
 
 ## Tasks
 - [x] T1 (R1): Remove the dead `shuffle_dimensions` test and add nominal categorical reducer coverage.
@@ -24,11 +25,13 @@ Out: rewriting the model rollout core, changing steering-lite metrics.
 - [x] T5 (R4): Update public docs and comments away from legacy JS headline and stale "wiring in progress" text.
 - [x] T6 (R5/R6): Run UAT commands and record paths.
 - [x] T7 (R7): Run humanizer on README/spec prose and fix mechanical tells.
+- [x] T8 (R8): Rewrite README around the measured quantities: raw logprobs first, easier value summaries second, then showcase figures.
 
 ## Log
 - 2026-06-25: `shuffle_dimensions` was removed in commit `abfe0e1`, but tests still import it.
 - 2026-06-25: Root and packaged vignette JSONL currently hash-identical, so deleting root duplicates should not change eval data.
 - 2026-06-25: Branch `creating-tinymfv` exists before deleting the OpenRouter creation scripts from main.
+- 2026-06-25: README had the MFQ-2 culture-map image and MFV steering metrics, but it did not show the range plot or the ordinal `administer` path.
 
 ## UAT
 - Human-readable evidence file: `docs/spec/20260625_repo_cleanup_uat.md`.
@@ -37,6 +40,8 @@ Out: rewriting the model rollout core, changing steering-lite metrics.
 - `just smoke`: PASS, 5 Qwen/Qwen3-0.6B vignette rows, `mean_pmass_allowed=0.985396534204483`, result at `data/results/forced_choice_classic.jsonl`, see `/tmp/tinymfv_smoke_cleanup.log`.
 - `python - <<'PY' ... data/results/forced_choice_classic.jsonl`: PASS, first result row includes `p`, `score`, `label`, `pmass_allowed`, `nll_prefill`, `top1`, and `margin`.
 - `python3 /home/wassname/.agents/skills/humanizer/lint.py README.md docs/spec/20260625_repo_cleanup.md`: PASS, no OVER checks, see `/tmp/tinymfv_humanizer_lint_final.log`.
+- `python - <<'PY' ... README.md`: PASS, required terms and all README image links present, see `/tmp/tinymfv_readme_docs_check.log`.
+- `python3 /home/wassname/.agents/skills/humanizer/lint.py README.md docs/spec/20260625_repo_cleanup.md docs/spec/20260625_repo_cleanup_uat.md`: PASS, no OVER checks, see `/tmp/tinymfv_humanizer_lint_readme_followup.log`.
 - `rg -n 'mean_js|median_js|max_js|nll_json|mean_nll_json|agree_logodds|logodds\b|keyed_logodds\b|openrouter|OpenRouter|OPENROUTER|openrouter_request|shuffle_dimensions|\bJS\b|Jensen|jensen' src scripts tests README.md pyproject.toml justfile`: PASS, output empty.
 - `rg -n 'ROOT / "data" / f"vignettes|ROOT / "data" / "vignettes' scripts src`: PASS, output empty.
 - `git branch --list creating-tinymfv`: PASS, branch exists.

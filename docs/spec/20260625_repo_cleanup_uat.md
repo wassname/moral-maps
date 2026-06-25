@@ -82,6 +82,58 @@ docs/spec/20260625_repo_cleanup_uat.md: 19 prose lines
 check                  count  budget  status
 ```
 
+## README follow-up
+
+Command:
+
+```sh
+python - <<'PY' 2>&1 | tee /tmp/tinymfv_readme_docs_check.log
+...
+PY
+```
+
+Result excerpt:
+
+```text
+required_terms_missing: []
+image_links: ['docs/img/showcase/mfq2/map_pca_ipsative.png', 'docs/img/showcase/mfq2/range.png', 'docs/img/showcase/mfv/foundation_dlogit.png']
+missing_image_links: []
+tracked_image_links: ['docs/img/showcase/mfq2/map_pca_ipsative.png', 'docs/img/showcase/mfq2/range.png', 'docs/img/showcase/mfv/foundation_dlogit.png']
+README docs check: PASS
+```
+
+Humanizer follow-up command:
+
+```sh
+python3 /home/wassname/.agents/skills/humanizer/lint.py README.md docs/spec/20260625_repo_cleanup.md docs/spec/20260625_repo_cleanup_uat.md
+```
+
+Result excerpt from `/tmp/tinymfv_humanizer_lint_readme_followup.log`:
+
+```text
+README.md: 108 prose lines
+check                  count  budget  status
+tricolon                   1       -  info
+
+docs/spec/20260625_repo_cleanup.md: 41 prose lines
+check                  count  budget  status
+
+docs/spec/20260625_repo_cleanup_uat.md: 25 prose lines
+check                  count  budget  status
+```
+
+Fresh-eyes review:
+
+```text
+no blockers.
+README diff answers the latest ask well: raw answer-token logprobs are the primitive;
+pmass_allowed/nll_prefill are defined; sensitive relative readouts are score, lp,
+dlogit_per_foundation, and delta C; easier value summaries are profile, profile_E,
+and logodds_agree. Artifact sweeps found no tracked/staged __pycache__, .pyc,
+data/results, logs, root duplicate data, OpenRouter, multilabel, separation, or
+calibration junk.
+```
+
 ## stale-name sweeps
 
 Command:
