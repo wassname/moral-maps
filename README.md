@@ -184,19 +184,33 @@ Use delta logit or delta $C$ for effect size. Use SI only when you care about th
 ## Instruments
 
 The reader is answer-space-agnostic: it gathers logprobs over answer tokens at a prefilled slot
-(`src/tinymfv/instrument.py`).
+(`src/tinymfv/instrument.py`). Ordinal instruments read a 1..M Likert point and reduce to a keyed
+expected score `E`, the rank-centered logit contrast `C`, `logodds_agree`, entropy, and
+`pmass_allowed`; the nominal MFV vignettes read a foundation category and reduce to the log-prob over
+foundations (`dlogit`).
 
-- Nominal instruments, the MFV vignettes, read a foundation category and reduce to mean category
-  probability.
-- Ordinal instruments, MFQ-2 / Big-Five / 16PF / humor-styles, read a 1..M scale point and reduce to
-  keyed expected score `E`, logit contrast `C`, `logodds_agree`, entropy, and `pmass_allowed`.
+"Ways asked" is the per-item debias: ordinal items are presented in three reworded framings
+(forward / scale-inverted / content-negated, canonicalized and averaged, which cancels acquiescence);
+MFV runs two option-order passes (forward / reversed enumeration, which cancels position bias).
 
-The bundled public map references are:
+| instrument | items | ways asked | measure | per-respondent | per-country | per-item human | source |
+| :--- | ---: | :--- | :--- | :--- | ---: | :--- | :--- |
+| MFQ-2 (Moral Foundations) | 36 | 3 reworded framings | log-odds + contrast `C`, 1-5 Likert | yes (raw) | 19 | no | Atari et al. 2023 |
+| Big Five | 50 | 3 reworded framings | log-odds + contrast `C`, 1-5 Likert | no | 24 | no | BFI (country source not recorded in-repo) |
+| 16PF | 162 | 3 reworded framings | log-odds + contrast `C`, 1-5 Likert | no | 34 | no | Cattell 16PF (country source not recorded) |
+| Humor Styles | 32 | 3 reworded framings | log-odds + contrast `C`, model 1-5 / human 1-7 | no | 28 | no | Martin et al. 2003 |
+| MFV (Moral Foundations Vignettes) | 132 | 2 option-order passes | log-prob over 7-way categorical (`dlogit`) | no | 5 | yes (per-vignette) | Clifford et al. 2015; norms JimenezLeal2025 + Yamada2025 |
 
-- `docs/img/showcase/mfq2/map_pca_ipsative.png`: culture map, model base and steer poles against
+Items is the unique-item count; ordinal items are each scored x3 framings. Per-respondent = raw
+individual human data is bundled (MFQ-2 ships Atari et al. Study 2 respondents, used for the SPLOM and
+the PCA basis); per-country = number of societies with published mean+sd; per-item human = per-question
+human distribution (only the MFV vignettes carry Clifford's per-vignette ratings).
+
+The bundled public showcase figures (per instrument, identical layout) are:
+
+- `docs/img/showcase/<instr>/map_pca_ipsative.png`: culture map, model base and steer poles against
   human societies.
-- `docs/img/showcase/mfq2/range.png`: per-factor human ranges beside the model steer path.
-- `docs/img/showcase/mfv/foundation_dlogit.png`: MFV per-foundation steer effect in nats.
+- `docs/img/showcase/<instr>/range.png`: per-factor human ranges beside the model steer path.
 
 ## Scope
 
