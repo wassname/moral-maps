@@ -29,19 +29,11 @@ SPLITS = ["other_violate", "self_violate"]
 
 
 def local_jsonl(file_key: str, split: str) -> Path:
-    return ROOT / "data" / f"vignettes_{file_key}_{split}.jsonl"
-
-
-def local_csv(file_key: str) -> Path:
-    return ROOT / "data" / f"vignettes_{file_key}.csv"
+    return ROOT / "src" / "tinymfv" / "data" / f"vignettes_{file_key}_{split}.jsonl"
 
 
 def hf_jsonl(cfg: str, split: str) -> str:
     return f"{cfg}/vignettes_{split}.jsonl"
-
-
-def hf_csv(cfg: str) -> str:
-    return f"{cfg}/vignettes.csv"
 
 
 def yaml_configs() -> str:
@@ -108,12 +100,12 @@ violated foundation.
 
 Each vignette row also includes `ai_*` diagnostic labels across all 7 foundations.
 
-Method, see `scripts/07_multilabel.py`:
+Historical method:
 
-1. Prompt framing: a judge LLM rates each scenario on all 7 foundations using a 1–5 Likert scale.
+1. Prompt framing: a judge LLM rated each scenario on all 7 foundations using a 1–5 Likert scale.
    Foundation definitions are drawn from the Clifford et al. (2015) survey rubric ("It violates norms of harm or care…", etc.).
-2. Bias mitigation: each scenario is rated twice, once asking "how much does this violate?" and once asking "how acceptable is this?". Each frame is z-scored per foundation across all items, averaged, and mapped back to Likert scale.
-3. Rescale: on the classic set, where we have human rater percentages, we fit a per-foundation linear mapping from judge Likert score to human percentage. This rescale is applied to all sets.
+2. Bias mitigation: each scenario was rated twice, once asking "how much does this violate?" and once asking "how acceptable is this?". Each frame was z-scored per foundation across all items, averaged, and mapped back to Likert scale.
+3. Rescale: on the classic set, where we have human rater percentages, a per-foundation linear mapping from judge Likert score to human percentage was fit and applied to all sets.
 
 Columns added per vignette:
 
@@ -138,7 +130,7 @@ Calibration quality on classic, n=132:
 ## Eval
 
 Use `tinymfv.evaluate(model, tokenizer, name="classic")`. It returns a per-foundation
-table plus `top1_acc`, `mean_js`, and `median_js` against the `human_*` label
+table plus `top1_acc`, `informedness`, and `mean_nll_T` against the `human_*` label
 distribution. Full eval: see [tiny-mfv on GitHub](https://github.com/wassname/tinymfv).
 Source vignettes: https://github.com/peterkirgis/llm-moral-foundations
 """
@@ -151,7 +143,6 @@ def main():
 
     files: list[tuple[Path, str]] = []
     for cfg, file_key in CONFIGS.items():
-        files.append((local_csv(file_key), hf_csv(cfg)))
         for split in SPLITS:
             files.append((local_jsonl(file_key, split), hf_jsonl(cfg, split)))
 

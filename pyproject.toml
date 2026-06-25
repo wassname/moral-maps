@@ -6,16 +6,10 @@ requires-python = ">=3.11"
 dependencies = [
     "transformers>=5.7",
     "torch",
-    "accelerate",
     "pandas",
     "loguru",
-    "python-dotenv",
-    "tyro",
-    "openai>=1.40",
-    "httpx",
     "tqdm",
     "tabulate",
-    "datasets",
     "numpy",
 ]
 
@@ -29,12 +23,8 @@ maps = [
 
 [dependency-groups]
 dev = [
-    "openrouter-wrapper",
     "scipy>=1.17.1",
 ]
-
-[tool.uv.sources]
-openrouter-wrapper = { git = "https://github.com/wassname/openrouter_wrapper" }
 
 [build-system]
 requires = ["hatchling"]

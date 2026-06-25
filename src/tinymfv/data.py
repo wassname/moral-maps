@@ -1,12 +1,9 @@
 """Dataset loading. Reads per-condition jsonls and inner-joins by id, returning
 the packed structure the eval consumes.
 
-Files used by eval (both paraphrased rewrites, both OOD relative to verbatim source):
-    data/vignettes[_<name>]_other_violate.jsonl   (3rd-person paraphrase of origin)
-    data/vignettes[_<name>]_self_violate.jsonl    (1st-person rewrite)
-
-Side artifact (not used by eval, kept for human-correlation sanity check):
-    data/vignettes[_<name>]_origin.jsonl          (verbatim source, train-set risk)
+Files used by eval live in `src/tinymfv/data/`:
+    vignettes_<name>_other_violate.jsonl   (3rd-person paraphrase of origin)
+    vignettes_<name>_self_violate.jsonl    (1st-person rewrite)
 
 Each row: {id, foundation, foundation_coarse, wrong, text}.
 
@@ -45,7 +42,7 @@ def _load_jsonl(p: Path) -> list[dict]:
     return [json.loads(line) for line in p.read_text().splitlines() if line.strip()]
 
 
-# Legacy column names from the source jsonls -> normalised `human_*` keys.
+# Source-column aliases from the jsonls -> normalised `human_*` keys.
 # "Not Wrong" is the Clifford et al. (2015) social-norms control option
 # ("the act is morally fine"), which maps to our SocialNorms foundation.
 _HUMAN_LEGACY: dict[str, str] = {
@@ -128,8 +125,8 @@ def load_vignettes(name: ConfigName = "classic") -> list[dict]:
             "set": cfg,
         }
         # Pass through extra keys (ai_*, human_*, etc.); also normalise the
-        # legacy stringified percent columns ('Care': '83 %') into numeric
-        # `human_*` keys so eval can read a single label schema.
+        # source percent columns ('Care': '83 %') into numeric `human_*` keys
+        # so eval reads a single label schema.
         for k, v in ov.items():
             if k in _CORE_KEYS or k in row:
                 continue
