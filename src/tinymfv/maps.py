@@ -221,6 +221,7 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     placed_boxes = []
+    soc_labels = []                                    # kept artists, pruned later if under compass/minimap
     for i in np.argsort(P[:, 0]):                      # left-to-right; leftmost wins contested space
         t = ax.annotate(countries[i], (P[i, 0], P[i, 1]), fontsize=7, color="#555555",
                         xytext=(3, 2), textcoords="offset points", zorder=6)
@@ -228,7 +229,7 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         if any(bb.overlaps(b) for b in placed_boxes):
             t.remove()
         else:
-            placed_boxes.append(bb)
+            placed_boxes.append(bb); soc_labels.append(t)
     for key, col, pt in [("base", C_BASE, pb), ("honest", C_HON, ph), ("dis", C_DIS, pf)]:
         if boots and key in boots and pt is not None:
             bp = (np.asarray(boots[key]) @ Pc - mu) @ Vt[:2].T
@@ -292,11 +293,20 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     xlo, xhi = ax.get_xlim(); ylo, yhi = ax.get_ylim()
     allpts = np.vstack([P] + [p for p in (pb, ph, pf) if p is not None]
                        + ([traj_pts] if traj_pts is not None else []))
-    fx = (allpts[:, 0] - xlo) / (xhi - xlo); fy = (allpts[:, 1] - ylo) / (yhi - ylo)
     corners = {"TR": (0.62, 0.70), "TL": (0.04, 0.70), "BR": (0.62, 0.04), "BL": (0.04, 0.04)}
+    # crowd score counts data points AND the already-drawn text labels (society codes, steer/trajectory
+    # labels) inside each corner box -- so the compass avoids landing on labels, not only on dots.
+    fig.canvas.draw()
+    rend = fig.canvas.get_renderer()
+    pts_disp = ax.transData.transform(allpts)
+    txt_disp = np.array([((e.x0 + e.x1) / 2, (e.y0 + e.y1) / 2)
+                         for t in ax.texts for e in [t.get_window_extent(rend)]])
+    occ = np.vstack([pts_disp, txt_disp]) if len(txt_disp) else pts_disp
     def crowd(name):
         bx, by = corners[name]
-        return int(((fx >= bx) & (fx <= bx + 0.30) & (fy >= by) & (fy <= by + 0.27)).sum())
+        p0 = ax.transAxes.transform((bx, by)); p1 = ax.transAxes.transform((bx + 0.30, by + 0.27))
+        return int(((occ[:, 0] >= p0[0]) & (occ[:, 0] <= p1[0]) &
+                    (occ[:, 1] >= p0[1]) & (occ[:, 1] <= p1[1])).sum())
     ranked = sorted(corners, key=crowd)
     want_minimap = cloud is not None
     comp_corner = ranked[1] if want_minimap else ranked[0]
@@ -305,6 +315,15 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         _minimap(ax, Pi, P, pb, (xlo, xhi, ylo, yhi), box=(mb[0], mb[1], 0.26, 0.26))
     cb = corners[comp_corner]
     compass(ax, Vt[:2].T, dims, title=f"{instr.display} compass", box=(cb[0], cb[1], 0.30, 0.27))
+    # final guard: drop any society label still sitting under the compass (or minimap) inset box, so the
+    # legend never overlaps a code. Labels are lower-priority than the legend -> omit, don't relocate.
+    reserved = [(cb[0], cb[1], 0.30, 0.27)] + ([(mb[0], mb[1], 0.26, 0.26)] if want_minimap else [])
+    boxes_disp = [(ax.transAxes.transform((bx, by)), ax.transAxes.transform((bx + w, by + h)))
+                  for bx, by, w, h in reserved]
+    for t in soc_labels:
+        e = t.get_window_extent(renderer)
+        if any(e.x1 >= p0[0] and e.x0 <= p1[0] and e.y1 >= p0[1] and e.y0 <= p1[1] for p0, p1 in boxes_disp):
+            t.remove()
     ax.set_xlabel(f"PC1 ({var[0]*100:.0f}% var) · {_axis_gloss(Vt[0], dims)}")
     ax.set_ylabel(f"PC2 ({var[1]*100:.0f}% var) · {_axis_gloss(Vt[1], dims)}")
     ax.set_title(f"{instr.name}: ipsative culture map ({len(countries)} societies)", fontsize=10)
@@ -370,27 +389,31 @@ def plot_splom(instr: Instrument, dims: list[str], cloud: np.ndarray, M: np.ndar
             fc = order[c]
             ax = axes[r][c]
             ax.tick_params(labelsize=6, length=2)
-            if r == c:                                          # marginal + AI rules
-                if zoom:
-                    # the zoom window is too narrow for a histogram (it slices the marginal into a few
-                    # solid blocks); show society means as a visible mid-panel rug instead, so the
-                    # society context + AI steer rules both read in the tight window.
-                    ax.scatter(M_n[:, fr], np.full(M_n.shape[0], 0.5), s=70, marker="|",
-                               color=COUNTRY_GREY, alpha=0.85, linewidths=0.8, zorder=3)
-                    ax.set_ylim(0, 1)
-                else:
-                    ax.hist(cloud_n[:, fr], bins=22, range=rng[fr], color=CLOUD_GREY,
-                            alpha=0.55, edgecolor="none")
+            if r == c:                                          # human distribution (violin) + AI steer
+                # horizontal violin = human spread of this foundation; AI base/+C/-C ride on it as the
+                # same trajectory dots used off-diagonal (1-D analogue), so the diagonal reads the same way.
+                vp = ax.violinplot(cloud_n[:, fr], positions=[0.5], vert=False, widths=0.9,
+                                   showextrema=False)
+                for b in vp["bodies"]:
+                    b.set_facecolor(CLOUD_GREY); b.set_alpha(0.5); b.set_edgecolor("none")
+                ax.plot([prof_n[cc][fr] for cc in cs], [0.5] * len(cs), "-", color="0.5", lw=0.7, zorder=4)
+                cmax = max(abs(cc) for cc in cs) or 1.0
                 for cc in cs:
                     if not np.isfinite(prof_n[cc][fr]):
                         continue
                     col = "black" if cc == 0 else (POS_COL if cc > 0 else NEG_COL)
-                    ax.axvline(prof_n[cc][fr], color=col, lw=(1.6 if cc == 0 else 0.9), zorder=5)
-                ax.set_xlim(*rng[fr]); ax.set_yticks([])
-                ax.text(0.5, 0.86, dims[fr], transform=ax.transAxes, ha="center", va="top",
+                    ax.scatter(prof_n[cc][fr], 0.5, s=(34 if cc == 0 else 14 + 18 * abs(cc) / cmax),
+                               color=col, edgecolors="white", linewidths=0.4, zorder=6)
+                ax.set_xlim(*rng[fr]); ax.set_ylim(0, 1); ax.set_yticks([])
+                ax.text(0.5, 0.94, dims[fr], transform=ax.transAxes, ha="center", va="top",
                         fontsize=7.5, fontweight="bold", color="0.25")
             elif r > c:                                         # joint scatter + trajectory
-                ax.scatter(cloud_n[:, fc], cloud_n[:, fr], s=3, color=CLOUD_GREY, alpha=0.10,
+                # jitter the respondent cloud: MFQ-2 per-foundation scores are ordinal, so raw points
+                # land on a lattice that reads as confusing grid-dots; jitter softens it to a density.
+                jit = 0.05 * (smax - 1)
+                ax.scatter(cloud_n[:, fc] + rngen.uniform(-jit, jit, cloud_n.shape[0]),
+                           cloud_n[:, fr] + rngen.uniform(-jit, jit, cloud_n.shape[0]),
+                           s=3, color=CLOUD_GREY, alpha=0.10,
                            edgecolors="none", zorder=1, rasterized=True)
                 ax.scatter(M_n[:, fc], M_n[:, fr], s=9, color=COUNTRY_GREY, alpha=0.75,
                            edgecolors="none", zorder=2)
