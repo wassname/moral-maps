@@ -17,9 +17,17 @@ with a human distribution over foundations (Clifford et al. 2015). Three configs
 `scifi`, `ai-actor`), two framings each (`other_violate`, `self_violate`).
 [[HF dataset](https://huggingface.co/datasets/wassname/tiny-mfv)]
 
-![MFQ-2 culture map: LLM base and steered points against human societies](docs/img/showcase/mfq2/map_pca_ipsative.png)
+The bundled showcase steers Qwen3-4B with one activation vector, extracted once from
+`wassname/moral_stories_foundations` fairness situations (mean activation difference, fairness vs a
+balanced sample of the other foundations, situations only, no completions), iso-KL calibrated, then
+read across every instrument at base / +c / -c. On MFQ-2 it selectively raises the equality factor
+(the only factor that rises at the gentlest +c; it falls under -c); on the MFV vignettes it raises
+the Fairness foundation directionally but care leads, so the vector is fairness-leaning rather than a
+clean fairness isolator.
 
-![MFQ-2 range plot: human society ranges beside the model steer path](docs/img/showcase/mfq2/range.png)
+![MFQ-2 culture map: base and fairness-steered points against human societies](docs/img/showcase/mfq2/map_pca_ipsative.png)
+
+![MFQ-2 range plot: human society ranges beside the fairness steer path; equality rises at +c](docs/img/showcase/mfq2/range.png)
 
 ## Install
 
@@ -159,7 +167,7 @@ Full return schemas live in the `TypedDict`s in `src/tinymfv/eval.py` and
 
 ## Steering plots
 
-![MFV steer effect: per-foundation delta logit for positive and negative poles](docs/img/showcase/mfv/foundation_dlogit.png)
+![MFV range plot: per-foundation emphasis, fairness steer at +c / -c against human societies](docs/img/showcase/mfv/range.png)
 
 `si_per_foundation` lives in steering-lite. It is a stricter, thresholded flip metric: did the steer
 move rows toward the intended foundation at `+C` and away at `-C`, while penalizing rows that were
