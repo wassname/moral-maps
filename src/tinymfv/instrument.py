@@ -167,13 +167,3 @@ def reduce_ordinal(items: dict[str, dict], instr: Instrument) -> np.ndarray:
         agr = (instr.scale_max + 1 - E) if it["sign"] < 0 else E
         by_dim[it["dimension"]].append(agr)
     return np.array([float(np.mean(by_dim[d])) for d in instr.dimensions])
-
-
-# --- negative control (currently unwired): shuffle item->dimension; the shuffled profile's
-# correlation with the true profile must collapse to chance, else the signal is a layout artifact.
-# A non-null steering result is only interpretable once this passes. ---
-
-def shuffle_dimensions(items: dict[str, dict], rng: np.random.Generator) -> dict[str, dict]:
-    dims = [it["dimension"] for it in items.values()]
-    rng.shuffle(dims)
-    return {iid: {**it, "dimension": d} for (iid, it), d in zip(items.items(), dims)}
