@@ -109,9 +109,14 @@ $$\mathrm{pmass\_allowed} = \sum_{k=1}^{K} \exp(\ell_k)$$
 
 $$p_k = \frac{\exp(\ell_k)}{\mathrm{pmass\_allowed}}$$
 
-`pmass_allowed` is answer-format coherence: high means the model put probability mass on valid
-answer tokens at the answer slot. Low means it wanted prose, punctuation, a refusal, or another
-out-of-space token. It does not say which valid answer is right.
+`pmass_allowed` is answer-format coherence: mass on valid answer tokens at the answer slot. The
+slot is force-prefilled, so the scaffold primes a valid token and `pmass_allowed` is pinned high
+under the forced-choice path. Treat it as a format floor, not a sensitive coherence gate: a steered
+run that has broken the model can still score `pmass_allowed` near 1.0. The two signals that carry
+coherence instead are `frac_unscorable` (rows with no scorable slot, a self-closed think with no
+answer or a blown-up forward; near 0 once the end-of-answer tokens are suppressed over the budget)
+and `nll_prefill` below (does the scaffold still fit the model). pmass does not say which valid
+answer is right.
 
 `nll_prefill` measures whether the forced assistant prefill itself fits the model:
 
@@ -185,7 +190,9 @@ Use delta logit or delta $C$ for effect size. Use SI only when you care about th
   vectors averaged, cancelling option-order effects ([Pezeshkpour & Hruschka 2023](https://arxiv.org/abs/2308.11483)).
 - A sliding think budget. `max_think_tokens` (0 / 64 dev default / 4096 / unbounded) is a setting you
   sweep: steering accrues over the think trace, so the same vector moves the profile more with more
-  think, up to the point (~512) where the model closes `</think>` on its own and the readout collapses.
+  think. The model's end-of-answer tokens (eos and `</think>`) are suppressed over the budget, so it
+  cannot self-close mid-trace into an unscorable state; every read is taken at the same forced slot,
+  comparable across base and steered, instead of the old readout collapse once the model self-closed.
 - Two modes. dev (N=1, greedy, 64 think) is fast and granular, the default. full (N=4 sampled traces
   per ordering, Bayesian-model-averaged, high think) adds sampling-variance uncertainty and SI.
 
