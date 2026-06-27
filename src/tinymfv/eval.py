@@ -437,7 +437,13 @@ def evaluate(
             "T": T, "informedness": informedness, "mean_pmass_allowed": mean_pmass_allowed,
             "frac_unscorable": frac_unscorable, "mean_nll_prefill": mean_nll_prefill,
         }.items() if v is not None}
-        logger.debug("aux stats: " + json.dumps(aux))
+        logger.debug(
+            "aux stats: " + json.dumps(aux) + "\n"
+            "SHOULD: mean_pmass_allowed stays near base (model answers in-format) and informedness > 0 "
+            "(discriminates the violated foundation above chance). If pmass_allowed falls or "
+            "frac_unscorable rises while informedness -> 0, the steer broke FORMAT -> the moral "
+            "numbers are noise, not signal (the steer/breakage confound)."
+        )
         if verbose >= 2:
             # full first-row score dump + profile table (DEMO A trace already printed
             # above in the rollout, first batch).
