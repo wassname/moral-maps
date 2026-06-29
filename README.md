@@ -4,15 +4,29 @@ tinymfv is a small set of quick value evals for local LLM steering work. It is s
 
 It asks moral vignettes and survey questions, reads the model's answer probabilities, and compares the model profile to human responses. The main use case is simple: after you steer a model, did the intended values move, did nearby values move too, and does the result still look like a coherent answer?
 
-The plots are the point. Range plots show where the model sits relative to human societies. Culture maps show the base model and steered models on a PCA map of human response profiles.
+Range plots show where the model sits relative to human societies. Culture maps show the base model and steered models on a PCA map of human response profiles.
 
 ![MFQ-2 range plot: human society ranges beside the fairness steer path](docs/img/showcase/mfq2/range.png)
+
+![MFQ-2 culture map: base and fairness-steered points against human societies](docs/img/showcase/mfq2/map_pca_ipsative.png)
+
+![Big Five range plot: fairness steer path per trait against human society ranges](docs/img/showcase/big5/range.png)
+
+![Big Five culture map with the steering trajectory](docs/img/showcase/big5/map_pca_ipsative.png)
+
+![16PF range plot: fairness steer path across all 16 factors](docs/img/showcase/16pf/range.png)
+
+![16PF culture map with the steering trajectory](docs/img/showcase/16pf/map_pca_ipsative.png)
+
+![Humor Styles range plot: fairness steer path per style against human ranges](docs/img/showcase/humor_styles/range.png)
+
+![Humor Styles culture map with the steering trajectory](docs/img/showcase/humor_styles/map_pca_ipsative.png)
 
 ![MFV culture map: base and fairness-steered points against human countries](docs/img/showcase/mfv/map_pca_ipsative.png)
 
 ![MFV range plot: Care moves most under the fairness vector](docs/img/showcase/mfv/range.png)
 
-More maps are in `docs/img/showcase/` for MFQ-2, Big Five, 16PF, and Humor Styles. The plotting script now defaults to clean base / +C / -C maps; use `--show-sweep` when you want the diagnostic `c=-4..+4` trajectory.
+The plotting script defaults to clean base / +C / -C maps; use `--show-sweep` when you want the diagnostic `c=-4..+4` trajectory.
 
 ## Install
 
@@ -66,7 +80,8 @@ vignettes = load_vignettes("classic")  # "classic", "scifi", "ai-actor", or "all
 report = evaluate(model, tok, vignettes=vignettes, return_per_row=True)
 
 print(report["profile"])              # mean probability per foundation
-print(report["mean_pmass_allowed"])   # probability mass on valid answer tokens
+print(report["informedness"])         # chance-corrected argmax agreement with human labels
+print(report["mean_pmass_allowed"])   # mean valid-answer mass across rows
 print(report["per_row"][0]["score"])  # foundation logprobs, in nats
 ```
 
@@ -83,32 +98,56 @@ instr = get_instrument("mfq2")  # "mfq2", "big5", "16pf", or "humor_styles"
 report = administer(model, tok, instr)
 
 print(report["dimensions"])
-print(report["profile_E"])                # human-comparable scale means
-print(report["profile_C"])                # steering-sensitive log contrast
+print(report["profile_E"])                # expected survey score, for human comparison
+print(report["profile_C"])                # log contrast, for steering deltas
 print(report["per_item_frame"][0]["lp"])  # raw answer-token logprobs
+```
+
+Generate the bundled range plots and culture maps from a steering-lite all-instrument run:
+
+```bash
+uv run python scripts/plot_steer_showcase.py \
+  --run-dir ../steering-lite/outputs/allinstr_qwen35_4b \
+  --out docs/img/showcase
 ```
 
 ## Metrics
 
-There are two metric families.
+There are two metric families: human-comparison metrics for maps and logprob metrics for steering deltas.
 
-Human-comparison metrics are bounded and easy to plot against survey data.
+### Moral foundation profile (`profile`)
 
 For MFV, the profile is the mean probability of each foundation:
 
 $$p_f = \mathbb{E}_i\,P(f \mid i)$$
 
-For surveys, `profile_E` is the expected scale score, reverse-keyed where needed:
+Use this for human-comparison plots. It is bounded and easy to read.
+
+### Expected survey score (`profile_E`)
+
+For surveys, the expected score is the mean 1-5 answer after reverse-keying where needed:
 
 $$E_i = \sum_{k=1}^{M} k p_{i,k}$$
 
-Steering metrics are logprob based. They are more sensitive because they move before the sampled answer flips.
+Use this for human-comparison plots. It is bounded, so it can hide small steering effects near confident answers. The plot CSV stores the same quantity in its `mean` column.
+
+### Chance-corrected MFV agreement (`informedness`)
+
+For MFV, `informedness` is macro Youden's J between the model argmax and the human modal foundation. It is in `[-1, 1]`, where `0` is chance and `1` is perfect.
+
+Use this when you care about answer flips. It is the same metric family as steering-lite's surgical informedness, but this repo reports it as `informedness`.
+
+### Answer-token logprobs (`lp`)
 
 At the answer slot, tinymfv gathers the logprobs for the allowed answers:
 
 $$\ell_k = \log P(a_k \mid \mathrm{prompt}, \mathrm{think}, \mathrm{prefill})$$
 
-For surveys, `profile_C` is the steering-sensitive direction score. It weights high agreement tokens positive and low agreement tokens negative, using logprobs instead of bounded survey means:
+This is the raw readout. The steering metrics below are functions of these logprobs.
+
+### Survey log contrast (`profile_C`, per-factor `C`)
+
+For surveys, the log contrast is the steering-sensitive direction score. It weights high agreement tokens positive and low agreement tokens negative, using answer-token logprobs instead of bounded survey means:
 
 $$C_i = \sum_{k=1}^{M} \left(k - \frac{M + 1}{2}\right)\ell_{i,k}$$
 
@@ -116,15 +155,31 @@ Use `delta C` for survey steering effects:
 
 $$\Delta C_i = C_i^{\mathrm{steered}} - C_i^{\mathrm{base}}$$
 
-For MFV, use the paired foundation logit change:
+### Paired MFV logit delta
 
-$$\Delta_{i,f} = \operatorname{logit} p_{i,f}^{\mathrm{steered}} - \operatorname{logit} p_{i,f}^{\mathrm{base}}$$
+For MFV steering effects, use the paired foundation logit change:
 
-`pmass_allowed` is a format check, not a value score:
+$$\Delta_{i,f} = \mathrm{logit}\,p_{i,f}^{\mathrm{steered}} - \mathrm{logit}\,p_{i,f}^{\mathrm{base}}$$
+
+Positive means the steer made foundation $f$ more likely for that vignette. Negative means less likely.
+
+`evaluate()` gives you per-row foundation `score` and `profile`; compare base and steered runs to compute this delta. The bundled showcase reads the already-aggregated version, `dlogit_per_foundation`, from steering-lite's `mfv.json` artifact.
+
+### Allowed-answer mass (`pmass_allowed`, `mean_pmass_allowed`)
+
+`pmass_allowed` is the per-row format check, not a value score:
 
 $$\mathrm{pmass}_{\mathrm{allowed}} = \sum_{k=1}^{K}\exp(\ell_k)$$
 
-If it drops, the model is leaking probability into invalid answers. If `nll_prefill` rises, the forced answer scaffold itself no longer fits the model well.
+`mean_pmass_allowed` is the mean over rows. If it drops, the model is leaking probability into invalid answers.
+
+### Prefill NLL (`nll_prefill`, `mean_nll_prefill`)
+
+`nll_prefill` checks whether the forced answer scaffold still fits the model:
+
+$$\mathrm{nll}_{\mathrm{prefill}} = -\frac{1}{J}\sum_{j=1}^{J}\log P(u_j \mid \mathrm{context}, u_{<j})$$
+
+`mean_nll_prefill` is the mean over rows. If it rises, the answer slot may be measuring scaffold damage rather than a clean value shift.
 
 ## Scope
 
