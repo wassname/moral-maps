@@ -61,28 +61,28 @@ Out:
   - likely_fail: old `authority_tradition_obedience` runner or JSON is still referenced.
   - sneaky_fail: pair wording smuggles in tradition, dignity, care, or social norms; catch by reading rendered prompts.
   - UAT: file paths show the exact pure pair and no proxy pair.
-- [/] T2 (R2): Validate templates with the fixed pair.
+- [x] T2 (R2): Validate templates with the fixed pair.
   - steps: run a stage-A screen over fixed pair x candidate templates x source-stratified Authority-affordant scenarios.
   - verify: summary table has one pair id, multiple template ids, and off-axis/style audit columns.
   - success: choose a template because it cleanly elicits the fixed Authority contrast.
   - likely_fail: all templates produce weak separation.
   - sneaky_fail: the top template wins by persona echo or verbosity; catch with echo/style columns and example reads.
   - UAT: selected template artifact plus examples can be inspected without reading code.
-- [ ] T3 (R3): Validate and export scenarios with the fixed pair and chosen template.
+- [x] T3 (R3): Validate and export scenarios with the fixed pair and chosen template.
   - steps: run stage B over up to 30 source-ranked scenarios per source where practical; export strict-pass scenarios and examples.
   - verify: selected source-count table plus selected examples file.
   - success: selected scenarios are diverse and elicit pure Authority contrast.
   - likely_fail: many sources produce no strict-pass scenarios.
   - sneaky_fail: scenarios themselves make the contrast about tradition/social norms or care; catch by source-balanced example inspection.
   - UAT: selected examples show the same fixed pair/template on varied scenarios.
-- [ ] T4 (R4): Export selected data into steering-lite.
+- [x] T4 (R4): Export selected data into steering-lite.
   - steps: copy selected JSONL and summary into `steering-lite/data/persona_library_selections/`; add a pure Authority runner.
   - verify: `rg -n "pure_authority|authority-respecting|authority-disregarding|authority_tradition_obedience" /media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/data/persona_library_selections /media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/scripts`.
   - success: runner references pure Authority selection and no proxy/strict22 path.
   - likely_fail: runner still references `authority_tradition_obedience`.
   - sneaky_fail: copied summary and JSONL disagree on pair/template; catch by parsing both.
   - UAT: committed steering-lite files point to the pure Authority selection.
-- [ ] T5 (R5): Queue one cheap pure-Authority steer/eval UAT.
+- [/] T5 (R5): Queue pure-Authority steer/eval UAT.
   - steps: queue `sspace` first on `mfv mfq2` at `c=0.5,1`, `admin-n-samples=8`; only broaden after it passes.
   - verify: pueue label includes why/resolve; output contains MFV and MFQ-2 profiles over the signed c-grid.
   - success: small positive `c` raises MFV/MFQ-2 Authority and small negative `c` lowers it, without Social Norms dominating MFV.
@@ -92,7 +92,7 @@ Out:
     - direction: MFV Authority `dlogit(+0.5) > 0` and `dlogit(-0.5) < 0`; MFQ-2 Authority `C(+0.5) > base` and `C(-0.5) < base`.
     - selectivity: MFV Social Norms is not larger than Authority at the same small-c rows.
     - coherence: MFV `frac_unscorable` stays near zero and margin does not collapse; ordinal `pmass` stays near base.
-- [ ] T6 (R5, R6): If the cheap UAT passes, compare runner-supported methods.
+- [/] T6 (R5, R6): Compare runner-supported methods.
   - steps: queue `mean_diff`, `pca`, `sspace`, `directional_ablation`, and `linear_act` with unique timestamped output dirs.
   - verify: each output dir has `summary.json`, `mfv_profiles.csv`, `mfq2_profiles.csv`, and method-specific verifier output.
   - success: choose a method that preserves pure Authority direction and selectivity.
@@ -168,3 +168,8 @@ Out:
 - 2026-06-30: Replanned the active path around the fixed premise `authority-respecting` vs `authority-disregarding`. Validation now only selects templates and scenarios; method comparison only happens after a cheap pure-Authority steer/eval UAT passes.
 - 2026-06-30: User clarified the verification target from the previous good readout: direction, selectivity, and coherence. Direction means the intended signed Authority movement is present. Selectivity means the movement is not dominated by MFV Social Norms or another off-axis foundation. Coherence means answer mass/margin/unscorable gates do not explain the effect.
 - 2026-06-30: Persona-library commit `f355b47` adds `pure_authority` (`authority-respecting` vs `authority-disregarding`) and changes `prepare_authority_steering_selection.py` so the active path has one fixed pair and no axis/persona selection. Dry-run artifact: `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/pure_authority_20260630/stage_a_dryrun_qwen3_14b_deepinfra.json`, 240 planned cells, one pair id.
+- 2026-06-30: Persona-library commit `6450d51` replaced article templates like `a {persona} person` because they rendered as `a authority-respecting person`. Neutral-template Stage A artifact: `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/pure_authority_20260630_neutral_templates/stage_a_live_qwen3_14b_deepinfra.json`. Winner: `Speak with the priorities of someone {persona}.`, strict pass 0.125, mean axis delta 3.460. This is not strong by itself; Stage B is needed.
+- 2026-06-30: Stage B artifact: `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/pure_authority_20260630_neutral_templates/stage_b_live_qwen3_14b_deepinfra.json`, 342/342 success, strict pass 25 rows (0.073). Exported strict25 selection from 5 sources, source-skewed toward ValueBench: 18 ValueBench, 4 Daily Dilemmas, 1 AIRisk, 1 SocialChem, 1 W2S character.
+- 2026-06-30: Steering-lite commit `7e2ca7c` tightened `scripts/verify_authority_showcase.py` to fail if small-c signed Authority direction fails, MFV Social Norms is larger than Authority, or coherence gates fail. Running it on the old invalid score60 MFV output reproduces the useful verdict: signed direction pass, selectivity fail, coherence clean.
+- 2026-06-30: Steering-lite commit `b35e269` adds `data/persona_library_selections/pure_authority_qwen3_14b_strict25.jsonl`, matching summary, and `scripts/run_pure_authority_strict25_showcase.sh`. This is the active pure-Authority selection.
+- 2026-06-30: Queued pure-Authority strict25 method comparison on MFV/MFQ-2 with `c-grid=0.5,1`, `admin-n-samples=8`: pueue 406 `mean_diff`, 407 `pca`, 408 `sspace`, 409 `directional_ablation`, 410 `linear_act`. Pass criterion in labels: small-c Authority sign correct, MFV Social Norms not larger than Authority, coherence ok.
