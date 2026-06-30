@@ -140,6 +140,13 @@ Out:
   - likely_fail: README narrates failed strict22/debug history.
   - sneaky_fail: captions imply a general sign convention; catch by reading README without this spec.
   - UAT: external-review-v2 comprehension panel can explain what/where/why/measurement/dataset in its own words.
+- [x] T11 (R5): Render candidate PCA maps from the best current MFV path.
+  - steps: choose the method using MFV Authority direction and MFV coherence evidence only; render candidate maps/ranges from the selected steering-lite run.
+  - verify: `uv run python scripts/plot_steer_showcase.py --run-dir /media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/outputs/20260630T163010Z_pure_authority_mundane15_pca_mfv_mfq2_n8 --out docs/img/showcase_authority_pca_mundane15 --vec-label "pure Authority, PCA (+c = more Authority)" --coherence-frac 0.99 --margin-frac 0.50 --contrast-frac 0.000001`
+  - success: MFV candidate map and range exist, with c path over `[-1.0, -0.5, 0.0, 0.5, 1.0]`.
+  - likely_fail: the plotter uses MFQ-2 or arbitrary small-c thresholds to choose the method.
+  - sneaky_fail: candidate images silently replace README figures before the steer is accepted; catch by writing to a separate candidate directory.
+  - UAT: candidate artifacts are in `/media/wassname/SGIronWolf/projects5/2026/lite/tinymfv/docs/img/showcase_authority_pca_mundane15/`. Result: `pca` is the best current candidate by MFV-only evidence; it has signed Authority movement at `c=0.5` and `c=1.0`, `pmass=1.000`, `frac_unscorable=0.000`, and minimum MFV `margin/base=0.805`.
 
 ## Context
 - Current wrong path: `dignity_over_authority` strict22. It was selected as the best dignity conflict axis, not the desired Authority-only axis.
@@ -210,3 +217,4 @@ Out:
 - 2026-07-01: Repaired the pure-Authority selection pipeline around the fixed pair and verbatim persona instructions. Removed direct ValueBench, Airisk/Machiavelli, law/police, safety/harm, and lexical false positives from bare `order/orders`, `master`, and `senior`. Final validator artifact: `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/pure_authority_verbatim_mundane5_20260630/stage_b_live_qwen3_14b_deepinfra.json`; 125 successes, 0 errors, 33 strict rows, 15 score>=70 selected rows across 4 sources, 0 persona echo/refusal.
 - 2026-07-01: Copied the selected data into steering-lite and added verbatim persona-library prompt support so the steer uses the same prompts that validation tested. Queued pueue 417-421 for `mean_diff`, `pca`, `sspace`, `directional_ablation`, and `linear_act` on MFV/MFQ-2 with `c=0.5,1`, `N=8`.
 - 2026-07-01: User correctly objected that the `c=0.5`, MFQ-2, Social-Norms-selectivity, and hard coherence thresholds were arbitrary. Replaced the active verifier with an MFV-only evidence report: Authority direction over all paired c values, plus MFV `pmass`, `mean_margin`, `margin/base`, `frac_unscorable`, and `mean_nll_prefill`. Under this corrected view, `pca` and `linear_act` have signed MFV Authority direction across the evaluated path; `sspace` is only locally signed; `mean_diff` and `directional_ablation` are direction failures.
+- 2026-07-01: Rendered candidate maps/ranges from the current best MFV-only method, `pca`, into `/media/wassname/SGIronWolf/projects5/2026/lite/tinymfv/docs/img/showcase_authority_pca_mundane15/`. These are candidate artifacts, not README replacements.
