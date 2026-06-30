@@ -52,8 +52,11 @@ Out:
     - [x] validate OpenRouter routing: `qwen/qwen3-8b` has no DeepInfra endpoint; `qwen/qwen3-14b` on DeepInfra works.
     - [x] fix Qwen3 blank generations by adding `/no_think` for Qwen generator prompts.
     - [x] fix wrapper retry for OpenRouter SSE JSON/rate-limit errors and bump persona-library dependency.
-    - [/] run full stage-A screen over 720 axis/template/scenario pairs.
-    - [ ] export selected stage-A winner and selected examples.
+    - [x] run full stage-A screen over 720 axis/template/scenario pairs.
+    - [x] rerun stage A with wrapper timeout retry so no avoidable rows are missing.
+    - [x] export selected stage-A winner to stage-B inputs.
+    - [/] run stage B over the 342 authority-affordant scenarios.
+    - [ ] export selected stage-B scenarios and selected examples.
   - verify: print top template/axis rows and selected source counts.
   - success: best selected axis is Authority-only, not `dignity_over_authority`; selected scenarios are diverse across sources.
   - likely_fail: best row is still a conflict axis or all scenarios come from one source.
@@ -123,3 +126,5 @@ Out:
 - 2026-06-30: Smoke artifact `out/authority_affordant_20260630/deepinfra_qwen3_14b_nothink_smoke_live.json` completed 3/3 rows with `generator_provider_only=["DeepInfra"]`. Early signal: `authority_tradition_obedience` strict-pass 1/1 and mean axis delta 6.3; generic `authority_only` still mostly collapses toward welfare.
 - 2026-06-30: Pushed `openrouter_wrapper` commit `816e2d0` to retry OpenRouter upstream SSE JSON/rate-limit errors, then bumped persona-library to that wrapper commit. Stage-A run resumed from cache and passed the previous Gemini failure point.
 - 2026-06-30: Current stage-A artifact `out/authority_affordant_20260630/stage_a_live_qwen3_14b_deepinfra.json` was at 274/720 results, 274 successes, 0 errors when checked.
+- 2026-06-30: Stage A completed 720/720 after rerun with `openrouter_wrapper` commit `01190c8`, which retries upstream idle timeouts. Persona-library bump commit: `e61f8a0`.
+- 2026-06-30: Stage-A winner is `authority_tradition_obedience` with template `Answer as someone who is {persona}.`, strict pass 0.208 and mean axis delta 3.877. This is weak, so do not steer from stage A directly. Stage B is running over 342 authority-affordant scenarios to select only rows where the axis actually separates.
