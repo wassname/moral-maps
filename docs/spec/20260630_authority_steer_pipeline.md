@@ -94,6 +94,8 @@ Out:
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_variants_20260630/stage_a_live.json`
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/manifest.json`
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/stage_a_live.json`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/alibaba_smoke_dryrun.json`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/alibaba_smoke_live.json`
 
 ## Log
 - 2026-06-30: User corrected the axis. `dignity_over_authority` is not the goal; it confounds Authority with dignity/care/wellbeing. Use Authority-only.
@@ -103,5 +105,7 @@ Out:
 - 2026-06-30: First `authority_only` screen was too weak: best template strict-pass 0.083, mean axis delta 1.633. Audit samples showed generic wellbeing/autonomy responses when prompts lacked authority affordance, and several templates were grammatically bad for adjective personas.
 - 2026-06-30: Revised screen tests three mirrored Authority-only variants (`authority_only`, `authority_role_duty`, `authority_tradition_obedience`) and ten adjective-compatible templates. Dry-run manifest: 3 axes * 10 templates * 24 prompts = 720 planned pairs.
 - 2026-06-30: Switched persona-library validation to `openrouter_wrapper` after direct OpenAI SDK calls hit upstream Qwen 429s. Pushed wrapper fix `d011cd6` because its retry predicate was async and broke stamina/tenacity retries.
-- 2026-06-30: Added DeepInfra as explicit OpenRouter provider preference in the validator. Smoke artifact `out/authority_variants_20260630/wrapper_deepinfra_smoke_live.json` completed 3/3 rows with `provider_order=["DeepInfra"]`.
+- 2026-06-30: Added DeepInfra as explicit OpenRouter provider preference in the validator. That was the wrong abstraction for `qwen/qwen3-8b`: the OpenRouter endpoint list shows only AtlasCloud fp8 and Alibaba. The earlier smoke did not prove DeepInfra routing.
 - 2026-06-30: Replaced seed-random scenario selection with source-stratified Authority-affordance ranking. New stage-A rows include explicit boss/rules/commanding-officer/king/captain/protocol cases; weak sources remain visible so stage A can reject them.
+- 2026-06-30: Replaced global provider preference with generator-only provider pinning. Generator calls now use `provider.only=["Alibaba"]` and `allow_fallbacks=false`; judge calls remain unpinned. Dry-run artifact `out/authority_affordant_20260630/alibaba_smoke_dryrun.json` records `generator_provider_only=["Alibaba"]`.
+- 2026-06-30: Live Alibaba smoke confirmed the routing but hit upstream 429s from Alibaba: artifact `out/authority_affordant_20260630/alibaba_smoke_live.json` has `generator_provider_only=["Alibaba"]`, `n_results=1`, and the row error cites `provider_name="Alibaba"`. Next step is BYOK/wait/retry, or choose another close Qwen endpoint deliberately.
