@@ -1,0 +1,19 @@
+```json
+{
+ "summary": "tinymfv is a tool for quickly evaluating the impact of steering on language models, comparing their responses to human data. It uses moral vignettes and survey questions to measure changes in model behavior and assesses how those changes align with human preferences.",
+ "datasets": ["MFV classic", "MFV scifi", "MFV ai-actor", "MFQ-2", "Big Five", "16PF", "Humor Styles"],
+ "map_measurement": "The plots show the profile, which is the model's mean probability on each moral foundation (for MFV) or the mean expected 1-5 answer for each factor on a survey instrument.",
+ "coherence_rule": "Only coherent coefficients (those where the answer mass remains above 99% of the base run) are plotted. Once a coefficient becomes incoherent, later points on that side are dropped.",
+ "plot_encoding": "Gray marks represent human societies/respondents, black is the base model, red is positive steering, and blue is negative steering.",
+ "own_words_use_case": "I would use this to rapidly test steering directions on a local LLM and see if they move the model's responses closer to human patterns or drift them further away, particularly useful when speed and sensitivity are key.",
+ "scores": {
+  "clarity": "4",
+  "conciseness": "5",
+  "technical_accuracy": "5"
+ },
+ "unclear": ["The specific process of 'canonicalizing' survey frames before averaging is unclear."],
+ "misunderstandings": ["The text implies an equivalence between the datasets' foundations and psychological factors, which may not be precise."],
+ "missing_to_act": ["It would be helpful to see example code on how to change steering prompts and re-evaluate."],
+ "suggestions": ["Clarify the procedure for canonicalizing survey frames, providing a specific example would be helpful."]
+}
+```

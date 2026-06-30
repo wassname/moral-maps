@@ -1,0 +1,32 @@
+{
+ "summary": "tinymfv provides fast, token‑level value evaluations for steering experiments by querying LLMs with moral vignettes and survey items, converting answer probabilities into a compact model profile. Researchers use it to detect whether a steering intervention shifted intended values, affected nearby values, and kept the model’s responses within human norms, catching probability shifts before sampled answers change.",
+ "datasets": ["MFV classic", "MFV scifi", "MFV ai-actor", "MFQ-2", "Big Five", "16PF", "Humor Styles"],
+ "map_measurement": "the model profile (mean probability per moral foundation for MFV vignettes, or mean expected 1‑5 score per factor for survey instruments)",
+ "coherence_rule": "only coefficients whose answer‑mass remains above 99 % of the base‑run are plotted; once a side drops to ≤99 % it and further points on that side are omitted",
+ "plot_encoding": "gray marks represent human societies or respondents, black is the base model, red indicates positive steering, and blue indicates negative steering",
+ "own_words_use_case": "I would use tinymfv to quickly quantify how a steering intervention moves an LLM’s value profile relative to a human baseline, spotting subtle probability shifts that precede overt answer changes and revealing whether the steer unintentionally drags nearby values away from human norms.",
+ "scores": {"clarity": "4", "conciseness": "3", "technical_accuracy": "5"},
+ "unclear": [
+   "What exactly constitutes 'answer mass' and how it is computed for each coefficient.",
+   "Whether the MFV profile shown on maps is raw probability or z‑scored emphasis, and how the transformation is applied.",
+   "How the 99 % threshold is applied separately to positive and negative steering sides.",
+   "What specific files or outputs from a steering‑lite run are required by the plotting script."
+ ],
+ "misunderstandings": [
+   "Readers might assume the red/blue points always correspond to authority steering, while the examples are just one steer direction.",
+   "The maps might be read as showing raw foundation probabilities, when they actually display z‑scored relative emphasis.",
+   "The profile for MFV and surveys might be treated as directly comparable, though they are on different scales."
+ ],
+ "missing_to_act": [
+   "Instructions on how to generate a steering‑lite run directory (e.g., commands to produce the required steering outputs).",
+   "Details on required hardware/software beyond uv (e.g., GPU, transformers version).",
+   "Explicit description of the input format expected by the plotting script (CSV columns).",
+   "A minimal, self‑contained example that runs from model loading to plot generation without external steering‑lite outputs."
+ ],
+ "suggestions": [
+   "Add a brief ‘Quick start’ section that shows how to produce a steering‑lite run, then call the plotting script with a toy dataset.",
+   "Clarify the coherence rule with a formula: plot coefficient c if mass(c) > 0.99 × mass(base).",
+   "Specify that MFV map values are z‑scored across foundations before PCA, and note the scaling in the figure caption.",
+   "Define 'answer mass' in the Measurement section as the total probability mass on the allowed answer tokens for a given coefficient."
+ ]
+}

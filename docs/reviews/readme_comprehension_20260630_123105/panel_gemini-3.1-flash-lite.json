@@ -1,0 +1,34 @@
+{
+ "summary": "tinymfv is a lightweight tool for evaluating local LLMs by measuring moral vignette probabilities and psychological survey scores. Researchers use it to verify steering interventions, ensuring that probability shifts successfully track intended values without causing the model to lose coherence or become psychologically unrecognizable relative to human data.",
+ "datasets": [
+  "MFV classic",
+  "MFV scifi",
+  "MFV ai-actor",
+  "MFQ-2",
+  "Big Five",
+  "16PF",
+  "Humor Styles"
+ ],
+ "map_measurement": "For MFV vignettes, it is the model's mean probability on each foundation (z-scored across foundations). For survey instruments, it is the mean expected 1-5 score for each factor.",
+ "coherence_rule": "The path shows coefficients (c=0, plus/minus c) only as long as the answer mass remains above 99% of the base run; points are dropped once a side becomes incoherent.",
+ "plot_encoding": "Gray marks represent human societies or respondents, black represents the base unsteered model, red depicts positive steering, and blue depicts negative steering.",
+ "own_words_use_case": "I would use this during steering development to quickly detect if my proposed steering vectors are actually moving the model's latent value profile towards the target benchmarks, or—crucially—if they are pushing the model into 'psychological alien' territory where it maintains its format but lacks human-like response patterns.",
+ "scores": {
+  "clarity": "5",
+  "conciseness": "5",
+  "technical_accuracy": "5"
+ },
+ "unclear": [
+  "The exact definition and setup of 'steering-lite', which is required for running the visual generation scripts despite not being clearly documented as a sub-repo or dependency.",
+  "Whether the 'culture map' and 'range' plots automatically handle the mathematical discrepancy between MFV probability profiles and questionnaire 1-5 scales, or if they require distinct processing."
+ ],
+ "misunderstandings": [
+  "The text categorizes MFV vignettes and survey instruments under the same plotting umbrella, potentially misguiding the reader to assume they are directly comparable metrics despite their different underlying measurement methods (probability mass vs. ordinal scale)."
+ ],
+ "missing_to_act": [
+  "A sample of the output directory structure or an explanation of how to generate the 'steering-lite' data required for the plot generation script."
+ ],
+ "suggestions": [
+  "Clarify the 'steering-lite' dependency in the Install section, explaining if it is a library, a folder, or a separate tool, and provide an example of the input data format expected by plot_steer_showcase.py."
+ ]
+}

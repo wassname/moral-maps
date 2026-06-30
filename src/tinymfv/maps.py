@@ -7,9 +7,9 @@ same way.
 
   plot_ipsative_pca : where the model sits among human cultures. Each society's profile is
                       row-centred (its overall endorsement level removed) then PCA'd, so the axes
-                      are RELATIVE emphasis across factors, not acquiescence. The model's base +
-                      steered poles are projected into the same space; a compass inset shows how
-                      each factor loads.
+                      are RELATIVE emphasis across factors, not acquiescence. The model's base and
+                      steered endpoint profiles are projected into the same space; a compass inset
+                      shows how each factor loads.
   plot_range        : per-factor, the steer as a directed c-sweep (tail at the -c pole, single
                       arrowhead at the +c pole) against the strip of human societies. With a zoomed
                       small-multiple companion (plot_range_zoom), one panel per factor on its own
@@ -243,8 +243,6 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
                                   (pb, C_BASE, base_lab, (9, -13), "left")]:
         if pt is None:
             continue
-        if pt is not pb:
-            ax.annotate("", xy=pt, xytext=pb, arrowprops=dict(arrowstyle="-|>", color=col, lw=2.0), zorder=5)
         ax.scatter(*pt, s=120, c=col, marker="o", edgecolors="white", linewidths=1.2, zorder=7)
         ax.annotate(lab, pt, xytext=dxy, textcoords="offset points", fontsize=9, color=col,
                     fontweight="bold", ha=ha, va="center", zorder=8)
@@ -252,7 +250,6 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     if traj:
         inco = traj_incoherent or set()
         cs_sorted = sorted(traj)
-        cmax = max(abs(c) for c in cs_sorted) or 1.0
         traj_pts = np.array([proj(traj[c]) for c in cs_sorted])
         # two arms fanning from base (c=0): +c red, -c blue. Marker grows with |c|; a point whose
         # admin pmass fell below the coherence floor is hollow (the steer is no longer measuring).
@@ -266,12 +263,8 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
                 if c == 0:
                     continue
                 col = POS_COL if c > 0 else NEG_COL
-                ax.scatter(p[0], p[1], s=14 + 26 * abs(c) / cmax, c="none" if c in inco else col,
+                ax.scatter(p[0], p[1], s=34, c="none" if c in inco else col,
                            edgecolors=col, linewidths=1.0, zorder=6)
-            cend, pend = arm[-1] if hi > 0 else arm[0]
-            ax.annotate(f"c={cend:+.0f}", pend, xytext=(4, 4), textcoords="offset points",
-                        fontsize=7, color=POS_COL if cend > 0 else NEG_COL, zorder=8,
-                        bbox=dict(boxstyle="round,pad=0.1", fc="#faf8f2", ec="none", alpha=0.7))
     # Crop to the SOCIETIES + steer anchors for EVERY instrument (the human cloud is far wider and would
     # bury them in a central blob; it stays a clipped backdrop). Then PAD THE BOTTOM to reserve a clean
     # strip for the legend insets -- deterministic placement, identical on every plot, no overlap with
@@ -284,7 +277,7 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         wx0, wx1 = min(cx[0], np.nanmin(anc[:, 0])), max(cx[1], np.nanmax(anc[:, 0]))
         wy0, wy1 = min(cy[0], np.nanmin(anc[:, 1])), max(cy[1], np.nanmax(anc[:, 1]))
         sx, sy = wx1 - wx0, wy1 - wy0
-        dview = (wx0 - 0.05 * sx, wx1 + 0.05 * sx, wy0 - 0.05 * sy, wy1 + 0.05 * sy)  # data frame, no pad
+        dview = (wx0 - 0.12 * sx, wx1 + 0.12 * sx, wy0 - 0.12 * sy, wy1 + 0.12 * sy)  # data frame, no legend pad
     else:
         x0, x1 = ax.get_xlim(); y0, y1 = ax.get_ylim()
         dview = (x0, x1, y0, y1); sy = y1 - y0
@@ -422,40 +415,29 @@ def plot_splom(instr: Instrument, dims: list[str], cloud: np.ndarray, M: np.ndar
 # --- per-vector steer range ---------------------------------------------------------------------
 
 def draw_steer(ax, xs: float, cs: list[float], yv: np.ndarray, base_y: float,
-               ms: float = 3.5, lw: float = 2.0, head: float = 7.0, dx: float = 0.06,
-               dots: bool = True) -> None:
-    """Draw the steer c-sweep at column x=xs as TWO arms fanning out FROM the base (the unsteered
-    model at c=0): a red arm to the +c pole, a blue arm to the -c pole. Each arm is a line plus a
-    triangle HEAD MARKER at the pole pointing AWAY from base (^ if the pole is above base, v if below),
-    so the head flips to point down on factors the steer lowers. This matches plot_ipsative_pca's
-    base->pole arrows -- the unsteered model is the origin, NOT the -c pole.
-
-    The head is the ONLY marker at each pole (no dot under it) and is a constant-size marker, NOT a
-    FancyArrow: FancyArrowPatch shrinks and can flip its head once the shaft is shorter than the head,
-    which is exactly the near-collapsed-pole case here. `dots` adds the intermediate per-c step dots
-    (the zoom labels them c=X and wants them; the main range does not -- there they only clutter a short
-    arm into a blob). The +c arm is nudged +dx in x and the -c arm -dx, so a NON-bidirectional steer
-    (both poles the same side of base) reads as two short PARALLEL arms rather than overlapping."""
+               lw: float = 2.0, dx: float = 0.12, tick: float = 0.038) -> None:
+    """Draw one coherent AI c-path."""
     assert list(cs) == sorted(cs) and 0.0 in cs, f"draw_steer needs sorted cs with c=0 (yv[-1]=+pole, yv[0]=-pole), got {cs}"
-    ax.plot(xs, base_y, "o", ms=ms, color="black", zorder=7)            # base: the unsteered model
-    if dots:
-        for c, y in zip(cs, yv):
-            if c == 0 or c == cs[0] or c == cs[-1]:                     # base drawn above; poles = head only
-                continue
-            ax.plot(xs + (dx if c > 0 else -dx), float(y), "o", ms=ms * 0.6, zorder=7,
-                    color=POS_COL if c > 0 else NEG_COL)
-    for pole_y, col, xo in [(float(yv[-1]), POS_COL, xs + dx), (float(yv[0]), NEG_COL, xs - dx)]:
-        if abs(pole_y - base_y) > 1e-9:
-            ax.plot([xo, xo], [base_y, pole_y], color=col, lw=lw, zorder=6, solid_capstyle="round")
-            ax.plot(xo, pole_y, marker=("^" if pole_y >= base_y else "v"), color=col, ms=head,
-                    markeredgecolor="none", zorder=8)
+    cmax = max(abs(c) for c in cs) or 1.0
+    xs_by_c = {c: xs if c == 0.0 else xs + dx * np.sign(c) * np.sqrt(abs(c) / cmax) for c in cs}
+    for side_cs, col in [([c for c in cs if c <= 0.0], NEG_COL), ([c for c in cs if c >= 0.0], POS_COL)]:
+        if len(side_cs) < 2:
+            continue
+        x_path = [xs_by_c[c] for c in side_cs]
+        y_path = [float(yv[cs.index(c)]) for c in side_cs]
+        ax.plot(x_path, y_path, color=col, lw=lw, alpha=0.9, zorder=6, solid_capstyle="round")
+    for c, y in zip(cs, yv):
+        if c == 0.0:
+            col, t = "black", tick * 1.25
+        else:
+            col, t = (POS_COL if c > 0 else NEG_COL), tick
+        x = xs_by_c[c]
+        ax.plot([x - t, x + t], [float(y), float(y)], color=col, lw=lw, zorder=8)
 
 
 def draw_range_panel(ax, instr: Instrument, dims: list[str], cs: list[float], prof: dict,
                      humans: dict, cloud: np.ndarray | None, vec: str) -> tuple[float, float]:
-    """One vector's range panel: respondent cloud + named society dots + the steer c-sweep drawn as
-    two arrows fanning out from the base dot (red to the +c pole, blue to the -c pole). The widest
-    steer carries a '-N {vec} / base / +N {vec}' in-plot key. Returns the cropped (ymin, ymax)."""
+    """One vector's range panel: human society dots plus one AI steer column per factor."""
     rng = np.random.default_rng(0)
     ys: list[float] = []
     spans = [float(np.ptp([prof[c][i] for c in cs])) for i in range(len(dims))]
@@ -483,13 +465,13 @@ def draw_range_panel(ax, instr: Instrument, dims: list[str], cs: list[float], pr
         yv = np.array([prof[c][i] for c in cs])
         ys += yv.tolist()
         base_y = float(yv[list(cs).index(0.0)])
-        draw_steer(ax, xs, cs, yv, base_y, dots=False)
+        draw_steer(ax, xs, cs, yv, base_y)
         if i == label_i:
             # Only the two pole labels, to the RIGHT of the steer column. No 'base' tag: the black dot
             # between the two coloured arms is self-evidently the unsteered model, and on a near-collapsed
             # pole (e.g. humor affiliative, +c ~ base) a 'base' tag overprints the +c tag.
             for c_end, y_end, col in [(cs[-1], yv[-1], POS_COL), (cs[0], yv[0], NEG_COL)]:
-                ax.annotate(f"c={int(c_end):+d}", (xs + 0.30, y_end), fontsize=6.8,
+                ax.annotate(f"c={c_end:+g}", (xs + 0.30, y_end), fontsize=6.8,
                             ha="left", va="center", color=col, zorder=9)
 
     pad = 0.10 * (max(ys) - min(ys))
@@ -568,7 +550,7 @@ def plot_range_zoom(instr: Instrument, dims: list[str], cs: list[float], prof: d
 
         xs = 0.30
         base_y = float(yv[list(cs).index(0.0)])
-        draw_steer(ax, xs, cs, yv, base_y, ms=4.5, lw=2.4, head=9.0, dx=0.10)
+        draw_steer(ax, xs, cs, yv, base_y, lw=2.4, dx=0.10, tick=0.055)
         named = {}
         if near:
             name_xy = {nm: (float(x), v) for (nm, v), x in zip(near, soc_x)}

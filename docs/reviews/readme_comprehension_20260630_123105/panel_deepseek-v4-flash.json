@@ -1,0 +1,37 @@
+{
+ "summary": "tinymfv is a lightweight evaluation suite that measures whether LLM steering interventions shift moral/value profiles (from vignettes and surveys) in the intended direction without moving nearby dimensions, and plots those profiles against human reference data. A researcher would use it to get fast, sensitive feedback on local steering experiments before sampled answers flip.",
+ "datasets": ["MFV classic", "MFV scifi", "MFV ai-actor", "MFQ-2", "Big Five", "16PF", "Humor Styles"],
+ "map_measurement": "For survey instruments (MFQ‑2, Big Five, 16PF, Humor Styles) it is the mean expected 1‑5 score per factor; for MFV instruments it is the relative foundation emphasis (foundation probabilities z‑scored across foundations) because model and human units differ.",
+ "coherence_rule": "The plotted path includes only coefficients (starting from c=0 and proceeding by sign) whose answer mass stays above 99% of the base run's answer mass; once a side falls to or below 99%, later points on that side are dropped.",
+ "plot_encoding": "Gray marks are human societies or respondents, black is the base model, red is positive steering, and blue is negative steering.",
+ "own_words_use_case": "I would use tinymfv when iterating on steering vectors to confirm that a manipulation changes the intended moral or personality dimension without distorting unrelated ones, and that the resulting model profile remains plausible relative to actual human societies, all without needing heavy sampling or full behavioral evals.",
+ "scores": {
+  "clarity": 4,
+  "conciseness": 5,
+  "technical_accuracy": 5
+ },
+ "unclear": [
+  "What exactly 'c' represents in the coherence rule or in the plot captions (+C, -C) is not defined.",
+  "The phrase 'answer mass stays above 99% of the base run' is ambiguous: is it the absolute mass on valid tokens, or the ratio of the steered mass to the base mass?",
+  "The map measurement description says 'the profile' but then distinguishes z‑scored foundation emphasis for MFV vs mean expected scores for surveys, which could confuse a first reader looking for a single definition.",
+  "It's not explained how many coefficients or what range of c values are typically explored."
+ ],
+ "misunderstandings": [
+  "The coherence rule sentence could be read as though the 99% threshold applies to the answer mass of each individual coefficient, but it's not clear whether that mass is compared to the base run's mass or to an absolute cutoff.",
+  "The phrase 'once a side becomes incoherent' may mislead readers into thinking 'incoherent' is a formal property, when it is simply defined by the 99% answer‑mass threshold.",
+  "The map z‑score note for MFV could be overlooked, leading a user to interpret MFV maps as raw probabilities, which would be incomparable to human data."
+ ],
+ "missing_to_act": [
+  "A user needs to already have steering‑lite outputs in a specific directory structure to run the bundled plotting script; there is no standalone plotting API or example for custom data.",
+  "The 99% coherence threshold is hard‑coded; users who want a different tolerance have no parameter to adjust.",
+  "No guidance is given on how to produce the steered runs (coefficient‑stepping procedure) or what the 'c' values correspond to in the steering framework.",
+  "The connection between the Python API (evaluate, administer) and the plotting workflow is not documented; the script appears to operate on saved run‑dirs, not on in‑memory reports."
+ ],
+ "suggestions": [
+  "Add a sentence that defines 'c' as the steering coefficient (or magnitude) and explains the usual progression (e.g., 0, ±0.5, ±1, …).",
+  "Clarify the answer‑mass condition: e.g., 'the proportion of probability assigned to valid answer tokens for a steered run must be at least 99% of that proportion in the base run'.",
+  "Distinguish the map measurement for MFV and surveys in a single concise line in the Measurement section, not just a parenthetical note.",
+  "Provide a small plain‑Python example that loads a saved run‑dir and calls a plotting function, so users can adapt the threshold or data source.",
+  "Explicitly mention that the user must have run steering‑lite (or equivalent coefficient‑based steering) to generate the required run‑dir structure; link to that repository."
+ ]
+}

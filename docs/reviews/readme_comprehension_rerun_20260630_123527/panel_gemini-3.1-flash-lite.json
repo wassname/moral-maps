@@ -1,0 +1,34 @@
+{
+ "summary": "tinymfv is a lightweight evaluation toolkit designed to benchmark how steering interventions shift an LLM's moral and psychological value profiles against human reference populations. It allows researchers to quickly visualize and detect if steering successfully shifts model behavior or if it causes the model to diverge into incoherent, 'psychologically alien' territory before triggering full-text generation.",
+ "datasets": [
+  "MFV classic",
+  "MFV scifi",
+  "MFV ai-actor",
+  "MFQ-2",
+  "Big Five",
+  "16PF",
+  "Humor Styles"
+ ],
+ "map_measurement": "The measurement is the 'profile,' representing either relative foundation emphasis (z-scored foundation probabilities) for MFV or mean expected 1-5 factor scores for survey instruments, plotted against human reference data.",
+ "coherence_rule": "The plotted path includes coefficients (c) where the model's answer mass (total probability on valid answer tokens) remains above 99% of the base run; points are dropped once this coherence threshold is crossed. 'c' is the signed scalar multiplier applied to the calibrated steering vector.",
+ "plot_encoding": "Gray represents human reference data (societies/individuals); black is the base model; red indicates positive steering; blue indicates negative steering.",
+ "own_words_use_case": "I would use this during the prototyping phase of model steering to validate whether an intervention is hitting its intended target regarding cultural or moral dimensions. It functions as a 'sanity check' to ensure the model remains grounded in human-like response patterns and doesn't break its output format, allowing for rapid iteration on steering strength without needing to generate and manually review long-form model outputs.",
+ "scores": {
+  "clarity": "5",
+  "conciseness": "5",
+  "technical_accuracy": "5"
+ },
+ "unclear": [
+  "The exact mathematical definition or implementation for the 'calibrated steering vector' is not provided.",
+  "The text does not explicitly explain how the base model is 'outside the country cloud' in the PCA visualization, leaving the reader to infer the relationship between model-space and human-space.",
+  "It is not entirely clear if the reference data is fixed per instrument or depends on external dependencies not listed in the snippet."
+ ],
+ "misunderstandings": [
+  "A reader might assume 'c' represents a raw logit bias rather than a scalar multiplier on a pre-calibrated steering vector.",
+  "The usage of 'answer mass' might be confused with a value sentiment score, whereas it is strictly a measure of format coherence."
+ ],
+ "suggestions": [
+  "Add a definition or reference for 'calibrated steering vector' to clarify if it requires an external library or specific preparation.",
+  "Explicitly define the PCA axes in the documentation graphics to clarify what the distance between the 'black' model point and the 'gray' culture cloud signifies."
+ ]
+}

@@ -1,0 +1,29 @@
+{
+ "summary": "tinymfv is a compact, fast evaluation suite for local LLM steering that probes value shifts via moral vignettes and survey questions, reading answer-token probabilities to produce a single model profile. A researcher would use it to quickly determine whether a steering intervention moved intended values, whether it perturbed nearby values, and whether the steered profile remains plausible relative to human response data. The evals are sensitive enough to detect probability shifts before sampled answers flip.",
+ "datasets": ["MFV classic", "MFV scifi", "MFV ai-actor", "MFQ-2", "Big Five", "16PF", "Humor Styles"],
+ "map_measurement": "The measurement shown on maps and range plots is the profile: for MFV it is the model's mean probability per moral foundation; for survey instruments it is the mean expected 1-5 score per factor (after reverse‑keying). In showcase plots, MFV uses relative foundation emphasis (z-scored across foundations) to make model and human units comparable.",
+ "coherence_rule": "The plotted path shows only coherent coefficients where c (the signed multiplier on the calibrated steering vector) starts at 0, then each positive and negative side is included while its answer mass (total probability on valid answer tokens) stays above 99% of the base run. Once a side's answer mass drops to ≤99% of the base run, later points on that side are dropped.",
+ "plot_encoding": "Gray marks represent human societies or respondents, black marks are the base (unsteered) model, red marks are positive steering, and blue marks are negative steering.",
+ "own_words_use_case": "I would use tinymfv for iterative steering development to rapidly compare base, positively‑steered, and negatively‑steered model runs against the same human reference plots. It quickly reveals whether a steering vector shifts value profiles in the intended direction and magnitude, whether it also shifts nearby values, and whether the steered model remains a plausible psychological entity rather than an outlier—avoiding the trap of format‑coherent but alien behavior.",
+ "scores": {"clarity": 4, "conciseness": 4, "technical_accuracy": 5},
+ "unclear": [
+  "The variable 'c' is used in the coherence rule and paths but is only defined later in the Coherence rule paragraph, not earlier in the Plot encoding section.",
+  "The phrase 'range plots' is not explicitly defined — it is unclear whether the gray marks represent individual data points, ranges (min‑max), or error bars around a mean.",
+  "The 'answer mass' concept is introduced in the coherence rule but the API output 'mean_pmass_allowed' is not explicitly linked to it.",
+  "The distinction between MFV plots (z-scored) and survey plots (raw expected scores) is explained only in the Measurement section, which could cause confusion when viewing MFV showcase plots without that context.",
+  "The term 'psychological alien' is used qualitatively but never formally defined — it is inferred from being outside the human country cloud on a PCA map."
+ ],
+ "misunderstandings": [
+  "The statement 'still lands near real human response patterns' might imply the base model already does, whereas later examples show the base model can be a clear outlier (e.g., Big Five map shows 'psychological alien').",
+  "The coherence rule says 'each positive and negative side while its answer mass stays above 99% of the base run' — a reader could misinterpret 'incoherent' as logically contradictory rather than format‑invalid (low probability on valid tokens).",
+  "The plot encoding says 'Gray marks are human societies or respondents' but the range plots are described as showing 'human society ranges' — one might think the gray region is a continuous range rather than discrete points.",
+  "The MFQ‑2 caption mentions 'culture map' but the general description uses 'culture map' interchangeably with 'map' — the reader may not know it is a PCA projection of human country profiles until the Measurement section explains it."
+ ],
+ "suggestions": [
+  "Define 'c' (signed multiplier on the calibrated steering vector) earlier, perhaps in the Plot encoding or before the coherence rule.",
+  "Clarify in the Plot encoding that range plots show a box‑and‑whisker or min‑max line for human societies, with gray marks as summary points, not individual respondents.",
+  "Add a brief note that 'answer mass' is the same as the API's 'mean_pmass_allowed' and is a format coherence metric, not a value score.",
+  "Explicitly state in the dataset table or a footnote that MFV showcase plots use relative (z‑scored) emphasis for comparability, while survey plots use raw expected scores.",
+  "Introduce the 'psychological alien' concept with a short definition, e.g., 'a model profile that lies far outside the convex hull of human country means on a PCA map.'"
+ ]
+}

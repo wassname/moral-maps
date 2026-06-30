@@ -1,0 +1,49 @@
+{
+  "summary": "tinymfv is a lightweight library that evaluates moral foundations and personality survey responses of local LLMs by turning answer‑token probabilities into a concise model profile. Researchers use it to quickly see how a steering or fine‑tuning change shifts the model’s values compared to human reference data, without needing full‑scale human evaluation.",
+  "datasets": [
+    "MFV classic",
+    "MFV scifi",
+    "MFV ai-actor",
+    "MFQ-2",
+    "Big Five",
+    "16PF",
+    "Humor Styles"
+  ],
+  "map_measurement": "The maps and range plots show the model’s profile: for MFV the mean probability of each moral foundation (z‑scored across foundations for plotting), and for survey instruments the mean expected 1‑5 score for each factor after reverse‑keying.",
+  "coherence_rule": "Only coefficients whose answer‑mass stays above 99 % of the base run are kept; the path starts at c = 0 and includes each positive and negative c while the mass threshold is met, dropping later points on a side once it falls at or below 99 %.",
+  "plot_encoding": "Gray marks represent human societies or respondents, black marks the base model, red marks the positively steered endpoint, and blue marks the negatively steered endpoint.",
+  "own_words_use_case": "In my research I often compare different prompting or fine‑tuning strategies; with tinymfv I could run a fast paired evaluation that quantifies how each method moves the model’s moral or personality profile toward or away from documented human norms, giving an early signal before costly human studies.",
+  "scores": {
+    "clarity": "5",
+    "conciseness": "4",
+    "technical_accuracy": "5"
+  },
+  "unclear": [
+    "Exact definition of 'answer‑mass' and how it is computed from token probabilities is not spelled out.",
+    "How to produce the '+C' and '-C' steering runs (the required steering command or configuration) is not described.",
+    "The format and column meanings of the human reference CSV files (e.g., country means) are not documented.",
+    "The phrase 'human societies' on range plots is vague—whether each point is a country, a demographic group, or an aggregate is unclear.",
+    "'Canonicalizes these frames before averaging' is mentioned but the exact method is not explained."
+  ],
+  "misunderstandings": [
+    "The statement that MFV map values are z‑scored across foundations could be misread as raw probabilities being plotted.",
+    "The term 'coherent coefficients' might be interpreted as always keeping all coefficients, whereas the rule actually drops them when answer‑mass falls below 99 %.",
+    "Seeing 'human societies' as actual societies rather than averaged country scores could lead to incorrect interpretation of the axes.",
+    "The note 'format check: mass on valid answer tokens' could be taken to mean an automatic validation step, which is not described.",
+    "The comment 'MFV is nominal: the answer is the category' could be read as a categorical classification system rather than a probabilistic profile."
+  ],
+  "missing_to_act": [
+    "Step‑by‑step instructions for generating the '+C' and '-C' steered model checkpoints (e.g., which steering script, hyperparameters) are missing.",
+    "Details on required hardware, Python version, and additional dependencies beyond uv pip install (e.g., torch, CUDA) are not provided.",
+    "Explanation of the expected directory layout for the steering‑lite run‑dir argument used by the plotting script is absent.",
+    "Specification of column names and units in the human reference CSV files to allow correct loading and comparison is lacking.",
+    "A minimal example of interpreting the plotted axes (e.g., PCA component meaning) to understand the culture map would be helpful."
+  ],
+  "suggestions": [
+    "Add a short 'Steering workflow' section that shows how to obtain the base, +C, and -C model outputs and what files the plot script expects.",
+    "Include a table describing the columns in each human reference CSV (e.g., country, foundation scores) and their units.",
+    "Clarify in the Measurement section that MFV map values are z‑scored across foundations.",
+    "Provide a concrete definition of 'answer‑mass' and the 99 % coherence threshold, perhaps with a small numeric example.",
+    "Mention required Python and PyTorch versions and any GPU/CUDA requirements in the Install section."
+  ]
+}

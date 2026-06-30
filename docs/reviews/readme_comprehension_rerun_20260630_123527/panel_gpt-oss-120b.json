@@ -1,0 +1,39 @@
+{
+  "summary": "tinymfv is a lightweight suite of fast value evaluations for local LLM steering. It probes models with moral vignettes and survey items, reads token probabilities, and aggregates them into a profile that can be compared against human reference data to see if a steer shifts the intended values and how it affects related values.",
+  "datasets": [
+    "MFV classic",
+    "MFV scifi",
+    "MFV ai-actor",
+    "MFQ-2",
+    "Big Five",
+    "16PF",
+    "Humor Styles"
+  ],
+  "map_measurement": "The maps display the model’s profile: for MFV the mean probability for each moral foundation, and for the survey instruments the mean expected 1‑5 answer for each factor after reverse‑keying (i.e., the averaged scale score).",
+  "coherence_rule": "Only coefficient steps (c) that remain coherent are plotted: the path starts at c = 0 (base model) and then includes successive positive and negative c values while the answer‑mass (total probability on valid answer tokens) stays above 99 % of the base run. When answer‑mass falls to ≤ 99 % on a side, that side is considered incoherent and any later points on that side are omitted. Here c is the signed multiplier applied to the calibrated steering vector.",
+  "plot_encoding": "Gray marks represent human societies or respondents; black marks the base (unsteered) model; red marks the positively steered endpoint; blue marks the negatively steered endpoint.",
+  "own_words_use_case": "A researcher could use tinymfv to rapidly assess whether a proposed steering intervention nudges a LLM toward a desired moral or personality profile without causing unintended drift, by visualizing the shift against real human norms and detecting early inconsistencies before full generation testing.",
+  "scores": {
+    "clarity": "4",
+    "conciseness": "3",
+    "technical_accuracy": "4"
+  },
+  "unclear": [
+    "The term \"human societies\" is used for both country‑level aggregates and raw respondent data without explicit distinction.",
+    "The exact calculation of answer‑mass (whether it sums over all items or per‑item) is not spelled out.",
+    "How the z‑scoring for MFV plots is performed (across foundations per model or across models) is not fully detailed.",
+    "The meaning of \"format‑coherent\" is mentioned but not defined."
+  ],
+  "misunderstandings": [
+    "One might think the MFV map quantity is a raw probability, but the README says it is a z‑scored relative emphasis, which could be misread.",
+    "The phrase \"coherent coefficients\" could be interpreted as mathematically coherent rather than referring to answer‑mass staying above a threshold.",
+    "The description of \"human reference\" could be taken to mean a single dataset, whereas multiple country‑level and respondent‑level sources are used."
+  ],
+  "suggestions": [
+    "Add a concise legend in the README that maps gray, black, red, and blue colors to their meanings.",
+    "Define explicitly what \"human societies\" (e.g., country‑level aggregates) and \"human respondents\" (individual data) refer to.",
+    "Provide a short formula or description of how answer‑mass is computed and how the 99 % threshold is applied.",
+    "Explain the z‑scoring process for MFV visualizations, including the axis of standardization.",
+    "Clarify the term \"format‑coherent\" and its relevance to steering evaluation."
+  ]
+}

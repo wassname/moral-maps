@@ -1,3 +1,21 @@
+You are reading the README below for the FIRST time as a cold researcher.
+Answer ONLY from what it says; where something is unstated or ambiguous, say so.
+Output ONE JSON object, no prose, no fences:
+{
+ "summary": "<2-3 sentences: what is tinymfv and why would a researcher use it?>",
+ "datasets": ["<datasets you think are included>"],
+ "map_measurement": "<what measurement is shown on the maps and range plots?>",
+ "coherence_rule": "<which steered coefficients are shown or dropped?>",
+ "plot_encoding": "<what do gray, black, red, and blue marks mean?>",
+ "own_words_use_case": "<why use this in your own research, stated in your own words with inference rather than copied phrasing>",
+ "scores": {"clarity": "<1-5>", "conciseness": "<1-5>", "technical_accuracy": "<1-5>"},
+ "unclear": ["<what was confusing, ambiguous, or you had to guess>"],
+ "misunderstandings": ["<places the text invites a wrong reading>"],
+ "missing_to_act": ["<what a reader still needs to reproduce or act on this>"],
+ "suggestions": ["<concrete edit that would help>"]
+}
+
+README:
 # tinymfv
 
 tinymfv is a small set of fast value evals for local LLM steering work. It asks moral vignettes and survey questions, reads answer-token probabilities, and turns them into one model profile.
@@ -28,7 +46,7 @@ The Humor Styles map shows the same failure mode more sharply: the model profile
 
 ![MFV range plot: foundation emphasis beside base, +C, and -C authority steering](docs/img/showcase/mfv/range.png)
 
-Here `c` is the signed multiplier on the calibrated steering vector. The plotted path shows only coherent coefficients: `c=0`, then each positive and negative side while its answer mass stays above 99% of the base run. Once a side becomes incoherent, later points on that side are dropped.
+The plotted path shows only coherent coefficients: `c=0`, then each positive and negative `c` while its answer mass stays above 99% of the base run. Once a side becomes incoherent, later points on that side are dropped.
 
 ## Install
 
@@ -127,11 +145,7 @@ where $i$ is an item, $d$ is a survey factor, $k$ is a scale point, and $M$ is t
 
 This is what the survey maps and range plots show. In the showcase CSVs, this is the `mean` column. For MFV showcase plots, model and human units differ, so the plotted quantity is relative foundation emphasis: each foundation profile is z-scored across foundations before mapping.
 
-For paired steering runs, compare the base profile to the steered profile path. Answer mass is a coherence check, not a value score:
-
-$$m(c) = \mathbb{E}_i \sum_{a \in A_i} P_c(a \mid i)$$
-
-where $A_i$ is the valid answer-token set for item $i$. The showcase drops a side at the first coefficient where answer mass is at or below 99% of the base run.
+For paired steering runs, compare the base profile to the steered profile path. The showcase drops a coefficient when its answer mass is at or below 99% of the base run.
 
 ## Scope
 
