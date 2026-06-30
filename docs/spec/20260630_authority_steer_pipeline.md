@@ -106,13 +106,25 @@ Out:
   - likely_fail: MFQ-2 noisy or opposite sign.
   - sneaky_fail: profile shift comes from loss of answer structure; catch with answer mass, survey contrast, and MFV margin.
   - UAT: one table lets the user decide whether the steer is good enough to show.
-- [ ] T8 (R1-R5): Repair the pure-Authority data selection.
+- [x] T8 (R1-R5): Repair the pure-Authority data selection.
   - steps: inspect rendered strict25 examples; remove scenarios whose Authority affordance is actually Social Norms, legality, institutional controversy, or welfare/autonomy; rerun scenario validation with stricter source balance and example audit.
   - verify: selected examples file has direct respect/disregard for authority without Social Norms or dignity/care wording, and source counts are not dominated by ValueBench.
   - success: strict selected rows still separate the fixed persona pair, and the rendered examples read like Authority rather than social-order controversy.
   - likely_fail: too few strict rows survive after deconfounding.
   - sneaky_fail: judge score is high because the responses echo `authority-respecting`/`authority-disregarding`; catch by reading examples and echo/style columns.
-  - UAT: committed steering-lite selection file plus example table show the corrected data before another GPU run.
+  - UAT: committed steering-lite selection file plus example table show the corrected data before another GPU run. Result: pass for data export, steer/eval pending.
+    - persona-library source commit: `f37cca5` (`Tighten pure authority selection`).
+    - steering-lite prompt-transfer commit: `6e05b29` (`Use verbatim persona-library prompts`).
+    - steering-lite selection commit: `f6ea42b` (`Add mundane pure-authority selection`).
+    - selected data: `/media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/data/persona_library_selections/pure_authority_qwen3_14b_mundane15.jsonl`.
+    - selected examples: `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/pure_authority_verbatim_mundane5_20260630/selection_score70/selected_examples.md`.
+- [/] T10 (R5): Run mundane15 pure-Authority steer/eval UAT across methods.
+  - steps: queue `mean_diff`, `pca`, `sspace`, `directional_ablation`, and `linear_act` on MFV/MFQ-2 with `c-grid=0.5,1`, `admin-n-samples=8`, and the verifier.
+  - verify: each pueue output dir passes or fails `scripts/verify_authority_showcase.py --small-c 0.5`.
+  - success: at least one method passes signed Authority direction on MFV and MFQ-2, MFV Social Norms does not dominate Authority, and coherence is clean.
+  - likely_fail: smaller cleaner data is underpowered and gives weak/unstable direction.
+  - sneaky_fail: method appears to work only because it changes retained c rows or answer structure; catch with verifier coherence and matching c grid.
+  - UAT: verifier tables for pueue tasks 417-421.
 - [ ] T9 (R7): Update README only from the final successful run.
   - steps: regenerate all README plots from one final artifact; add concise table and captions.
   - verify: README image links resolve; no 16PF plot; no WIP methodology journal in reader prose.
@@ -126,6 +138,7 @@ Out:
 - Current target: `+Authority <-> -Authority`.
 - Current target model: `Qwen/Qwen3-4B`.
 - Existing validation model evidence: `qwen/qwen3-8b`, same family and reasonably close, but weak strict-pass rates are not enough.
+- Current active training selection: `pure_authority_qwen3_14b_mundane15`, fixed pair with verbatim persona text and 15 strict-pass, score>=70 scenarios from role-authority mundane sources.
 - Sign calibration is run-local. If the axis declares an Authority anchor, positive `c` can be oriented to that anchor. Without a declared anchor, plots should use `+c`/`-c` only.
 - Persona-library Authority-only prep files:
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/data/personas/persona_pairs_v2_candidates.jsonl`
@@ -186,3 +199,5 @@ Out:
 - 2026-06-30: Pueue 409 `directional_ablation` completed at `/media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/outputs/20260630T123208Z_pure_authority_strict25_directional_ablation_mfv_mfq2_n8`. Verifier verdict: fail. Iso-KL calibration never reached target: bracket floor `C=0.0061` still had `kl_p95=0.971` against target `0.5`. MFV direction failed because both signs raised Authority (`+0.296` at `+0.5`, `+0.219` at `-0.5`), and selectivity failed because Social Norms moved more (`+0.407`, `+0.206`). MFQ-2 direction failed hard: `authority` C base `31.388`, `+0.5` delta `-6.284`, `-0.5` delta `-7.094`. Coherence was clean for both instruments.
 - 2026-06-30: Pueue 411 `linear_act` completed at `/media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/outputs/20260630T123208Z_pure_authority_strict25_linear_act_mfv_mfq2_n8`. Verifier verdict: fail. MFQ-2 small-c direction passed weakly (`authority` C base `30.660`, `+0.5` delta `+0.351`, `-0.5` delta `-3.905`), but MFV direction failed (`Authority` dlogit `-0.202` at `+0.5`, `+0.102` at `-0.5`) and selectivity failed because Social Norms moved more (`+0.294`, `+0.111`). Coherence was clean (`pmass=1.000`; MFV `frac_unscorable=0.000`), so this is not answer collapse.
 - 2026-06-30: All pure-Authority strict25 method runs failed the same verifier family. Pattern: coherence is clean, but either MFV Authority direction is wrong/weak, MFQ-2 Authority direction is wrong/weak, or MFV Social Norms dominates. This points more to selection/template/scenario contamination than to plotting or answer-token collapse.
+- 2026-07-01: Repaired the pure-Authority selection pipeline around the fixed pair and verbatim persona instructions. Removed direct ValueBench, Airisk/Machiavelli, law/police, safety/harm, and lexical false positives from bare `order/orders`, `master`, and `senior`. Final validator artifact: `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/pure_authority_verbatim_mundane5_20260630/stage_b_live_qwen3_14b_deepinfra.json`; 125 successes, 0 errors, 33 strict rows, 15 score>=70 selected rows across 4 sources, 0 persona echo/refusal.
+- 2026-07-01: Copied the selected data into steering-lite and added verbatim persona-library prompt support so the steer uses the same prompts that validation tested. Queued pueue 417-421 for `mean_diff`, `pca`, `sspace`, `directional_ablation`, and `linear_act` on MFV/MFQ-2 with `c=0.5,1`, `N=8`; pass criterion remains direction/selectivity/coherence.
