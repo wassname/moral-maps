@@ -86,8 +86,22 @@ Out:
 - Current target model: `Qwen/Qwen3-4B`.
 - Existing validation model evidence: `qwen/qwen3-8b`, same family and reasonably close, but weak strict-pass rates are not enough.
 - Sign calibration is run-local. If the axis declares an Authority anchor, positive `c` can be oriented to that anchor. Without a declared anchor, plots should use `+c`/`-c` only.
+- Persona-library Authority-only prep files:
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/data/personas/persona_pairs_v2_candidates.jsonl`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_only_20260630/manifest.json`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_only_20260630/stage_a_live.json`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_variants_20260630/manifest.json`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_variants_20260630/stage_a_live.json`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/manifest.json`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/stage_a_live.json`
 
 ## Log
 - 2026-06-30: User corrected the axis. `dignity_over_authority` is not the goal; it confounds Authority with dignity/care/wellbeing. Use Authority-only.
 - 2026-06-30: Killed pueue task 397 because it was spending GPU on README/eval plots for the old strict22 steer before the steer was known-good.
-
+- 2026-06-30: Added `authority_only` to persona-library as `authority-respecting` vs `authority-skeptical`, with behavior definitions that avoid dignity/care/wellbeing wording.
+- 2026-06-30: `prepare_authority_steering_selection.py` now defaults to `authority_only` and supports explicit `--axis-ids`. Dry-run manifest: 24 stage-A prompts from 12 sources, 10 templates, 240 planned pairs; stage B has 342 candidate scenarios.
+- 2026-06-30: First `authority_only` screen was too weak: best template strict-pass 0.083, mean axis delta 1.633. Audit samples showed generic wellbeing/autonomy responses when prompts lacked authority affordance, and several templates were grammatically bad for adjective personas.
+- 2026-06-30: Revised screen tests three mirrored Authority-only variants (`authority_only`, `authority_role_duty`, `authority_tradition_obedience`) and ten adjective-compatible templates. Dry-run manifest: 3 axes * 10 templates * 24 prompts = 720 planned pairs.
+- 2026-06-30: Switched persona-library validation to `openrouter_wrapper` after direct OpenAI SDK calls hit upstream Qwen 429s. Pushed wrapper fix `d011cd6` because its retry predicate was async and broke stamina/tenacity retries.
+- 2026-06-30: Added DeepInfra as explicit OpenRouter provider preference in the validator. Smoke artifact `out/authority_variants_20260630/wrapper_deepinfra_smoke_live.json` completed 3/3 rows with `provider_order=["DeepInfra"]`.
+- 2026-06-30: Replaced seed-random scenario selection with source-stratified Authority-affordance ranking. New stage-A rows include explicit boss/rules/commanding-officer/king/captain/protocol cases; weak sources remain visible so stage A can reject them.
