@@ -44,7 +44,7 @@ Out:
 - R6: README only shows successful artifacts. Done means: README plot captions name the Authority steer and use regenerated images from the final run. VERIFY: README image links and run-dir command point to the final output.
 
 ## Tasks
-- [/] T1 (R1, R2): Define and validate the right axis in persona-library.
+- [x] T1 (R1, R2): Define and validate the right axis in persona-library.
   - steps: add or run a `+Authority/-Authority` axis through the existing template/scenario validation workflow.
   - done:
     - [x] define Authority-only candidate axes, with no dignity/care/welfare negative pole.
@@ -55,8 +55,8 @@ Out:
     - [x] run full stage-A screen over 720 axis/template/scenario pairs.
     - [x] rerun stage A with wrapper timeout retry so no avoidable rows are missing.
     - [x] export selected stage-A winner to stage-B inputs.
-    - [/] run stage B over the 342 authority-affordant scenarios.
-    - [ ] export selected stage-B scenarios and selected examples.
+    - [x] run stage B over the 342 authority-affordant scenarios.
+    - [x] export selected stage-B scenarios and selected examples.
   - verify: print top template/axis rows and selected source counts.
   - success: best selected axis is Authority-only, not `dignity_over_authority`; selected scenarios are diverse across sources.
   - likely_fail: best row is still a conflict axis or all scenarios come from one source.
@@ -129,3 +129,5 @@ Out:
 - 2026-06-30: Stage A completed 720/720 after rerun with `openrouter_wrapper` commit `01190c8`, which retries upstream idle timeouts. Persona-library bump commit: `e61f8a0`.
 - 2026-06-30: Stage-A winner is `authority_tradition_obedience` with template `Answer as someone who is {persona}.`, strict pass 0.208 and mean axis delta 3.877. This is weak, so do not steer from stage A directly. Stage B is running over 342 authority-affordant scenarios to select only rows where the axis actually separates.
 - 2026-06-30: Stage B completed 342/342 with 49 strict rows. Exported stricter score>=60 selection with 32 scenarios across 8 sources. Committed in steering-lite as `2b59088`: `data/persona_library_selections/authority_only_qwen3_14b_score60.jsonl`, matching summary, and `scripts/run_authority_only_score60_showcase.sh`.
+- 2026-06-30: Killed steering-lite pueue task 399 after calibration reached `C=39.758`, `kl_p95=0.547` but then spent 34 minutes in the final calibration snapshot with no eval outputs. Killed task 400 because the runner did not forward CLI overrides, so it would have ignored `--fixed-C`.
+- 2026-06-30: Pushed steering-lite `eafae69` so `scripts/run_authority_only_score60_showcase.sh` forwards `"$@"`. Queued pueue task 401 with `--fixed-C 39.758 --out outputs/20260630_authority_only_qwen3_14b_score60_sspace_mfv_mfq2_n8_fixedC39758`.
