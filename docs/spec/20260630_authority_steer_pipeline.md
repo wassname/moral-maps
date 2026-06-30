@@ -16,7 +16,7 @@ Do not polish README plots from a bad or ambiguous steer.
 - Do not use `dignity_over_authority` as the steer axis. That is a conflict axis and confounds Authority with dignity/care/wellbeing.
 - Dignity, Care, Fairness, wellbeing, style, verbosity, refusal, and sycophancy are side-effect checks, not the axis definition.
 - Persona/template/scenario validation comes before steering.
-- Use the closest practical model for validation. Current evidence: persona-library used `qwen/qwen3-8b`, steer target is `Qwen/Qwen3-4B`; same family and close enough for first-pass selection, but weak validation should not be trusted.
+- Use the closest practical model for validation. Current path: `qwen/qwen3-14b` on DeepInfra, because `qwen/qwen3-8b` has only AtlasCloud/Alibaba endpoints and Alibaba was upstream-rate-limited. Steer target is still `Qwen/Qwen3-4B`.
 - Queue GPU steer/eval with `pueue` only after selection looks sane.
 - README is for readers. Keep journal, caveats, failed attempts, and work-in-progress methodology in this spec, not in README.
 - README should eventually show only the successful artifacts: what was steered, what moved, which eval measured it, and why a researcher might use it.
@@ -46,6 +46,14 @@ Out:
 ## Tasks
 - [/] T1 (R1, R2): Define and validate the right axis in persona-library.
   - steps: add or run a `+Authority/-Authority` axis through the existing template/scenario validation workflow.
+  - done:
+    - [x] define Authority-only candidate axes, with no dignity/care/welfare negative pole.
+    - [x] select source-stratified Authority-affordant stage-A scenarios.
+    - [x] validate OpenRouter routing: `qwen/qwen3-8b` has no DeepInfra endpoint; `qwen/qwen3-14b` on DeepInfra works.
+    - [x] fix Qwen3 blank generations by adding `/no_think` for Qwen generator prompts.
+    - [x] fix wrapper retry for OpenRouter SSE JSON/rate-limit errors and bump persona-library dependency.
+    - [/] run full stage-A screen over 720 axis/template/scenario pairs.
+    - [ ] export selected stage-A winner and selected examples.
   - verify: print top template/axis rows and selected source counts.
   - success: best selected axis is Authority-only, not `dignity_over_authority`; selected scenarios are diverse across sources.
   - likely_fail: best row is still a conflict axis or all scenarios come from one source.
@@ -97,6 +105,7 @@ Out:
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/alibaba_smoke_dryrun.json`
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/alibaba_smoke_live.json`
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/deepinfra_qwen3_14b_nothink_smoke_live.json`
+  - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_affordant_20260630/stage_a_live_qwen3_14b_deepinfra.json`
 
 ## Log
 - 2026-06-30: User corrected the axis. `dignity_over_authority` is not the goal; it confounds Authority with dignity/care/wellbeing. Use Authority-only.
@@ -112,3 +121,5 @@ Out:
 - 2026-06-30: Live Alibaba smoke confirmed the routing but hit upstream 429s from Alibaba: artifact `out/authority_affordant_20260630/alibaba_smoke_live.json` has `generator_provider_only=["Alibaba"]`, `n_results=1`, and the row error cites `provider_name="Alibaba"`. Next step is BYOK/wait/retry, or choose another close Qwen endpoint deliberately.
 - 2026-06-30: OpenRouter endpoint scan found `qwen/qwen3-14b` has DeepInfra; `qwen/qwen3-8b` does not. Direct mini-test showed DeepInfra Qwen3 returns `content=null` unless prompted with `/no_think`. Patched the validator to add `/no_think` for Qwen-family generator models.
 - 2026-06-30: Smoke artifact `out/authority_affordant_20260630/deepinfra_qwen3_14b_nothink_smoke_live.json` completed 3/3 rows with `generator_provider_only=["DeepInfra"]`. Early signal: `authority_tradition_obedience` strict-pass 1/1 and mean axis delta 6.3; generic `authority_only` still mostly collapses toward welfare.
+- 2026-06-30: Pushed `openrouter_wrapper` commit `816e2d0` to retry OpenRouter upstream SSE JSON/rate-limit errors, then bumped persona-library to that wrapper commit. Stage-A run resumed from cache and passed the previous Gemini failure point.
+- 2026-06-30: Current stage-A artifact `out/authority_affordant_20260630/stage_a_live_qwen3_14b_deepinfra.json` was at 274/720 results, 274 successes, 0 errors when checked.
