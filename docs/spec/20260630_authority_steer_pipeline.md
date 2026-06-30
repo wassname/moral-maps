@@ -14,7 +14,10 @@ Do not polish README plots from a bad or ambiguous steer.
 ## User Preferences
 - The target axis is Authority only: `+Authority <-> -Authority`.
 - The Authority persona pair is fixed by construct, not selected by validation. Validation may choose templates and scenarios, but must not choose a different persona pair or semantic proxy.
-- Pure Authority means roughly `respect authority` versus `disregard/challenge authority`. Do not use dignity, tradition, obedience, social norms, care, wellbeing, hierarchy-as-status, or broad social order as the pole definition.
+- Pure Authority means exactly this premise unless the user changes it:
+  - `+Authority`: `authority-respecting`
+  - `-Authority`: `authority-disregarding`
+- Do not use dignity, tradition, obedience, social norms, care, wellbeing, hierarchy-as-status, or broad social order as the pole definition.
 - Do not use `dignity_over_authority` as the steer axis. That is a conflict axis and confounds Authority with dignity/care/wellbeing.
 - Dignity, tradition, Social Norms, Care, Fairness, wellbeing, style, verbosity, refusal, and sycophancy are side-effect checks, not the axis definition.
 - Persona/template/scenario validation comes before steering.
@@ -39,73 +42,74 @@ Out:
 - General automatic sign labeling for arbitrary steering vectors.
 
 ## Requirements
-- R1: The persona pair is fixed pure Authority. Done means: artifacts show one pair only, `respect authority` versus `disregard/challenge authority`, with no dignity/tradition/Social-Norms/care/wellbeing pole wording. VERIFY: inspect pair JSON and rendered prompt examples.
-- R2: Template/scenario selection is validated before steering for the fixed pair only. Done means: summary reports template count, scenario sources, strict pass rate, axis delta, off-axis/style scores, and selected scenario count. VERIFY: selection summary JSON plus examples file, with no axis-variant winner field.
-- R3: The steering run uses selected data committed in steering-lite. Done means: steering-lite has `data/persona_library_selections/authority_only_*.jsonl` plus matching summary, and the runner references that file. VERIFY: `rg -n "authority_only" data/persona_library_selections scripts`.
-- R4: Small-c tinymfv direction is correct before high-c plots matter. Done means: MFV Authority moves in the intended direction at the smallest coherent positive coefficient, and the reverse side moves the opposite way. VERIFY: effect table from steering-lite/tinymfv output.
-- R5: Eval reliability is measured before README. Done means: MFV, MFQ-2, Humor, and Big Five report profile shift, reader-logit shift, and noise/CI where available; MFQ-2 uses sampled reads if needed. VERIFY: generated summary table.
-- R6: README only shows successful artifacts. Done means: README plot captions name the Authority steer and use regenerated images from the final run. VERIFY: README image links and run-dir command point to the final output.
+- R1: The persona pair is fixed pure Authority. Done means: artifacts show one pair only, `authority-respecting` versus `authority-disregarding`, with no dignity/tradition/Social-Norms/care/wellbeing pole wording. VERIFY: inspect pair JSON and rendered prompt examples.
+- R2: Template validation holds R1 fixed. Done means: summary ranks templates for the fixed pair only, with no axis/persona-variant winner. VERIFY: template screen artifact contains one pair id and multiple template ids.
+- R3: Scenario validation holds R1 and the chosen template fixed. Done means: source-stratified scenarios are selected because they elicit the fixed Authority contrast cleanly, not because they redefine the axis. VERIFY: selected examples file shows the same pair/template on every row.
+- R4: The steering run uses selected data committed in steering-lite. Done means: steering-lite has `data/persona_library_selections/pure_authority_*.jsonl` plus matching summary, and the runner references that file. VERIFY: `rg -n "pure_authority" data/persona_library_selections scripts`.
+- R5: Small-c tinymfv direction is correct before high-c plots matter. Done means: MFV Authority moves in the intended direction at the smallest coherent positive coefficient, and the reverse side moves the opposite way. VERIFY: effect table from steering-lite/tinymfv output.
+- R6: Eval reliability is measured before README. Done means: MFV, MFQ-2, Humor, and Big Five report profile shift, reader-logit shift, and noise/CI where available; MFQ-2 uses sampled reads if needed. VERIFY: generated summary table.
+- R7: README only shows successful artifacts. Done means: README plot captions name the pure Authority steer and use regenerated images from the final run. VERIFY: README image links and run-dir command point to the final output.
 
 ## Tasks
-- [ ] T1 (R1, R2): Fix pure Authority pair and validate only templates/scenarios.
-  - steps: use one fixed `+Authority/-Authority` persona pair, then run template/scenario validation without axis variants.
+- [ ] T1 (R1): Write the fixed pure Authority pair.
+  - steps: add the exact pair `authority-respecting` vs `authority-disregarding` to persona-library/steering-lite selection inputs; remove axis-variant selection from the active path.
   - done:
-    - [ ] define one pure Authority pair, with no dignity/tradition/Social-Norms/care/welfare pole wording.
-    - [ ] select source-stratified Authority-affordant stage-A scenarios.
-    - [x] validate OpenRouter routing: `qwen/qwen3-8b` has no DeepInfra endpoint; `qwen/qwen3-14b` on DeepInfra works.
-    - [x] fix Qwen3 blank generations by adding `/no_think` for Qwen generator prompts.
-    - [x] fix wrapper retry for OpenRouter SSE JSON/rate-limit errors and bump persona-library dependency.
-    - [ ] run stage A over fixed pair x templates x stage-A scenarios.
-    - [ ] export the best template to stage-B inputs.
-    - [ ] run stage B over authority-affordant scenarios.
-    - [ ] export selected scenarios and selected examples.
-  - verify: print top template rows and selected source counts for the fixed pair.
-  - success: template/scenario selection is diverse and uses the fixed pure Authority pair.
-  - likely_fail: generated responses separate on tradition/social norms more than Authority.
-  - sneaky_fail: positive pole is just authoritarian/harmful or negative pole is just caring/helpful; catch by reading selected examples and off-axis scores.
-  - UAT: open the selected examples file and see clear Authority contrast without dignity/tradition/social-norms/care as the defining feature.
-- [ ] T2 (R2, R3): Export the selected data into steering-lite.
-  - steps: copy selected JSONL and summary into `steering-lite/data/persona_library_selections/`; add a runner for the authority-only selection.
-  - verify: `rg -n "authority_only" /media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/data/persona_library_selections /media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/scripts`.
-  - success: runner references authority-only selection and no strict22 path.
-  - likely_fail: runner still references `authority_dignity_strict22`.
-  - sneaky_fail: copied summary and JSONL disagree on template/axis; catch by parsing both.
-  - UAT: file paths are clickable and committed in steering-lite.
-- [ ] T3 (R4): Queue a steering-lite steer/eval only after T1/T2 pass.
-  - steps: pueue a GPU job with label stating expected Authority movement and pass/fail resolve.
-  - verify: pueue label includes why/resolve; output contains c-grid MFV profiles.
-  - success: small positive `c` raises MFV Authority and small negative `c` lowers it.
+    - [ ] pair artifact contains exactly one pair id.
+    - [ ] rendered example shows only `authority-respecting` and `authority-disregarding`.
+  - verify: `rg -n "authority-respecting|authority-disregarding|authority_tradition_obedience|dignity_over_authority" <selection files>`.
+  - success: only the pure pair appears in active selection files.
+  - likely_fail: old `authority_tradition_obedience` runner or JSON is still referenced.
+  - sneaky_fail: pair wording smuggles in tradition, dignity, care, or social norms; catch by reading rendered prompts.
+  - UAT: file paths show the exact pure pair and no proxy pair.
+- [ ] T2 (R2): Validate templates with the fixed pair.
+  - steps: run a stage-A screen over fixed pair x candidate templates x source-stratified Authority-affordant scenarios.
+  - verify: summary table has one pair id, multiple template ids, and off-axis/style audit columns.
+  - success: choose a template because it cleanly elicits the fixed Authority contrast.
+  - likely_fail: all templates produce weak separation.
+  - sneaky_fail: the top template wins by persona echo or verbosity; catch with echo/style columns and example reads.
+  - UAT: selected template artifact plus examples can be inspected without reading code.
+- [ ] T3 (R3): Validate and export scenarios with the fixed pair and chosen template.
+  - steps: run stage B over up to 30 source-ranked scenarios per source where practical; export strict-pass scenarios and examples.
+  - verify: selected source-count table plus selected examples file.
+  - success: selected scenarios are diverse and elicit pure Authority contrast.
+  - likely_fail: many sources produce no strict-pass scenarios.
+  - sneaky_fail: scenarios themselves make the contrast about tradition/social norms or care; catch by source-balanced example inspection.
+  - UAT: selected examples show the same fixed pair/template on varied scenarios.
+- [ ] T4 (R4): Export selected data into steering-lite.
+  - steps: copy selected JSONL and summary into `steering-lite/data/persona_library_selections/`; add a pure Authority runner.
+  - verify: `rg -n "pure_authority|authority-respecting|authority-disregarding|authority_tradition_obedience" /media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/data/persona_library_selections /media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/scripts`.
+  - success: runner references pure Authority selection and no proxy/strict22 path.
+  - likely_fail: runner still references `authority_tradition_obedience`.
+  - sneaky_fail: copied summary and JSONL disagree on pair/template; catch by parsing both.
+  - UAT: committed steering-lite files point to the pure Authority selection.
+- [ ] T5 (R5): Queue one cheap pure-Authority steer/eval UAT.
+  - steps: queue `sspace` first on `mfv mfq2` at `c=0.5,1`, `admin-n-samples=8`; only broaden after it passes.
+  - verify: pueue label includes why/resolve; output contains MFV and MFQ-2 profiles over the signed c-grid.
+  - success: small positive `c` raises MFV/MFQ-2 Authority and small negative `c` lowers it, without Social Norms dominating MFV.
   - likely_fail: sign is reversed or flat.
-  - sneaky_fail: Authority moves only at incoherent high `c`; catch with coherence/path gate.
-  - UAT: effect table shows the small-c Authority direction before any README plot update.
-- [ ] T4 (R5): Evaluate reliability and side effects.
+  - sneaky_fail: Authority moves only because high-c rows are incoherent; catch with pmass, MFV margin, and small-c verifier.
+  - UAT: verifier table shows local direction, path through `c=1`, and off-axis max.
+- [ ] T6 (R5, R6): If the cheap UAT passes, compare runner-supported methods.
+  - steps: queue `mean_diff`, `pca`, `sspace`, `directional_ablation`, and `linear_act` with unique timestamped output dirs.
+  - verify: each output dir has `summary.json`, `mfv_profiles.csv`, `mfq2_profiles.csv`, and method-specific verifier output.
+  - success: choose a method that preserves pure Authority direction and selectivity.
+  - likely_fail: all methods reproduce off-axis Social Norms movement.
+  - sneaky_fail: a method looks good because retained c values differ; catch by printing retained c values and quality gates.
+  - UAT: method comparison table links each output dir and verifier table.
+- [ ] T7 (R6): Evaluate reliability and side effects.
   - steps: run tinymfv summary over MFV, MFQ-2, Humor, Big Five; estimate noise/CI where available.
   - verify: table includes profile shift/human SD, reader-logit shift, and uncertainty/noise columns.
   - success: Authority signal is larger than noise and side effects are interpretable.
   - likely_fail: MFQ-2 noisy or opposite sign.
   - sneaky_fail: profile shift comes from loss of answer structure; catch with answer mass, survey contrast, and MFV margin.
   - UAT: one table lets the user decide whether the steer is good enough to show.
-- [ ] T5 (R6): Update README only from the final successful run.
+- [ ] T8 (R7): Update README only from the final successful run.
   - steps: regenerate all README plots from one final artifact; add concise table and captions.
   - verify: README image links resolve; no 16PF plot; no WIP methodology journal in reader prose.
   - success: reader sees what tinymfv is, what was steered, which datasets measured it, and why it matters.
   - likely_fail: README narrates failed strict22/debug history.
   - sneaky_fail: captions imply a general sign convention; catch by reading README without this spec.
   - UAT: external-review-v2 comprehension panel can explain what/where/why/measurement/dataset in its own words.
-- [ ] T6 (R4, R5): Fix the current Authority steer before README.
-  - steps: run a cheaper verifier first (`mfv` at `c=0.5,1`, `mfq2` at `c=0.5,1`) while iterating axis/C/selection.
-  - verify: effect table shows Authority local direction, monotone path through `c=1`, and off-axis max smaller than Authority shift on MFV/MFQ-2.
-  - success: no MFQ-2 double-back at `+1`; MFV Social Norms is not the largest movement.
-  - likely_fail: lowering C makes direction vanish instead of fixing the path.
-  - sneaky_fail: selecting scenarios by MFV/MFQ-2 directly overfits the eval; keep persona-library validation separate from tinymfv eval.
-  - UAT: verifier table plus per-foundation path table show the steer is both signed and selective enough to plot.
-- [ ] T7 (R4, R5, R6): Compare one full showcase run per runner-supported steering method.
-  - steps: queue `mean_diff`, `pca`, `sspace`, `directional_ablation`, and `linear_act` with the same Authority-only score60 persona-library selection, the same `mfv mfq2 humor_styles big5` instrument subset, sampled survey reads `N=8`, and signed c-grid `0.5,1,2,3,4`.
-  - verify: each output dir has `summary.json`, `mfv_profiles.csv`, `mfq2_profiles.csv`, `humor_styles_profiles.csv`, `big5_profiles.csv`; then run the Authority verifier and regenerate plots only from passing runs.
-  - success: at least one method moves Authority in the intended direction locally and through coherent `c=1`, does not make MFV Social Norms the largest effect, and yields coherent README-relevant plots.
-  - likely_fail: all methods reproduce the same off-axis Social Norms/tradition entanglement.
-  - sneaky_fail: a method looks good because high-c rows were dropped asymmetrically; catch by printing retained c values and per-instrument quality gates beside the plots.
-  - UAT: a method comparison table links each output dir, verifier table, and regenerated plot folder.
 
 ## Context
 - Current wrong path: `dignity_over_authority` strict22. It was selected as the best dignity conflict axis, not the desired Authority-only axis.
@@ -158,3 +162,4 @@ Out:
   - pueue 407: `directional_ablation` -> `/media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/outputs/20260630T104202_authority_tradition_obedience_score60_directional_ablation_mfv_mfq2_humor_big5_n8`
   - pueue 408: `linear_act` -> `/media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/outputs/20260630T104202_authority_tradition_obedience_score60_linear_act_mfv_mfq2_humor_big5_n8`
 - 2026-06-30: User caught a spec error: validation was supposed to hold the pure Authority persona pair fixed and choose only templates/scenarios. The previous stage-A screen incorrectly let validation choose among axis/persona variants, and selected `authority_tradition_obedience`, a proxy contaminated by tradition/Social Norms. Killed pueue 404 and removed 405-408; old score60 artifacts are invalid evidence for the pure-Authority goal.
+- 2026-06-30: Replanned the active path around the fixed premise `authority-respecting` vs `authority-disregarding`. Validation now only selects templates and scenarios; method comparison only happens after a cheap pure-Authority steer/eval UAT passes.
