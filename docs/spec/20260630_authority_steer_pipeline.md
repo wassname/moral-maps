@@ -170,6 +170,20 @@ Out:
   - likely_fail: MFV Authority sign regresses in the full run.
   - sneaky_fail: plotter silently drops different `c` rows per instrument; catch by the shared coherent c-values printout.
   - UAT: live plot files are in `/media/wassname/SGIronWolf/projects5/2026/lite/tinymfv/docs/img/showcase/{mfv,mfq2,humor_styles,big5}/`. MFV verifier result: Authority dlogit `+0.306/-0.327` at `c=0.5` and `+0.906/-0.910` at `c=1.0`; `pmass=1.000`, `frac_unscorable=0.000`, and minimum `margin/base=0.800`. Plotter result: shared coherent c values `[-1.0, -0.5, 0.0, 0.5, 1.0]`.
+- [/] T15 (R5): Try PCA in whitened S-space.
+  - steps: add `sspace_pca` to steering-lite as a separate method; compute paired-diff PCA after projecting Linear outputs into whitened S-space; queue the same pure-Authority MFV/MFQ-2 UAT.
+  - verify: `just smoke` in steering-lite includes `sspace_pca`; `scripts/run_allinstr_showcase.py --method sspace_pca ... --instruments mfv mfq2` writes a unique output dir; `scripts/verify_authority_showcase.py <out_dir>` reports MFV Authority direction and coherence.
+  - success: `sspace_pca` matches or improves PCA on MFV Authority direction while keeping MFV coherence clean.
+  - likely_fail: S-space PCA behaves like old `sspace`, signed locally but unstable at `c=1`.
+  - sneaky_fail: it looks better only because a different c grid or coherence gate was used; catch by reusing `c-grid=0.5,1`, `N=8`, and the same verifier.
+  - UAT: steering-lite branch `feat/corda-space-steering`, commit `746be6c`, adds `sspace_pca`. Smoke proof: `/tmp/corda_steering_lite_smoke.log` shows `30 passed in 93.31s`. Real UAT queued as pueue `438`, output `/media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/outputs/20260701T181538_pure_authority_mundane15_sspace_pca_mfv_mfq2_n8`.
+- [/] T16 (R5): Add a real CorDA-space steering variant.
+  - steps: use the CorDA paper/repo construction: estimate context covariance, decompose `W Sigma_x`, apply `Sigma_x^{-1}` to the right singular factor, then extract a steering direction in that context-oriented rank space.
+  - verify: `just smoke` in steering-lite includes `corda_pca`; `scripts/run_allinstr_showcase.py --method corda_pca ... --instruments mfv mfq2` writes a unique output dir; `scripts/verify_authority_showcase.py <out_dir>` reports MFV Authority direction and coherence.
+  - success: `corda_pca` gives a clean MFV Authority path and coherence evidence comparable to, or better than, residual PCA.
+  - likely_fail: last-token covariance is too low-rank and mostly behaves like regularized SVD of `W`.
+  - sneaky_fail: implementation is merely S-space with a new name; catch by checking for `W Sigma_x`, regularized covariance inverse, and the reconstructed right factor.
+  - UAT: steering-lite branch `feat/corda-space-steering`, commit `746be6c`, adds `corda_pca`. Smoke proof: `/tmp/corda_steering_lite_smoke.log` shows `30 passed in 93.31s`. Real UAT queued as pueue `439`, output `/media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/outputs/20260701T181538_pure_authority_mundane15_corda_pca_mfv_mfq2_n8`.
 
 ## Context
 - Current wrong path: `dignity_over_authority` strict22. It was selected as the best dignity conflict axis, not the desired Authority-only axis.
@@ -178,6 +192,8 @@ Out:
 - Existing validation model evidence: `qwen/qwen3-8b`, same family and reasonably close, but weak strict-pass rates are not enough.
 - Current active training selection: `pure_authority_qwen3_14b_mundane15`, fixed pair with verbatim persona text and 15 strict-pass, score>=70 scenarios from role-authority mundane sources.
 - Sign calibration is run-local. If the axis declares an Authority anchor, positive `c` can be oriented to that anchor. Without a declared anchor, plots should use `+c`/`-c` only.
+- `sspace_pca` hypothesis: PCA worked best in residual space; S-space was locally signed but unstable at `c=1`. PCA in whitened S-space tests whether the useful part was the PCA direction estimator while keeping the weight-SVD coordinate system.
+- `corda_pca` hypothesis: CorDA orients weight decomposition with data context by decomposing `W Sigma_x` and reconstructing with `Sigma_x^{-1}`. The steering-lite variant uses last-token prompt context covariance for memory, not the full-sequence 43GB-style covariance path from the reference implementation.
 - Persona-library Authority-only prep files:
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/data/personas/persona_pairs_v2_candidates.jsonl`
   - `/media/wassname/SGIronWolf/projects5/2026/weight-steering-repos/persona-steering-template-library/out/authority_only_20260630/manifest.json`
@@ -245,3 +261,4 @@ Out:
 - 2026-07-01: Pueue 423 completed the full PCA run over MFV, MFQ-2, Humor Styles, and Big Five at `N=8`: `/media/wassname/SGIronWolf/projects5/2026/lite/steering-lite/outputs/20260630T222000Z_pure_authority_mundane15_pca_readme_mfv_mfq2_humor_big5_n8`. MFV Authority direction is signed at both evaluated magnitudes (`+0.306/-0.327` at `c=0.5`; `+0.906/-0.910` at `c=1.0`) and coherence is clean (`pmass=1.000`, unscorable `0`, min margin/base `0.800`). The README plot images were regenerated from this run with the shared coherent c path `[-1,-0.5,0,+0.5,+1]`.
 - 2026-07-01: MFQ-2 per-sample bootstrap from the pueue 423 run shows sign stability even at `N=1`: every bootstrap draw has the intended Authority direction for `c in {-1,-0.5,+0.5,+1}`. `N=4` or `N=8` tightens uncertainty, but the minimum sign-stable `N` in this run is `1`.
 - 2026-07-01: README was updated from the final PCA run only. External-review-v2 comprehension panels first identified repeated gaps around `reader-logit shift`, the c path/gates, and MFQ-2 sampled reads; after edits, the final panel understood the core package/use-case and left only expected out-of-scope requests for a steering-lite end-to-end tutorial.
+- 2026-07-01: Steering-lite branch `feat/corda-space-steering` commit `746be6c` adds `sspace_pca` and `corda_pca`. `sspace_pca` is PCA after projection into whitened weight-SVD coordinates. `corda_pca` follows the CorDA construction from Yang et al. 2024 and iboing/CorDA: regularized last-token context covariance, SVD of `W Sigma_x`, and right-factor reconstruction with `Sigma_x^{-1}`. Tiny-model smoke passed with `30 passed in 93.31s`. Pueue `438` and `439` are queued for pure-Authority MFV/MFQ-2 UAT.
