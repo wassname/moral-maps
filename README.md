@@ -1,10 +1,10 @@
 # tinymfv
 
-tinymfv is a small set of fast value evals for local LLM steering work. It asks moral vignettes and survey questions, reads answer-token probabilities, and turns them into one model profile.
+tinymfv is a small set of fast value evals for local LLM steering work. It asks moral vignettes and survey questions, reads answer-token probabilities, and turns them into model profiles.
 
-Use it when you want to know whether a steer moved the intended values, moved nearby values too, and still lands near real human response patterns. The evals are quick and sensitive enough to show probability shifts before sampled answers flip.
+Use it to check three things: did the intended value move, what else moved, and does the model still sit near human response patterns? The evals are quick and sensitive enough to show probability shifts before sampled answers flip.
 
-The plots compare that profile to human data. Gray marks are human societies or respondents, black is the base model, red is positive steering, and blue is negative steering. This showcase uses an Authority contrast vector built from `authority-respecting` versus `authority-disregarding` personas. steering-lite built and applied the vector; tinymfv measures the resulting model profiles. Here `c` is the steering-lite multiplier on that vector. Red is `+c`, more Authority; blue is `-c`, less Authority.
+The plots compare model profiles to human data. Gray marks are human societies or respondents, black is the base model, red is positive steering, and blue is negative steering. This showcase uses a steering vector built from `authority-respecting` versus `authority-disregarding` personas. steering-lite built and applied the vector; tinymfv measures the result. Here `c` is the steering-lite multiplier on that vector. Red is `+c`, more Authority; blue is `-c`, less Authority.
 
 MFV comes first because it is the direct moral-vignette readout. MFV uses categorical answers: the answer is a moral foundation. MFQ-2 is the Moral Foundations Questionnaire 2 survey, where the answer is a 1-5 scale point.
 
@@ -12,7 +12,7 @@ MFV comes first because it is the direct moral-vignette readout. MFV uses catego
 
 ![MFV range plot: foundation emphasis beside Authority steering](docs/img/showcase/mfv/range.png)
 
-MFV uses the same map and range plotters as the surveys, after converting foundation probabilities into relative foundation emphasis. Each profile is z-scored across foundations before mapping, so the plot compares which foundations are high or low within that profile.
+MFV uses the same map and range plotters as the surveys, after converting forced-choice foundation probabilities into relative foundation emphasis. Each profile is z-scored across foundations before mapping, so the plot compares which foundations are high or low within that profile.
 
 ![Humor Styles range plot: human society ranges beside Authority steering](docs/img/showcase/humor_styles/range.png)
 
@@ -34,7 +34,7 @@ MFQ-2 means Moral Foundations Questionnaire 2, the short survey instrument. It i
 
 The path shows only usable coefficients: `c=0`, then each positive and negative side until one of the plot gates fails. This run kept the full path `c=-1,-0.5,0,+0.5,+1`. For surveys, collapse can mean the answer distribution loses its factor structure even when answer mass stays high.
 
-This is the same run as the plots. The contrast used to build the vector varied Authority; the table shows every measured axis that moved.
+This is the same run as the plots. The vector was built from an Authority persona pair; the table shows the measured movement and side effects.
 
 `profile shift / human SD` is the distance from `c=-1` to `c=+1`, divided by the standard deviation of country means in the bundled human reference for that axis. `100%` means one human SD. `profile shift` is in plot units: MFV relative-emphasis z-score, or survey expected 1-5 score. `reader-logit shift` is the direct answer-logit readout for the same endpoints: MFV uses the per-foundation logit change, surveys use the rank-logit contrast `C`. The `+/-` term is the propagated item uncertainty.
 
@@ -87,9 +87,9 @@ just smoke
 
 | dataset | bundled data | human reference | profile used in plots |
 |---|---|---|---|
-| MFV classic | [132 moral vignettes, other](src/tinymfv/data/vignettes_classic_other_violate.jsonl) / [self](src/tinymfv/data/vignettes_classic_self_violate.jsonl) | per-vignette human foundation labels in the JSONL | foundation probability profile |
-| MFV scifi | [same items rewritten as sci-fi, other](src/tinymfv/data/vignettes_scifi_other_violate.jsonl) / [self](src/tinymfv/data/vignettes_scifi_self_violate.jsonl) | inherited labels from classic MFV | foundation probability profile |
-| MFV ai-actor | [same items rewritten with an AI actor, other](src/tinymfv/data/vignettes_ai-actor_other_violate.jsonl) / [self](src/tinymfv/data/vignettes_ai-actor_self_violate.jsonl) | inherited labels from classic MFV | foundation probability profile |
+| MFV classic | [132 moral vignettes, other](src/tinymfv/data/vignettes_classic_other_violate.jsonl) / [self](src/tinymfv/data/vignettes_classic_self_violate.jsonl) | per-vignette human foundation labels in the JSONL | forced-choice foundation probability profile |
+| MFV scifi | [same items rewritten as sci-fi, other](src/tinymfv/data/vignettes_scifi_other_violate.jsonl) / [self](src/tinymfv/data/vignettes_scifi_self_violate.jsonl) | inherited labels from classic MFV | forced-choice foundation probability profile |
+| MFV ai-actor | [same items rewritten with an AI actor, other](src/tinymfv/data/vignettes_ai-actor_other_violate.jsonl) / [self](src/tinymfv/data/vignettes_ai-actor_self_violate.jsonl) | inherited labels from classic MFV | forced-choice foundation probability profile |
 | MFQ-2 | [36 items](src/tinymfv/data/surveys/mfq2/forward.json), plus inverted and negated frames | [country means](src/tinymfv/data/human/mfq2_country_foundations.csv), plus [raw respondents](src/tinymfv/data/atari_study2_raw.csv) | expected 1-5 score per foundation |
 | Big Five | [50 items](src/tinymfv/data/surveys/big5/questionnaire.json), plus inverted and negated frames | [country means](src/tinymfv/data/human/big5_country_factors.csv) | expected 1-5 score per trait |
 | 16PF | [162 items](src/tinymfv/data/surveys/16pf/questionnaire.json), plus inverted and negated frames | [country means](src/tinymfv/data/human/16pf_country_factors.csv) | expected 1-5 score per factor |
@@ -113,7 +113,7 @@ model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen3-4B").cuda()
 vignettes = load_vignettes("classic")  # "classic", "scifi", "ai-actor", or "all"
 report = evaluate(model, tok, vignettes=vignettes)
 
-print(report["profile"])              # mean probability per foundation
+print(report["profile"])              # mean forced-choice probability per foundation
 print(report["mean_pmass_allowed"])   # format check: mass on valid answer tokens
 ```
 
@@ -140,7 +140,7 @@ Generate the bundled range plots and culture maps from a steering-lite all-instr
 uv run python scripts/plot_steer_showcase.py \
   --run-dir ../steering-lite/outputs/20260630T222000Z_pure_authority_mundane15_pca_readme_mfv_mfq2_humor_big5_n8 \
   --out docs/img/showcase \
-  --vec-label "Authority contrast, PCA (+c = more Authority)" \
+  --vec-label "Authority steer, PCA (+c = more Authority)" \
   --coherence-frac 0.99 \
   --contrast-frac 0.000001 \
   --margin-frac 0.50
@@ -152,7 +152,7 @@ The plot gate keeps only coefficients that all plotted instruments can still rea
 
 The measurement on the maps is the profile.
 
-For MFV, the profile is the model's mean probability on each moral foundation:
+For MFV, the profile is the model's mean forced-choice probability on each moral foundation:
 
 $$\mathrm{profile}_f = \mathbb{E}_i P(f \mid i)$$
 
