@@ -74,6 +74,41 @@ GROUP_PITCH = 1.55       # x-distance between factors; > pair width so each (soc
 # base is neutral, +c is red, -c is blue, human societies are grey.
 C_BASE, C_HON, C_DIS, C_HUM = "#111111", POS_COL, NEG_COL, "#888888"
 
+# Stable per-zone fill colors so the SAME Inglehart-Welzel zone reads the same across every
+# instrument's map (research consistency). Keyed by the zone names the caller passes; an unlisted
+# zone falls back to grey. -- added by Claude
+ZONE_COLORS = {
+    "English-Speaking": "#4e79a7",
+    "Protestant Europe": "#59a14f",
+    "Catholic Europe":   "#8cd17d",
+    "Orthodox":          "#b6992d",
+    "Baltic":            "#499894",
+    "Confucian":         "#e15759",
+    "Latin America":     "#f28e2b",
+    "African-Islamic":   "#9c755f",
+    "South Asia":        "#b07aa1",
+}
+
+
+def convex_hull(pts: np.ndarray) -> np.ndarray:
+    """2D convex-hull vertices (CCW) via Andrew's monotone chain. Inline instead of scipy so the
+    `maps` install extra stays matplotlib-only (scipy is dev-only). pts (n,2) -> polygon (m,2)."""
+    P = sorted(map(tuple, pts.tolist()))
+    if len(P) <= 2:
+        return np.array(P, dtype=float)
+    cross = lambda o, a, b: (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+    lower: list = []
+    for p in P:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
+            lower.pop()
+        lower.append(p)
+    upper: list = []
+    for p in reversed(P):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
+            upper.pop()
+        upper.append(p)
+    return np.array(lower[:-1] + upper[:-1], dtype=float)
+
 
 def save_both(fig, fig_dir: Path, stem: str, dpi: int = 200) -> Path:
     fig_dir.mkdir(parents=True, exist_ok=True)
@@ -180,6 +215,7 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
                       *, respondents: np.ndarray | None = None, haze: np.ndarray | None = None,
                       traj: dict[float, np.ndarray] | None = None, traj_incoherent: set | None = None,
                       boots: dict | None = None,
+                      zones: dict[str, list[str]] | None = None, emphasize: set[str] | None = None,
                       labels: tuple[str, str, str] = ("baseline (c=0)", "honest (c=+2)", "dishonest (c=-2)")):
     """Ipsative culture map. M is societies x K (0-1 fraction); base / pos / neg are the length-K
     fraction vectors for the base model and its two steer poles (or None). `labels` is the legend
@@ -194,8 +230,12 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     path through PC space. Public README plots pass only the coherent prefix; incoherent c values
     are omitted.
     `traj_incoherent` is the subset of those c whose admin pmass fell below the coherence floor --
-    drawn hollow. `boots` optionally maps 'base'/'honest'/'dis' -> (n x K) bootstrap matrices. Returns
-    the Figure."""
+    drawn hollow. `boots` optionally maps 'base'/'honest'/'dis' -> (n x K) bootstrap matrices.
+    `zones` maps an Inglehart-Welzel zone name to the subset of `countries` (verbatim strings) in it;
+    each zone with >=3 members gets a shaded convex hull (echoes the Economist WVS map's zone blobs),
+    testing whether moral-foundation space recovers the WVS clusters. `emphasize` is a subset of
+    `countries` labelled bold-first so named outliers (China, US, Sweden...) always survive the
+    label-collision drop. Returns the Figure."""
     try:
         import textalloc as ta
     except ImportError:
@@ -216,16 +256,44 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         Pi = (cloud @ Pc - mu) @ Vt[:2].T
         ax.scatter(Pi[:, 0], Pi[:, 1], s=4, c="#8f8a7e", alpha=0.14, edgecolors="none",
                    zorder=1, rasterized=True)
+    # Inglehart-Welzel zone hulls: a shaded convex blob per zone with >=3 member societies, drawn
+    # UNDER the society dots (zorder<3). The zone name sits at the hull centroid in grey, echoing the
+    # Economist WVS map. A 2-member zone has no polygon, so it's shown as its connecting segment.
+    if zones:
+        cidx = {c: i for i, c in enumerate(countries)}
+        for zname, members in zones.items():
+            mi = [cidx[c] for c in members if c in cidx]
+            if len(mi) < 2:
+                continue
+            zpts = P[mi]
+            zcol = ZONE_COLORS.get(zname, "#888888")
+            if len(mi) >= 3:
+                hull = convex_hull(zpts)
+                ax.add_patch(plt.Polygon(hull, closed=True, facecolor=zcol, edgecolor=zcol,
+                                         alpha=0.13, lw=1.0, zorder=1.6))
+                ax.plot(*np.vstack([hull, hull[:1]]).T, color=zcol, lw=1.0, alpha=0.45, zorder=1.7)
+            else:
+                ax.plot(zpts[:, 0], zpts[:, 1], color=zcol, lw=1.2, alpha=0.5, zorder=1.7)
+            cx, cy = zpts.mean(0)
+            ax.text(cx, cy, zname, fontsize=8.5, color="#6b6b6b", ha="center", va="center",
+                    style="italic", zorder=2, alpha=0.85)
     ax.scatter(P[:, 0], P[:, 1], s=26, c=C_HUM, alpha=0.7, edgecolors="white", linewidths=0.5, zorder=3)
-    # Society labels: each 2-letter ISO code is pinned RIGHT NEXT to its dot (small fixed offset, no
-    # leader line). A label is dropped entirely if its box would collide with an already-placed one --
-    # better an omitted code than one flung far from its point. No relocation, no arrows.
+    # Society labels: each name/ISO code is pinned RIGHT NEXT to its dot (small fixed offset, no
+    # leader line). A label is dropped if its box would collide with an already-placed one -- better an
+    # omitted code than one flung far from its point. `emphasize` countries are placed FIRST (so they
+    # win contested space) and drawn bold+dark, so the named outliers always survive the drop.
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     placed_boxes = []
-    for i in np.argsort(P[:, 0]):                      # left-to-right; leftmost wins contested space
-        t = ax.annotate(countries[i], (P[i, 0], P[i, 1]), fontsize=7, color="#555555",
-                        xytext=(3, 2), textcoords="offset points", zorder=6)
+    emph = emphasize or set()
+    order_lr = list(np.argsort(P[:, 0]))               # left-to-right; leftmost wins contested space
+    order = [i for i in order_lr if countries[i] in emph] + [i for i in order_lr if countries[i] not in emph]
+    for i in order:
+        is_e = countries[i] in emph
+        t = ax.annotate(countries[i], (P[i, 0], P[i, 1]),
+                        fontsize=8.5 if is_e else 7, color="#111111" if is_e else "#555555",
+                        fontweight="bold" if is_e else "normal",
+                        xytext=(3, 2), textcoords="offset points", zorder=7 if is_e else 6)
         bb = t.get_window_extent(renderer)
         if any(bb.overlaps(b) for b in placed_boxes):
             t.remove()
