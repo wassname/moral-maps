@@ -142,11 +142,14 @@ def select_spread_zones(P: np.ndarray, countries: list[str], zones: dict[str, li
 
 
 def outlying_countries(P: np.ndarray, countries: list[str], n: int = 4) -> set[str]:
-    """The `n` countries farthest from the data centroid -- the automatic extreme labels for ANY map,
-    unioned with a named-major set (US/Japan/China...) so every map labels the same few landmarks plus
-    whatever its own extremes are."""
-    d = np.hypot(*(P - P.mean(0)).T)
-    return {countries[i] for i in np.argsort(d)[::-1][:n]}
+    """The corner-most country in each direction: the society that projects farthest along each of n
+    compass directions from the centroid (n=4 -> the four diagonal CORNERS top-right/bottom-left/
+    top-left/bottom-right; n=8 adds the axis extremes). Unlike 'n farthest from the centroid' (which
+    can bunch all on one side and miss a corner), this guarantees the top-right-most, bottom-left-most
+    etc. are each labelled -- the extremes a reader's eye goes to, on ANY map."""
+    Pc = P - P.mean(0)
+    dirs = [(1, 1), (-1, -1), (-1, 1), (1, -1), (1, 0), (-1, 0), (0, 1), (0, -1)][:n]
+    return {countries[int(np.argmax(Pc[:, 0] * dx + Pc[:, 1] * dy))] for dx, dy in dirs}
 
 
 def draw_zone_hulls(ax, P: np.ndarray, countries: list[str], zones: dict[str, list[str]],

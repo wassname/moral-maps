@@ -223,17 +223,22 @@ def main() -> None:
     ax.axvline(med_x, color="#c9c4b4", lw=1.0, zorder=1)
     maps.draw_zone_hulls(ax, P, countries, zones)
     ax.scatter(P[:, 0], P[:, 1], s=28, c=dot_cols, alpha=0.85, edgecolors="white", linewidths=0.5, zorder=3)
-    for i, c in enumerate(countries):
-        if c in label_set:
-            ax.annotate(c, (P[i, 0], P[i, 1]), fontsize=9, xytext=(4, 3),
-                        textcoords="offset points", color="#111", fontweight="bold", zorder=6)
-    # LLM stars cluster in one corner (that IS the result), so their inline labels collide -- use a
-    # legend in the empty lower-right instead; the distinct colours tie each star to its name.
+    mnames = list(models)
+    mpts = np.array([models[k] for k in mnames])
     for (name, pt), col in zip(models.items(), MODEL_COLORS):
-        ax.scatter(*pt, s=190, marker="*", c=col, edgecolors="white", linewidths=1.0, zorder=8,
-                   label=name)
-    ax.legend(loc="lower right", fontsize=9, framealpha=0.92, title="LLMs (sampled)",
-              title_fontproperties={"weight": "bold"}, borderpad=0.7, labelspacing=0.5).set_zorder(11)
+        ax.scatter(*pt, s=190, marker="*", c=col, edgecolors="white", linewidths=1.0, zorder=8)
+    # All labels (country + LLM) placed by textalloc: non-overlapping, with leader lines back to the
+    # dot/star. LLM labels ON the map (not a legend), coloured to their star; country labels dark. The
+    # scatter set it avoids is every dot + star, so no label lands on a point.
+    import textalloc as ta
+    lab_i = [i for i, c in enumerate(countries) if c in label_set]
+    tx = [P[i, 0] for i in lab_i] + list(mpts[:, 0])
+    ty = [P[i, 1] for i in lab_i] + list(mpts[:, 1])
+    txt = [countries[i] for i in lab_i] + mnames
+    tcol = ["#111"] * len(lab_i) + list(MODEL_COLORS[:len(mnames)])
+    ta.allocate_text(fig, ax, tx, ty, txt,
+                     x_scatter=list(P[:, 0]) + list(mpts[:, 0]), y_scatter=list(P[:, 1]) + list(mpts[:, 1]),
+                     textsize=9, textcolor=tcol, linecolor="#aaa", linewidth=0.6, draw_lines=True)
     # Four pole signposts, each arrow sitting ON its neutral crosshair (x=0.5 for the vertical axis,
     # y=0.5 for the horizontal one -- these lines are NOT at the plot centre) and pointing out to its
     # pole, in the padded inner margin. All labels horizontal so they stay readable.
