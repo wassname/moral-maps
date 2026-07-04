@@ -762,3 +762,47 @@ STILL overlaps heavily even on country means -- humor-style country profiles do 
 cluster the IW way on the top 2 ipsative PCs, a real negative result, not a plot
 bug. (Whether any linear axis separates humor zones is the LDA question, tested
 separately.)
+
+## 2026-07-04 — WVS map: labeled Inglehart-Welzel axes replace blind PCA
+
+### Problem
+The WVS multi-model map used a blind ipsative PCA (PC1 37%, PC2 13%), so a model
+dot "off in a random place" carried no meaning and 90 overlapping zone blobs were
+unreadable. Fix: give the map the two NAMED Inglehart-Welzel axes the Economist
+uses, so position = meaning.
+
+### Approach (`src/tinymfv/iw_axes.py`)
+Build the two IW axes from GlobalOpinionQA WVS items, each item oriented to its
+axis-positive pole by READING the option order (one child-quality row is stored
+`['Not mentioned','Important']`, the reversed order that would silently flip a sign):
+- Y Traditional<->Secular-Rational: religion importance + belief in God, abortion
+  justifiable, child autonomy (obedience-/independence+/determination+/imagination+).
+- X Survival<->Self-expression: homosexuality justifiable, interpersonal trust,
+  political action (petition/demonstration/boycott).
+An entity's coordinate = mean `positiveness` (0-1, toward the positive pole) over an
+axis's items. Models answer the SAME items through the answer-token reader; single
+DIGIT option labels (0..n-1) keep the 1-10 justifiable scale single-token (letters
+failed: the model emits the option word, not the letter -> pmass collapse).
+
+### UAT (human anchors reproduce the published IW map)
+Sweden X=0.67 Y=0.65 (self-expression+secular, the "godless hippies" corner);
+US X=0.52 Y=0.43 (self-expression but BELOW-median secular, the known US religiosity
+signature); Japan/China/Korea high-secular low-self-expression (East Asia top-left);
+Nigeria/Pakistan/Egypt bottom-left survival+traditional. Signs verified correct.
+Caveat: APPROXIMATE IW -- 3 themes/axis not the canonical 5 (national pride /
+authority / materialism absent from GlobalOpinionQA), not a verbatim factor score.
+
+### Rendering: one generic rule for all maps
+Iterated with the user against the actual Economist chart. Landed on: tight rounded
+CONVEX HULLS (not inflated disc unions), EDGE-ONLY colour (no fill, so overlaps
+don't muddy), and three purely geometric helpers in `maps.py` that work on any map:
+- `select_spread_zones`: greedy max-coverage on hull areas -- seed the largest zone,
+  add whichever adds the most NEW non-overlapping area. Drops central/covered zones
+  (Orthodox) and keeps the corner cultures (West/East-Asia/Latin-America/African-
+  Islamic), the four the Economist draws.
+- `outlying_countries` + one representative per drawn zone + named landmarks = the
+  label set (no more lettering all 90 dots).
+- Pole signposts with arrows sitting ON the human-median crosshairs (not 0.5),
+  ticks removed. `plot_ipsative_pca` switched to the same treatment.
+Model-star palette is disjoint from the zone colours so a star never reads as a zone.
+-- authored by Claude
