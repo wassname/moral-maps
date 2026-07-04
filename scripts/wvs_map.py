@@ -43,9 +43,12 @@ from tinymfv.read import read_items, resolve_answer_ids
 from tinymfv.read_api import read_items_sampled
 from tinymfv.iw_axes import AXIS_ITEMS, X_AXIS, Y_AXIS, SKIP, resolve_items, positiveness
 
-# model-star palette deliberately DISJOINT from ZONE_COLORS (muted blue/red/orange/brown/yellow/
-# green), so a star never camouflages into a zone -- black / magenta / deep-purple read as "model".
-MODEL_COLORS = ["#111111", "#d81b9a", "#5b2c86", "#008b8b", "#b8860b", "#8b0000"]
+# model-star palette: saturated/dark tones, distinct from the muted ZONE_COLORS. Long enough for a
+# big model panel (zip truncates silently, so a short list would just drop stars). The coloured
+# textalloc label ties each star to its name, so near-collisions between star colours are tolerable.
+MODEL_COLORS = ["#111111", "#d81b9a", "#5b2c86", "#008b8b", "#b8860b", "#8b0000",
+                "#c2185b", "#00429d", "#5d1451", "#1a5e1a", "#7a3b00", "#444444",
+                "#a80000", "#006d6d"]
 # option labels are single digits 0..n-1 -- single-token (unlike '10' on the justifiable scale) and
 # the format the answer-token reader is tuned for (a bare digit, not a letter the model ignores in
 # favour of the option word).
@@ -164,9 +167,17 @@ def main() -> None:
     # fresh API call each time. hashlib is stable.
     sig = hashlib.md5(repr(sorted((s, m["n"]) for s, m in meta.items())).encode()).hexdigest()[:8]
     cpath = Path(args.cache)
+    cpath.parent.mkdir(parents=True, exist_ok=True)
     cache = json.loads(cpath.read_text()).get(sig, {}) if cpath.exists() else {}
     vecs: dict[str, dict[str, np.ndarray]] = {k: {s: np.array(p) for s, p in v.items()}
                                               for k, v in cache.items()}
+
+    def save_cache() -> None:
+        """Persist after EACH model so a killed run (session teardown) keeps finished models -- the
+        write-once-at-end version silently discarded every sampled model when interrupted."""
+        allc = json.loads(cpath.read_text()) if cpath.exists() else {}
+        allc[sig] = {k: {s: p.tolist() for s, p in v.items()} for k, v in vecs.items()}
+        cpath.write_text(json.dumps(allc))
 
     if args.local_model:
         key = args.local_model.split("/")[-1] + " (lp)"
@@ -183,6 +194,7 @@ def main() -> None:
                                    max_think_tokens=args.max_think_tokens, batch_size=16,
                                    verbose_first=(k == 0))
             vecs[key] = read_model(rows, meta)
+            save_cache()
     for m in args.api_models:
         key = m.split("/")[-1] + " (sampled)"
         if key not in vecs:
@@ -191,11 +203,9 @@ def main() -> None:
                 rows += read_items_sampled(m, instr, instr.items, n_samples=args.api_samples,
                                            verbose_first=(k == 0))
             vecs[key] = read_model(rows, meta)
+            save_cache()                    # persist this model before starting the next (kill-safe)
+            logger.info(f"cached {key}")
 
-    cpath.parent.mkdir(parents=True, exist_ok=True)
-    allc = json.loads(cpath.read_text()) if cpath.exists() else {}
-    allc[sig] = {k: {s: p.tolist() for s, p in v.items()} for k, v in vecs.items()}
-    cpath.write_text(json.dumps(allc))
     models = {k: model_axis_scores(v, meta, resolved) for k, v in vecs.items()}
 
     # Generic legibility rule (same on every map): draw only the zones that cover the most separate
