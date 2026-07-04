@@ -376,18 +376,32 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         Pi = (cloud @ Pc - mu) @ Vt[:2].T
         ax.scatter(Pi[:, 0], Pi[:, 1], s=4, c="#8f8a7e", alpha=0.14, edgecolors="none",
                    zorder=1, rasterized=True)
-    if zones:
-        draw_zone_regions(ax, P, countries, zones, cloud_P=Pi, cloud_countries=cloud_countries)
-    ax.scatter(P[:, 0], P[:, 1], s=26, c=C_HUM, alpha=0.7, edgecolors="white", linewidths=0.5, zorder=3)
+    # Same clean treatment as the WVS map: draw only the 4 zones covering the most separate space, as
+    # edge-only hulls, and colour each dot by its drawn zone (grey if ungrouped).
+    sel_zones = select_spread_zones(P, countries, zones, 4) if zones else {}
+    if sel_zones:
+        draw_zone_hulls(ax, P, countries, sel_zones)
+    zone_of_c = {c: z for z, ms in sel_zones.items() for c in ms}
+    dot_cols = [ZONE_COLORS.get(zone_of_c.get(c), C_HUM) for c in countries]
+    ax.scatter(P[:, 0], P[:, 1], s=26, c=dot_cols, alpha=0.75, edgecolors="white", linewidths=0.5, zorder=3)
     # Society labels: each name/ISO code is pinned RIGHT NEXT to its dot (small fixed offset, no
     # leader line). A label is dropped if its box would collide with an already-placed one -- better an
     # omitted code than one flung far from its point. `emphasize` countries are placed FIRST (so they
     # win contested space) and drawn bold+dark, so the named outliers always survive the drop.
+    # Label only the landmarks (emphasize) + the 4 most-outlying + one representative (most-central
+    # member) per drawn zone -- the same de-clutter rule as the WVS map, so no map letters all N dots.
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     placed_boxes = []
     emph = emphasize or set()
-    order_lr = list(np.argsort(P[:, 0]))               # left-to-right; leftmost wins contested space
+    cidx = {c: i for i, c in enumerate(countries)}
+    reps = set()
+    for ms in sel_zones.values():
+        mem = [c for c in ms if c in cidx]
+        mp = P[[cidx[c] for c in mem]]
+        reps.add(mem[int(np.argmin(np.hypot(*(mp - mp.mean(0)).T)))])
+    label_set = emph | outlying_countries(P, countries, 4) | reps
+    order_lr = [i for i in np.argsort(P[:, 0]) if countries[i] in label_set]   # leftmost wins contested space
     order = [i for i in order_lr if countries[i] in emph] + [i for i in order_lr if countries[i] not in emph]
     for i in order:
         is_e = countries[i] in emph
