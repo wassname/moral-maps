@@ -81,12 +81,17 @@ C_BASE, C_HON, C_DIS, C_HUM = "#111111", POS_COL, NEG_COL, "#888888"
 # instrument's map (research consistency). Keyed by the zone names the caller passes; an unlisted
 # zone falls back to grey. -- added by Claude
 ZONE_COLORS = {
-    "English-Speaking": "#4e79a7",
+    # macro zones (map default)
+    "West":              "#4e79a7",
+    "East Asia":         "#e15759",
+    # fine zones (macro=False)
+    "English-Speaking":  "#4e79a7",
     "Protestant Europe": "#59a14f",
     "Catholic Europe":   "#8cd17d",
-    "Orthodox":          "#b6992d",
     "Baltic":            "#499894",
     "Confucian":         "#e15759",
+    # shared by both groupings
+    "Orthodox":          "#b6992d",
     "Latin America":     "#f28e2b",
     "African-Islamic":   "#9c755f",
     "South Asia":        "#b07aa1",

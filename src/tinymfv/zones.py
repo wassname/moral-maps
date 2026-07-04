@@ -78,6 +78,16 @@ _CANON = {
 ECONOMIST_OUTLIERS = {"China", "South Korea", "United States", "Great Britain", "Japan",
                       "Nigeria", "Pakistan", "Sweden"}
 
+# Coarser macro-zones for the maps. The nine fine IW zones over-fragment low-dimensional maps: the
+# English-speaking world and the European religions (Protestant/Catholic/Baltic) don't separate, so
+# they merge into one "West"; "Confucian" reads oddly for Japan/Korea, so it's the plainer "East
+# Asia". Fewer, better-separated blobs. -- authored by Claude
+IW_MACRO = {
+    "English-Speaking": "West", "Protestant Europe": "West", "Catholic Europe": "West",
+    "Baltic": "West", "Orthodox": "Orthodox", "Confucian": "East Asia",
+    "Latin America": "Latin America", "African-Islamic": "African-Islamic", "South Asia": "South Asia",
+}
+
 
 def zone_of(country: str) -> str | None:
     """IW zone of a verbatim country string, or None for a known-corrupt row. KeyErrors (fail loud)
@@ -86,9 +96,11 @@ def zone_of(country: str) -> str | None:
     return None if canon is None else IW_ZONE[canon]
 
 
-def zones_for(countries: list[str]) -> tuple[dict[str, list[str]], set[str]]:
+def zones_for(countries: list[str], macro: bool = True) -> tuple[dict[str, list[str]], set[str]]:
     """Group verbatim country strings by IW zone + the subset to emphasize (Economist outliers).
-    Known-corrupt rows are dropped with a warning; unrecognised countries KeyError via zone_of."""
+    `macro` (default) collapses the nine fine zones to six broader ones (IW_MACRO) so low-dimensional
+    maps aren't over-fragmented. Known-corrupt rows are dropped with a warning; unrecognised countries
+    KeyError via zone_of."""
     groups: dict[str, list[str]] = {}
     dropped: list[str] = []
     emph: set[str] = set()
@@ -97,7 +109,7 @@ def zones_for(countries: list[str]) -> tuple[dict[str, list[str]], set[str]]:
         if z is None:
             dropped.append(c)
             continue
-        groups.setdefault(z, []).append(c)
+        groups.setdefault(IW_MACRO[z] if macro else z, []).append(c)
         if _CANON.get(c, c) in ECONOMIST_OUTLIERS:
             emph.add(c)
     if dropped:
