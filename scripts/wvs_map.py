@@ -211,11 +211,12 @@ def main() -> None:
         pts = P[[cidx[c] for c in mem]]
         reps.add(mem[int(np.argmin(np.hypot(*(pts - pts.mean(0)).T)))])
     label_set = emph | maps.outlying_countries(P, countries, 4) | reps
+    med_x, med_y = float(np.median(P[:, 0])), float(np.median(P[:, 1]))   # the typical human society
     fig, ax = plt.subplots(figsize=(11, 9))
     ax.set_facecolor("#faf8f2")
     ax.grid(True, color="#eceadf", lw=0.3, zorder=0)
-    ax.axhline(0.5, color="#d9d5c6", lw=0.8, zorder=1)
-    ax.axvline(0.5, color="#d9d5c6", lw=0.8, zorder=1)
+    ax.axhline(med_y, color="#c9c4b4", lw=1.0, zorder=1)   # crosshair through the human median (Economist)
+    ax.axvline(med_x, color="#c9c4b4", lw=1.0, zorder=1)
     maps.draw_zone_hulls(ax, P, countries, zones)
     ax.scatter(P[:, 0], P[:, 1], s=28, c=dot_cols, alpha=0.85, edgecolors="white", linewidths=0.5, zorder=3)
     for i, c in enumerate(countries):
@@ -226,21 +227,25 @@ def main() -> None:
         ax.scatter(*pt, s=150, marker="*", c=col, edgecolors="white", linewidths=1.0, zorder=8)
         ax.annotate(name, pt, xytext=(7, 4), textcoords="offset points", fontsize=9,
                     fontweight="bold", color=col, zorder=9)
-    # Four pole signposts in the padded inner margin (Economist style): the label sits in whitespace
-    # just inside each edge with an arrow pointing OUT to its pole, so the two axes read unambiguously
-    # without colliding with ticks or the title.
+    # Four pole signposts, each arrow sitting ON its neutral crosshair (x=0.5 for the vertical axis,
+    # y=0.5 for the horizontal one -- these lines are NOT at the plot centre) and pointing out to its
+    # pole, in the padded inner margin. All labels horizontal so they stay readable.
+    from matplotlib.transforms import blended_transform_factory
+    import matplotlib.patheffects as pe
     ax.margins(0.13)
-
-    def pole(tx, ty, tipx, tipy, text, rot):
-        ax.annotate(text, xy=(tipx, tipy), xytext=(tx, ty), xycoords="axes fraction",
-                    ha="center", va="center", rotation=rot, fontsize=11, fontweight="bold",
-                    color="#555", zorder=10, arrowprops=dict(arrowstyle="-|>", color="#999", lw=1.3))
-    pole(0.5, 0.955, 0.5, 0.998, "Secular-Rational", 0)
-    pole(0.5, 0.045, 0.5, 0.002, "Traditional", 0)
-    pole(0.052, 0.5, 0.002, 0.5, "Survival", 90)
-    pole(0.948, 0.5, 0.998, 0.5, "Self-expression", 270)
+    tX = blended_transform_factory(ax.transData, ax.transAxes)   # x = data (on x=0.5 line), y = axes frac
+    tY = blended_transform_factory(ax.transAxes, ax.transData)   # x = axes frac, y = data (on y=0.5 line)
+    pkw = dict(fontsize=11, fontweight="bold", color="#555", zorder=10, ha="center", va="center",
+               path_effects=[pe.withStroke(linewidth=3.0, foreground="white")])
+    awp = dict(arrowstyle="-|>", color="#999", lw=1.3)
+    ax.annotate("Secular-Rational", xy=(med_x, 0.995), xytext=(med_x, 0.945), xycoords=tX, arrowprops=awp, **pkw)
+    ax.annotate("Traditional", xy=(med_x, 0.005), xytext=(med_x, 0.055), xycoords=tX, arrowprops=awp, **pkw)
+    ax.annotate("Survival", xy=(0.006, med_y), xytext=(0.08, med_y), xycoords=tY, arrowprops=awp, **pkw)
+    ax.annotate("Self-expression", xy=(0.994, med_y), xytext=(0.9, med_y), xycoords=tY, arrowprops=awp, **pkw)
     ax.set_xlabel("")
     ax.set_ylabel("")
+    ax.set_xticks([])                                    # Economist: no ticks; the crosshair is the reference
+    ax.set_yticks([])
     ax.set_title(f"WVS Inglehart-Welzel map: LLMs among {len(countries)} human societies "
                  f"(approximate IW axes)", fontsize=12)
     ax.text(0.01, 0.01,
