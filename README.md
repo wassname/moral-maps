@@ -6,55 +6,57 @@ When comparing models or checkpoints you can use it to check three things: did t
 
 ## The plots - Are model moral aliens?
 
-One fun thing we can do with this repo is compare AI's models on human psychological and anthropological surveys. Are they like us?
+One interesting thing we can do with this repo is compare AI's models on human psychological and anthropological surveys. Are they like us?
 
 One thing jumps out of the plots below. Before any steering the base model is already a psychological alien on some axes: on the culture maps it sits away from most humans, most sharply on Big5 openness (low) and conscientiousness (high), and on humor style (high aggressive, low affiliative). And steering is strong relative to human variation, on the headline axes a single sweep moves the profile further than any two countries differ, not just a US-vs-Australia nudge.
 
 What happens when we steer them? Below we steer models with `authority-respecting` versus `authority-disregarding` personas.
 
-<!-- TODO introduce what MFV is -->
+### Value maps: where a model sits, on named axes
 
-![MFV culture map: Authority steering against human countries](docs/img/showcase/mfv/map_pca_ipsative.png)
-
-<!-- caption / interp sequence. how it's measured. -->
-
-![MFV range plot: foundation emphasis beside Authority steering](docs/img/showcase/mfv/range.png)
-
-Steering from blue (`-c`, less Authority) to red (`+c`, more Authority) lifts the Authority foundation most: `+1.82` nat on the Authority reader-logit and `+401%` of a human country SD in foundation emphasis, with the other foundations dropping as it rises. The map places the base model (black) against human societies (gray), with the red/blue steering path running through it.
-
-MFV uses the same map and range plotters as the surveys, after converting forced-choice foundation probabilities into relative foundation emphasis. Each profile is z-scored across foundations before mapping, so the plot compares which foundations are high or low within that profile.
-
-![Humor Styles range plot: human society ranges beside Authority steering](docs/img/showcase/humor_styles/range.png)
-
-![Humor Styles value map: named adaptive/maladaptive and self/other axes with Authority steering](docs/img/showcase/humor_styles/map_value.png)
-
-The value ("quadrant") map is the clearest read: named axes instead of blind PCs, maladaptive-to-adaptive humor left to right and other- to self-directed bottom to top, with the four human zones as convex hulls. Here the zones overlap almost completely, so humor style does not sort societies the way values do, a real negative result.
-
-![Humor Styles culture map: Authority steering against human societies](docs/img/showcase/humor_styles/map_pca_ipsative.png)
-
-The blind-PCA version shows the same failure mode more sharply: the model profile can live away from the human societies. That is the useful warning sign, a model can answer in the requested format and still be a moral or psychological alien on the measured profile.
-
-![Big Five range plot: human society ranges beside Authority steering](docs/img/showcase/big5/range.png)
-
-![Big Five value map: named plasticity/stability meta-trait axes with Authority steering](docs/img/showcase/big5/map_value.png)
-
-On named axes: reserved-to-exploratory left to right (Plasticity = extraversion + openness), volatile-to-stable bottom to top (Stability = agreeableness + conscientiousness + emotional stability), the two DeYoung meta-traits. The Authority steer barely moves the base here, matching the flat range plot: this is a values push, not a personality one.
-
-![Big Five culture map: Authority steering against human societies](docs/img/showcase/big5/map_pca_ipsative.png)
-
-Read the blind-PCA map left to right: gray is the human reference, black is the base LLM, and the red/blue line is the coherent steering path. Here the LLM sits outside the country cloud, so on this measure it is a psychological alien before steering moves it.
-
-MFQ-2 means Moral Foundations Questionnaire 2, the short survey instrument. It is separate from MFV, the moral-vignette foundation reader. MFQ-2 has fewer items per axis than the longer personality surveys, so the showcase averages 8 sampled reads per item before treating small path wiggles as signal.
-
-![MFQ-2 range plot: human society ranges beside Authority steering](docs/img/showcase/mfq2/range.png)
+The clearest view is the value ("quadrant") map. Each has two named axes borrowed from the psychology that built the survey, the human societies drawn as cultural regions, and the model as a black dot with a coloured path showing where steering takes it: turning the Authority push up (red) or down (blue). Every map keeps one orientation, the cultural West to the west and the global South to the south, so they all read the same way.
 
 ![MFQ-2 value map: named individualizing/binding and equality/proportionality axes with Authority steering](docs/img/showcase/mfq2/map_value.png)
 
-The value map is the sharpest of the set: individualizing-to-binding morality left to right, the fairness split (equality-to-proportionality) bottom to top, on the same convention as the WVS map (cultural West to the west, African-Islamic to the south). The `+c` Authority steer walks the base out of the Western individualizing corner across to the binding zone shared by the African-Islamic and East-Asian societies.
+Moral-foundations theory (Jonathan Haidt's) holds that our moral sense runs on a few basic concerns: caring for others, fairness, loyalty to the group, respect for authority, and a sense of the sacred. The MFQ-2 survey scores a person, or a model, on each. On this map, left to right runs from an individual-first morality (care, equality) to a group-first one (loyalty, authority, purity); bottom to top splits fairness into equal-shares versus earned-shares. The base model sits in the Western, individual-first corner, and pushing it toward Authority walks it clear across to the group-first corner shared by the African-Islamic and East-Asian societies.
+
+![Big Five value map: named plasticity/stability meta-trait axes with Authority steering](docs/img/showcase/big5/map_value.png)
+
+Big Five personality collapses to two broad traits: how outgoing and open a person is (reserved to exploratory, left to right) and how even-keeled they are (volatile to stable, bottom to top). The Authority push barely moves the base model here, which is the point: it shifts values, not personality.
+
+![Humor Styles value map: named adaptive/maladaptive and self/other axes with Authority steering](docs/img/showcase/humor_styles/map_value.png)
+
+Humor is the honest negative result. On adaptive-vs-maladaptive and self-vs-other axes the human zones overlap almost completely: humor style does not sort societies the way values do. Worth knowing the instrument is flat before reading anything into a steer on it.
+
+### Range plots: one factor at a time
+
+A range plot takes an instrument one factor at a time: the spread of human societies is a grey strip, their middle a black line, and the steer a red-to-blue sweep, so even a small model move stays visible against the whole human range.
+
+![MFV range plot: foundation emphasis beside Authority steering](docs/img/showcase/mfv/range.png)
+
+MFV (moral-foundation vignettes, the repo's namesake) hands the model a short story about someone breaking a moral rule and asks which kind of wrong it is: cruelty, cheating, betrayal, defiance of authority, or defiling the sacred. Pushed toward Authority, the model does just what you would hope, it calls out the authority violations far more often and the others less. The move is large: about as wide as the gap between the least and the most authority-minded societies on earth, not a nudge.
+
+![MFQ-2 range plot: human society ranges beside Authority steering](docs/img/showcase/mfq2/range.png)
+
+![Big Five range plot: human society ranges beside Authority steering](docs/img/showcase/big5/range.png)
+
+![Humor Styles range plot: human society ranges beside Authority steering](docs/img/showcase/humor_styles/range.png)
+
+The surveys echo their maps: MFQ-2's binding factors climb under the steer, while Big Five and humor stay flat.
+
+### Blind-PCA maps
+
+When a survey has no ready-made named axes (MFV), or just as a cross-check on the value maps, we let the data pick the axes: find the two directions along which human societies differ most, and place the model in them. A small compass shows which traits each axis is built from, and an inset shows where the zoomed-in frame sits within the full crowd of human respondents.
+
+![MFV culture map: Authority steering against human countries](docs/img/showcase/mfv/map_pca_ipsative.png)
 
 ![MFQ-2 culture map: Authority steering against human societies](docs/img/showcase/mfq2/map_pca_ipsative.png)
 
-The path shows only usable coefficients: `c=0`, then each positive and negative side until one of the plot gates fails. This run kept the full path `c=-1,-0.5,0,+0.5,+1`. For surveys, collapse can mean the answer distribution loses its factor structure even when answer mass stays high.
+![Big Five culture map: Authority steering against human societies](docs/img/showcase/big5/map_pca_ipsative.png)
+
+![Humor Styles culture map: Authority steering against human societies](docs/img/showcase/humor_styles/map_pca_ipsative.png)
+
+The story survives without the named axes: on Big Five and humor the base model already sits outside the human crowd before any steering, an alien on the measured profile. For MFV each profile is read relative to the model's own average, so the map shows which foundation a model leans on more than usual, not how much it endorses everything.
 
 
 ## Install
