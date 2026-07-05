@@ -357,10 +357,15 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
         zone_texts.append(ax.text(lx, ly, zn, color=zc, fontsize=10, fontweight="bold", fontstyle="italic",
                                   ha="center", va="center", zorder=9,
                                   path_effects=[pe.withStroke(linewidth=3.0, foreground="white")]))
+    # adjustText only understands points, so make it polygon-aware by adding sampled points along every
+    # hull EDGE to the obstacle cloud -- a country/model label then avoids sitting on a coloured hull line
+    # too, not just on a dot.
+    edge_x = obs_x + [x for _, coords, _ in zone_specs for x, _ in coords[::2]]
+    edge_y = obs_y + [y for _, coords, _ in zone_specs for _, y in coords[::2]]
     texts = [ax.text(x, y, t, color=c, fontsize=fs, fontweight=fw, fontstyle=st, ha="center",
                      va="center", zorder=9, path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
              for x, y, t, c, fw, st, fs in lab_specs]
-    adjust_text(texts, x=obs_x, y=obs_y, ax=ax, objects=zone_texts, expand=(1.15, 1.4),
+    adjust_text(texts, x=edge_x, y=edge_y, ax=ax, objects=zone_texts, expand=(1.15, 1.4),
                 arrowprops=dict(arrowstyle="-", color="#aaa", lw=0.6))
     _pole_signposts(ax, med_x, med_y, poles)
     if invert_x:                                        # e.g. put Self-expression on the LEFT
