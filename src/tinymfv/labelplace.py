@@ -109,7 +109,9 @@ def allocate_labels(ax, anchor_sets: list[np.ndarray], texts: list[str], colors:
         w_i, h_i = wh[i]
         gap = gap_frac * h_i                                 # ~half a character clear of every obstacle
         r0 = pad0[i] + gap                                   # clear the marker itself + the gap
-        radii = [r0, r0 + 0.9 * h_i] if region[i] else [r0 + k * h_i for k in (0.0, 0.9, 1.8, 2.8, 4.0)]
+        # region labels reach further out (up to ~3 text-heights) so a CENTRAL crowded hull can still
+        # find clear air off its perimeter; marker labels stay close so they read as attached.
+        radii = [r0 + k * h_i for k in ((0.0, 0.9, 1.8, 3.0) if region[i] else (0.0, 0.9, 1.8, 2.8, 4.0))]
         obstacles = np.vstack([hard, soft]) if region[i] and len(soft) else hard
         best = None                                          # (penalty, -clearance, box, anchor, radius)
         for anc in A_px[i]:
