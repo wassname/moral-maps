@@ -39,5 +39,8 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.metadata]
+allow-direct-references = true   # the api extra pulls openrouter_wrapper straight from git
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/tinymfv"]
