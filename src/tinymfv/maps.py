@@ -152,6 +152,25 @@ def outlying_countries(P: np.ndarray, countries: list[str], n: int = 4) -> set[s
     return {countries[int(np.argmax(Pc[:, 0] * dx + Pc[:, 1] * dy))] for dx, dy in dirs}
 
 
+def _map_annotations(P: np.ndarray, countries: list[str], zones_all: dict[str, list[str]] | None,
+                     emphasize: set[str] | None, grey: str):
+    """Shared map policy for plot_value_map + plot_ipsative_pca -- one copy so the two renderers can't
+    silently diverge: pick the 4 most-separate zones, colour each dot by its drawn zone (`grey` if
+    ungrouped), and build label_set = landmarks (emphasize) + 4 corner outliers + one central
+    representative per drawn zone. Returns (selected_zones, dot_cols, label_set)."""
+    zones = select_spread_zones(P, countries, zones_all, 4) if zones_all else {}
+    zone_of_c = {c: z for z, ms in zones.items() for c in ms}
+    dot_cols = [ZONE_COLORS.get(zone_of_c.get(c), grey) for c in countries]
+    cidx = {c: i for i, c in enumerate(countries)}
+    reps = set()
+    for ms in zones.values():
+        mem = [c for c in ms if c in cidx]
+        mp = P[[cidx[c] for c in mem]]
+        reps.add(mem[int(np.argmin(np.hypot(*(mp - mp.mean(0)).T)))])
+    label_set = (emphasize or set()) | outlying_countries(P, countries, 4) | reps
+    return zones, dot_cols, label_set
+
+
 def draw_zone_hulls(ax, P: np.ndarray, countries: list[str], zones: dict[str, list[str]],
                     pad: float = 0.022) -> None:
     """Economist-style zone outline: the tight CONVEX HULL of a zone's country-mean points, rounded
@@ -218,16 +237,7 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     import textalloc as ta
     zones_all, emph = zones_for(countries)
     emph = (emphasize or set()) | emph
-    zones = select_spread_zones(P, countries, zones_all, 4)
-    zone_of_c = {c: z for z, ms in zones.items() for c in ms}
-    dot_cols = [ZONE_COLORS.get(zone_of_c.get(c), "#888888") for c in countries]
-    cidx = {c: i for i, c in enumerate(countries)}
-    reps = set()
-    for ms in zones.values():
-        mem = [c for c in ms if c in cidx]
-        mp = P[[cidx[c] for c in mem]]
-        reps.add(mem[int(np.argmin(np.hypot(*(mp - mp.mean(0)).T)))])
-    label_set = emph | outlying_countries(P, countries, 4) | reps
+    zones, dot_cols, label_set = _map_annotations(P, countries, zones_all, emph, "#888888")
 
     med_x, med_y = float(np.median(P[:, 0])), float(np.median(P[:, 1]))
     fig, ax = plt.subplots(figsize=(10.5, 8.5))
@@ -372,21 +382,10 @@ def compass(ax_main, L: np.ndarray, labels: list[str], title: str = "compass",
         r = np.hypot(x, y)
         tx.append(x / r * (r + 0.07)); ty.append(y / r * (r + 0.07)); tips_x.append(x); tips_y.append(y)
     cax.set_xlim(-1.5, 1.5); cax.set_ylim(-1.5, 1.5)
-    placed = False
-    try:                                                       # textalloc spreads colliding tip labels
-        import textalloc as ta
-        ta.allocate_text(ax_main.figure, cax, tx, ty, [l.capitalize() for l in labels],
-                         x_scatter=tips_x + [0], y_scatter=tips_y + [0], textsize=7.5,
-                         linecolor=color, linewidth=0.5, textcolor=color, draw_lines=True)
-        placed = True
-    except Exception:
-        placed = False
-    if not placed:
-        for j, lab in enumerate(labels):
-            x, y = L[j]; r = np.hypot(x, y)
-            cax.text(x / r * (r + 0.07), y / r * (r + 0.07), lab.capitalize(), fontsize=7.5,
-                     fontweight="bold", color=color, ha="left" if x >= 0 else "right",
-                     va="bottom" if y >= 0 else "top", clip_on=False)
+    import textalloc as ta                                      # textalloc spreads colliding tip labels
+    ta.allocate_text(ax_main.figure, cax, tx, ty, [l.capitalize() for l in labels],
+                     x_scatter=tips_x + [0], y_scatter=tips_y + [0], textsize=7.5,
+                     linecolor=color, linewidth=0.5, textcolor=color, draw_lines=True)
     cax.set_aspect("equal"); cax.axis("off")
     cax.set_title(title, fontsize=10, fontweight="bold", color=color, pad=3)
 
@@ -453,10 +452,6 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     variance dominates). An eigenvalue floor gives a 1- or 2-country zone a visible blob. The PCA is
     fit on the country means M; `respondents`/`haze` only scatter + set the crop. Returns the
     Figure."""
-    try:
-        import textalloc as ta
-    except ImportError:
-        ta = None
     _, Vt, var, mu, Pc = ipsative_pca(M)               # fit on country means: between-country axes
     P = (M @ Pc - mu) @ Vt[:2].T
     cloud = haze if haze is not None else respondents  # what we scatter + crop to (fit is separate)
@@ -473,13 +468,11 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
         Pi = (cloud @ Pc - mu) @ Vt[:2].T
         ax.scatter(Pi[:, 0], Pi[:, 1], s=4, c="#8f8a7e", alpha=0.14, edgecolors="none",
                    zorder=1, rasterized=True)
-    # Same clean treatment as the WVS map: draw only the 4 zones covering the most separate space, as
-    # edge-only hulls, and colour each dot by its drawn zone (grey if ungrouped).
-    sel_zones = select_spread_zones(P, countries, zones, 4) if zones else {}
+    # Same clean treatment as the WVS map (shared policy via _map_annotations): draw only the 4 zones
+    # covering the most separate space, as edge-only hulls, and colour each dot by its drawn zone.
+    sel_zones, dot_cols, label_set = _map_annotations(P, countries, zones, emphasize, C_HUM)
     if sel_zones:
         draw_zone_hulls(ax, P, countries, sel_zones)
-    zone_of_c = {c: z for z, ms in sel_zones.items() for c in ms}
-    dot_cols = [ZONE_COLORS.get(zone_of_c.get(c), C_HUM) for c in countries]
     ax.scatter(P[:, 0], P[:, 1], s=26, c=dot_cols, alpha=0.75, edgecolors="white", linewidths=0.5, zorder=3)
     # Society labels: each name/ISO code is pinned RIGHT NEXT to its dot (small fixed offset, no
     # leader line). A label is dropped if its box would collide with an already-placed one -- better an
@@ -491,13 +484,6 @@ def plot_ipsative_pca(instr: Instrument, dims: list[str], countries: list[str], 
     renderer = fig.canvas.get_renderer()
     placed_boxes = []
     emph = emphasize or set()
-    cidx = {c: i for i, c in enumerate(countries)}
-    reps = set()
-    for ms in sel_zones.values():
-        mem = [c for c in ms if c in cidx]
-        mp = P[[cidx[c] for c in mem]]
-        reps.add(mem[int(np.argmin(np.hypot(*(mp - mp.mean(0)).T)))])
-    label_set = emph | outlying_countries(P, countries, 4) | reps
     order_lr = [i for i in np.argsort(P[:, 0]) if countries[i] in label_set]   # leftmost wins contested space
     order = [i for i in order_lr if countries[i] in emph] + [i for i in order_lr if countries[i] not in emph]
     for i in order:
@@ -807,10 +793,7 @@ def plot_range_zoom(instr: Instrument, dims: list[str], cs: list[float], prof: d
     """Zoomed companion: one subplot per factor with its OWN y-axis, so the steer (small vs the
     human spread) is legible. Societies near the steer named; off-range extremes in the corners.
     Returns the Figure."""
-    try:
-        import textalloc as ta
-    except ImportError:
-        ta = None
+    import textalloc as ta
     n = len(dims)
     ncol = min(3, n)
     nrow = (n + ncol - 1) // ncol
@@ -849,18 +832,8 @@ def plot_range_zoom(instr: Instrument, dims: list[str], cs: list[float], prof: d
         txt = [("c=0" if c == 0 else f"c={c:+g}") for c in cs] + list(named)
         dot_x = [xs] * len(cs) + (list(soc_x) if near else [])
         dot_y = list(map(float, yv)) + ([v for _, v in near] if near else [])
-        placed = False
-        if ta is not None:
-            try:
-                ta.allocate_text(fig, ax, tx, ty, txt, x_scatter=dot_x, y_scatter=dot_y,
-                                 textsize=6.5, linecolor="#bbbbbb", linewidth=0.4, textcolor="#333333")
-                placed = True
-            except Exception:
-                placed = False
-        if not placed:
-            for x, y, t in zip(tx, ty, txt):
-                ax.annotate(t, (x + (0.12 if x >= 0 else -0.12), y), fontsize=6.5,
-                            ha="left" if x >= 0 else "right", va="center", color="#333333")
+        ta.allocate_text(fig, ax, tx, ty, txt, x_scatter=dot_x, y_scatter=dot_y,
+                         textsize=6.5, linecolor="#bbbbbb", linewidth=0.4, textcolor="#333333")
         mx_name, mx_val = max(soc, key=lambda t: t[1])
         mn_name, mn_val = min(soc, key=lambda t: t[1])
         if mx_val > yhi:
