@@ -41,7 +41,11 @@ _ANSWER_SUFFIX = ("\n\nAnswer with ONLY one option from [{space}] -- a single to
 
 
 def _client() -> OpenAI:
-    return OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPENROUTER_API_KEY"])
+    # max_retries: the SDK backs off (respecting Retry-After) on transient 429s -- some OpenRouter
+    # models are rate-limited to ~20 rpm and the sampling reader bursts, so a plain 0-retry client
+    # crashes the whole run mid-model. This is transient infra, not a bug to fail fast on.
+    return OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPENROUTER_API_KEY"],
+                  max_retries=6)
 
 
 def parse_answer(text: str, answer_space: list[str]) -> str | None:
