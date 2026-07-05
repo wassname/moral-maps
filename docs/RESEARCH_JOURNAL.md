@@ -806,3 +806,40 @@ don't muddy), and three purely geometric helpers in `maps.py` that work on any m
   ticks removed. `plot_ipsative_pca` switched to the same treatment.
 Model-star palette is disjoint from the zone colours so a star never reads as a zone.
 -- authored by Claude
+
+## 2026-07-05 -- MFV cross-country comparison is invalid (drop the culture layer)
+
+Built the MFV named-axis quadrant map (value_coords_contrast: signed z-contrast, since
+MFV's compositional relative-emphasis profile makes the survey `1 - p` complement
+meaningless). It rendered fine and the STEER story is right (+Authority pushes the base
+model into the binding/authority corner, which no human sample occupies -- the base is the
+only point with positive authority emphasis, y=+0.61). But the COUNTRY layer inverts the
+known Inglehart-Welzel pattern: Latin America comes out MORE individualizing than the West
+(LatAm mean binding -0.81 vs West -0.63; Brazil/Argentina/Colombia beat Netherlands/
+Australia/US; only Peru is a low-individualizing LatAm exception). wassname caught my two
+wrong framings ("just the US", "Netherlands solidly individualizing") -- the real pattern is
+West-below-LatAm, his original instinct.
+
+Chased the source papers. This is not merely noisy stitching; the instrument FAILS
+cross-country comparison and the authors say so:
+- Jimenez-Leal et al. 2025 (Collabra, doi 10.1525/collabra.128178) -- the source for our
+  US/Argentina/Colombia/Peru, N=1650 one polling agency, one Spanish MFV. Ran measurement
+  invariance + DIF tests: non-invariance and uniform DIF on many items; "cross-cultural
+  comparisons with this tool are restricted." So even WITHIN one study/scale the US-vs-LatAm
+  and Peru-vs-Argentina orderings are not trustworthy.
+- Marques 2020 (Brazil, SP university students): Brazilians judged individualizing
+  violations MORE harshly than the US sample; "cannot be sure whether these findings are
+  driven by differences in culture, stimuli, or sample composition."
+- Hopp 2024 (Netherlands, Prolific N=586): direct comparison "hindered" (data not shared);
+  divergences "might be more driven by instruments than translational artifacts."
+
+Mechanism on top of that: each country's 8-point profile is z-scored across its 6 foundations,
+so a near-flat rater (Peru, raw spread ~0.37 vs Argentina ~0.67) gets divided by a tiny SD
+and whipped around by measurement noise. Five different studies (Jimenez-Leal, Marques, Hopp,
+Yamada JP, Crone AU undergrads) with different samples/scales/translations, no shared anchor,
+then z-scored, manufactures a confident cultural inversion out of data the authors say can't
+be compared.
+
+Decision: MFV is NOT a cultures map. Keep it for the MODEL's relative-emphasis steer only.
+Plan below. MFQ-2/Big5/Humour use single-source country tables and are unaffected (TODO: still
+worth confirming each is single-source + comparable). -- authored by Claude
