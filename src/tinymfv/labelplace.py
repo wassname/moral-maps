@@ -74,16 +74,19 @@ def allocate_labels(ax, anchor_sets: list[np.ndarray], texts: list[str], colors:
                     region: list[bool] | None = None, fontsize: float = 9.0,
                     fontsizes: list[float] | None = None, styles: list[str] | None = None,
                     anchor_pad: list[float] | None = None, gap_frac: float = 0.28,
+                    spacing_x: float = 0.5, spacing_y: float = 0.3,
                     stroke: float = 2.0, linecolor: str = "#9a958a", linewidth: float = 0.6):
     """Place N labels. See the module docstring for the model. Draws directly onto `ax`.
 
     anchor_sets : per label, an (Ki, 2) array of candidate attachment points (data coords).
     hard_pts    : (M, 2) markers no label may cover; placed label boxes are added to this as we go.
     soft_pts    : (P, 2) polygon-edge points; only `region` labels avoid them.
-    region[i]   : True  -> multi-anchor, maximise clearance, avoid soft points, no white box, no leader
+    region[i]   : True  -> multi-anchor, nearest CLEAR ring (hugs the hull), avoid soft points, no leader
                   False -> nearest clear slot, hard points only, thin white outline, leader if far.
     anchor_pad[i]: px radius of label i's own marker, so the box clears a big star as well as the gap.
     gap_frac    : gap kept from every obstacle, as a fraction of text height (~half a character).
+    spacing_x/_y: scale the label<->own-marker spacing beyond the marker (anisotropic: text stacks
+                  tighter vertically than horizontally, so y is pulled in more than x).
     """
     n = len(texts)
     region = region or [False] * n
@@ -108,17 +111,22 @@ def allocate_labels(ax, anchor_sets: list[np.ndarray], texts: list[str], colors:
     for i in order:
         w_i, h_i = wh[i]
         gap = gap_frac * h_i                                 # ~half a character clear of every obstacle
-        r0 = pad0[i] + gap                                   # clear the marker itself + the gap
-        # region labels reach further out (up to ~3 text-heights) so a CENTRAL crowded hull can still
-        # find clear air off its perimeter; marker labels stay close so they read as attached.
-        radii = [r0 + k * h_i for k in ((0.0, 0.9, 1.8, 3.0) if region[i] else (0.0, 0.9, 1.8, 2.8, 4.0))]
         obstacles = np.vstack([hard, soft]) if region[i] and len(soft) else hard
-        best = None                                          # (penalty, -clearance, box, anchor, radius)
-        for anc in A_px[i]:
-            ax0, ay0 = anc
-            for r in radii:
+        # reach = extra spacing rings (in text-heights) tried NEAREST-first, so a label hugs its marker /
+        # hull. Spacing beyond the marker is anisotropic (spacing_x/_y): wider left-right than up-down,
+        # since stacked text crowds vertically. pad0 (marker radius) is NOT scaled, so nothing lands on
+        # its own glyph.
+        reach = (0.0, 0.7, 1.4, 2.2, 3.0) if region[i] else (0.0, 0.9, 1.8, 2.8, 4.0)
+        best = None                                          # global fallback: lowest penalty seen
+        pick = None                                          # accepted clear slot: (box, anchor, k)
+        for k in reach:
+            ring = None                                      # best clear candidate at THIS ring
+            for anc in A_px[i]:
+                ax0, ay0 = anc
+                ext = gap + k * h_i
+                rx, ry = pad0[i] + spacing_x * ext, pad0[i] + spacing_y * ext
                 for ux, uy in _DIRS:
-                    cx, cy = ax0 + ux * (r + w_i / 2), ay0 + uy * (r + h_i / 2)
+                    cx, cy = ax0 + ux * (rx + w_i / 2), ay0 + uy * (ry + h_i / 2)
                     box = (cx - w_i / 2 - gap, cy - h_i / 2 - gap, cx + w_i / 2 + gap, cy + h_i / 2 + gap)
                     pen = 0.0
                     if box[0] < abox.x0 or box[2] > abox.x1 or box[1] < abox.y0 or box[3] > abox.y1:
@@ -129,25 +137,25 @@ def allocate_labels(ax, anchor_sets: list[np.ndarray], texts: list[str], colors:
                         ox = max(0.0, min(box[2], pb[2]) - max(box[0], pb[0]))
                         oy = max(0.0, min(box[3], pb[3]) - max(box[1], pb[1]))
                         pen += 0.02 * ox * oy
-                    key = (pen, -clear)
-                    if best is None or key < best[0]:
-                        best = (key, (cx, cy), box, (ax0, ay0), r)
-                    if pen == 0.0 and not region[i]:
-                        break                                # marker: first clear slot (nearest) wins
-                else:
-                    continue
-                break
-            else:
-                continue
-            if not region[i]:
-                break
-        (pen, _), (cx, cy), box, (ax0, ay0), r = best
+                    if best is None or (pen, -clear) < best[0]:
+                        best = ((pen, -clear), box, (ax0, ay0), k)
+                    if pen == 0.0:
+                        if not region[i]:                    # marker: first clear slot (nearest) wins
+                            ring = (box, (ax0, ay0), k, clear); break
+                        if ring is None or clear > ring[3]:  # region: emptiest slot on this NEAREST ring
+                            ring = (box, (ax0, ay0), k, clear)
+                if ring is not None and not region[i]:
+                    break
+            if ring is not None:
+                pick = ring; break                           # nearest clear ring wins -> label hugs marker/hull
+        box, (ax0, ay0), k = (pick[0], pick[1], pick[2]) if pick else (best[1], best[2], best[3])
         placed.append(box)
+        cx, cy = (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
         # leader line: marker labels only, when the slot is far or contested. Same-colour (model/steer)
         # labels get a looser threshold since their colour already ties them to the marker.
         if not region[i]:
-            thr = h_i * (2.6 if colors[i] != "#111" else 1.15)
-            if r > r0 + thr or pen > 0:
+            thr = 2.6 if colors[i] != "#111" else 1.15       # in text-heights of reach
+            if k > thr or pick is None:
                 nx, ny = min(max(ax0, box[0]), box[2]), min(max(ay0, box[1]), box[3])
                 (lx0, ly0), (lx1, ly1) = to_data((ax0, ay0)), to_data((nx, ny))
                 ax.plot([lx0, lx1], [ly0, ly1], "-", color=linecolor, lw=linewidth, zorder=2.5)
