@@ -172,19 +172,22 @@ def _map_annotations(P: np.ndarray, countries: list[str], zones_all: dict[str, l
 
 
 def draw_zone_hulls(ax, P: np.ndarray, countries: list[str], zones: dict[str, list[str]],
-                    pad: float = 0.022) -> None:
+                    pad: float = 0.022) -> list[tuple[float, float]]:
     """Economist-style zone outline: the tight CONVEX HULL of a zone's country-mean points, rounded
     and slightly inflated (shapely buffer), drawn as a coloured EDGE ONLY (no fill, so overlapping
     zones don't muddy), with the zone label in the same colour anchored to the TOP of its own hull --
     so each label attaches unambiguously to one boundary even where hulls overlap. A 1- or 2-country
     zone degenerates to a rounded disc/capsule via the same buffer. Cleaner than a union of
     per-country discs when the axes already separate the countries (WVS IW map); the disc-union
-    `draw_zone_regions` stays for the instrument maps that overlay within-country respondent spread."""
+    `draw_zone_regions` stays for the instrument maps that overlay within-country respondent spread.
+    Returns the zone-label anchor points so the caller can feed them to textalloc as obstacles (a
+    country/model label must not land on a zone name)."""
     import matplotlib.patheffects as pe
     from shapely.geometry import MultiPoint
     from matplotlib.patches import Polygon as MplPolygon
     cidx = {c: i for i, c in enumerate(countries)}
     buf = pad * float(np.hypot(*(P.max(0) - P.min(0))))
+    anchors: list[tuple[float, float]] = []
     for zname, members in zones.items():
         pts = np.array([P[cidx[c]] for c in members if c in cidx])
         if len(pts) < 2:                                # convex hull needs 2+ members to contour
@@ -198,6 +201,8 @@ def draw_zone_hulls(ax, P: np.ndarray, countries: list[str], zones: dict[str, li
         ax.text(apex[0], apex[1], zname, fontsize=10, color=zcol, ha="center", va="bottom",
                 style="italic", fontweight="bold", zorder=5,
                 path_effects=[pe.withStroke(linewidth=3.0, foreground="white")])
+        anchors.append((float(apex[0]), float(apex[1])))
+    return anchors
 
 
 def _pole_signposts(ax, med_x: float, med_y: float, poles: tuple[str, str, str, str]) -> None:
@@ -225,14 +230,22 @@ MODEL_RED = "#d0021b"
 
 def plot_value_map(display: str, countries: list[str], P: np.ndarray,
                    poles: tuple[str, str, str, str], *, models: dict[str, tuple[float, float]] | None = None,
+                   steer: dict[str, tuple[float, float, str]] | None = None,
                    emphasize: set[str] | None = None, title: str | None = None, note: str | None = None):
     """The interpretable "4-value map": two NAMED axes with four pole signposts through the human
     MEDIAN crosshair, Economist-style zone hulls (the 4 most-separate zones), zone-coloured dots, and
     textalloc labels (landmarks + corner outliers + one representative per zone + any models). NO
     compass / minimap / ticks -- this is the alternative to plot_ipsative_pca, not a replacement.
 
-    P is countries x 2 already in the named-axis space (see value_axes.value_coords / iw_axes). `models`
-    maps a model name to its (x, y) in the SAME space -> drawn as labelled stars. Returns the Figure."""
+    P is countries x 2 already in the named-axis space (see value_axes.value_coords / iw_axes).
+
+    Two ways to overlay AI (mutually exclusive):
+    - `models`: name -> (x, y[, x_se, y_se]) INDEPENDENT points (the WVS panel), each a bold red dot
+      with an optional 95% CI cross and a textalloc label.
+    - `steer`: {"base": (x, y, label), "pos": (...), "neg": (...)} ONE model's steer, drawn as a
+      CONNECTED path (black base, red +c arm, blue -c arm) with directly-placed pole labels -- the
+      same visual language as plot_ipsative_pca's trajectory, so the two map families read alike.
+    Returns the Figure."""
     from .zones import zones_for
     import textalloc as ta
     zones_all, emph = zones_for(countries)
@@ -245,7 +258,7 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     ax.grid(True, color="#eceadf", lw=0.3, zorder=0)
     ax.axhline(med_y, color="#c9c4b4", lw=1.0, zorder=1)
     ax.axvline(med_x, color="#c9c4b4", lw=1.0, zorder=1)
-    draw_zone_hulls(ax, P, countries, zones)
+    zone_anchors = draw_zone_hulls(ax, P, countries, zones)   # feed to textalloc so labels avoid zone names
     ax.scatter(P[:, 0], P[:, 1], s=26, c=dot_cols, alpha=0.85, edgecolors="white", linewidths=0.5, zorder=3)
 
     lab_i = [i for i, c in enumerate(countries) if c in label_set]
@@ -253,6 +266,7 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     ty = [P[i, 1] for i in lab_i]
     txt = [countries[i] for i in lab_i]
     tcol = ["#111"] * len(lab_i)
+    sx, sy = list(P[:, 0]), list(P[:, 1])
     if models:
         mnames = list(models)
         mx = np.array([models[k][0] for k in mnames])
@@ -267,11 +281,25 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
                    edgecolors="white", linewidths=1.0, zorder=8)
         tx += list(mx); ty += list(my); txt += mnames
         tcol += [MODEL_RED] * len(mnames)
-        sx = list(P[:, 0]) + list(mx); sy = list(P[:, 1]) + list(my)
-    else:
-        sx, sy = list(P[:, 0]), list(P[:, 1])
+        sx += list(mx); sy += list(my)
+    if steer:
+        bx, by, _ = steer["base"]
+        for key, col, dxy, ha in [("pos", POS_COL, (10, 9), "left"), ("neg", NEG_COL, (-10, -11), "right")]:
+            if key not in steer:
+                continue
+            ex, ey, elab = steer[key]
+            ax.plot([bx, ex], [by, ey], "-", color=col, lw=1.6, alpha=0.85, zorder=7)  # connected arm
+            ax.scatter(ex, ey, s=90, c=col, edgecolors="white", linewidths=1.0, zorder=8)
+            ax.annotate(elab, (ex, ey), xytext=dxy, textcoords="offset points", fontsize=9,
+                        color=col, fontweight="bold", ha=ha, va="center", zorder=9)
+            sx.append(ex); sy.append(ey)
+        ax.scatter(bx, by, s=90, c=C_BASE, edgecolors="white", linewidths=1.0, zorder=8)
+        ax.annotate(steer["base"][2], (bx, by), xytext=(10, -12), textcoords="offset points",
+                    fontsize=9, color=C_BASE, fontweight="bold", ha="left", va="center", zorder=9)
+        sx.append(bx); sy.append(by)
     ax.margins(0.13)
-    ta.allocate_text(fig, ax, tx, ty, txt, x_scatter=sx, y_scatter=sy,
+    ta.allocate_text(fig, ax, tx, ty, txt, x_scatter=sx + [a[0] for a in zone_anchors],
+                     y_scatter=sy + [a[1] for a in zone_anchors],
                      textsize=9, textcolor=tcol, linecolor="#aaa", linewidth=0.6, draw_lines=True)
     _pole_signposts(ax, med_x, med_y, poles)
     ax.set_xticks([]); ax.set_yticks([]); ax.set_xlabel(""); ax.set_ylabel("")
