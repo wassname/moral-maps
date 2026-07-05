@@ -12,17 +12,17 @@ One thing jumps out of the plots below. Before any steering the base model is al
 
 ### The whole field, on the world's value map
 
-The clearest single answer comes from the World Values Survey, the standard culture map of the world. Since 1981 it has asked people in about ninety countries the same questions, and two axes drawn from it sort societies by how traditional or secular they are and how much they weigh survival over self-expression. We put seventeen frontier models through the same questions.
+The clearest single view comes from the World Values Survey, the standard culture map of the world. Since 1981 it has asked people in about ninety countries the same questions, and two axes drawn from it sort societies by how traditional or secular they are and how much they weigh survival over self-expression. We put seventeen frontier models through the same questions.
 
 ![WVS culture map: 17 frontier models among about 90 human societies](docs/img/wvs/wvs_map_iw.png)
 
-Every model lands in the top-left: more secular and more self-expressive than almost any country on earth, deep in the rich-world corner and often past its edge, and none of them sits near the African or Muslim societies. This is a different reading from the rest of the page. These frontier models are closed APIs with no answer probabilities to read, so each is scored by rated sampling (rate every option one to five, twelve times, with the option order shuffled), and the human positions are approximated from the GlobalOpinionQA question set. The steering plots below instead follow one open model we can push, Qwen3-4B.
+Every model sits in the top-left: more secular and more self-expressive than almost any country on earth, deep in the rich-world corner and often past its edge, and none of them sits near the African or Muslim societies. This is a different reading from the rest of the page. These frontier models are closed APIs with no answer probabilities to read, so each is scored by rated sampling (rate every option one to five, twelve times, with the option order shuffled), and the human positions are approximated from the GlobalOpinionQA question set. The steering plots below instead follow one open model we can push, Qwen3-4B.
 
 What happens when we steer them? Below we steer models with `authority-respecting` versus `authority-disregarding` personas.
 
 ### Value maps: where a model sits, on named axes
 
-The clearest view is the value ("quadrant") map. Each has two named axes borrowed from the psychology that built the survey, the human societies drawn as cultural regions, and the model as a black dot with a coloured path showing where steering takes it. Steering here means nudging the model's internal state toward the authority-respecting side (red, more Authority) or away from it (blue, less), without retraining. Every map keeps one orientation, the cultural West to the west and the global South to the south, so they all read the same way.
+The nicest plots are the value ("quadrant") map. Each has two named axes borrowed from the psychology that built the survey, the human societies drawn as cultural regions, and the model as a black dot with a coloured path showing where steering takes it. Steering here means nudging the model's internal state toward the authority-respecting side (red, more Authority) or away from it (blue, less), without retraining. Every map keeps one orientation, the cultural West to the west and the global South to the south, so they all read the same way.
 
 ![MFQ-2 value map: individual-first vs group-first morality, with the Authority steer path](docs/img/showcase/mfq2/map_value.png)
 
@@ -34,7 +34,7 @@ Big Five personality collapses to two broad traits: how outgoing and open a pers
 
 ![Humor Styles value map: adaptive vs maladaptive humor, with the Authority steer path](docs/img/showcase/humor_styles/map_value.png)
 
-Humor is the honest negative result. On its axes (warm, healthy humor versus put-down humor; joking at yourself versus at others) the human regions overlap almost completely: humor style does not sort societies the way values do. Worth knowing a survey can't tell societies apart at all before reading anything into a steer on it.
+Humor show little variaiton on the map (although the range plots below show some nuance). On its axes (warm, healthy humor versus put-down humor; joking at yourself versus at others) the human regions overlap almost completely: humor style does not sort societies the way values do. Worth knowing a survey can't tell societies apart at all before reading anything into a steer on it.
 
 ### Range plots: one factor at a time
 
@@ -64,7 +64,6 @@ When a survey has no ready-made named axes (MFV), or just as a cross-check on th
 
 ![Humor Styles culture map: Authority steering against human societies](docs/img/showcase/humor_styles/map_pca_ipsative.png)
 
-The story survives without the named axes: on Big Five and humor the base model already sits outside the human crowd before any steering, an alien on the measured profile. For MFV each profile is read relative to the model's own average, so the map shows which foundation a model leans on more than usual, not how much it endorses everything.
 
 
 ## Install
@@ -151,43 +150,31 @@ uv run python scripts/plot_steer_showcase.py \
   --margin-frac 0.50
 ```
 
-The plot gate keeps only coefficients that all plotted instruments can still read. A row passes when answer mass, survey rank-logit contrast, and MFV top-foundation margin stay above the requested fraction of their base values: `pmass(c)/pmass(0) >= coherence-frac`, `mean_abs_C(c)/mean_abs_C(0) >= contrast-frac`, and `mean_margin(c)/mean_margin(0) >= margin-frac`.
+The ploting code keeps only coefficients that all plotted instruments can still read. A row passes when answer mass, survey rank-logit contrast, and MFV top-foundation margin stay above the requested fraction of their base values: `pmass(c)/pmass(0) >= coherence-frac`, `mean_abs_C(c)/mean_abs_C(0) >= contrast-frac`, and `mean_margin(c)/mean_margin(0) >= margin-frac`.
 
 ## Measurement
 
-The measurement on the maps is the profile.
+Steering is an intervention, so we judge it like surgery: did the intended thing move a lot, did everything else move as little as possible, and is the model still coherent? tinymfv reads three quantities that answer those, in rising order of steer-sensitivity.
 
-For MFV, the profile is the model's mean forced-choice probability on each moral foundation:
-
-$$\mathrm{profile}_f = \mathbb{E}_i P(f \mid i)$$
-
-For survey instruments, the profile is the mean expected 1-5 answer for each factor, after reverse-keying:
-
-$$\mathrm{profile}_d = \mathbb{E}_{i \in d}\sum_{k=1}^{M} k P(k \mid i)$$
-
-where $i$ is an item, $d$ is a survey factor, $k$ is a scale point, and $M$ is the largest scale value.
-
-This is what the survey maps and range plots show. In the showcase CSVs, this is the `mean` column. For MFV showcase plots, model and human units differ, so the plotted quantity is relative foundation emphasis: each foundation profile is z-scored across foundations before mapping.
-
-The table's reader-logit shift uses a more sensitive log-space readout.
-
-For MFV:
-
-$$\Delta_f = \mathbb{E}_i \left(\ell_{i,f}^{(+1)} - \ell_{i,f}^{(-1)}\right)$$
-
-where $\ell_{i,f}^{(c)}$ is the forced-choice logit for foundation $f$ on item $i$ at coefficient $c$.
-
-For survey instruments:
-
-$$C_d(c) = \mathbb{E}_{i \in d}\sum_{k=1}^{M} \left(k - \frac{M+1}{2}\right)\ell_{i,k}^{(c)}$$
-
-and the table reports $C_d(+1)-C_d(-1)$.
-
-For paired steering runs, compare the base profile to the steered profile path. Answer mass is a coherence check, not a value score:
+Coherence is the gate. `pmass` is the share of probability the model puts on the valid answer tokens, and entropy is how spread-out the answer is within them:
 
 $$m(c) = \mathbb{E}_i \sum_{a \in A_i} P_c(a \mid i)$$
 
-where $A_i$ is the valid answer-token set for item $i$. The showcase also checks survey rank-logit contrast and MFV top-foundation margin, because a steered reader can keep answer mass while losing useful structure.
+where $A_i$ is the valid answer-token set for item $i$. A steer that drives `pmass` toward zero, or the answers toward uniform, has broken the format, and any value read off it is noise. Coherence matters most on the unintended side: a strong steer that quietly turns answers to mush can look like change when it is really damage.
+
+The profile is what the maps plot: the human-comparable score per factor. For a survey it is the expected 1-5 answer (after reverse-keying); for MFV the mean forced-choice probability per foundation:
+
+$$\mathrm{profile}_d = \mathbb{E}_{i \in d}\sum_{k=1}^{M} k\,P(k \mid i) \qquad \mathrm{profile}_f = \mathbb{E}_i P(f \mid i)$$
+
+with $i$ an item, $d$ a factor, $k$ a scale point up to $M$. This lands the model against human norms, but it hides steering: near a confident answer the expected score sits in a flat spot ($\partial E/\partial \ell_j = p_j (j - E)$ vanishes), so a steer that only reallocates the tails barely moves it. In the showcase CSVs this is the `mean` column; for MFV, model and human units differ, so the maps plot relative emphasis (each profile z-scored across foundations).
+
+The steer signal is `C`, the rank-centered logit contrast: the same shape as the profile but in log-space with midpoint-centered weights, so its derivative is a fixed weight with no $p_j$ suppression and it still sees the steer when the profile is pinned:
+
+$$C_d(c) = \mathbb{E}_{i \in d}\sum_{k=1}^{M}\left(k - \tfrac{M+1}{2}\right)\ell_{i,k}^{(c)} \qquad \Delta_f = \mathbb{E}_i\left(\ell_{i,f}^{(+1)} - \ell_{i,f}^{(-1)}\right)$$
+
+where $\ell$ is the answer-token logprob at coefficient $c$. The intended change is $C$ (or $\Delta_f$) on the steered factor; the unintended change is $C$ moving on the other factors. A surgical steer has large intended change and small off-target change, at unchanged coherence.
+
+Together that is the surgical-informedness view: reward intended change, penalize unintended change, gate on coherence. tinymfv reports the pieces (pmass, entropy, per-factor profile and $C$, and for MFV a nominal informedness, the Youden's J of the model's top foundation against the human top foundation); steering-lite folds them into the single base-anchored surgical-informedness score it uses to rank steers.
 
 ## Scope
 
