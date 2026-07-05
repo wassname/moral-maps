@@ -25,27 +25,19 @@ and E degenerates to an integer.
 """
 from __future__ import annotations
 
-import os
+import asyncio
 import re
 from math import inf
 
 import numpy as np
 from loguru import logger
-from openai import OpenAI
+from openrouter_wrapper.retry import openrouter_request   # stamina backoff on 429/provider/upstream errors
 
 from .instrument import Instrument, InstrItem
 from .read import build_user_content
 
 _ANSWER_SUFFIX = ("\n\nAnswer with ONLY one option from [{space}] -- a single token, nothing else: "
                   "no words, no punctuation, no explanation.")
-
-
-def _client() -> OpenAI:
-    # max_retries: the SDK backs off (respecting Retry-After) on transient 429s -- some OpenRouter
-    # models are rate-limited to ~20 rpm and the sampling reader bursts, so a plain 0-retry client
-    # crashes the whole run mid-model. This is transient infra, not a bug to fail fast on.
-    return OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPENROUTER_API_KEY"],
-                  max_retries=6)
 
 
 def parse_answer(text: str, answer_space: list[str]) -> str | None:
@@ -61,15 +53,17 @@ def parse_answer(text: str, answer_space: list[str]) -> str | None:
     return best
 
 
-def _sample_texts(client: OpenAI, model: str, prompt: str, n_samples: int, temperature: float,
+def _sample_texts(model: str, prompt: str, n_samples: int, temperature: float,
                   max_tokens: int) -> list[str]:
-    """N completions, requesting up to 8 per call via the `n` param and topping up until N."""
+    """N completions via the openrouter_wrapper (stamina retry handles transient 429/provider/upstream
+    errors), requesting up to 8 per call via `n` and topping up until N."""
     texts: list[str] = []
     while len(texts) < n_samples:
-        resp = client.chat.completions.create(
-            model=model, messages=[{"role": "user", "content": prompt}],
-            temperature=temperature, n=min(n_samples - len(texts), 8), max_tokens=max_tokens)
-        texts.extend((c.message.content or "") for c in resp.choices)
+        payload = {"model": model, "messages": [{"role": "user", "content": prompt}],
+                   "temperature": temperature, "n": min(n_samples - len(texts), 8),
+                   "max_tokens": max_tokens}
+        data = asyncio.run(openrouter_request(payload))
+        texts.extend((c["message"].get("content") or "") for c in data["choices"])
     return texts
 
 
@@ -81,7 +75,6 @@ def read_items_sampled(model: str, instr: Instrument, items: list[InstrItem], *,
     `instr.answer_space`; `pmass_allowed` is the parse rate; `lp = log(p)` carries -inf on unsampled
     tokens ON PURPOSE so any C/LO consumer fails loudly instead of reading a fabricated number."""
     assert temperature > 0, "sampling readout needs temperature > 0; temp 0 collapses E to an integer"
-    client = _client()
     space = instr.answer_space
     A = len(space)
     idx = {a: k for k, a in enumerate(space)}
@@ -89,7 +82,7 @@ def read_items_sampled(model: str, instr: Instrument, items: list[InstrItem], *,
     for it_n, it in enumerate(items):
         user = build_user_content(instr, it)
         prompt = user + _ANSWER_SUFFIX.format(space="/".join(space))
-        texts = _sample_texts(client, model, prompt, n_samples, temperature, max_tokens)
+        texts = _sample_texts(model, prompt, n_samples, temperature, max_tokens)
         counts = np.zeros(A)
         for t in texts:
             a = parse_answer(t, space)
@@ -104,6 +97,7 @@ def read_items_sampled(model: str, instr: Instrument, items: list[InstrItem], *,
             "id": it.id, "frame": it.frame, "lp": lp, "p": p, "pmass_allowed": pmass,
             "dimension": it.dimension, "sign": it.sign, "human_label": it.human_label,
             "n_samples": len(texts), "n_parsed": n_parsed,
+            "prompt": prompt, "texts": texts,   # raw responses kept so a run's answers are auditable/saveable
         })
         if verbose_first and it_n == 0:
             logger.debug(

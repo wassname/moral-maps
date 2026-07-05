@@ -145,6 +145,8 @@ def main() -> None:
     ap.add_argument("--out", default="/tmp/claude-1000/wvs_map_iw.png")
     ap.add_argument("--cache", default="/tmp/claude-1000/wvs_iw_vectors.json",
                     help="cache model per-item p vectors so re-styling skips the API/model calls")
+    ap.add_argument("--responses", default="/tmp/claude-1000/wvs_iw_responses.jsonl",
+                    help="append every raw model response here (audit trail; API calls cost money)")
     args = ap.parse_args()
 
     recs = load_wvs_all()
@@ -173,6 +175,17 @@ def main() -> None:
         allc[sig] = {k: {s: p.tolist() for s, p in v.items()} for k, v in vecs.items()}
         cpath.write_text(json.dumps(allc))
 
+    rpath = Path(args.responses)
+    rpath.parent.mkdir(parents=True, exist_ok=True)
+
+    def save_responses(key: str, rows: list[dict]) -> None:
+        """Append every raw sampled response (audit trail -- these API calls cost money)."""
+        with rpath.open("a") as fh:
+            for r in rows:
+                fh.write(json.dumps({"model": key, "sig": sig, "item": r["id"],
+                                     "prompt": r.get("prompt"), "texts": r.get("texts"),
+                                     "p": np.asarray(r["p"]).tolist(), "pmass": r["pmass_allowed"]}) + "\n")
+
     if args.local_model:
         key = args.local_model.split("/")[-1] + " (lp)"
         if key not in vecs:
@@ -196,6 +209,7 @@ def main() -> None:
             for k, instr in enumerate(instrs):
                 rows += read_items_sampled(m, instr, instr.items, n_samples=args.api_samples,
                                            verbose_first=(k == 0))
+            save_responses(key, rows)       # raw answers first (before reducing to p vectors)
             vecs[key] = read_model(rows, meta)
             save_cache()                    # persist this model before starting the next (kill-safe)
             logger.info(f"cached {key}")
