@@ -1,66 +1,61 @@
 # tinymfv
 
-tinymfv is a small set of fast value evals for local LLM steering work. It asks moral vignettes and survey questions, reads answer-token probabilities, and turns them into model profiles.
+tinymfv is a small set of fast value evals for local LLM steering work. It asks moral vignettes and survey questions, reads answer-token probabilities, and turns them into model profiles that you can compare to humans.
 
-Use it to check three things: did the intended value move, what else moved, and does the model still sit near human response patterns? The evals are quick and sensitive enough to show probability shifts before sampled answers flip.
+When comparing models or checkpoints you can use it to check three things: did the intended value move?, what else moved?, how does this compare to human responses? The evals are quick and sensitive enough to show probability shifts.
 
-The plots compare model profiles to human data. Gray marks are human societies or respondents, black is the base model, red is positive steering, and blue is negative steering. This showcase uses a steering vector built from `authority-respecting` versus `authority-disregarding` personas. steering-lite built and applied the vector; tinymfv measures the result. Here `c` is the steering-lite multiplier on that vector. Red is `+c`, more Authority; blue is `-c`, less Authority.
+## The plots - Are model moral aliens?
 
-MFV comes first because it is the direct moral-vignette readout. MFV uses categorical answers: the answer is a moral foundation. MFQ-2 is the Moral Foundations Questionnaire 2 survey, where the answer is a 1-5 scale point.
+One fun thing we can do with this repo is compare AI's models on human psychological and anthropological surveys. Are they like us?
+
+One thing jumps out of the plots below. Before any steering the base model is already a psychological alien on some axes: on the culture maps it sits away from most humans, most sharply on Big5 openness (low) and conscientiousness (high), and on humor style (high aggressive, low affiliative). And steering is strong relative to human variation, on the headline axes a single sweep moves the profile further than any two countries differ, not just a US-vs-Australia nudge.
+
+What happens when we steer them? Below we steer models with `authority-respecting` versus `authority-disregarding` personas.
+
+<!-- TODO introduce what MFV is -->
 
 ![MFV culture map: Authority steering against human countries](docs/img/showcase/mfv/map_pca_ipsative.png)
 
+<!-- caption / interp sequence. how it's measured. -->
+
 ![MFV range plot: foundation emphasis beside Authority steering](docs/img/showcase/mfv/range.png)
+
+Steering from blue (`-c`, less Authority) to red (`+c`, more Authority) lifts the Authority foundation most: `+1.82` nat on the Authority reader-logit and `+401%` of a human country SD in foundation emphasis, with the other foundations dropping as it rises. The map places the base model (black) against human societies (gray), with the red/blue steering path running through it.
 
 MFV uses the same map and range plotters as the surveys, after converting forced-choice foundation probabilities into relative foundation emphasis. Each profile is z-scored across foundations before mapping, so the plot compares which foundations are high or low within that profile.
 
 ![Humor Styles range plot: human society ranges beside Authority steering](docs/img/showcase/humor_styles/range.png)
 
+![Humor Styles value map: named adaptive/maladaptive and self/other axes with Authority steering](docs/img/showcase/humor_styles/map_value.png)
+
+The value ("quadrant") map is the clearest read: named axes instead of blind PCs, maladaptive-to-adaptive humor left to right and other- to self-directed bottom to top, with the four human zones as convex hulls. Here the zones overlap almost completely, so humor style does not sort societies the way values do, a real negative result.
+
 ![Humor Styles culture map: Authority steering against human societies](docs/img/showcase/humor_styles/map_pca_ipsative.png)
 
-The Humor Styles map shows the same failure mode more sharply: the model profile can live away from the human societies. That is the useful warning sign, a model can answer in the requested format and still be a moral or psychological alien on the measured profile.
+The blind-PCA version shows the same failure mode more sharply: the model profile can live away from the human societies. That is the useful warning sign, a model can answer in the requested format and still be a moral or psychological alien on the measured profile.
 
 ![Big Five range plot: human society ranges beside Authority steering](docs/img/showcase/big5/range.png)
 
+![Big Five value map: named plasticity/stability meta-trait axes with Authority steering](docs/img/showcase/big5/map_value.png)
+
+On named axes: reserved-to-exploratory left to right (Plasticity = extraversion + openness), volatile-to-stable bottom to top (Stability = agreeableness + conscientiousness + emotional stability), the two DeYoung meta-traits. The Authority steer barely moves the base here, matching the flat range plot: this is a values push, not a personality one.
+
 ![Big Five culture map: Authority steering against human societies](docs/img/showcase/big5/map_pca_ipsative.png)
 
-Read the Big Five map left to right: gray is the human reference, black is the base LLM, and the red/blue line is the coherent steering path. Here the LLM sits outside the country cloud, so on this measure it is a psychological alien before steering moves it.
+Read the blind-PCA map left to right: gray is the human reference, black is the base LLM, and the red/blue line is the coherent steering path. Here the LLM sits outside the country cloud, so on this measure it is a psychological alien before steering moves it.
 
 MFQ-2 means Moral Foundations Questionnaire 2, the short survey instrument. It is separate from MFV, the moral-vignette foundation reader. MFQ-2 has fewer items per axis than the longer personality surveys, so the showcase averages 8 sampled reads per item before treating small path wiggles as signal.
 
 ![MFQ-2 range plot: human society ranges beside Authority steering](docs/img/showcase/mfq2/range.png)
 
+![MFQ-2 value map: named individualizing/binding and equality/proportionality axes with Authority steering](docs/img/showcase/mfq2/map_value.png)
+
+The value map is the sharpest of the set: individualizing-to-binding morality left to right, the fairness split (equality-to-proportionality) bottom to top, on the same convention as the WVS map (cultural West to the west, African-Islamic to the south). The `+c` Authority steer walks the base out of the Western individualizing corner across to the binding zone shared by the African-Islamic and East-Asian societies.
+
 ![MFQ-2 culture map: Authority steering against human societies](docs/img/showcase/mfq2/map_pca_ipsative.png)
 
 The path shows only usable coefficients: `c=0`, then each positive and negative side until one of the plot gates fails. This run kept the full path `c=-1,-0.5,0,+0.5,+1`. For surveys, collapse can mean the answer distribution loses its factor structure even when answer mass stays high.
 
-This is the same run as the plots. The vector was built from an Authority persona pair; the table shows the measured movement and side effects.
-
-`profile shift / human SD` is the distance from `c=-1` to `c=+1`, divided by the standard deviation of country means in the bundled human reference for that axis. `100%` means one human SD. `profile shift` is in plot units: MFV relative-emphasis z-score, or survey expected 1-5 score. `reader-logit shift` is the direct answer-logit readout for the same endpoints: MFV uses the per-foundation logit change, surveys use the rank-logit contrast `C`. The `+/-` term is the propagated item uncertainty.
-
-| dataset | axis | profile shift / human SD | profile shift | reader-logit shift |
-| --- | --- | --- | --- | --- |
-| MFV vignettes | Care | -242% | -0.59 | -0.07 +/- 0.28 |
-| MFV vignettes | Sanctity | -9% | -0.05 | +0.53 +/- 0.21 |
-| MFV vignettes | Authority | +401% | +1.17 | +1.82 +/- 0.32 |
-| MFV vignettes | Loyalty | -18% | -0.05 | +0.55 +/- 0.18 |
-| MFV vignettes | Fairness | -5% | -0.02 | +0.56 +/- 0.20 |
-| MFV vignettes | Liberty | -75% | -0.46 | +0.11 +/- 0.20 |
-| Humor Styles | affiliative | +144% | +0.40 | +15.00 +/- 3.98 |
-| Humor Styles | selfenhancing | +162% | +0.25 | +13.52 +/- 4.86 |
-| Humor Styles | aggressive | -23% | -0.04 | +0.08 +/- 7.58 |
-| Humor Styles | selfdefeating | +32% | +0.06 | +13.62 +/- 6.55 |
-| Big Five | extraversion | +105% | +0.17 | +7.21 +/- 4.79 |
-| Big Five | neuroticism | +2% | +0.00 | +7.69 +/- 3.56 |
-| Big Five | agreeableness | +269% | +0.34 | +16.03 +/- 4.17 |
-| Big Five | conscientiousness | +435% | +0.45 | +17.21 +/- 4.03 |
-| Big Five | openness | +41% | +0.07 | +17.77 +/- 2.48 |
-| MFQ-2 survey | care | +305% | +0.93 | +23.20 +/- 6.08 |
-| MFQ-2 survey | equality | +21% | +0.07 | +16.06 +/- 7.89 |
-| MFQ-2 survey | proportionality | +270% | +0.77 | +24.48 +/- 5.87 |
-| MFQ-2 survey | loyalty | +202% | +0.82 | +25.88 +/- 6.33 |
-| MFQ-2 survey | authority | +338% | +1.17 | +29.73 +/- 2.83 |
-| MFQ-2 survey | purity | +137% | +0.74 | +23.53 +/- 8.02 |
 
 ## Install
 
