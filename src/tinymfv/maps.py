@@ -258,22 +258,24 @@ def model_family_color(name: str) -> str:
 
 
 def _hull_label_pos(coords: np.ndarray, center: np.ndarray, obstacles: list[tuple[float, float]],
-                    span: np.ndarray, out: float = 0.018) -> tuple[float, float]:
-    """Place a zone label directly ON its hull's boundary, hugging the emptiest arc -- NO leader line. A
-    convex hull has plenty of perimeter, so rather than fling the label into open space with an arrow,
-    walk its boundary vertices, nudge each slightly OUTWARD (away from the plot centre so the text sits
-    just outside the edge), and keep the one whose NEAREST dot/label is farthest (distances normalised
-    by the data span so x/y crowding weigh equally). The label lands against an uncrowded stretch of
-    its own outline."""
-    best, best_score = tuple(coords[0]), -np.inf
+                    span: np.ndarray, out: float = 0.03) -> tuple[float, float, str, str]:
+    """Place a zone label JUST OUTSIDE the emptiest arc of its hull -- NO leader line and NOT on the
+    coloured edge line itself. A convex hull has plenty of perimeter, so walk its boundary vertices,
+    push each OUTWARD (away from the plot centre), and keep the one whose NEAREST dot/label is farthest
+    (distances normalised by the data span). Returns (x, y, ha, va) where the alignment makes the text
+    box extend further outward, so it clears its own outline instead of straddling it."""
+    best, best_score, best_u = (float(coords[0][0]), float(coords[0][1])), -np.inf, np.array([0.0, 1.0])
     for vx, vy in coords:
         dn = np.array([(vx - center[0]) / span[0], (vy - center[1]) / span[1]])
         u = dn / (np.hypot(*dn) or 1.0)                  # outward unit vector (normalised space)
         cx, cy = vx + out * u[0] * span[0], vy + out * u[1] * span[1]
         dmin = min(np.hypot((cx - ox) / span[0], (cy - oy) / span[1]) for ox, oy in obstacles)
         if dmin > best_score:
-            best_score, best = dmin, (cx, cy)
-    return best
+            best_score, best, best_u = dmin, (cx, cy), u
+    ux, uy = best_u
+    ha = "left" if ux > 0.3 else "right" if ux < -0.3 else "center"   # text extends outward from the edge
+    va = "bottom" if uy > 0.3 else "top" if uy < -0.3 else "center"
+    return best[0], best[1], ha, va
 
 
 def plot_value_map(display: str, countries: list[str], P: np.ndarray,
@@ -297,7 +299,7 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
       same visual language as plot_ipsative_pca's trajectory, so the two map families read alike.
     Returns the Figure."""
     from .zones import zones_for
-    from adjustText import adjust_text
+    import textalloc as ta
     import matplotlib.patheffects as pe
     zones_all, emph = zones_for(countries)
     emph = (emphasize or set()) | emph
@@ -350,23 +352,23 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     span = P.max(0) - P.min(0)
     center = P.mean(0)
     obs_pts = list(zip(obs_x, obs_y))
-    zone_texts, zplaced = [], []
-    for zn, coords, zc in zone_specs:                   # label hugs the emptiest arc of its OWN hull edge
-        lx, ly = _hull_label_pos(coords, center, obs_pts + zplaced, span)
-        zplaced.append((lx, ly))
-        zone_texts.append(ax.text(lx, ly, zn, color=zc, fontsize=10, fontweight="bold", fontstyle="italic",
-                                  ha="center", va="center", zorder=9,
-                                  path_effects=[pe.withStroke(linewidth=3.0, foreground="white")]))
-    # adjustText only understands points, so make it polygon-aware by adding sampled points along every
-    # hull EDGE to the obstacle cloud -- a country/model label then avoids sitting on a coloured hull line
-    # too, not just on a dot.
-    edge_x = obs_x + [x for _, coords, _ in zone_specs for x, _ in coords[::2]]
-    edge_y = obs_y + [y for _, coords, _ in zone_specs for _, y in coords[::2]]
-    texts = [ax.text(x, y, t, color=c, fontsize=fs, fontweight=fw, fontstyle=st, ha="center",
-                     va="center", zorder=9, path_effects=[pe.withStroke(linewidth=2.5, foreground="white")])
-             for x, y, t, c, fw, st, fs in lab_specs]
-    adjust_text(texts, x=edge_x, y=edge_y, ax=ax, objects=zone_texts, expand=(1.15, 1.4),
-                arrowprops=dict(arrowstyle="-", color="#aaa", lw=0.6))
+    # Zone labels: seat each JUST OUTSIDE the emptiest arc of its OWN hull edge (polygon-aware, no leader,
+    # not on the coloured line). Their spots then join the obstacle set so point labels dodge them too.
+    zx_obs, zy_obs = [], []
+    for zn, coords, zc in zone_specs:
+        lx, ly, lha, lva = _hull_label_pos(coords, center, obs_pts + list(zip(zx_obs, zy_obs)), span)
+        ax.text(lx, ly, zn, color=zc, fontsize=10, fontweight="bold", fontstyle="italic", ha=lha, va=lva,
+                zorder=9, path_effects=[pe.withStroke(linewidth=3.0, foreground="white")])
+        zx_obs.append(lx); zy_obs.append(ly)
+    # Point labels via textalloc: a grid + candidate-box placer that tries slots on EVERY side of each
+    # marker and keeps the first that clears the obstacle grid -- so a label auto-takes the roomier side
+    # and never sits on its own marker (leader line only when it must reach). Obstacles = dots + sampled
+    # hull EDGES + the zone-label spots, so it dodges polygons and area names too.
+    sx = obs_x + [x for _, coords, _ in zone_specs for x, _ in coords[::2]] + zx_obs
+    sy = obs_y + [y for _, coords, _ in zone_specs for _, y in coords[::2]] + zy_obs
+    ta.allocate_text(fig, ax, [s[0] for s in lab_specs], [s[1] for s in lab_specs],
+                     [s[2] for s in lab_specs], x_scatter=sx, y_scatter=sy, textsize=9,
+                     textcolor=[s[3] for s in lab_specs], linecolor="#aaa", linewidth=0.6, draw_lines=True)
     _pole_signposts(ax, med_x, med_y, poles)
     if invert_x:                                        # e.g. put Self-expression on the LEFT
         ax.invert_xaxis()
