@@ -32,6 +32,12 @@ DIGITS_1_5 = ["1", "2", "3", "4", "5"]
 PREFILL = "("
 
 # instrument name -> (survey subdir, {frame: filename stem}, human_csv, display, human_scale_max)
+# human_csv provenance (per-country reference means; ported from the mft_honesty experiment):
+#   mfq2 : Atari+ 2023 "Morality beyond the WEIRD", OSF osf.io/srtxn/ Study 2 (19 countries)
+#   big5 : OpenPsychometrics IPIP-FFM raw (openpsychometrics.org/_rawdata, BIG5), aggregated (24 countries)
+#   16pf : OpenPsychometrics 16PF raw (openpsychometrics.org/tests/16PF), aggregated (34 countries)
+#   humor_styles : Schermer+ 2020 "Humor styles across 28 countries", doi 10.1007/s12144-019-00552-y (Tables 1-2)
+# (MFV is not here -- it's read in scripts/plot_steer_showcase.py::read_human_mfv, provenance in that docstring.)
 _F3 = {"forward": "questionnaire", "inverted": "questionnaire_inverted", "negated": "questionnaire_negated"}
 _SPECS = {
     "mfq2": ("mfq2", {"forward": "forward", "inverted": "inverted", "negated": "negated"},

@@ -245,9 +245,14 @@ def _zscore(v: np.ndarray) -> np.ndarray:
 
 def read_human_mfv() -> tuple[list[str], dict[str, dict[str, float]]]:
     """(countries, {country: {foundation: mean_1to5}}) from the bundled MFV human norms.
-    JimenezLeal2025 (LatAm: Argentina/Colombia/Peru/US) + Yamada2025 (MFV-J: Japan)
-    + Hopp2024 (Dutch: Netherlands) + Marques2020 (Brazil) + Crone2021 (Australia):
-    8 countries x 6 foundations (no Social Norms). Provenance: mfv_country_factors_SOURCES.md."""
+    8 countries x 6 foundations (no Social Norms). Per-row provenance = the CSV `source`
+    column; each tag expands here (full transform detail lives in the row's git commit body):
+      JimenezLeal2025_LatAm   AR/CO/PE/US  Jimenez-Leal+ 2025 Collabra doi 10.1525/collabra.128178 (tables)
+      Yamada2025_MFV-J        Japan        Yamada+ 2026 Jpn J Psych doi 10.4992/jjpsy.97.24228 (table)
+      Hopp2024_DutchMFV       Netherlands  Hopp+ 2024 JDM 19:e10 doi 10.1017/jdm.2024.5 (Table 1; care=mean(phys,emo))
+      Marques2020_..._affinecal Brazil     Marques+ 2020 JDM journal.sjdm.org/19/190809a; Fig-3 digitized + affine bias-cal
+      Crone2021_AusUndergrad  Australia    Crone,Rhee,Laham 2021 Behav Res Methods doi 10.3758/s13428-020-01489-y;
+                                           raw 90-item dat_rep.sav (OSF cmwpv, 756 undergrads), NOT the GA-abbrev subset"""
     path = T.maps.DATA / "human" / "mfv_country_factors.csv"
     by_country: dict[str, dict[str, float]] = {}
     with open(path, newline="") as fh:
