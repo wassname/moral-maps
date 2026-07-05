@@ -341,6 +341,14 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     step = 0.02 * float(np.mean(P.max(0) - P.min(0)))
     zone_perims = [densify_polygon(coords, step) for _, coords, _ in zone_specs]
     soft_pts = np.vstack(zone_perims) if zone_perims else np.empty((0, 2))
+    # the four pole signposts (drawn later, ON the crosshair edges) become obstacles so a zone/point
+    # label near the frame edge won't collide with 'Adaptive' / 'Self-directed' etc. Each pole is a
+    # short keep-out BAND (a few points inward along its axis), since the label text is wide.
+    fxm, fym = ax.transLimits.transform((med_x, med_y))
+    a2d = lambda fx, fy: tuple(ax.transData.inverted().transform(ax.transAxes.transform((fx, fy))))
+    pole_pts = ([a2d(fxm, f) for f in (0.945, 0.88)] + [a2d(fxm, f) for f in (0.055, 0.12)] +
+                [a2d(f, fym) for f in (0.085, 0.15, 0.21)] + [a2d(f, fym) for f in (0.9, 0.84, 0.78)])
+    hard_pts = np.array(list(zip(obs_x, obs_y)) + pole_pts)
     anchor_sets = zone_perims + [np.array([[s[0], s[1]]]) for s in lab_specs]
     texts = [zn for zn, _, _ in zone_specs] + [s[2] for s in lab_specs]
     colors = [zc for _, _, zc in zone_specs] + [s[3] for s in lab_specs]
@@ -349,7 +357,7 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     styles = ["italic"] * len(zone_specs) + ["normal"] * len(lab_specs)
     region = [True] * len(zone_specs) + [False] * len(lab_specs)
     anchor_pad = [3.0] * len(zone_specs) + [s[5] for s in lab_specs]
-    allocate_labels(ax, anchor_sets, texts, colors, weights, np.array(list(zip(obs_x, obs_y))),
+    allocate_labels(ax, anchor_sets, texts, colors, weights, hard_pts,
                     soft_pts=soft_pts, region=region, fontsizes=fontsizes, styles=styles,
                     anchor_pad=anchor_pad)
     _pole_signposts(ax, med_x, med_y, poles)
