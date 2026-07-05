@@ -1,0 +1,155 @@
+"""General candidate-slot label placement for matplotlib: polygon-aware, short-leader, gist-ready.
+
+The problem: matplotlib has no label placer that (a) tries every side of a marker and keeps the
+nearest clear slot, (b) draws a leader line ONLY when the label had to move far, and (c) treats a
+filled polygon (a convex-hull region) as something to avoid. adjustText (Phlya/adjustText) relaxes
+by force and parks labels in local minima; textalloc (ckjellson/textalloc) does candidate placement
+but only against points/lines/other-text, and always/never draws lines. This is a small placer that
+does all three, generalised so ONE call handles both marker labels and region labels.
+
+The generalisation (wassname's idea): every label owns a SET of 1..N candidate anchor points, and we
+search placements around all of them.
+  - a MARKER label (country / model dot) passes its single point -> the box sits adjacent to it.
+  - a REGION label (a zone name over a convex hull) passes its whole densified perimeter -> the box
+    can attach ANYWHERE along the hull edge, so it has tons of options and never needs to overlap.
+
+Two obstacle classes:
+  - HARD points (markers, and every already-placed label box): no label may cover these.
+  - SOFT points (polygon edges, via densify_polygon): only REGION labels avoid these. A marker label
+    wears a thin white outline, so it may cross a hull line and stay readable (cheaper than contorting
+    every country label around the zone boundaries).
+
+Selection differs by label kind, which is the whole point of the 1..N anchor-set framing:
+  - region labels MAXIMISE clearance over all (perimeter-anchor x slot) candidates -> the emptiest arc
+    of their own hull, in the open, no white box and no leader.
+  - marker labels take the NEAREST clear slot (adjacent reads as attached), with a ~half-character gap
+    from every obstacle and a leader line only when the slot is far or contested.
+
+Runs in PIXEL space (measures real rendered text extents), so call it AFTER the axes are at their
+final limits and orientation -- e.g. after ax.invert_xaxis() -- otherwise the 'try every side'
+geometry is mirrored and every label drifts one way.
+
+Adapted from textalloc (ckjellson/textalloc, MIT) and wassname's plotly placer
+(gist b0b34492cd1679f1daeb5892ef714dce). -- authored by Claude
+"""
+from __future__ import annotations
+
+import numpy as np
+import matplotlib.patheffects as pe
+
+
+def densify_polygon(coords: np.ndarray, step: float) -> np.ndarray:
+    """A convex hull is stored as ~6 CORNER vertices; the long straight edges between them carry no
+    points, so a label can sit ON an edge and 'see' nothing to dodge. Sample points every `step` data
+    units ALONG each closed edge, promoting the polygon PATH (not just its corners) to a point cloud
+    the box-collision test can feel."""
+    coords = np.asarray(coords, float)
+    pts = []
+    for i in range(len(coords)):
+        a, b = coords[i], coords[(i + 1) % len(coords)]
+        n = max(2, int(np.hypot(*(b - a)) / step) + 1)
+        pts.extend(a + t * (b - a) for t in np.linspace(0, 1, n, endpoint=False))
+    return np.array(pts) if pts else np.empty((0, 2))
+
+
+def _box_metrics(box, pts):
+    """(count of pts inside box, distance from box to nearest pt) for a padded AABB and a point cloud."""
+    if not len(pts):
+        return 0, np.inf
+    x0, y0, x1, y1 = box
+    dx = np.maximum(0.0, np.maximum(x0 - pts[:, 0], pts[:, 0] - x1))
+    dy = np.maximum(0.0, np.maximum(y0 - pts[:, 1], pts[:, 1] - y1))
+    d = np.hypot(dx, dy)
+    return int(np.count_nonzero(d == 0.0)), float(d.min())
+
+
+# candidate directions in priority order: right, left, under, up (horizontal reads best, 'under'
+# before 'over'), then the four diagonals. y is UP in matplotlib display space.
+_ANGLES = np.deg2rad([0, 180, 270, 90, 315, 225, 45, 135])
+_DIRS = np.column_stack([np.cos(_ANGLES), np.sin(_ANGLES)])
+
+
+def allocate_labels(ax, anchor_sets: list[np.ndarray], texts: list[str], colors: list[str],
+                    weights: list[str], hard_pts: np.ndarray, *, soft_pts: np.ndarray | None = None,
+                    region: list[bool] | None = None, fontsize: float = 9.0,
+                    fontsizes: list[float] | None = None, styles: list[str] | None = None,
+                    anchor_pad: list[float] | None = None, gap_frac: float = 0.28,
+                    stroke: float = 2.0, linecolor: str = "#9a958a", linewidth: float = 0.6):
+    """Place N labels. See the module docstring for the model. Draws directly onto `ax`.
+
+    anchor_sets : per label, an (Ki, 2) array of candidate attachment points (data coords).
+    hard_pts    : (M, 2) markers no label may cover; placed label boxes are added to this as we go.
+    soft_pts    : (P, 2) polygon-edge points; only `region` labels avoid them.
+    region[i]   : True  -> multi-anchor, maximise clearance, avoid soft points, no white box, no leader
+                  False -> nearest clear slot, hard points only, thin white outline, leader if far.
+    anchor_pad[i]: px radius of label i's own marker, so the box clears a big star as well as the gap.
+    gap_frac    : gap kept from every obstacle, as a fraction of text height (~half a character).
+    """
+    n = len(texts)
+    region = region or [False] * n
+    fs = fontsizes or [fontsize] * n
+    st = styles or ["normal"] * n
+    pad0 = anchor_pad or [4.0] * n
+    fig = ax.figure
+    fig.canvas.draw()                                        # freeze limits + get a live renderer
+    rend = fig.canvas.get_renderer()
+    to_px = ax.transData.transform
+    to_data = ax.transData.inverted().transform
+    A_px = [to_px(np.asarray(a, float).reshape(-1, 2)) for a in anchor_sets]
+    hard = to_px(np.asarray(hard_pts, float)) if len(hard_pts) else np.empty((0, 2))
+    soft = to_px(np.asarray(soft_pts, float)) if (soft_pts is not None and len(soft_pts)) else np.empty((0, 2))
+    abox = ax.get_window_extent()
+    wh = []                                                  # measured (w, h) px per label
+    for t, w, s, z in zip(texts, weights, st, fs):
+        h = ax.text(0, 0, t, fontsize=z, fontweight=w, fontstyle=s, ha="left", va="bottom")
+        e = h.get_window_extent(rend); wh.append((e.width, e.height)); h.remove()
+    placed = []                                              # settled label boxes -> hard obstacles
+    order = sorted(range(n), key=lambda i: not region[i])    # region labels first, so markers dodge them
+    for i in order:
+        w_i, h_i = wh[i]
+        gap = gap_frac * h_i                                 # ~half a character clear of every obstacle
+        r0 = pad0[i] + gap                                   # clear the marker itself + the gap
+        radii = [r0, r0 + 0.9 * h_i] if region[i] else [r0 + k * h_i for k in (0.0, 0.9, 1.8, 2.8, 4.0)]
+        obstacles = np.vstack([hard, soft]) if region[i] and len(soft) else hard
+        best = None                                          # (penalty, -clearance, box, anchor, radius)
+        for anc in A_px[i]:
+            ax0, ay0 = anc
+            for r in radii:
+                for ux, uy in _DIRS:
+                    cx, cy = ax0 + ux * (r + w_i / 2), ay0 + uy * (r + h_i / 2)
+                    box = (cx - w_i / 2 - gap, cy - h_i / 2 - gap, cx + w_i / 2 + gap, cy + h_i / 2 + gap)
+                    pen = 0.0
+                    if box[0] < abox.x0 or box[2] > abox.x1 or box[1] < abox.y0 or box[3] > abox.y1:
+                        pen += 1000.0                        # off-canvas: last resort
+                    inside, clear = _box_metrics(box, obstacles)
+                    pen += 50.0 * inside
+                    for pb in placed:                        # overlap area with settled labels
+                        ox = max(0.0, min(box[2], pb[2]) - max(box[0], pb[0]))
+                        oy = max(0.0, min(box[3], pb[3]) - max(box[1], pb[1]))
+                        pen += 0.02 * ox * oy
+                    key = (pen, -clear)
+                    if best is None or key < best[0]:
+                        best = (key, (cx, cy), box, (ax0, ay0), r)
+                    if pen == 0.0 and not region[i]:
+                        break                                # marker: first clear slot (nearest) wins
+                else:
+                    continue
+                break
+            else:
+                continue
+            if not region[i]:
+                break
+        (pen, _), (cx, cy), box, (ax0, ay0), r = best
+        placed.append(box)
+        # leader line: marker labels only, when the slot is far or contested. Same-colour (model/steer)
+        # labels get a looser threshold since their colour already ties them to the marker.
+        if not region[i]:
+            thr = h_i * (2.6 if colors[i] != "#111" else 1.15)
+            if r > r0 + thr or pen > 0:
+                nx, ny = min(max(ax0, box[0]), box[2]), min(max(ay0, box[1]), box[3])
+                (lx0, ly0), (lx1, ly1) = to_data((ax0, ay0)), to_data((nx, ny))
+                ax.plot([lx0, lx1], [ly0, ly1], "-", color=linecolor, lw=linewidth, zorder=2.5)
+        dx, dy = to_data((cx, cy))
+        ax.text(dx, dy, texts[i], color=colors[i], fontsize=fs[i], fontweight=weights[i], fontstyle=st[i],
+                ha="center", va="center", zorder=10,
+                path_effects=[pe.withStroke(linewidth=stroke, foreground="white")])

@@ -28,6 +28,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 
 from .instrument import Instrument
+from .labelplace import allocate_labels, densify_polygon
 
 DATA = Path(__file__).resolve().parent / "data"
 
@@ -257,27 +258,6 @@ def model_family_color(name: str) -> str:
     return MODEL_RED
 
 
-def _hull_label_pos(coords: np.ndarray, center: np.ndarray, obstacles: list[tuple[float, float]],
-                    span: np.ndarray, out: float = 0.03) -> tuple[float, float, str, str]:
-    """Place a zone label JUST OUTSIDE the emptiest arc of its hull -- NO leader line and NOT on the
-    coloured edge line itself. A convex hull has plenty of perimeter, so walk its boundary vertices,
-    push each OUTWARD (away from the plot centre), and keep the one whose NEAREST dot/label is farthest
-    (distances normalised by the data span). Returns (x, y, ha, va) where the alignment makes the text
-    box extend further outward, so it clears its own outline instead of straddling it."""
-    best, best_score, best_u = (float(coords[0][0]), float(coords[0][1])), -np.inf, np.array([0.0, 1.0])
-    for vx, vy in coords:
-        dn = np.array([(vx - center[0]) / span[0], (vy - center[1]) / span[1]])
-        u = dn / (np.hypot(*dn) or 1.0)                  # outward unit vector (normalised space)
-        cx, cy = vx + out * u[0] * span[0], vy + out * u[1] * span[1]
-        dmin = min(np.hypot((cx - ox) / span[0], (cy - oy) / span[1]) for ox, oy in obstacles)
-        if dmin > best_score:
-            best_score, best, best_u = dmin, (cx, cy), u
-    ux, uy = best_u
-    ha = "left" if ux > 0.3 else "right" if ux < -0.3 else "center"   # text extends outward from the edge
-    va = "bottom" if uy > 0.3 else "top" if uy < -0.3 else "center"
-    return best[0], best[1], ha, va
-
-
 def plot_value_map(display: str, countries: list[str], P: np.ndarray,
                    poles: tuple[str, str, str, str], *, models: dict[str, tuple[float, float]] | None = None,
                    model_labels: dict[str, str] | None = None,
@@ -299,8 +279,6 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
       same visual language as plot_ipsative_pca's trajectory, so the two map families read alike.
     Returns the Figure."""
     from .zones import zones_for
-    import textalloc as ta
-    import matplotlib.patheffects as pe
     zones_all, emph = zones_for(countries)
     emph = (emphasize or set()) | emph
     zones, dot_cols, label_set = _map_annotations(P, countries, zones_all, emph, "#888888")
@@ -314,12 +292,12 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     zone_specs = draw_zone_hulls(ax, P, countries, zones, label=False)   # labels go through the allocator
     ax.scatter(P[:, 0], P[:, 1], s=26, c=dot_cols, alpha=0.85, edgecolors="white", linewidths=0.5, zorder=3)
 
-    # Two-stage placement. Point labels (country / model / steer) go through ONE adjustText pass (force
-    # repulsion off the dots and each other, leader lines). The few big ZONE labels get a dedicated
-    # emptiest-slot search first (adjustText's local relaxation parks them in crowded local minima), and
-    # the point labels then avoid those. obs_x/obs_y are the dots every label must dodge.
+    # Two-stage placement. The few big ZONE labels get a dedicated emptiest-hull-edge search first, then
+    # the point labels (country / model / steer) go through allocate_labels, which dodges dots + hull
+    # edges + those zone labels. obs_x/obs_y are the dots+stars every label must dodge.
     obs_x, obs_y = list(P[:, 0]), list(P[:, 1])
-    lab_specs = [(P[i, 0], P[i, 1], countries[i], "#111", "normal", "normal", 9)
+    # each marker label spec: (x, y, text, colour, weight, marker_pad_px). pad clears the marker glyph.
+    lab_specs = [(P[i, 0], P[i, 1], countries[i], "#111", "normal", 5.0)
                  for i, c in enumerate(countries) if c in label_set]
     if models:
         # each model is a STAR coloured by lab family. Every model is plotted, but only `model_labels`
@@ -332,7 +310,7 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
         for k, x, y, col in zip(mnames, mx, my, mcols):
             disp = k if model_labels is None else model_labels.get(k)
             if disp:
-                lab_specs.append((x, y, disp, col, "bold", "normal", 9))
+                lab_specs.append((x, y, disp, col, "bold", 13.0))    # star is big -> larger marker pad
         obs_x += list(mx); obs_y += list(my)
     if steer:
         bx, by, blab = steer["base"]
@@ -342,36 +320,36 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
             ex, ey, elab = steer[key]
             ax.plot([bx, ex], [by, ey], "-", color=col, lw=1.6, alpha=0.85, zorder=7)   # connected arm
             ax.scatter(ex, ey, s=90, c=col, edgecolors="white", linewidths=1.0, zorder=8)
-            lab_specs.append((ex, ey, elab, col, "bold", "normal", 9))
+            lab_specs.append((ex, ey, elab, col, "bold", 8.0))
             obs_x.append(ex); obs_y.append(ey)
         ax.scatter(bx, by, s=90, c=C_BASE, edgecolors="white", linewidths=1.0, zorder=8)
-        lab_specs.append((bx, by, blab, C_BASE, "bold", "normal", 9))
+        lab_specs.append((bx, by, blab, C_BASE, "bold", 8.0))
         obs_x.append(bx); obs_y.append(by)
 
     ax.margins(0.13)
-    span = P.max(0) - P.min(0)
-    center = P.mean(0)
-    obs_pts = list(zip(obs_x, obs_y))
-    # Zone labels: seat each JUST OUTSIDE the emptiest arc of its OWN hull edge (polygon-aware, no leader,
-    # not on the coloured line). Their spots then join the obstacle set so point labels dodge them too.
-    zx_obs, zy_obs = [], []
-    for zn, coords, zc in zone_specs:
-        lx, ly, lha, lva = _hull_label_pos(coords, center, obs_pts + list(zip(zx_obs, zy_obs)), span)
-        ax.text(lx, ly, zn, color=zc, fontsize=10, fontweight="bold", fontstyle="italic", ha=lha, va=lva,
-                zorder=9, path_effects=[pe.withStroke(linewidth=3.0, foreground="white")])
-        zx_obs.append(lx); zy_obs.append(ly)
-    # Point labels via textalloc: a grid + candidate-box placer that tries slots on EVERY side of each
-    # marker and keeps the first that clears the obstacle grid -- so a label auto-takes the roomier side
-    # and never sits on its own marker (leader line only when it must reach). Obstacles = dots + sampled
-    # hull EDGES + the zone-label spots, so it dodges polygons and area names too.
-    sx = obs_x + [x for _, coords, _ in zone_specs for x, _ in coords[::2]] + zx_obs
-    sy = obs_y + [y for _, coords, _ in zone_specs for _, y in coords[::2]] + zy_obs
-    ta.allocate_text(fig, ax, [s[0] for s in lab_specs], [s[1] for s in lab_specs],
-                     [s[2] for s in lab_specs], x_scatter=sx, y_scatter=sy, textsize=9,
-                     textcolor=[s[3] for s in lab_specs], linecolor="#aaa", linewidth=0.6, draw_lines=True)
+    if invert_x:                                         # e.g. Self-expression on the LEFT. Flip BEFORE
+        ax.invert_xaxis()                                # placement so the pixel-space allocator sees the
+    ax.autoscale(False)                                  # final orientation (else every label mirrors left).
+    # ONE placement pass for everything (see labelplace.allocate_labels). Each zone name is a REGION
+    # label whose candidate anchors are its whole densified hull perimeter -- so it seats itself in the
+    # emptiest open air outside the hull, no white box, no leader. Country/model/steer names are MARKER
+    # labels sitting adjacent to their point. hard_pts = dots + stars every label dodges; soft_pts = all
+    # hull edges, which only the region labels avoid (marker labels wear a white outline and may cross).
+    step = 0.02 * float(np.mean(P.max(0) - P.min(0)))
+    zone_perims = [densify_polygon(coords, step) for _, coords, _ in zone_specs]
+    soft_pts = np.vstack(zone_perims) if zone_perims else np.empty((0, 2))
+    anchor_sets = zone_perims + [np.array([[s[0], s[1]]]) for s in lab_specs]
+    texts = [zn for zn, _, _ in zone_specs] + [s[2] for s in lab_specs]
+    colors = [zc for _, _, zc in zone_specs] + [s[3] for s in lab_specs]
+    weights = ["bold"] * len(zone_specs) + [s[4] for s in lab_specs]
+    fontsizes = [10.0] * len(zone_specs) + [9.0] * len(lab_specs)
+    styles = ["italic"] * len(zone_specs) + ["normal"] * len(lab_specs)
+    region = [True] * len(zone_specs) + [False] * len(lab_specs)
+    anchor_pad = [3.0] * len(zone_specs) + [s[5] for s in lab_specs]
+    allocate_labels(ax, anchor_sets, texts, colors, weights, np.array(list(zip(obs_x, obs_y))),
+                    soft_pts=soft_pts, region=region, fontsizes=fontsizes, styles=styles,
+                    anchor_pad=anchor_pad)
     _pole_signposts(ax, med_x, med_y, poles)
-    if invert_x:                                        # e.g. put Self-expression on the LEFT
-        ax.invert_xaxis()
     ax.set_xticks([]); ax.set_yticks([]); ax.set_xlabel(""); ax.set_ylabel("")
     if models:                                          # legend: one star swatch per lab family present
         from matplotlib.lines import Line2D
