@@ -205,13 +205,11 @@ def main() -> None:
     # Render through the SHARED value-map renderer (same one the instrument value maps use): pole
     # signposts through the human median, 4 auto-selected zone hulls, textalloc labels, model stars.
     _, emph = zones_for(countries)
+    # Title + caption live in the README (nicer voice, editable), not baked into the figure.
     fig = maps.plot_value_map(
         "WVS Inglehart-Welzel", countries, P,
         ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
-        models=models, emphasize=emph,
-        title=f"WVS Inglehart-Welzel map: LLMs among {len(countries)} human societies (approximate IW axes)",
-        note=("Approximate IW: axes built from GlobalOpinionQA WVS items (3 themes/axis, not the\n"
-              "canonical 5; national pride / authority / materialism absent). Not a verbatim WVS factor score."))
+        models=models, emphasize=emph)
     fig.savefig(args.out, dpi=200, bbox_inches="tight")
     logger.info(f"wrote {args.out}")
 

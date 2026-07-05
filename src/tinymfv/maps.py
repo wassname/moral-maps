@@ -199,11 +199,9 @@ def _pole_signposts(ax, med_x: float, med_y: float, poles: tuple[str, str, str, 
     ax.annotate(xp, xy=(0.994, med_y), xytext=(0.9, med_y), xycoords=tY, arrowprops=awp, **kw)
 
 
-# model-star palette: saturated/dark tones, distinct from the muted ZONE_COLORS (shared by the WVS map
-# script + plot_value_map). The coloured label ties each star to its name.
-MODEL_STAR_COLORS = ["#111111", "#d81b9a", "#5b2c86", "#008b8b", "#b8860b", "#8b0000",
-                     "#c2185b", "#00429d", "#5d1451", "#1a5e1a", "#7a3b00", "#444444",
-                     "#a80000", "#006d6d"]
+# Economist convention: every model is the SAME bold red (bigger than the grey society dots), told
+# apart by its on-map label, not by colour. Distinct from the muted ZONE_COLORS.
+MODEL_RED = "#d0021b"
 
 
 def plot_value_map(display: str, countries: list[str], P: np.ndarray,
@@ -238,7 +236,7 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     ax.axhline(med_y, color="#c9c4b4", lw=1.0, zorder=1)
     ax.axvline(med_x, color="#c9c4b4", lw=1.0, zorder=1)
     draw_zone_hulls(ax, P, countries, zones)
-    ax.scatter(P[:, 0], P[:, 1], s=28, c=dot_cols, alpha=0.85, edgecolors="white", linewidths=0.5, zorder=3)
+    ax.scatter(P[:, 0], P[:, 1], s=26, c=dot_cols, alpha=0.85, edgecolors="white", linewidths=0.5, zorder=3)
 
     lab_i = [i for i, c in enumerate(countries) if c in label_set]
     tx = [P[i, 0] for i in lab_i]
@@ -248,10 +246,10 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     if models:
         mnames = list(models)
         mpts = np.array([models[k] for k in mnames])
-        for (name, pt), col in zip(models.items(), MODEL_STAR_COLORS):
-            ax.scatter(*pt, s=190, marker="*", c=col, edgecolors="white", linewidths=1.0, zorder=8)
+        ax.scatter(mpts[:, 0], mpts[:, 1], s=150, marker="o", c=MODEL_RED,   # Economist: bigger red dots
+                   edgecolors="white", linewidths=1.0, zorder=8)
         tx += list(mpts[:, 0]); ty += list(mpts[:, 1]); txt += mnames
-        tcol += list(MODEL_STAR_COLORS[:len(mnames)])
+        tcol += [MODEL_RED] * len(mnames)
         sx = list(P[:, 0]) + list(mpts[:, 0]); sy = list(P[:, 1]) + list(mpts[:, 1])
     else:
         sx, sy = list(P[:, 0]), list(P[:, 1])
@@ -260,10 +258,20 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
                      textsize=9, textcolor=tcol, linecolor="#aaa", linewidth=0.6, draw_lines=True)
     _pole_signposts(ax, med_x, med_y, poles)
     ax.set_xticks([]); ax.set_yticks([]); ax.set_xlabel(""); ax.set_ylabel("")
-    ax.set_title(title or f"{display}: value map", fontsize=12)
+    if models:                                          # minimal colour legend (red = models, grey = societies)
+        from matplotlib.lines import Line2D
+        handles = [Line2D([], [], marker="o", linestyle="none", markerfacecolor=MODEL_RED,
+                          markeredgecolor="white", markersize=11, label="AI models"),
+                   Line2D([], [], marker="o", linestyle="none", markerfacecolor="#8f8a80",
+                          markeredgecolor="white", markersize=8, label=f"{len(countries)} societies")]
+        ax.legend(handles=handles, loc="upper left", fontsize=9, frameon=False,
+                  borderaxespad=0.8, handletextpad=0.3).set_zorder(11)
+    # Title + caption are OFF by default -- the README carries the headline + sources (nicer voice
+    # there than baked jargon). Pass title/note only for a standalone figure.
+    if title:
+        ax.set_title(title, fontsize=12, loc="left")
     if note:
-        ax.text(0.01, 0.01, note, transform=ax.transAxes, fontsize=6.5, color="#888",
-                va="bottom", ha="left", zorder=10)
+        fig.text(0.02, 0.015, note, ha="left", va="bottom", fontsize=7.5, color="#999")
     return fig
 
 
