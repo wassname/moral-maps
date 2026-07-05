@@ -269,6 +269,19 @@ def main() -> None:
         x, y, xs, ys = models[key]
         logger.info(f"cached {key}: ({x:.2f}, {y:.2f}) +-({1.96*xs:.02f}, {1.96*ys:.02f}) 95% CI")
 
+    # Uncertainty as a TABLE, not whiskers on the map (the CI crosses overlap into noise with a dozen+
+    # models). Sorted widest-first so the mushy models are obvious. The CI is bootstrap over items +
+    # samples; for the wide ones it's item-disagreement (the model rates different WVS items
+    # inconsistently on an axis), which more samples will NOT shrink -- see the readme/journal note.
+    ci_rows = [(k, v[0], v[1], 1.96 * v[2], 1.96 * v[3]) for k, v in models.items() if len(v) > 3]
+    if ci_rows:
+        from tabulate import tabulate
+        ci_rows.sort(key=lambda r: -(r[3] + r[4]))
+        table = tabulate(ci_rows, headers=["model", "x self-expr", "y secular", "x 95%CI", "y 95%CI"],
+                         tablefmt="pipe", floatfmt="+.2f")
+        Path(args.out).with_name("wvs_model_ci.md").write_text(table + "\n")
+        logger.info("model coords + 95% CI (widest first):\n" + table)
+
     # Render through the SHARED value-map renderer (same one the instrument value maps use): pole
     # signposts through the human median, 4 auto-selected zone hulls, textalloc labels, model stars.
     _, emph = zones_for(countries)

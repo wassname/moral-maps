@@ -268,16 +268,13 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     tcol = ["#111"] * len(lab_i)
     sx, sy = list(P[:, 0]), list(P[:, 1])
     if models:
+        # models carry (x, y[, x_se, y_se]); the CI is NOT drawn -- with a dozen+ models the whisker
+        # crosses overlap into noise. Uncertainty lives in the companion table (wvs_map save_ci_table),
+        # which also shows it's item-disagreement (irreducible by N), not sampling noise.
         mnames = list(models)
         mx = np.array([models[k][0] for k in mnames])
         my = np.array([models[k][1] for k in mnames])
-        # optional bootstrap SE (rated models carry (x, y, x_se, y_se); logprob models just (x, y))
-        xse = np.array([models[k][2] if len(models[k]) > 2 else 0.0 for k in mnames])
-        yse = np.array([models[k][3] if len(models[k]) > 3 else 0.0 for k in mnames])
-        if (xse > 0).any() or (yse > 0).any():           # 95% CI -> a mushy model reads as uncertain
-            ax.errorbar(mx, my, xerr=1.96 * xse, yerr=1.96 * yse, fmt="none", ecolor=MODEL_RED,
-                        elinewidth=1.0, alpha=0.4, capsize=2.5, capthick=0.8, zorder=7)
-        ax.scatter(mx, my, s=150, marker="o", c=MODEL_RED,   # Economist: bigger red dots
+        ax.scatter(mx, my, s=120, marker="o", c=MODEL_RED,   # Economist: bigger red dots
                    edgecolors="white", linewidths=1.0, zorder=8)
         tx += list(mx); ty += list(my); txt += mnames
         tcol += [MODEL_RED] * len(mnames)
