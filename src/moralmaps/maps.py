@@ -369,6 +369,9 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
 
     ax.margins(0.17)                                     # roomy edges: the pole signposts sit in the inner
     ax.autoscale(False)                                  # margin and edge labels (Serbia, Adaptive) need to fit.
+    if models:                                           # the WVS overlay stacks the most-secular model stars
+        y0, y1 = ax.get_ylim()                           # against the top edge; add top headroom so their
+        ax.set_ylim(y0, y1 + 0.22 * (y1 - y0))           # stars + labels seat INSIDE the frame. -- Claude
     # Orientation is already baked into the coords (orient_geographic above), so the pixel-space label
     # allocator sees the final left/right; no ax.invert_xaxis() that would mirror every placed label.
     # ONE placement pass for everything (see labelplace.allocate_labels). Each zone name is a REGION
@@ -403,12 +406,15 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     # NO legend: each model family already has a directly-placed, family-coloured label on the map, so a
     # swatch legend would just duplicate that ink (Tufte eraser test). Grey dots read as societies from
     # the labelled examples (Sweden, Japan...); the count lives in the README caption.
-    # Title + caption are OFF by default -- the README carries the headline + sources (nicer voice
-    # there than baked jargon). Pass title/note only for a standalone figure.
+    # Title + caption default OFF (the README carries them). When passed (the hero WVS map) draw them
+    # INSIDE the axes, in the empty bottom-left corner, so a crop of the PNG can't strip the attribution
+    # and there's no external white band. -- Claude
     if title:
-        ax.set_title(title, fontsize=12, loc="left")
+        ax.text(0.012, 0.075, title, transform=ax.transAxes, ha="left", va="bottom",
+                fontsize=11, fontweight="bold", color="#333", zorder=11, linespacing=1.05)
     if note:
-        fig.text(0.02, 0.015, note, ha="left", va="bottom", fontsize=7.5, color="#999")
+        ax.text(0.012, 0.02, note, transform=ax.transAxes, ha="left", va="bottom",
+                fontsize=7.5, color="#8a857a", zorder=11, linespacing=1.1)
     return fig
 
 

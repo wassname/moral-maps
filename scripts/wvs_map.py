@@ -285,7 +285,9 @@ def main() -> None:
     # Render through the SHARED value-map renderer (same one the instrument value maps use): pole
     # signposts through the human median, 4 auto-selected zone hulls, auto-placed labels, model stars.
     _, emph = zones_for(countries)
-    # Title + caption live in the README (nicer voice, editable), not baked into the figure.
+    # The hero map (unlike the instrument maps) bakes on a title + an attribution note carrying the
+    # repo URL, so copies shared around the web stay credited and self-explanatory. Everything else
+    # still leans on the README voice.
     # Drop the " (rated)" readout tag from the on-map labels (the cache/CI-table keep it) -- the map is
     # crowded and every model here is rated, so the tag adds nothing.
     plot_models = {k.replace(" (rated)", ""): v for k, v in models.items()}
@@ -305,7 +307,9 @@ def main() -> None:
     fig = maps.plot_value_map(
         "WVS Inglehart-Welzel", countries, P,
         ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
-        models=plot_models, model_labels=model_labels, emphasize=emph)
+        models=plot_models, model_labels=model_labels, emphasize=emph,
+        title="Frontier LLMs on the\nWorld Values Survey",
+        note="17 models, rated sampling\ngithub.com/wassname/moral-maps")
     fig.savefig(args.out, dpi=200, bbox_inches="tight")
     logger.info(f"wrote {args.out}")
 
