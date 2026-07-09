@@ -1,14 +1,14 @@
 # tinymfv
 
-tinymfv is a small set of fast value evals for local LLM steering work. It asks moral vignettes and survey questions, reads answer-token probabilities, and turns them into model profiles that you can compare to humans.
+Fast value evals for local language models. It asks standard human survey questions and moral vignettes, reads the model's answer-token probabilities, and compares the profile to human norms. Built for steering work: the readout is sensitive enough that a small intervention shows up as a probability shift.
 
-When comparing models or checkpoints you can use it to check three things: did the intended value move?, what else moved?, how does this compare to human responses? The evals are quick and sensitive enough to show probability shifts.
+The instruments are standard human ones, bundled with human reference data: World Values Survey items (via [GlobalOpinionQA](https://huggingface.co/datasets/Anthropic/llm_global_opinions)), [moral-foundation vignettes](https://scottaclifford.com/wp-content/uploads/2015/01/CICSA_MoralVignettes_BRM_ND.pdf) (Clifford et al. 2015), MFQ-2, Big Five, 16PF, and Humor Styles. An example item, from the World Values Survey:
 
-## The plots - Are model moral aliens?
+> Generally speaking, would you say that most people can be trusted or that you need to be very careful in dealing with people?
 
-One interesting thing we can do with this repo is compare AI's models on human psychological and anthropological surveys. Are they like us?
+## Are models moral aliens?
 
-One thing jumps out of the plots below. Before any steering the base model is already a psychological alien on some axes: on the culture maps it sits away from most humans, most sharply on Big5 openness (low) and conscientiousness (high), and on humor style (high aggressive, low affiliative). And steering is strong relative to human variation, on the headline axes a single sweep moves the profile further than any two countries differ, not just a US-vs-Australia nudge.
+Before any steering the base model is already a psychological alien on some axes: on the culture maps it sits away from most humans, most sharply on Big5 openness (low) and conscientiousness (high), and on humor style (high aggressive, low affiliative). And steering is strong relative to human variation: on the headline axes a single sweep moves the profile further than any two countries differ.
 
 ### The whole field, on the world's value map
 
@@ -34,7 +34,7 @@ Big Five personality collapses to two broad traits: how outgoing and open a pers
 
 ![Humor Styles value map: adaptive vs maladaptive humor, with the Authority steer path](docs/img/showcase/humor_styles/map_value.png)
 
-Humor show little variaiton on the map (although the range plots below show some nuance). On its axes (warm, healthy humor versus put-down humor; joking at yourself versus at others) the human regions overlap almost completely: humor style does not sort societies the way values do. Worth knowing a survey can't tell societies apart at all before reading anything into a steer on it.
+Humor shows little variation on the map (although the range plots below show some nuance). On its axes (warm, healthy humor versus put-down humor; joking at yourself versus at others) the human regions overlap almost completely: humor style does not sort societies the way values do. Worth knowing a survey can't tell societies apart at all before reading anything into a steer on it.
 
 ### Range plots: one factor at a time
 
@@ -148,7 +148,7 @@ uv run python scripts/plot_steer_showcase.py \
   --margin-frac 0.50
 ```
 
-The ploting code keeps only coefficients that all plotted instruments can still read. A row passes when answer mass, survey rank-logit contrast, and MFV top-foundation margin stay above the requested fraction of their base values: `pmass(c)/pmass(0) >= coherence-frac`, `mean_abs_C(c)/mean_abs_C(0) >= contrast-frac`, and `mean_margin(c)/mean_margin(0) >= margin-frac`.
+The plotting code keeps only coefficients that all plotted instruments can still read. A row passes when answer mass, survey rank-logit contrast, and MFV top-foundation margin stay above the requested fraction of their base values: `pmass(c)/pmass(0) >= coherence-frac`, `mean_abs_C(c)/mean_abs_C(0) >= contrast-frac`, and `mean_margin(c)/mean_margin(0) >= margin-frac`.
 
 ## Measurement
 
