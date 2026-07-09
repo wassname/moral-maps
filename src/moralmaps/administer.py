@@ -1,6 +1,6 @@
 """Run an ordinal Instrument end-to-end on a local model -> profile + coherence check.
 
-This is the survey counterpart to `tinymfv.evaluate` (the vignette forced-choice eval). It ties:
+This is the survey counterpart to `moralmaps.evaluate` (the vignette forced-choice eval). It ties:
 
     read_items            (answer-token readout, all frames)
     per_item_categorical  (canonicalize each frame to forward, average -> one dist per item)

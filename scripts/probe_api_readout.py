@@ -26,11 +26,11 @@ from loguru import logger
 from tabulate import tabulate
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-import tinymfv as T
-from tinymfv.instruments import get as get_instrument
-from tinymfv.read import read_items, resolve_answer_ids, build_user_content
-from tinymfv.read_api import read_items_sampled
-from tinymfv.readouts import expected_score, entropy
+import moralmaps as T
+from moralmaps.instruments import get as get_instrument
+from moralmaps.read import read_items, resolve_answer_ids, build_user_content
+from moralmaps.read_api import read_items_sampled
+from moralmaps.readouts import expected_score, entropy
 
 W = np.arange(1, 6, dtype=float)
 

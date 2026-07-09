@@ -1,7 +1,7 @@
 """Dataset loading. Reads per-condition jsonls and inner-joins by id, returning
 the packed structure the eval consumes.
 
-Files used by eval live in `src/tinymfv/data/`:
+Files used by eval live in `src/moralmaps/data/`:
     vignettes_<name>_other_violate.jsonl   (3rd-person paraphrase of origin)
     vignettes_<name>_self_violate.jsonl    (1st-person rewrite)
 

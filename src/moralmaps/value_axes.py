@@ -12,7 +12,7 @@ Sources (axis groupings aggregated from these papers):
 - MFQ-2 equality/proportionality fairness split: Atari et al. 2023 "Morality beyond the WEIRD".
 - Big Five meta-traits Plasticity/Stability: DeYoung, Quilty & Peterson 2007, doi 10.1037/0022-3514.93.5.880.
 - HSQ 2x2 adaptive/maladaptive x self/other: Martin et al. 2003, doi 10.1016/S0092-6566(02)00534-2.
-- WVS: Inglehart & Welzel 2005 (see tinymfv.iw_axes -- the WVS map builds its own item-level axes;
+- WVS: Inglehart & Welzel 2005 (see moralmaps.iw_axes -- the WVS map builds its own item-level axes;
   this table is for the psychometric instruments).
 
 The debatable calls (flagged): the SECOND MFT axis is not canonical -- mfq2 uses the documented

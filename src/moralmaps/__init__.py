@@ -1,4 +1,4 @@
-"""tinymfv: tiny moral/value instruments for local LLMs.
+"""moralmaps: moral and value instruments for LLMs.
 
 One answer-token reader, two reducer families:
 
@@ -9,7 +9,7 @@ One answer-token reader, two reducer families:
 
 High-level usage:
 
-    from tinymfv import evaluate
+    from moralmaps import evaluate
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     tok = AutoTokenizer.from_pretrained("Qwen/Qwen3-4B")
@@ -19,7 +19,7 @@ High-level usage:
     print(rep["top1_acc"])      # argmax accuracy vs label
     print(rep["mean_nll_T"])    # temperature-scaled soft NLL vs label dist
 
-Lower-level: see `guided_rollout_forced_choice` in `tinymfv.guided`.
+Lower-level: see `guided_rollout_forced_choice` in `moralmaps.guided`.
 """
 from .data import load_vignettes, load_all_vignettes, CONFIGS, ConfigName
 from .eval import evaluate, CONDITIONS, EvalResult, EvalRow, EvalInfo
@@ -32,8 +32,8 @@ from .administer import administer
 
 
 def __getattr__(name: str):
-    # `maps` pulls matplotlib; load it lazily so `import tinymfv` stays headless and fast for the
-    # numeric-only consumers (steering-lite). `tinymfv.maps.plot_*` still works -- first access
+    # `maps` pulls matplotlib; load it lazily so `import moralmaps` stays headless and fast for the
+    # numeric-only consumers (steering-lite). `moralmaps.maps.plot_*` still works -- first access
     # triggers the import here.
     if name == "maps":
         import importlib

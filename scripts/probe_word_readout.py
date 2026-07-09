@@ -2,7 +2,7 @@
 0.826 top-1 in the validation table (journal 2026-05-08), and contrast it with the
 current debiased DIGIT readout (0.773).
 
-This does NOT touch the canonical eval. tinymfv.evaluate stays digit-only. This is a
+This does NOT touch the canonical eval. moralmaps.evaluate stays digit-only. This is a
 throwaway measurement (like the other probe_* scripts) that reuses the current
 _rollout_natural_or_forced core but gathers the first token of each foundation WORD
 (care/fair/loy/author/san/lib/social) instead of the option index digit -- the one
@@ -26,9 +26,9 @@ import torch
 from loguru import logger
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from tinymfv.data import load_vignettes
-from tinymfv.eval import _label_dist
-from tinymfv.guided import (
+from moralmaps.data import load_vignettes
+from moralmaps.eval import _label_dist
+from moralmaps.guided import (
     _DEFAULT_FORCED_FOUNDATIONS, _FORCED_FOUNDATION_DESCS,
     _resolve_first_token_ids, _rollout_natural_or_forced,
 )

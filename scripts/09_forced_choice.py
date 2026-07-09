@@ -1,6 +1,6 @@
 """Run forced-choice 7-way primary-foundation probe over a vignette set.
 
-Wraps `tinymfv.evaluate()`. Reports the AI-vs-label distribution match:
+Wraps `moralmaps.evaluate()`. Reports the AI-vs-label distribution match:
     top1_acc       argmax model == argmax label
     mean_nll       soft cross-entropy vs human distribution, nats
     mean_nll_T     same metric after one fitted temperature
@@ -27,8 +27,8 @@ from loguru import logger
 from tabulate import tabulate
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from tinymfv import evaluate, load_vignettes
-from tinymfv.guided import _DEFAULT_FORCED_FOUNDATIONS
+from moralmaps import evaluate, load_vignettes
+from moralmaps.guided import _DEFAULT_FORCED_FOUNDATIONS
 
 ROOT = Path(__file__).resolve().parents[1]
 

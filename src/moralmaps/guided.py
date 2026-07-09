@@ -411,7 +411,7 @@ class ForcedChoiceResult:
     # Full decoded generations per enum-ordering frame, one per sample.
     # `gen_text` is always a list of length N=n_samples (even at N=1).
     # Both texts are FULL — no stripping at </think>. If you want the
-    # pre-close part, split on `tinymfv.guided._CLOSE_MARKER`.
+    # pre-close part, split on `moralmaps.guided._CLOSE_MARKER`.
     gen_text: list[str]         # forward-frame, length N
     gen_text_rev: list[str]     # reversed-frame, length N
     # Headline per-frame logprobs at the prefill position, after Bayesian

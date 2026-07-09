@@ -1,4 +1,4 @@
-"""Showcase tinymfv's plotting on a real steering run.
+"""Showcase moralmaps's plotting on a real steering run.
 
 Consumes a steering-lite `run_allinstr_showcase.py` output dir (one calibrated
 activation-steering vector administered across every instrument over a signed
@@ -13,7 +13,7 @@ probabilities cannot share a raw axis with 1-5 survey scores. It still goes
 through the same plot_ipsative_pca / plot_range functions.
 
 cs are SIGNED multipliers of the calibrated coefficient C (0 = base). The public
-README plots show the coherent path: c=0 plus each +/-c row whose tinymfv answer mass
+README plots show the coherent path: c=0 plus each +/-c row whose moralmaps answer mass
 stays above the requested fraction of base. Incoherent rows are dropped.
 
   uv run python scripts/plot_steer_showcase.py \
@@ -35,9 +35,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-import tinymfv as T
-from tinymfv import get_instrument
-from tinymfv.zones import zones_for
+import moralmaps as T
+from moralmaps import get_instrument
+from moralmaps.zones import zones_for
 
 # 16pf turned off: even at 6 macro zones its ipsative map is an unreadable pile-up (that instrument
 # doesn't separate cultures; Brazil/Ecuador stretch Latin America across the whole plot). -- Claude
@@ -49,7 +49,7 @@ def _frac(x, scale_max: int) -> np.ndarray:
 
 
 def read_human_csv(path: str) -> dict[tuple[str, str], float]:
-    """{(country, foundation): mean} from a tinymfv human_<instrument>.csv."""
+    """{(country, foundation): mean} from a moralmaps human_<instrument>.csv."""
     out: dict[tuple[str, str], float] = {}
     with open(path, newline="") as fh:
         for r in csv.DictReader(fh):
@@ -212,7 +212,7 @@ def plot_ordinal(run_dir: Path, out: Path, name: str, vec_label: str, C: float,
     # Alternative NAMED-AXIS value map (interpretable poles, no compass/minimap): project the
     # societies + the AI base/steered points onto the instrument's two named value axes, and draw the
     # steer as a CONNECTED base->+c/-c path (same visual language as the ipsative map's trajectory).
-    from tinymfv.value_axes import VALUE_AXES, value_coords, axis_score
+    from moralmaps.value_axes import VALUE_AXES, value_coords, axis_score
     if name in VALUE_AXES:
         Pval, poles = value_coords(Mfrac, dims, name)
         (_, _, xa), (_, _, ya) = VALUE_AXES[name]

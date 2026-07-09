@@ -10,8 +10,8 @@ from pathlib import Path
 import numpy as np
 from tabulate import tabulate
 
-from tinymfv.instrument import canonicalize_to_forward
-from tinymfv.readouts import logit_contrast
+from moralmaps.instrument import canonicalize_to_forward
+from moralmaps.readouts import logit_contrast
 
 
 def _rows(path: Path) -> list[dict]:

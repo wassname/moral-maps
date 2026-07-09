@@ -1,7 +1,7 @@
 """P4 data foundation: what the GlobalOpinionQA WVS subset gives us for a WVS/Inglehart-Welzel map.
 
 Anthropic/llm_global_opinions is MC questions with per-country human answer distributions -- almost
-exactly tinymfv's instrument shape (allowed answer tokens + human anchors). This probe quantifies
+exactly moralmaps's instrument shape (allowed answer tokens + human anchors). This probe quantifies
 the WVS subset's coverage and prints the parse recipe, so we know a country x question matrix is
 dense enough to place models among human societies. No model runs here.
 

@@ -22,7 +22,7 @@ import torch
 from loguru import logger
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from tinymfv import evaluate
+from moralmaps import evaluate
 
 
 def main() -> None:

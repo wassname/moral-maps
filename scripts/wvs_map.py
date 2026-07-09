@@ -4,7 +4,7 @@ Economist chart), on the two named IW dimensions instead of a blind PCA.
   X = Survival <-> Self-expression        (homosexuality tolerance, interpersonal trust, political action)
   Y = Traditional <-> Secular-Rational    (religion importance + belief, abortion, child autonomy)
 
-Each axis is a small hand-picked battery of GlobalOpinionQA WVS items (tinymfv.iw_axes), every item
+Each axis is a small hand-picked battery of GlobalOpinionQA WVS items (moralmaps.iw_axes), every item
 oriented to its axis-positive pole by reading the option order. A country's coordinate is the mean
 `positiveness` (0-1) over that axis's items from the human WVS choice frequencies. A model's
 coordinate is the SAME items administered as a dense Likert readout (read_items_rated: rate every
@@ -40,12 +40,12 @@ import matplotlib.pyplot as plt
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from tinymfv import maps
-from tinymfv.zones import zones_for, zone_of
-from tinymfv.instrument import Instrument, InstrItem
-from tinymfv.read import read_items, resolve_answer_ids
-from tinymfv.read_api import read_items_rated
-from tinymfv.iw_axes import AXIS_ITEMS, X_AXIS, Y_AXIS, SKIP, resolve_items, positiveness
+from moralmaps import maps
+from moralmaps.zones import zones_for, zone_of
+from moralmaps.instrument import Instrument, InstrItem
+from moralmaps.read import read_items, resolve_answer_ids
+from moralmaps.read_api import read_items_rated
+from moralmaps.iw_axes import AXIS_ITEMS, X_AXIS, Y_AXIS, SKIP, resolve_items, positiveness
 
 # option labels are single digits 0..n-1 -- single-token (unlike '10' on the justifiable scale) and
 # the format the answer-token reader is tuned for (a bare digit, not a letter the model ignores in

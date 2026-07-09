@@ -1,6 +1,6 @@
 # MFV country norms: used POOLED only, never for cross-country comparison
 
-`mfv_country_factors.csv` holds moral-foundation-vignette (MFV) means for 8 countries. tinymfv uses
+`mfv_country_factors.csv` holds moral-foundation-vignette (MFV) means for 8 countries. moralmaps uses
 these **pooled into a single human reference** (the mean across samples, per foundation) for the MFV
 range plot. It does **not** plot them as a cultural map, and you should not read country-to-country
 differences off this table. Here is why.

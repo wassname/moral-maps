@@ -1,4 +1,4 @@
-# tinymfv figures
+# moralmaps figures
 
 A gallery of the culture maps and range plots. Each is captioned the newspaper way: a title, a
 one-line subtitle saying what you are looking at, a short caption pointing out what to notice, and a
@@ -42,7 +42,7 @@ GlobalOpinionQA (Durmus et al. 2023).</sub>
 The maps below all show the **same run**. The base model **Qwen3-4B** is read at c=0 (black), then
 pushed along a single **Authority** vector to +c (red, more Authority) and -c (blue, less). The vector
 is a PCA direction that [steering-lite](https://github.com/wassname/steering-lite) builds from an
-`authority-respecting` versus `authority-disregarding` persona pair; tinymfv only measures where the
+`authority-respecting` versus `authority-disregarding` persona pair; moralmaps only measures where the
 model lands, by logprobs, eight samples per item. Each instrument gets two maps: a **quadrant map** on
 named axes taken from the literature, and an **ipsative PCA map** whose axes are the blind top-two
 principal components, with a compass rose showing how the factors load.
@@ -83,7 +83,7 @@ is the model: it emphasises Authority far more than the pooled human reference, 
 further still.
 
 <sub>Sources: MFV (Clifford et al. 2015); country norms Jimenez-Leal 2025, Marques 2020, Hopp 2024, Yamada
-2025, Crone 2021, used pooled only (see `src/tinymfv/data/human/MFV_country_norms_NOTE.md`). Read by
+2025, Crone 2021, used pooled only (see `src/moralmaps/data/human/MFV_country_norms_NOTE.md`). Read by
 logprobs, N=8.</sub>
 
 ### Big Five

@@ -10,15 +10,15 @@ import unittest
 
 import numpy as np
 
-from tinymfv.data import CONFIGS, CONDITIONS, load_vignettes
-from tinymfv.instrument import (
+from moralmaps.data import CONFIGS, CONDITIONS, load_vignettes
+from moralmaps.instrument import (
     Instrument,
     canonicalize_to_forward,
     per_item_categorical,
     reduce_nominal,
     reduce_ordinal,
 )
-from tinymfv.readouts import expected_score, logit_contrast, logodds_agree
+from moralmaps.readouts import expected_score, logit_contrast, logodds_agree
 
 
 class InstrumentFlowTest(unittest.TestCase):

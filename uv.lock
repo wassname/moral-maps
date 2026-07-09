@@ -11,7 +11,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-06-29T06:18:19.538273755Z"
+exclude-newer = "2026-07-03T02:38:05.43429745Z"
 exclude-newer-span = "P6D"
 
 [[package]]
@@ -682,6 +682,54 @@ sdist = { url = "https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec9
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8", size = 9979, upload-time = "2022-08-14T12:40:09.779Z" },
 ]
+
+[[package]]
+name = "moral-maps"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "loguru" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "tabulate" },
+    { name = "torch" },
+    { name = "tqdm" },
+    { name = "transformers" },
+]
+
+[package.optional-dependencies]
+api = [
+    { name = "openrouter-wrapper" },
+    { name = "python-dotenv" },
+]
+maps = [
+    { name = "matplotlib" },
+    { name = "shapely" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "scipy" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "loguru" },
+    { name = "matplotlib", marker = "extra == 'maps'", specifier = ">=3.8" },
+    { name = "numpy" },
+    { name = "openrouter-wrapper", marker = "extra == 'api'", git = "https://github.com/wassname/openrouter_wrapper" },
+    { name = "pandas" },
+    { name = "python-dotenv", marker = "extra == 'api'" },
+    { name = "shapely", marker = "extra == 'maps'", specifier = ">=2.0" },
+    { name = "tabulate" },
+    { name = "torch" },
+    { name = "tqdm" },
+    { name = "transformers", specifier = ">=5.7" },
+]
+provides-extras = ["maps", "api"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "scipy", specifier = ">=1.17.1" }]
 
 [[package]]
 name = "mpmath"
@@ -1557,54 +1605,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/47/c6/ee486fd809e357697
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d7/c1/eb8f9debc45d3b7918a32ab756658a0904732f75e555402972246b0b8e71/tenacity-9.1.4-py3-none-any.whl", hash = "sha256:6095a360c919085f28c6527de529e76a06ad89b23659fa881ae0649b867a9d55", size = 28926, upload-time = "2026-02-07T10:45:32.24Z" },
 ]
-
-[[package]]
-name = "tiny-mfv"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "loguru" },
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "tabulate" },
-    { name = "torch" },
-    { name = "tqdm" },
-    { name = "transformers" },
-]
-
-[package.optional-dependencies]
-api = [
-    { name = "openrouter-wrapper" },
-    { name = "python-dotenv" },
-]
-maps = [
-    { name = "matplotlib" },
-    { name = "shapely" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "scipy" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "loguru" },
-    { name = "matplotlib", marker = "extra == 'maps'", specifier = ">=3.8" },
-    { name = "numpy" },
-    { name = "openrouter-wrapper", marker = "extra == 'api'", git = "https://github.com/wassname/openrouter_wrapper" },
-    { name = "pandas" },
-    { name = "python-dotenv", marker = "extra == 'api'" },
-    { name = "shapely", marker = "extra == 'maps'", specifier = ">=2.0" },
-    { name = "tabulate" },
-    { name = "torch" },
-    { name = "tqdm" },
-    { name = "transformers", specifier = ">=5.7" },
-]
-provides-extras = ["maps", "api"]
-
-[package.metadata.requires-dev]
-dev = [{ name = "scipy", specifier = ">=1.17.1" }]
 
 [[package]]
 name = "tokenizers"

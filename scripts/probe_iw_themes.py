@@ -10,7 +10,7 @@ import re
 
 from datasets import load_dataset
 
-from tinymfv.zones import zone_of
+from moralmaps.zones import zone_of
 
 SKIP = re.compile(r"don'?t know|no answer|refus|decline|none of|not applicable|^other|missing|inap",
                   re.I)

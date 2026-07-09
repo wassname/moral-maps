@@ -2,7 +2,7 @@
 
 **This is fail-fast research code.** Novel work, not in your training data. Extrapolate carefully.
 
-## What tinymfv is
+## What moralmaps is
 
 One answer-token logprob reader that runs many questionnaires. The model is prefilled to an
 answer slot after a short think budget; we read the next-token distribution over the vocab and

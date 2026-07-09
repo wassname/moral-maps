@@ -29,7 +29,7 @@ SPLITS = ["other_violate", "self_violate"]
 
 
 def local_jsonl(file_key: str, split: str) -> Path:
-    return ROOT / "src" / "tinymfv" / "data" / f"vignettes_{file_key}_{split}.jsonl"
+    return ROOT / "src" / "moralmaps" / "data" / f"vignettes_{file_key}_{split}.jsonl"
 
 
 def hf_jsonl(cfg: str, split: str) -> str:
@@ -65,7 +65,7 @@ size_categories:
 ---
 
 # tiny-mfv
-[:octocat:](https://github.com/wassname/tinymfv)
+[:octocat:](https://github.com/wassname/moral-maps)
 
 Small moral-foundations eval for language models.
 
@@ -129,9 +129,9 @@ Calibration quality on classic, n=132:
 
 ## Eval
 
-Use `tinymfv.evaluate(model, tokenizer, name="classic")`. It returns a per-foundation
+Use `moralmaps.evaluate(model, tokenizer, name="classic")`. It returns a per-foundation
 table plus `top1_acc`, `informedness`, and `mean_nll_T` against the `human_*` label
-distribution. Full eval: see [tiny-mfv on GitHub](https://github.com/wassname/tinymfv).
+distribution. Full eval: see [moral-maps on GitHub](https://github.com/wassname/moral-maps).
 Source vignettes: https://github.com/peterkirgis/llm-moral-foundations
 """
 

@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 
 import plot_steer_showcase as P
-from tinymfv import get_instrument
+from moralmaps import get_instrument
 
 DISPLAY = {
     "mfv": "MFV vignettes",

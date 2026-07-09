@@ -27,8 +27,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-import tinymfv as T
-from tinymfv.zones import zones_for
+import moralmaps as T
+from moralmaps.zones import zones_for
 
 ORDINAL = ["mfq2", "big5", "humor_styles"]
 FOUNDATION_ORDER = ["care", "fairness", "loyalty", "authority", "sanctity", "liberty"]
