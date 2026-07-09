@@ -1,6 +1,8 @@
 # tinymfv
 
-Fast value evals for local language models. It asks standard human survey questions and moral vignettes, reads the model's answer-token probabilities, and compares the profile to human norms. Built for steering work: the readout is sensitive enough that a small intervention shows up as a probability shift.
+tinymfv is a small set of fast value evals for LLM steering work. It asks moral vignettes and survey questions, reads answer-token probabilities (or rated samples, for API models without logprobs), and turns them into model profiles that you can compare to humans.
+
+When comparing models or checkpoints you can use it to check three things: did the intended value move?, what else moved?, how does this compare to human responses? The evals are quick and sensitive enough to show probability shifts.
 
 Every question comes from a real survey psychologists give people, and each ships with the human answers to compare against: World Values Survey items (via [GlobalOpinionQA](https://huggingface.co/datasets/Anthropic/llm_global_opinions)), [moral-foundation vignettes](https://scottaclifford.com/wp-content/uploads/2015/01/CICSA_MoralVignettes_BRM_ND.pdf) (Clifford et al. 2015, the repo's namesake), MFQ-2, Big Five, 16PF, and Humor Styles. An example item, from the World Values Survey:
 
@@ -8,11 +10,11 @@ Every question comes from a real survey psychologists give people, and each ship
 
 ## Are models moral aliens?
 
-Two things jump out of the plots below. First, before any steering the models are already psychological outliers. All seventeen frontier models sit outside the cultural mean of nearly every country on the World Values Survey map: more secular and more self-expression-leaning than almost any human society, an ultra Silicon Valley cultural point. And the open model we probe in depth, Qwen3-4B, scores below every surveyed country on Big Five openness and agreeableness, and reports more aggressive and less affiliative humor than every country except Malaysia. Second, steering is strong relative to human variation: on MFQ-2 a single sweep walks the model across most of the human range.
+One interesting thing we can do with this repo is put AI models through human psychological and anthropological surveys. Are they like us? Before any steering the models are already outliers: all seventeen frontier models sit outside the cultural mean of nearly every country on the World Values Survey map, more secular and more self-expression-leaning than almost any human society, an ultra Silicon Valley cultural point. And the open model we probe in depth, Qwen3-4B, scores below every surveyed country on Big Five openness and agreeableness, and reports more aggressive and less affiliative humor than every country except Malaysia. Steering is strong relative to human variation: on MFQ-2 a single sweep walks the model across most of the human range.
 
 ### The whole field, on the world's value map
 
-The clearest single view comes from the World Values Survey, the standard culture map of the world. Since 1981 it has asked people in about ninety countries the same questions, and two axes drawn from it sort societies by how traditional or secular they are and how much they weigh survival over self-expression. We put seventeen frontier models through the same questions.
+Start with the World Values Survey, the standard culture map of the world. Since 1981 it has asked people in about ninety countries the same questions, and two axes drawn from it sort societies by how traditional or secular they are and how much they weigh survival over self-expression. We put seventeen frontier models through the same questions (`scripts/wvs_map.py` makes this map).
 
 ![WVS culture map: 17 frontier models among about 90 human societies](docs/img/wvs/wvs_map_iw.png)
 
@@ -38,7 +40,7 @@ Humor shows little variation on the map (although the range plots below show som
 
 ### Range plots: one factor at a time
 
-A range plot takes an instrument one factor at a time: the spread of human societies is a grey strip, their middle a black line, and the steer a red-to-blue sweep, so even a small model move stays visible against the whole human range.
+A range plot takes one survey at a time, factor by factor: the spread of human societies is a grey strip, their middle a black line, and the steer a red-to-blue sweep, so even a small model move stays visible against the whole human range.
 
 ![MFV range plot: foundation emphasis beside Authority steering](docs/img/showcase/mfv/range.png)
 
@@ -97,7 +99,7 @@ just smoke
 | 16PF | [162 items](src/tinymfv/data/surveys/16pf/questionnaire.json), plus inverted and negated frames | [country means](src/tinymfv/data/human/16pf_country_factors.csv) | expected 1-5 score per factor |
 | Humor Styles | [32 items](src/tinymfv/data/surveys/humor_styles/questionnaire.json), plus inverted and negated frames | [country means](src/tinymfv/data/human/humor_styles_country_factors.csv), originally 1-7 | expected 1-5 score per style |
 
-MFV uses categorical answers: the answer is the foundation. The survey instruments use ordinal answers: the answer is a scale point.
+MFV uses categorical answers: the answer is the foundation. The surveys use ordinal answers: the answer is a scale point.
 
 Each MFV item is asked in two perspectives, `other_violate` and `self_violate`. Each survey item is asked three ways, forward, scale-inverted, and content-negated. tinymfv canonicalizes these frames before averaging, so the profile is less tied to one wording.
 
@@ -119,7 +121,7 @@ print(report["profile"])              # mean forced-choice probability per found
 print(report["mean_pmass_allowed"])   # format check: mass on valid answer tokens
 ```
 
-Run survey instruments with `administer`:
+Run surveys with `administer`:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -148,7 +150,7 @@ uv run python scripts/plot_steer_showcase.py \
   --margin-frac 0.50
 ```
 
-The plotting code keeps only coefficients that all plotted instruments can still read. A row passes when answer mass, survey rank-logit contrast, and MFV top-foundation margin stay above the requested fraction of their base values: `pmass(c)/pmass(0) >= coherence-frac`, `mean_abs_C(c)/mean_abs_C(0) >= contrast-frac`, and `mean_margin(c)/mean_margin(0) >= margin-frac`.
+The plotting code keeps only coefficients that every plotted dataset can still read. A row passes when answer mass, survey rank-logit contrast, and MFV top-foundation margin stay above the requested fraction of their base values: `pmass(c)/pmass(0) >= coherence-frac`, `mean_abs_C(c)/mean_abs_C(0) >= contrast-frac`, and `mean_margin(c)/mean_margin(0) >= margin-frac`.
 
 ## Measurement
 
@@ -158,21 +160,38 @@ Coherence is the gate. `pmass` is the share of probability the model puts on the
 
 $$m(c) = \mathbb{E}_i \sum_{a \in A_i} P_c(a \mid i)$$
 
-where $A_i$ is the valid answer-token set for item $i$. A steer that drives `pmass` toward zero, or the answers toward uniform, has broken the format, and any value read off it is noise. Coherence matters most on the unintended side: a strong steer that quietly turns answers to mush can look like change when it is really damage.
+where:
+
+- $c$ is the steering coefficient ($c=0$ is the base model), and $m(c)$ is `pmass` at that coefficient
+- $i$ indexes items (a vignette or survey question)
+- $A_i$ is the set of valid answer first-tokens for item $i$ (the seven foundation words, or the scale points 1-5)
+- $P_c(a \mid i)$ is the model's next-token probability of answer token $a$ under steer $c$
+
+A steer that drives `pmass` toward zero, or the answers toward uniform, has broken the format, and any value read off it is noise. Coherence matters most on the unintended side: a strong steer that quietly turns answers to mush can look like change when it is really damage.
 
 The profile is what the maps plot: the human-comparable score per factor. For a survey it is the expected 1-5 answer (after reverse-keying); for MFV the mean forced-choice probability per foundation:
 
 $$\mathrm{profile}_d = \mathbb{E}_{i \in d}\sum_{k=1}^{M} k\,P(k \mid i) \qquad \mathrm{profile}_f = \mathbb{E}_i P(f \mid i)$$
 
-with $i$ an item, $d$ a factor, $k$ a scale point up to $M$. This lands the model against human norms, but it hides steering: near a confident answer the expected score sits in a flat spot ($\partial E/\partial \ell_j = p_j (j - E)$ vanishes), so a steer that only reallocates the tails barely moves it. In the showcase CSVs this is the `mean` column; for MFV, model and human units differ, so the maps plot relative emphasis (each profile z-scored across foundations).
+where:
+
+- $d$ is a survey factor (e.g. openness) and $i \in d$ its items; $f$ is an MFV foundation
+- $k$ is a scale point, from 1 to $M$ (here $M=5$)
+- $P(k \mid i)$ is the probability of answering scale point $k$ on item $i$, renormalized over $A_i$; $P(f \mid i)$ likewise for foundation $f$
+
+This lands the model against human norms, but it hides steering: near a confident answer the expected score $E = \sum_k k\,p_k$ sits in a flat spot (its sensitivity to the answer logits, $\partial E/\partial \ell_j = p_j (j - E)$, vanishes as $p_j$ concentrates), so a steer that only reallocates the tails barely moves it. In the showcase CSVs this is the `mean` column; for MFV, model and human units differ, so the maps plot relative emphasis (each profile z-scored across foundations).
 
 The steer signal is `C`, the rank-centered logit contrast: the same shape as the profile but in log-space with midpoint-centered weights, so its derivative is a fixed weight with no $p_j$ suppression and it still sees the steer when the profile is pinned:
 
 $$C_d(c) = \mathbb{E}_{i \in d}\sum_{k=1}^{M}\left(k - \tfrac{M+1}{2}\right)\ell_{i,k}^{(c)} \qquad \Delta_f = \mathbb{E}_i\left(\ell_{i,f}^{(+1)} - \ell_{i,f}^{(-1)}\right)$$
 
-where $\ell$ is the answer-token logprob at coefficient $c$. The intended change is $C$ (or $\Delta_f$) on the steered factor; the unintended change is $C$ moving on the other factors. A surgical steer has large intended change and small off-target change, at unchanged coherence.
+where:
 
-In short: reward intended change, penalize unintended change, and require the model to stay coherent. tinymfv reports the pieces (pmass, entropy, per-factor profile and $C$, and for MFV a nominal informedness, the Youden's J of the model's top foundation against the human top foundation); steering-lite folds them into the single base-anchored surgical-informedness score it uses to rank steers.
+- $\ell_{i,k}^{(c)}$ is the logprob of scale point $k$'s answer token on item $i$ at steering coefficient $c$ (nats); $\ell_{i,f}$ likewise for foundation $f$
+- $k - \tfrac{M+1}{2}$ is the midpoint-centered weight (for $M=5$: $-2,-1,0,1,2$)
+- $\Delta_f$ contrasts the full positive and negative steers, $c=+1$ vs $c=-1$ The intended change is $C$ (or $\Delta_f$) on the steered factor; the unintended change is $C$ moving on the other factors. A surgical steer has large intended change and small off-target change, at unchanged coherence.
+
+We call the combined measurement surgical informedness: reward intended change, penalize unintended change, gate on coherence. tinymfv reports the pieces (pmass, entropy, per-factor profile and $C$, and for MFV a nominal informedness, the Youden's J of the model's top foundation against the human top foundation); steering-lite folds them into the single base-anchored surgical informedness score it uses to rank steers.
 
 ## Scope
 
