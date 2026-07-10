@@ -338,11 +338,8 @@ def _rollout_natural_or_forced(
 
 # ===== Forced-choice (K-way primary foundation) =====
 
-# Foundation set + descriptions adapted from the response options in
-# Clifford et al. (2015) Study 1. Their "social" option = "not morally wrong"
-# (the social-norms control set). Descriptions are parallel and short
-# (no repetitive "violates norms of" prefix) so no option stands out
-# structurally.
+# Foundation set from the response options in Clifford et al. (2015) Study 1.
+# Their "social" option = "not morally wrong" (the social-norms control set).
 _DEFAULT_FORCED_FOUNDATIONS: tuple[str, ...] = (
     "care", "fairness", "loyalty", "authority", "sanctity", "liberty", "social",
 )
