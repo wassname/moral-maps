@@ -33,7 +33,7 @@ from moralmaps.zones import zones_for
 ORDINAL = ["mfq2", "big5", "humor_styles"]
 FOUNDATION_ORDER = ["care", "fairness", "loyalty", "authority", "sanctity", "liberty"]
 _MFV_INSTR = "mfv"
-_MFV_YLABEL = "MFV: logit violation (nat, base-relative)"
+_MFV_YLABEL = "MFV: clr violation (nat, base-relative)"
 
 
 def _read_grid_csv(path: Path) -> list[dict]:
@@ -61,7 +61,7 @@ def _grid_values(rows: list[dict], value_key: str, foundations: list[str]) -> di
 def plot_mfv_grid_maps(run_dir: Path, out: Path, vec_label: str) -> list[Path]:
     """5x5 grid of ipsative culture maps, one per (hc, cc) cell."""
     rows = _read_grid_csv(run_dir / "mfv_profiles.csv")
-    # build profile per cell: {foundation: mean} (using dlogit relative to base)
+    # build profile per cell: {foundation: mean} (using dclr relative to base)
     hc_vals = sorted(set(float(r["honesty_c"]) for r in rows))
     cc_vals = sorted(set(float(r["credulity_c"]) for r in rows))
     founds = sorted(set(r["foundation"] for r in rows))
@@ -93,7 +93,7 @@ def plot_mfv_grid_maps(run_dir: Path, out: Path, vec_label: str) -> list[Path]:
                 ax.set_xlabel("honesty ->", fontsize=8)
             if j == 0:
                 ax.set_ylabel("credulity ^", fontsize=8)
-    fig.suptitle(f"MFV profile grid: {vec_label} (dlogit per foundation, base-relative)", fontsize=12)
+    fig.suptitle(f"MFV profile grid: {vec_label} (dclr per foundation, base-relative)", fontsize=12)
     fig.tight_layout()
     path = out / "mfv_grid_bars.png"
     fig.savefig(path, dpi=150)
@@ -132,10 +132,10 @@ def plot_ordinal_heatmaps(run_dir: Path, out: Path, name: str, vec_label: str) -
 
 
 def plot_mfv_heatmaps(run_dir: Path, out: Path, vec_label: str) -> list[Path]:
-    """2D heatmaps of MFV dlogit per foundation."""
+    """2D heatmaps of MFV dclr per foundation."""
     rows = _read_grid_csv(run_dir / "mfv_profiles.csv")
     founds = FOUNDATION_ORDER
-    grids, hc_vals, cc_vals = _grid_values(rows, "dlogit", founds)
+    grids, hc_vals, cc_vals = _grid_values(rows, "dclr", founds)
     n = len(founds)
     ncols = 3
     nrows = (n + ncols - 1) // ncols
@@ -148,13 +148,13 @@ def plot_mfv_heatmaps(run_dir: Path, out: Path, vec_label: str) -> list[Path]:
                        extent=[cc_vals[0] - 0.25, cc_vals[-1] + 0.25,
                                hc_vals[0] - 0.25, hc_vals[-1] + 0.25],
                        cmap="RdBu_r", vmin=-vmax, vmax=vmax)
-        ax.set_title(f"{f} (dlogit)", fontsize=9)
+        ax.set_title(f"{f} (dclr)", fontsize=9)
         ax.set_xlabel("credulity-c", fontsize=8)
         ax.set_ylabel("honesty-c", fontsize=8)
         plt.colorbar(im, ax=ax, shrink=0.8)
     for idx in range(len(founds), nrows * ncols):
         axes[idx // ncols][idx % ncols].set_visible(False)
-    fig.suptitle(f"MFV: {vec_label} 2D steer grid (dlogit per foundation)", fontsize=11)
+    fig.suptitle(f"MFV: {vec_label} 2D steer grid (dclr per foundation)", fontsize=11)
     fig.tight_layout()
     path = out / "mfv_heatmap.png"
     fig.savefig(path, dpi=150)

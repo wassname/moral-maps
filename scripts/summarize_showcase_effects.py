@@ -73,7 +73,7 @@ def _survey_rows(run_dir: Path, name: str, cs: list[float]) -> list[dict[str, st
             "c path": _cs_label(cs),
             "profile shift / human SD": _fmt_pct(100 * profile_delta / human_sd),
             "profile shift": _fmt(profile_delta),
-            "reader-logit shift": f"{_fmt(logit_delta)} ± {sem:.2f}",
+            "reader-space shift": f"{_fmt(logit_delta)} ± {sem:.2f}",
         })
     return out
 
@@ -91,21 +91,21 @@ def _mfv_rows(run_dir: Path, cs: list[float]) -> list[dict[str, str]]:
         pos = by_key[(foundation, pos_c)]
         human_sd = float(human_M[:, j].std(ddof=1))
         profile_delta = float(prof[pos_c][j] - prof[neg_c][j])
-        logit_delta = float(pos["dlogit"]) - float(neg["dlogit"])
-        sem = float(np.hypot(float(pos["dlogit_sem"]), float(neg["dlogit_sem"])))
+        clr_delta = float(pos["dclr"]) - float(neg["dclr"])
+        sem = float(np.hypot(float(pos["dclr_sem"]), float(neg["dclr_sem"])))
         out.append({
             "dataset": DISPLAY["mfv"],
             "axis": foundation,
             "c path": _cs_label(cs),
             "profile shift / human SD": _fmt_pct(100 * profile_delta / human_sd),
             "profile shift": _fmt(profile_delta),
-            "reader-logit shift": f"{_fmt(logit_delta)} ± {sem:.2f}",
+            "reader-space shift": f"{_fmt(clr_delta)} ± {sem:.2f}",
         })
     return out
 
 
 def _markdown_table(rows: list[dict[str, str]]) -> str:
-    cols = ["dataset", "axis", "c path", "profile shift / human SD", "profile shift", "reader-logit shift"]
+    cols = ["dataset", "axis", "c path", "profile shift / human SD", "profile shift", "reader-space shift"]
     lines = ["| " + " | ".join(cols) + " |", "| " + " | ".join(["---"] * len(cols)) + " |"]
     for row in rows:
         lines.append("| " + " | ".join(row[c] for c in cols) + " |")

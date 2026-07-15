@@ -416,7 +416,7 @@ def evaluate(
 
     # Unscorable rows (self-close with no answer slot, or a non-finite forward) carry NaN:
     # the read is undefined, not "zero coherence", so they drop from the means (nanmean,
-    # matching the dlogit path) and surface as frac_unscorable. That rate IS the coherence-
+    # matching the clr path) and surface as frac_unscorable. That rate IS the coherence-
     # loss signal: pmass under forced reads is pinned high (the scaffold primes a valid token),
     # so a low mean_pmass no longer flags breakage -- a high frac_unscorable / high
     # mean_nll_prefill does.
