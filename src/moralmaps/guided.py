@@ -646,6 +646,7 @@ def free_generation_demo(
     max_think_tokens: int = 512,
     temperature: float = 0.0,
     top_p: float = 1.0,
+    top_k: int = 20,
 ) -> tuple[str, str]:
     """One bs=1 free generation on a single vignette, for qualitative inspection.
 
@@ -667,7 +668,7 @@ def free_generation_demo(
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
     gen_kwargs = dict(max_new_tokens=max_think_tokens, pad_token_id=pad_id)
     if temperature > 0.0:
-        gen_kwargs.update(do_sample=True, temperature=temperature, top_p=top_p)
+        gen_kwargs.update(do_sample=True, temperature=temperature, top_p=top_p, top_k=top_k)
     else:
         gen_kwargs.update(do_sample=False)
     out = model.generate(**enc, **gen_kwargs)
