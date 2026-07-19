@@ -26,6 +26,15 @@ _CLOSE_MARKER: str = "</think>"
 _ASSISTANT_SENTINEL: str = "ZZUNIQ_ASSISTANT_SENTINEL_ZZ"
 
 
+def _generation_prompt_with_open_think(tok, messages: list[dict[str, str]]) -> str:
+    """Return exactly one open reasoning marker. (Claude, 2026-07-19)"""
+    prompt = tok.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True)
+    if prompt.rstrip().endswith("<think>"):
+        return prompt
+    return prompt + "<think>\n"
+
+
 def _assistant_close(tok) -> str:
     """Probe chat template for the assistant-turn close marker (e.g. `<|im_end|>\\n`
     on Qwen/ChatML, `<|eot_id|>` on Llama3). Tokenizer-agnostic: mimics what a chat
@@ -134,13 +143,9 @@ def _rollout_natural_or_forced(
     close = _assistant_close(tok)
 
     # ── Phase 1: think generation (full budget, no early stop) ──
-    chats = [
-        tok.apply_chat_template(
-            [{"role": "user", "content": f"{up}\n\n{schema_hint}" if schema_hint else up}],
-            tokenize=False, add_generation_prompt=True,
-        ) + "<think>\n"
-        for up in user_prompts
-    ]
+    chats = [_generation_prompt_with_open_think(
+        tok, [{"role": "user", "content": f"{up}\n\n{schema_hint}" if schema_hint else up}])
+        for up in user_prompts]
     think_end_id = tok.convert_tokens_to_ids("</think>")
     if think_end_id in (None, getattr(tok, "unk_token_id", None)):
         think_end_id = tok.eos_token_id
@@ -655,9 +660,8 @@ def free_generation_demo(
     if foundations is None:
         foundations = list(_DEFAULT_FORCED_FOUNDATIONS)
     schema = _make_forced_hint(foundations)
-    prompt_text = tok.apply_chat_template(
-        [{"role": "user", "content": f"{user_prompt}\n\n{schema}"}],
-        tokenize=False, add_generation_prompt=True) + "<think>\n"
+    prompt_text = _generation_prompt_with_open_think(
+        tok, [{"role": "user", "content": f"{user_prompt}\n\n{schema}"}])
     device = next(model.parameters()).device
     enc = tok(prompt_text, return_tensors="pt", add_special_tokens=False).to(device)
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
