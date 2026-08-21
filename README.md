@@ -5,12 +5,36 @@ moralmaps is a small set of fast value evals for LLM steering work. It asks surv
 ## Are models moral aliens?
 
 
-![WVS culture map: 17 frontier models among about 90 human societies](docs/img/wvs/wvs_map_iw.png)
+![Inglehart-Welzel culture map with 17 frontier models placed among 90 human societies, scored by rated sampling. Horizontal axis: self-expression on the left, survival on the right. Vertical axis: secular-rational at the top, traditional at the bottom. Coloured outlines mark the West, East Asia, Latin America and African-Islamic zones. Every model star sits in the upper left, and gpt-5.5, grok-4.3, gemini-2.5-pro and deepseek-v4-pro sit above the West outline entirely, higher than Sweden. The models run 0.53 to 0.76 on secular-rational against 0.06 to 0.70 for the societies, but none passes Iceland on self-expression. The push is vertical, not sideways.](docs/img/wvs/wvs_map_iw.png)
 
 One interesting thing we can do with this repo is put AI models through human psychological and anthropological surveys. Are they like us? Start with the World Values Survey, the standard culture map of the world: since 1981 it has asked people in about ninety countries the same questions, and two axes drawn from it sort societies by how traditional or secular they are and how much they weigh survival over self-expression. We put seventeen frontier models through the same questions (`scripts/wvs_map.py` makes this map).
 
 
-Every model sits in the top-left: more secular and more self-expressive than almost any country on earth, deep in the rich-world corner and often past its edge, and none of them sits near the African or Muslim societies, an ultra Silicon Valley cultural point. This map is measured differently from everything else on the page. These frontier models are closed APIs with no answer probabilities to read, so each is scored by rated sampling (rate every option one to five, twelve times, with the option order shuffled; `scripts/wvs_map.py`), and the human positions are approximated from the GlobalOpinionQA question set (axis construction in `src/moralmaps/iw_axes.py`). The steering plots below instead follow one open model we can push, Qwen3-4B.
+Every model sits in the top-left, deep in the rich-world corner and often past its edge, and none of them sits near the African or Muslim societies. The push is almost all vertical. Measured in the standard deviations of the 29 Western societies, every model is more secular-rational than the average one, from +0.5 to +2.9 sigma, while on self-expression they land between -0.7 and +1.2 sigma, which is ordinary. So they are not so much an ultra Silicon Valley point as a place north of the map that no society occupies.
+
+| model | z self-expr | z secular | Mahalanobis |
+|:------|------------:|----------:|------------:|
+| gpt-5.5 | -0.33 | +2.93 | +4.71 |
+| deepseek-v4-pro | +0.54 | +2.61 | +3.32 |
+| grok-4.3 | -0.19 | +2.61 | +4.08 |
+| gemini-2.5-pro | +0.01 | +2.29 | +3.38 |
+| qwen3.7-max | -0.66 | +2.18 | +4.01 |
+| gpt-5.4 | -0.13 | +2.07 | +3.21 |
+| gpt-5.3-chat | +0.21 | +1.96 | +2.69 |
+| gemma-4-31b-it | -0.73 | +1.86 | +3.62 |
+| deepseek-v4-flash | +0.68 | +1.64 | +1.83 |
+| llama-4-maverick | +1.14 | +1.64 | +1.65 |
+| mistral-large-2512 | +1.21 | +1.64 | +1.64 |
+| claude-opus-4.6 | +1.08 | +1.54 | +1.54 |
+| grok-4.20 | +0.81 | +1.43 | +1.47 |
+| claude-opus-4.7 | +0.81 | +1.21 | +1.22 |
+| gemma-3-27b-it | +0.88 | +1.21 | +1.21 |
+| claude-opus-4.8 | +0.94 | +1.00 | +1.04 |
+| llama-4-scout | +1.01 | +0.46 | +1.09 |
+
+Distance from the centroid of the 29 Western societies, in that cluster's own SDs (`scripts/wvs_outlier_table.py`). The per-axis z says which way and how far; the Mahalanobis column says how odd the placement is overall, and it uses the cluster's covariance, so it exceeds both z values for a model like gpt-5.5 that sits off the West's diagonal rather than along it. The same table against the other four zones is in [`wvs_model_outlier_sd.md`](docs/img/wvs/wvs_model_outlier_sd.md).
+
+This map is measured differently from everything else on the page. These frontier models are closed APIs with no answer probabilities to read, so each is scored by rated sampling (rate every option one to five, twelve times, with the option order shuffled; `scripts/wvs_map.py`), and the human positions are approximated from the GlobalOpinionQA question set (axis construction in `src/moralmaps/iw_axes.py`). The steering plots below instead follow one open model we can push, Qwen3-4B.
 
 The Economist ran a similar, nicely-made map in June 2026 ([briefing, archived](https://web.archive.org/web/20260630075107/https://www.economist.com/briefing/2026/06/25/ai-models-values-are-very-different-from-most-peoples)), putting 25 frontier models through the same Inglehart-Welzel axes. Their figure shows a surprising amount of scatter between model families: same-lab models can land in opposite corners (DeepSeek R1 sits up in the secular corner beside GPT-4o, while DeepSeek V4 Flash sits far off toward the traditional societies). moralmaps reruns that idea with more sensitive, graded readings (rate every option one to five with the order shuffled, rather than a handful of near-greedy answers) and a 95% confidence interval per model ([`wvs_model_ci.md`](docs/img/wvs/wvs_model_ci.md)), so we can tell how much of that scatter is real signal and how much is measurement noise.
 
@@ -31,15 +55,15 @@ Models have generally been trained to follow the instructions of the company tha
 Below are the ("quadrant") maps. Each has two named axes borrowed from psychology papers built from the survey, the human societies are drawn as cultural regions, and the model as a black dot with a coloured path showing where steering takes it. Steering here is activation steering, not prompting: a vector built by [steering-lite](https://github.com/wassname/steering-lite) from contrastive persona pairs and added to the model's hidden state at inference, toward the authority-respecting side (red, more Authority) or away from it (blue, less), without retraining. Every map keeps one orientation, the cultural West to the west and the global South to the south, so they all read the same way.
 
 
-![MFQ-2 value map: individual-first vs group-first morality, with the Authority steer path](docs/img/showcase/mfq2/map_value.png)
+![MFQ-2 value map for Qwen3-4B under an Authority activation steer, from moralmaps. Horizontal axis runs individualizing morality on the left to binding on the right; vertical axis equality at the top to proportionality at the bottom, with human societies outlined as cultural regions. A real value steer moves the black base dot across regions; no movement means no effect. The base model sits near the centre, on the equality side. Steering positive lands it in the binding quadrant inside the African-Islamic outline near Saudi Arabia; steering negative sends it to the far individualizing, equality corner above the West. One steer walks the model across most of the human map.](docs/img/showcase/mfq2/map_value.png)
 
 Moral-foundations theory (Jonathan Haidt's) holds that our moral sense runs on a few basic concerns: caring for others, fairness, loyalty to the group, respect for authority, and a sense of the sacred. The MFQ-2 survey (Moral Foundations Questionnaire) scores a person, or a model, on each. On this map, left to right runs from an individual-first morality (care, equality) to a group-first one (loyalty, authority, purity); bottom to top splits fairness into equal-shares versus earned-shares. The base model sits in the Western, individual-first corner, and pushing it toward Authority walks it clear across to the group-first corner shared by the African-Islamic and East-Asian societies.
 
-![Big Five value map: outgoing/open vs even-keeled axes, with the Authority steer path](docs/img/showcase/big5/map_value.png)
+![Big Five value map for Qwen3-4B under the same Authority steer. Horizontal axis runs exploratory personality on the left to reserved on the right; vertical axis stable at the bottom to volatile at the top, with human societies outlined as regions. Since Authority is a value, not a personality trait, a clean steer should barely move the dot here; a big move would mean collateral damage. The base model already sits far right of every human region, deep on the reserved side, and both steer ends stay in that corner, sliding only vertically between volatile and mid-stable. Personality is left almost untouched.](docs/img/showcase/big5/map_value.png)
 
 Big Five personality collapses to two broad traits: how outgoing and open a person is (reserved to exploratory, left to right) and how even-keeled they are (volatile to stable, bottom to top). The Authority push barely moves the base model here, which is the point: it shifts values, not personality.
 
-![Humor Styles value map: adaptive vs maladaptive humor, with the Authority steer path](docs/img/showcase/humor_styles/map_value.png)
+![Humor Styles value map for Qwen3-4B under the Authority steer. Horizontal axis runs adaptive humor on the left to maladaptive on the right; vertical axis self-directed at the bottom to other-directed at the top. The human regions (West, East Asia, African-Islamic, Orthodox) overlap almost completely, so this survey cannot separate societies, and any steer movement on it should be read with caution. The base model sits on the maladaptive side near Japan, outside the main human cluster; the positive steer nudges it slightly toward adaptive and the negative steer slightly further maladaptive, both small moves. Humor style barely responds to the value steer.](docs/img/showcase/humor_styles/map_value.png)
 
 Humor shows little variation on the map (although the range plots below show some nuance). On its axes (warm, healthy humor versus put-down humor; joking at yourself versus at others) the human regions overlap almost completely: humor style does not sort societies the way values do. Worth knowing a survey can't tell societies apart at all before reading anything into a steer on it.
 
@@ -47,15 +71,15 @@ Humor shows little variation on the map (although the range plots below show som
 
 A range plot takes one survey at a time, factor by factor: the spread of human societies is a grey strip, their middle a black line, and the steer a red-to-blue sweep, so even a small model move stays visible against the whole human range.
 
-![MFV range plot: foundation emphasis beside Authority steering](docs/img/showcase/mfv/range.png)
+![Range plot of moral-foundation vignettes for Qwen3-4B under the Authority steer. Horizontal axis lists six foundations (care, sanctity, authority, loyalty, fairness, liberty); vertical axis is relative emphasis as a z-score across foundations, with a grey dot marking the pooled human reference and a blue-to-red sweep marking the steer from minus one to plus one. A good steer moves authority a lot and the rest little. Authority climbs from about minus 0.1 at the blue end to about plus 1.0 at the red end, against a human reference near minus 0.85; care falls from about 2.0 to about 1.4 against a human 0.9; the other foundations shift under about 0.3. The steer moves the intended foundation most.](docs/img/showcase/mfv/range.png)
 
 MFV (moral-foundation vignettes, the repo's namesake) hands the model a short story about someone breaking a moral rule and asks which kind of wrong it is: cruelty, cheating, betrayal, defiance of authority, or defiling the sacred. Pushed toward Authority, the model does what steering should: it flags the authority violations far more often and the others less. The grey dot per foundation is a pooled human reference; the base model already flags authority violations well above the pooled human rate, and the steer pushes it further still. That human dot is pooled on purpose: MFV country norms fail cross-country measurement invariance ([Jimenez-Leal et al. 2025](https://doi.org/10.1525/collabra.128178)) and are stitched from five different studies, so MFV gets no culture map here, only this range against one pooled reference (details in [`src/moralmaps/data/human/MFV_country_norms_NOTE.md`](src/moralmaps/data/human/MFV_country_norms_NOTE.md)).
 
-![MFQ-2 range plot: human society ranges beside Authority steering](docs/img/showcase/mfq2/range.png)
+![Range plot of the MFQ-2 survey for Qwen3-4B under the Authority steer. Horizontal axis lists six foundations (care, equality, proportionality, loyalty, authority, purity); vertical axis is the survey mean on a 1 to 5 scale, with grey dots for country means from Japan up to Egypt and a blue-to-red sweep for the steer. A working steer should climb the binding foundations while equality stays put. Authority sweeps from about 3.05 to about 4.2 against country means of about 2.65 to 4.2; loyalty runs about 3.2 to 4.0, purity about 2.9 to 3.6, care about 3.45 to 4.35, while equality stays flat near 3.0. One sweep covers most of the human range.](docs/img/showcase/mfq2/range.png)
 
-![Big Five range plot: human society ranges beside Authority steering](docs/img/showcase/big5/range.png)
+![Range plot of the Big Five survey for Qwen3-4B under the Authority steer. Horizontal axis lists five traits (extraversion, neuroticism, agreeableness, conscientiousness, openness); vertical axis is the mean score on a 1 to 5 scale, with grey dots for country means and a blue-to-red steer sweep. A clean value steer should leave personality flat. It mostly does: neuroticism holds at about 3.0, extraversion moves about 3.0 to 3.17, agreeableness about 3.07 to 3.4 and conscientiousness about 3.0 to 3.45, openness stays near 3.0 while every country sits at about 3.5 or above. The model sits below all surveyed countries on openness and agreeableness at every steer level.](docs/img/showcase/big5/range.png)
 
-![Humor Styles range plot: human society ranges beside Authority steering](docs/img/showcase/humor_styles/range.png)
+![Range plot of the Humor Styles survey for Qwen3-4B under the Authority steer. Horizontal axis lists four styles (affiliative, self-enhancing, aggressive, self-defeating); vertical axis is the mean score on a 1 to 5 scale, with grey dots for country means and a blue-to-red steer sweep. A clean value steer should leave humor near flat, and it roughly does. Affiliative moves about 3.05 to 3.5 while countries run about 3.0 (Malaysia) to 4.2 (Serbia); aggressive sits about 2.9 to 3.05 against country means near 2.2 to 3.05; self-enhancing and self-defeating shift under about 0.3. The model stays less affiliative and more aggressive than nearly every country regardless of steer.](docs/img/showcase/humor_styles/range.png)
 
 The surveys echo their maps: MFQ-2's binding foundations (loyalty, authority, purity) climb under the steer, while Big Five and humor stay flat.
 
