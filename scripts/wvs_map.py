@@ -41,7 +41,7 @@ from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from moralmaps import maps
-from moralmaps.zones import zones_for, zone_of
+from moralmaps.zones import zones_for, zone_of, IW_MACRO
 from moralmaps.instrument import Instrument, InstrItem
 from moralmaps.read import read_items, resolve_answer_ids
 from moralmaps.read_api import read_items_rated
@@ -165,6 +165,39 @@ def model_coord_ci(psamples: dict[str, np.ndarray], resolved: dict[str, list[dic
     return x, y, float(np.std(bx)), float(np.std(by))
 
 
+def cluster_outlier_sd(countries: list[str], P: np.ndarray, models: dict[str, tuple],
+                       min_n: int = 8) -> list[tuple]:
+    """How odd each model looks as a member of each human macro-zone, in cluster SDs.
+
+    Two readings per (model, zone). The signed per-axis z says which way and how far on one named
+    axis, so `+2.9` on secular-rational reads as "2.9 sigma more secular-rational than the average
+    member of this zone". The Mahalanobis distance says how odd the placement is overall, using the
+    zone's own 2x2 covariance; it is the honest scalar because the zones are elongated and tilted
+    (the West runs diagonally), so a model far along a zone's own long axis is less of an outlier
+    than a plain z suggests. Zones under min_n countries are skipped: a 2x2 covariance from a handful
+    of points is mostly noise."""
+    by_zone: dict[str, list[int]] = {}
+    for i, c in enumerate(countries):
+        z = zone_of(c)
+        if z is not None:
+            by_zone.setdefault(IW_MACRO[z], []).append(i)
+    out = []
+    for zone, idx in sorted(by_zone.items()):
+        if len(idx) < min_n:
+            continue
+        Z = P[idx]
+        mu, sd = Z.mean(0), Z.std(0, ddof=1)
+        # ridge keeps the inverse finite if a zone is near-degenerate on one axis
+        S = np.cov(Z.T) + 1e-6 * np.eye(2)
+        Sinv = np.linalg.inv(S)
+        for name, v in models.items():
+            d = np.array([v[0], v[1]]) - mu
+            out.append((name.replace(" (rated)", ""), zone, len(idx),
+                        float(d[0] / sd[0]), float(d[1] / sd[1]),
+                        float(np.sqrt(d @ Sinv @ d))))
+    return out
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--local-model", default="Qwen/Qwen3-0.6B")
@@ -281,6 +314,9 @@ def main() -> None:
                          tablefmt="pipe", floatfmt="+.2f")
         Path(args.out).with_name("wvs_model_ci.md").write_text(table + "\n")
         logger.info("model coords + 95% CI (widest first):\n" + table)
+
+    # scripts/wvs_outlier_table.py turns wvs_model_ci.md into the zone-SD outlier table. It reads the
+    # committed coords rather than the cache, so it reruns offline without paying for 17 models again.
 
     # Render through the SHARED value-map renderer (same one the instrument value maps use): pole
     # signposts through the human median, 4 auto-selected zone hulls, auto-placed labels, model stars.
