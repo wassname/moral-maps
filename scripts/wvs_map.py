@@ -428,6 +428,7 @@ def main() -> None:
             "schema": 1,
             "axis": {"x": (["Self-expression", "Survival"] if sx < 0 else ["Survival", "Self-expression"]),
                      "y": (["Secular-Rational", "Traditional"] if sy < 0 else ["Traditional", "Secular-Rational"])},
+            "median": {"x": float(np.median(P[:, 0]) * sx), "y": float(np.median(P[:, 1]) * sy)},
             "countries": [{"name": name, "x": float(x * sx), "y": float(y * sy)}
                           for name, (x, y) in zip(countries, P)],
             "zones": zones,
