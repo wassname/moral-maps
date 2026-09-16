@@ -2,6 +2,10 @@
 
 Checked from the saved OpenRouter catalog on 2026-09-16. Protocol IDs hash all rendered WVS prompts and settings. `response_format` is only requested where the catalog advertises it. A mandatory model uses its least listed effort. Entries with mandatory reasoning but no supported-effort list are excluded rather than guessing a setting. These are candidate runs, not completed points.
 
+## Actual mandatory-reasoning batch
+
+The executed mandatory batch used one shared setting, `reasoning={"effort":"low"}`, with strict JSON schema and concurrency 1 for `anthropic/claude-fable-5.1`, `openai/gpt-6-astra`, `meta/muse-spark-1.3`, `z-ai/glm-5.3`, `z-ai/glm-5.3-flash`, `google/gemini-3.7-flash`, and `x-ai/grok-4.5`. Therefore the candidate hash for Muse below, which uses the catalog minimum `minimal`, is not the executed protocol. The append-only request ledger is the source of truth for actual run ID, protocol hash, raw request settings, usage and errors. -- PI[gpt-5.6-terra]
+
 | exact ID | catalog name | created UTC | input USD/M | output USD/M | reasoning | schema | protocol ID |
 |---|---|---:|---:|---:|---|---|---|
 | `anthropic/claude-fable-5.1` | Anthropic: Claude Fable 5.1 | 2026-09-01 | 10 | 50 | mandatory low | True | `4230ccaa1e160c793a906aef6b786d735d9fdbf71c3333691b0eba17dcf33928` |

@@ -386,18 +386,21 @@ def main() -> None:
     # Drop the " (rated)" readout tag from the on-map labels (the cache/CI-table keep it) -- the map is
     # crowded and every model here is rated, so the tag adds nothing.
     plot_models = {k.replace(" (rated)", ""): v for k, v in models.items()}
-    # Too many model names to label them all. Plot every star (colour = family) but LABEL only the
-    # latest model per family (highest version number), and drop the redundant "claude-" so the flagship
-    # reads "opus-4.8". Colour + legend carry the unlabelled siblings.
+    # Too many model names to label them all. Plot every star (colour = family) but label only the
+    # latest catalogued release in each family. Numeric version strings do not establish release order.
     fams: dict[str, list[str]] = {}
     for k in plot_models:
         family = maps.model_family(k)
         if family is None:
             raise ValueError(f"model has no explicit family: {k}")
         fams.setdefault(family, []).append(k)
-    def _ver(k: str) -> list[float]:
-        return [float(n) for n in re.findall(r"\d+(?:\.\d+)?", k)]
-    model_labels = {max(ks, key=_ver): max(ks, key=_ver).replace("claude-", "") for ks in fams.values()}
+    metadata = json.loads(Path("docs/img/wvs/wvs_model_metadata.json").read_text())["models"]
+    model_labels: dict[str, str] = {}
+    for family, names in fams.items():
+        catalogued = [name for name in names if name in metadata]
+        if catalogued:
+            latest = max(catalogued, key=lambda name: metadata[name]["created"])
+            model_labels[latest] = latest.replace("claude-", "")
     # Poles in NATURAL data order (x_neg, x_pos, y_neg, y_pos): raw X is high on Self-expression, raw Y
     # high on Secular-Rational. plot_value_map's orient_geographic then flips X so the cultural West
     # lands in the west (Self-expression left) and confirms African-Islamic sits south -- the same

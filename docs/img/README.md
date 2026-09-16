@@ -15,9 +15,9 @@ Regenerate everything with the two commands at the bottom.
 
 ## No country thinks like a chatbot
 
-*17 frontier LLMs placed among ~90 human societies on the World Values Survey map*
+*64 model coordinates among ~90 human societies on the World Values Survey map*
 
-![WVS culture map: 17 LLMs among ~90 societies on the Inglehart-Welzel axes](wvs/wvs_map_iw.png)
+![WVS culture map: 64 model coordinates among ~90 societies on the Inglehart-Welzel axes. The upper-left model cluster is crowded; use the linked CI table for exact values.](wvs/wvs_map_iw.png)
 
 Grey dots are human societies, coloured stars are language models tinted by lab family (warm for
 Chinese labs, cool for Western). Left to right runs from survival values to self-expression; bottom to
