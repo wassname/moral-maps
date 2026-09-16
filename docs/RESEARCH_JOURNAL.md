@@ -879,3 +879,35 @@ be compared.
 Decision: MFV is NOT a cultures map. Keep it for the MODEL's relative-emphasis steer only.
 Plan below. MFQ-2/Big5/Humour use single-source country tables and are unaffected (TODO: still
 worth confirming each is single-source + comparable). -- authored by Claude
+
+## 2026-09-16 -- WVS API run budget before requests
+
+This entry records the configuration-based budget for the planned WVS API measurement.
+
+Evidence from the approved plan and `scripts/wvs_map.py` before this run: the panel has twelve distinct
+WVS items, each model is requested twelve ratings per item, and each initial request has a maximum
+completion allowance of 1024 tokens. This yields 144 initial requests and 147456 maximum initial
+completion tokens per model. A malformed initial reply triggers one rescue with a 2048-token maximum,
+so 144 rescues add at most 294912 completion tokens. The protocol therefore reserves at most 442368
+completion tokens per model when every initial reply needs rescue. Input token counts are unknown at
+this point because OpenRouter bills the provider tokenization of each rendered prompt, and historical
+request records were not retained. Cache reads and writes, failed calls, and any unreported provider
+billing fields are also unknown, not zero. Source: approved plan
+`.pi/plan/9a9c0a-v1.md`, and the pre-run request loop in `src/moralmaps/read_api.py`.
+
+The planned accounting rule is `cost_usd = input_tokens * input_usd_per_million / 1e6 + completion_tokens
+* output_usd_per_million / 1e6`, with cached-token rates kept separate when the provider returns them.
+The plan records public catalog prices observed on 2026-09-16, including DeepSeek V4.1 Flash at
+0.15 input and 0.60 output USD per million tokens, and GLM 5.3 Flash at 0.09 input and 0.30 output
+USD per million tokens. On the output-only allowance, these give 0.09 and 0.04 USD respectively for
+one initial-only model run, and 0.27 and 0.13 USD respectively if every request needs a rescue. Fable
+5.1 and GPT-6 Astra are listed at 50 USD per million output tokens, which is 7.37 USD initial-only or
+22.12 USD if every request rescues, before inputs. These are configuration bounds using stated prices,
+not measured invoices. Source: `.pi/plan/9a9c0a-v1.md` Appendix, quoted catalog snapshot.
+
+My read: the cheapest full diagnostic should establish actual completion and rescue behavior before the
+expensive models. The unknown input and cache billing mean that a simple per-model maximum does not
+prove total spend remains below the authorized cap, so durable records must retain every raw usage object
+and request phase before the next paid call. -- PI[gpt-5.6-terra]
+
+The next result will replace these bounds with reconciled provider-reported usage.

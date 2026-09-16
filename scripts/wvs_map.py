@@ -44,13 +44,35 @@ from moralmaps import maps
 from moralmaps.zones import zones_for, zone_of, IW_MACRO
 from moralmaps.instrument import Instrument, InstrItem
 from moralmaps.read import read_items, resolve_answer_ids
-from moralmaps.read_api import read_items_rated
+from moralmaps.read_api import rated_protocol_identity, read_items_rated
 from moralmaps.iw_axes import AXIS_ITEMS, X_AXIS, Y_AXIS, SKIP, resolve_items, positiveness
 
 # option labels are single digits 0..n-1 -- single-token (unlike '10' on the justifiable scale) and
 # the format the answer-token reader is tuned for (a bare digit, not a letter the model ignores in
 # favour of the option word).
 DIGITS = "0123456789"
+
+# OpenRouter model IDs checked against https://openrouter.ai/api/v1/models on 2026-09-16.
+# Selecting a set is explicit because every uncached entry makes paid API calls.
+API_MODEL_SETS = {
+    "fable-astra": (
+        "anthropic/claude-fable-5.1",
+        "openai/gpt-6-astra",
+    ),
+    "recent": (
+        "anthropic/claude-fable-5.1",
+        "openai/gpt-6-astra",
+        "meta/muse-spark-1.3",
+        "moonshotai/kimi-k3",
+        "thinkingmachines/inkling",
+        "deepseek/deepseek-v4.1-flash",
+        "z-ai/glm-5.3",
+        "z-ai/glm-5.3-flash",
+        "google/gemini-3.7-flash",
+        "x-ai/grok-4.5",
+        "openai/gpt-5.6-sol",
+    ),
+}
 
 
 def load_wvs_all() -> list[dict]:
@@ -200,20 +222,36 @@ def cluster_outlier_sd(countries: list[str], P: np.ndarray, models: dict[str, tu
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--local-model", default="Qwen/Qwen3-0.6B")
+    ap.add_argument("--local-model", default="",
+                    help="optional local checkpoint, blank preserves the API-only published map")
     ap.add_argument("--api-models", nargs="*", default=[])
+    ap.add_argument("--api-model-set", choices=API_MODEL_SETS,
+                    help="explicit paid OpenRouter model set, combined with --api-models")
     ap.add_argument("--api-samples", type=int, default=12,
                     help="rating samples per item (each dense: every option rated), binary items order-balanced")
+    ap.add_argument("--api-concurrency", type=int, default=8,
+                    help="maximum concurrent OpenRouter calls, reduced for a provider that reports rate limits")
+    ap.add_argument("--api-request-timeout", type=float, default=90.0)
     ap.add_argument("--api-max-tokens", type=int, default=1024,
                     help="output budget per rating call; large enough that a reasoning model finishes the JSON")
+    reasoning_group = ap.add_mutually_exclusive_group()
+    reasoning_group.add_argument("--api-disable-reasoning", action="store_true",
+                                 help="send reasoning.enabled=false for models whose catalog metadata says optional")
+    reasoning_group.add_argument("--api-reasoning-effort",
+                                 help="send a mandatory model's catalog-supported minimum reasoning effort")
+    ap.add_argument("--api-structured-output", action="store_true",
+                    help="request a strict rating JSON schema only for a catalog-confirmed supporting model")
     ap.add_argument("--max-think-tokens", type=int, default=64)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
-    ap.add_argument("--out", default="/tmp/claude-1000/wvs_map_iw.png")
-    ap.add_argument("--cache", default="/tmp/claude-1000/wvs_iw_rated.json",
-                    help="cache model (x,y[,x_se,y_se]) coords so re-styling skips the API/model calls")
-    ap.add_argument("--responses", default="/tmp/claude-1000/wvs_iw_rated_responses.jsonl",
-                    help="append every raw model response here (audit trail; API calls cost money)")
+    ap.add_argument("--out", default="docs/img/wvs/wvs_map_iw.png")
+    ap.add_argument("--cache", default="slop/research/wvs/20260916_openrouter/wvs_iw_rated.json",
+                    help="durable completed-panel cache, tracked with the request evidence")
+    ap.add_argument("--records", default="slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+                    help="fsynced JSONL request ledger, outside /tmp and retained for reuse")
     args = ap.parse_args()
+    api_models = list(dict.fromkeys(args.api_models + list(API_MODEL_SETS.get(args.api_model_set, ()))))
+    api_reasoning = ({"enabled": False} if args.api_disable_reasoning else
+                     {"effort": args.api_reasoning_effort} if args.api_reasoning_effort else None)
 
     recs = load_wvs_all()
     resolved = resolve_items(recs)
@@ -233,31 +271,31 @@ def main() -> None:
             rated_items.append({"id": it["suffix"], "question": it["rec"]["q"],
                                 "options": it["rec"]["opts"], "n": it["n"]})
 
-    # DETERMINISTIC cache key over the item set: Python's builtin hash() is salted per process
-    # (PYTHONHASHSEED), so it changes every run and the cache never hits -- costing a fresh API call
-    # each time. hashlib is stable. cache value = (x, y[, x_se, y_se]) per model.
-    sig = hashlib.md5(repr(sorted((it["id"], it["n"]) for it in rated_items)).encode()).hexdigest()[:8]
     cpath = Path(args.cache)
     cpath.parent.mkdir(parents=True, exist_ok=True)
-    cache = json.loads(cpath.read_text()).get(sig, {}) if cpath.exists() else {}
-    models: dict[str, tuple] = {k: tuple(v) for k, v in cache.items()}
+    cache = json.loads(cpath.read_text()) if cpath.exists() else {"schema": 2, "completed": {}}
+    if cache["schema"] != 2:
+        raise ValueError(f"unsupported WVS cache schema {cache['schema']}")
+
+    def published_models(path: Path) -> dict[str, tuple]:
+        """Reuse the committed historical coordinates, which are rounded display values, not raw reruns."""
+        models = {}
+        for line in path.read_text().splitlines():
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) < 5 or cells[0] in ("model", "") or set(cells[1]) <= set(":- "):
+                continue
+            x, y, x_ci95, y_ci95 = (float(cell) for cell in cells[1:5])
+            models[cells[0]] = (x, y, x_ci95 / 1.96, y_ci95 / 1.96)
+        return models
+
+    published_ci = Path("docs/img/wvs/wvs_model_ci.md")
+    models: dict[str, tuple] = published_models(published_ci) if published_ci.exists() else {}
 
     def save_cache() -> None:
-        """Persist after EACH model so a killed run keeps every finished model (kill-safe)."""
-        allc = json.loads(cpath.read_text()) if cpath.exists() else {}
-        allc[sig] = {k: list(v) for k, v in models.items()}
-        cpath.write_text(json.dumps(allc))
-
-    rpath = Path(args.responses)
-    rpath.parent.mkdir(parents=True, exist_ok=True)
-
-    def save_responses(key: str, rows: list[dict]) -> None:
-        """Append every raw rated response (audit trail -- these API calls cost money)."""
-        with rpath.open("a") as fh:
-            for r in rows:
-                fh.write(json.dumps({"model": key, "sig": sig, "item": r["id"],
-                                     "prompt": r.get("prompt"), "texts": r.get("texts"),
-                                     "p": np.asarray(r["p"]).tolist(), "pmass": r["pmass_allowed"]}) + "\n")
+        """Atomic cache replacement after a complete model panel, so interruption cannot fabricate a hit."""
+        temp = cpath.with_suffix(cpath.suffix + ".tmp")
+        temp.write_text(json.dumps(cache, indent=2, sort_keys=True) + "\n")
+        temp.replace(cpath)
 
     rng = np.random.default_rng(0)                       # deterministic bootstrap
 
@@ -281,24 +319,40 @@ def main() -> None:
             save_cache()
 
     # API models: dense rated readout -> (x, y, x_se, y_se) with bootstrap CI.
-    for m in args.api_models:
+    for m in api_models:
         key = m.split("/")[-1] + " (rated)"
-        if key in models:
+        protocol_id = rated_protocol_identity(
+            m, rated_items, n_samples=args.api_samples, temperature=1.0,
+            max_tokens=args.api_max_tokens, concurrency=args.api_concurrency,
+            req_timeout=args.api_request_timeout, reasoning=api_reasoning,
+            structured_output=args.api_structured_output)
+        completed = cache["completed"].get(protocol_id)
+        if completed is not None:
+            models[key] = tuple(completed["coords"])
+            logger.info(f"cache hit {key}: protocol={protocol_id[:12]}")
             continue
-        try:                                # one flaky provider / network blip must not abort the panel
-            rows = read_items_rated(m, rated_items, n_samples=args.api_samples,
-                                    max_tokens=args.api_max_tokens, verbose_first=True)
-        except Exception as e:
-            logger.warning(f"{key}: read failed ({type(e).__name__}: {e}) -> skipping (not cached)")
+        rows = read_items_rated(m, rated_items, n_samples=args.api_samples,
+                                max_tokens=args.api_max_tokens, concurrency=args.api_concurrency,
+                                req_timeout=args.api_request_timeout, reasoning=api_reasoning,
+                                structured_output=args.api_structured_output,
+                                records_path=args.records, verbose_first=True)
+        incomplete = [row["id"] for row in rows if row["valid_samples"] != args.api_samples]
+        if incomplete:
+            logger.warning(f"{key}: incomplete items {incomplete}; raw evidence is in {args.records}; not cached or plotted")
             continue
-        save_responses(key, rows)           # raw answers first (before reducing)
-        psamples = {r["id"]: np.array(r["p_samples"]) for r in rows}
-        collapsed = [k for k, v in psamples.items() if v.size == 0]
-        if collapsed:                       # a refusing / off-format model: skip, keep the panel going
-            logger.warning(f"{key}: parse collapse on {collapsed} -> skipping (not cached)")
-            continue
+        psamples = {row["id"]: np.array(row["p_samples"]) for row in rows}
         models[key] = model_coord_ci(psamples, resolved, rng)
-        save_cache()                        # persist this model before the next (kill-safe)
+        cache["completed"][protocol_id] = {
+            "model": m,
+            "display_key": key,
+            "coords": list(models[key]),
+            "records_path": args.records,
+            "run_id": rows[0]["run_id"],
+            "protocol_id": protocol_id,
+            "n_items": len(rows),
+            "n_samples": args.api_samples,
+        }
+        save_cache()
         x, y, xs, ys = models[key]
         logger.info(f"cached {key}: ({x:.2f}, {y:.2f}) +-({1.96*xs:.02f}, {1.96*ys:.02f}) 95% CI")
 
@@ -332,7 +386,10 @@ def main() -> None:
     # reads "opus-4.8". Colour + legend carry the unlabelled siblings.
     fams: dict[str, list[str]] = {}
     for k in plot_models:
-        fams.setdefault(maps.model_family_color(k), []).append(k)
+        family = maps.model_family(k)
+        if family is None:
+            raise ValueError(f"model has no explicit family: {k}")
+        fams.setdefault(family, []).append(k)
     def _ver(k: str) -> list[float]:
         return [float(n) for n in re.findall(r"\d+(?:\.\d+)?", k)]
     model_labels = {max(ks, key=_ver): max(ks, key=_ver).replace("claude-", "") for ks in fams.values()}

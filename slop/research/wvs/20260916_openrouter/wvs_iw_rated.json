@@ -1,0 +1,20 @@
+{
+  "completed": {
+    "82875b6ee164d0d980eba738bf05f69959234567b91f9cfd01fcabca0bd70dac": {
+      "coords": [
+        0.6529354469060352,
+        0.5885508561103798,
+        0.049299882651159914,
+        0.08073268479006059
+      ],
+      "display_key": "qwen3.7-flash (rated)",
+      "model": "qwen/qwen3.7-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "82875b6ee164d0d980eba738bf05f69959234567b91f9cfd01fcabca0bd70dac",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T133001Z_82875b6ee164"
+    }
+  },
+  "schema": 2
+}

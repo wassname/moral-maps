@@ -269,18 +269,28 @@ MODEL_FAMILY_COLORS = {
     "gemini":   "#0ea5e9",   # Gemini / Google -> sea blue (sibling of gemma, bluer)
     "gpt":      "#2563eb",   # OpenAI -> blue
     "llama":    "#6d5ae0",   # Llama / Meta -> indigo
+    "muse":     "#7c3aed",   # Muse / Meta -> violet
     "claude":   "#c026d3",   # Anthropic -> purple / magenta
     "grok":     "#2b2d42",   # Grok / xAI -> near-black (brand), well clear of gpt blue
+    "kimi":     "#a16207",   # Kimi / Moonshot -> ochre
+    "glm":      "#dc2626",   # GLM / Z.ai -> red
+    "inkling":  "#0891b2",   # Inkling / Thinking Machines -> cyan
 }
 
 
-def model_family_color(name: str) -> str:
-    """The lab-family colour for a model key (substring match on the family name), MODEL_RED if none."""
+def model_family(name: str) -> str | None:
+    """Stable model-series name used to choose one label from each plotted family."""
     key = name.lower()
-    for fam, col in MODEL_FAMILY_COLORS.items():
-        if fam in key:
-            return col
-    return MODEL_RED
+    for family in MODEL_FAMILY_COLORS:
+        if family in key:
+            return family
+    return None
+
+
+def model_family_color(name: str) -> str:
+    """The model-series colour for a model key, or MODEL_RED if the series is unknown."""
+    family = model_family(name)
+    return MODEL_FAMILY_COLORS[family] if family is not None else MODEL_RED
 
 
 def plot_value_map(display: str, countries: list[str], P: np.ndarray,
