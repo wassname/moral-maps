@@ -420,23 +420,73 @@ def main() -> None:
             label_sources[family] = "explicit legacy release-order choice"
         model_labels[latest] = latest.replace("claude-", "")
     if args.web_data:
+        # This artifact is the shared geometry contract for the static, vanilla SVG and React maps.
+        # It stores the already-oriented coordinates and the static renderer's annotation policy.
+        from shapely.geometry import MultiPoint
+
         zones_all, _ = zones_for(countries)
-        zones = maps.select_spread_zones(P, countries, zones_all, 4)
         sx, sy = maps.orient_geographic(P, countries, zones_all)
+        Pplot = P * np.array([sx, sy])
+        zones, dot_cols, label_set = maps._map_annotations(Pplot, countries, zones_all, emph, "#888888")
+        cidx = {country: i for i, country in enumerate(countries)}
+        buf = 0.022 * float(np.hypot(*(Pplot.max(0) - Pplot.min(0))))
+        zone_hulls = []
+        for zone, members in zones.items():
+            pts = [tuple(Pplot[cidx[country]]) for country in members if country in cidx]
+            if len(pts) < 2:
+                raise ValueError(f"zone {zone} lacks two plotted countries")
+            coords = np.asarray(MultiPoint(pts).convex_hull.buffer(buf, quad_segs=16).exterior.coords)
+            # The static renderer's region allocator starts from the whole hull perimeter. The
+            # browser's expanding-ring allocator starts from the centroid, so its first viable
+            # candidate remains adjacent to the corresponding coloured boundary.
+            centroid = coords[:-1].mean(axis=0)
+            zone_hulls.append({"name": zone, "color": maps.ZONE_COLORS[zone],
+                               "points": coords.tolist(), "label_anchor": centroid.tolist()})
+
+        completed = {entry["display_key"].replace(" (rated)", ""): entry
+                     for entry in cache["completed"].values()}
+        family_logos = {
+            "claude": "logos/anthropic.svg", "deepseek": "logos/deepseek.svg",
+            "gemini": "logos/google.svg", "gemma": "logos/google.svg",
+            "glm": "logos/z-ai.svg", "gpt": "logos/openai.svg", "grok": "logos/x-ai.svg",
+            "inkling": "logos/thinkingmachines.svg", "kimi": "logos/moonshotai.svg",
+            "llama": "logos/meta.svg", "mistral": "logos/mistral.svg", "muse": "logos/meta.svg",
+            "qwen": "logos/qwen.svg",
+        }
+
+        def model_provenance(name: str) -> dict[str, object]:
+            panel = completed.get(name)
+            catalog = metadata.get(name)
+            if panel is None:
+                return {"readout": "recovered rounded historical coordinate", "items": None,
+                        "samples": None, "run_id": None, "protocol_id": None,
+                        "release_created": None, "release_source": "historical coordinate"}
+            return {"readout": "rated categorical response", "items": panel["n_items"],
+                    "samples": panel["n_samples"], "run_id": panel["run_id"],
+                    "protocol_id": panel["protocol_id"],
+                    "release_created": catalog["created"] if catalog else None,
+                    "release_source": "catalog" if catalog else "request ledger"}
+
         args.web_data.parent.mkdir(parents=True, exist_ok=True)
         args.web_data.write_text(json.dumps({
-            "schema": 1,
+            "schema": 2,
+            "title": "Frontier LLMs on the\nWorld Values Survey",
+            "note": f"{len(plot_models)} models, rated sampling\ngithub.com/wassname/moral-maps",
             "axis": {"x": (["Self-expression", "Survival"] if sx < 0 else ["Survival", "Self-expression"]),
                      "y": (["Secular-Rational", "Traditional"] if sy < 0 else ["Traditional", "Secular-Rational"])},
-            "median": {"x": float(np.median(P[:, 0]) * sx), "y": float(np.median(P[:, 1]) * sy)},
-            "countries": [{"name": name, "x": float(x * sx), "y": float(y * sy)}
-                          for name, (x, y) in zip(countries, P)],
+            "median": {"x": float(np.median(Pplot[:, 0])), "y": float(np.median(Pplot[:, 1]))},
+            "countries": [{"name": name, "x": float(x), "y": float(y), "color": color,
+                           "label": name if name in label_set else None}
+                          for name, (x, y), color in zip(countries, Pplot, dot_cols)],
             "zones": zones,
+            "zone_hulls": zone_hulls,
+            "logos": family_logos,
             "latest_by_family": {family: {"name": name, "source": label_sources[family]}
                                  for family, names in fams.items() for name in names if name in model_labels},
             "models": [{"name": name, "x": float(v[0] * sx), "y": float(v[1] * sy),
                         "family": maps.model_family(name), "color": maps.model_family_color(name),
-                        "label": model_labels.get(name)} for name, v in plot_models.items()],
+                        "label": model_labels.get(name), "provenance": model_provenance(name)}
+                       for name, v in plot_models.items()],
         }, indent=2, sort_keys=True) + "\n")
     # Poles in NATURAL data order (x_neg, x_pos, y_neg, y_pos): raw X is high on Self-expression, raw Y
     # high on Secular-Rational. plot_value_map's orient_geographic then flips X so the cultural West

@@ -1,0 +1,15 @@
+{
+  "labels": 27,
+  "kinds": {
+    "model": 13,
+    "country": 10,
+    "zone": 4
+  },
+  "bounds": {
+    "left": 76,
+    "right": 1154,
+    "top": 55,
+    "bottom": 818
+  },
+  "policy": "expanding rings, increasing steps, marker obstacles, pairwise overlap and bounds assertions"
+}

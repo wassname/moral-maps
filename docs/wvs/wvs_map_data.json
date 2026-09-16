@@ -11,451 +11,631 @@
   },
   "countries": [
     {
+      "color": "#888888",
+      "label": null,
       "name": "Albania",
       "x": -0.34060364901247114,
       "y": 0.3916805236536717
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Andorra",
       "x": -0.19605307590900742,
       "y": 0.2872413869286676
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Argentina",
       "x": -0.14983546774957562,
       "y": 0.3940946003236249
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Armenia",
       "x": -0.20967830986161892,
       "y": 0.29255690096003767
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Australia",
       "x": -0.31535990908305356,
       "y": 0.31032377649703047
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Austria",
       "x": -0.5223037925191643,
       "y": 0.5078291184737752
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Azerbaijan",
       "x": -0.47986189813334496,
       "y": 0.47877999801292975
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Bangladesh",
       "x": -0.17771250910617192,
       "y": 0.2185170445927002
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Belarus",
       "x": -0.212349244964338,
       "y": 0.36911061913779203
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Bolivia",
       "x": -0.22977359116420062,
       "y": 0.20575355630044792
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Bosnia Herzegovina",
       "x": -0.28340236345421765,
       "y": 0.3122307018706097
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Brazil",
       "x": -0.35580112848666184,
       "y": 0.2389311240190899
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Bulgaria",
       "x": -0.2033229406927835,
       "y": 0.4487408597891542
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Canada",
       "x": -0.6007567432567432,
       "y": 0.5379268033553748
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Chile",
       "x": -0.2699503964169258,
       "y": 0.34544118642628935
     },
     {
+      "color": "#e15759",
+      "label": "China",
       "name": "China",
       "x": -0.2931616820480187,
       "y": 0.5554226781769104
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Colombia",
       "x": -0.3153892218892219,
       "y": 0.22269841269841267
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Croatia",
       "x": -0.36594335295022884,
       "y": 0.3633910239807433
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Cyprus",
       "x": -0.28541627696268346,
       "y": 0.275419511986288
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Czechia",
       "x": -0.39829350897453486,
       "y": 0.5613889766422442
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Denmark",
       "x": -0.6657300149147606,
       "y": 0.6132750608247824
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Ecuador",
       "x": -0.21108824893522313,
       "y": 0.1983233572911128
     },
     {
+      "color": "#9c755f",
+      "label": "Egypt",
       "name": "Egypt",
       "x": -0.06244315954206919,
       "y": 0.146641325722886
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Estonia",
       "x": -0.30423529124393484,
       "y": 0.5025275669601471
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Ethiopia",
       "x": -0.15746570897181292,
       "y": 0.19187722789895975
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Finland",
       "x": -0.5904731690324967,
       "y": 0.551258795065921
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "France",
       "x": -0.5270035214502415,
       "y": 0.5002291086593103
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Georgia",
       "x": -0.1826306508561389,
       "y": 0.2667335331015857
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Germany",
       "x": -0.5635260309183077,
       "y": 0.5240198123611525
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Great Britain",
       "x": -0.5696608975609528,
       "y": 0.5535328076982802
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Greece",
       "x": -0.3159964850208172,
       "y": 0.36488193744987674
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Guatemala",
       "x": -0.28857627815228243,
       "y": 0.36053619024439865
     },
     {
+      "color": "#e15759",
+      "label": null,
       "name": "Hong Kong SAR",
       "x": -0.36391469499921747,
       "y": 0.4905954961653451
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Hungary",
       "x": -0.23152649865277466,
       "y": 0.45978362150632446
     },
     {
+      "color": "#4e79a7",
+      "label": "Iceland",
       "name": "Iceland",
       "x": -0.7012314341663172,
       "y": 0.5677624977921072
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Indonesia",
       "x": -0.12771297289425063,
       "y": 0.2325335335335335
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Iran",
       "x": -0.23320783762949784,
       "y": 0.31006771630666
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Iraq",
       "x": -0.15493449008064397,
       "y": 0.19472631072631072
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Italy",
       "x": -0.4309070673593499,
       "y": 0.3929868470977711
     },
     {
+      "color": "#e15759",
+      "label": "Japan",
       "name": "Japan",
       "x": -0.4330191209998057,
       "y": 0.6064228638325765
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Jordan",
       "x": -0.12159203648151506,
       "y": 0.18432400980608574
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Kazakhstan",
       "x": -0.14308593129168692,
       "y": 0.34813863139941176
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Kenya",
       "x": -0.2779854546506703,
       "y": 0.2407609642518004
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Kyrgyzstan",
       "x": -0.10815566017933205,
       "y": 0.2807546176327564
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Latvia",
       "x": -0.27016564606173954,
       "y": 0.5012283231174919
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Lebanon",
       "x": -0.1511583350829206,
       "y": 0.31222222222222223
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Libya",
       "x": -0.1559643725841997,
       "y": 0.1529120470604088
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Lithuania",
       "x": -0.30962705001722174,
       "y": 0.47393240841375395
     },
     {
+      "color": "#e15759",
+      "label": null,
       "name": "Macau SAR",
       "x": -0.3502817850634504,
       "y": 0.5291951711604919
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Malaysia",
       "x": -0.3073090243090243,
       "y": 0.314952380952381
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Maldives",
       "x": -0.2968042174615827,
       "y": 0.19067102392882931
     },
     {
+      "color": "#f28e2b",
+      "label": "Mexico",
       "name": "Mexico",
       "x": -0.2223763800839733,
       "y": 0.25423721830646473
     },
     {
+      "color": "#e15759",
+      "label": null,
       "name": "Mongolia",
       "x": -0.39843454634185715,
       "y": 0.47695238095238096
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Montenegro",
       "x": -0.3363307985114117,
       "y": 0.32891164603000833
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Morocco",
       "x": -0.31702043262043256,
       "y": 0.2695294977517199
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Myanmar",
       "x": -0.12121613721877203,
       "y": 0.2638412698412698
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Netherlands",
       "x": -0.5910713885704852,
       "y": 0.5558970262624637
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "New Zealand",
       "x": -0.6273472343683035,
       "y": 0.5704989613162689
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Nicaragua",
       "x": -0.17550000000000002,
       "y": 0.18293650793650792
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Nigeria",
       "x": -0.18111464192593707,
       "y": 0.17117185934438867
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "North Macedonia",
       "x": -0.261513717912872,
       "y": 0.3289379201464618
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Northern Ireland",
       "x": -0.5610131103812875,
       "y": 0.45120353089243065
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Norway",
       "x": -0.6482606082603507,
       "y": 0.6022098618016261
     },
     {
+      "color": "#888888",
+      "label": "Pakistan",
       "name": "Pakistan",
       "x": -0.17719135939556657,
       "y": 0.17695773137839582
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Peru",
       "x": -0.21419128606996862,
       "y": 0.2249236535133877
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Philippines",
       "x": -0.21356483685541808,
       "y": 0.2514514514514515
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Poland",
       "x": -0.3183850466544345,
       "y": 0.3114171762694594
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Portugal",
       "x": -0.2864445498559326,
       "y": 0.37983890694614153
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Puerto Rico",
       "x": -0.3513201895764486,
       "y": 0.26447937989911013
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Romania",
       "x": -0.18777913100679502,
       "y": 0.32834644808937796
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Russia",
       "x": -0.20290216042671308,
       "y": 0.39898594766097434
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Serbia",
       "x": -0.3042549694628824,
       "y": 0.36310433764281264
     },
     {
+      "color": "#e15759",
+      "label": null,
       "name": "Singapore",
       "x": -0.2345227370995448,
       "y": 0.39414713163714865
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Slovakia",
       "x": -0.36274437089527634,
       "y": 0.42741112797882286
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Slovenia",
       "x": -0.3898829991301483,
       "y": 0.5382587376026676
     },
     {
+      "color": "#e15759",
+      "label": "South Korea",
       "name": "South Korea",
       "x": -0.323098997995992,
       "y": 0.5796652366652367
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Spain",
       "x": -0.47164942718347297,
       "y": 0.46868098799908825
     },
     {
+      "color": "#4e79a7",
+      "label": "Sweden",
       "name": "Sweden",
       "x": -0.6703803299269019,
       "y": 0.6461499594342325
     },
     {
+      "color": "#4e79a7",
+      "label": null,
       "name": "Switzerland",
       "x": -0.5897355362828434,
       "y": 0.5298550141086323
     },
     {
+      "color": "#e15759",
+      "label": null,
       "name": "Taiwan ROC",
       "x": -0.3214688755688755,
       "y": 0.43132661232661235
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Tajikistan",
       "x": -0.13512499999999994,
       "y": 0.28067047238475806
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Thailand",
       "x": -0.2740718953888065,
       "y": 0.4148391067244298
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Tunisia",
       "x": -0.14877471009391358,
       "y": 0.3089237903356695
     },
     {
+      "color": "#9c755f",
+      "label": "Turkey",
       "name": "Turkey",
       "x": -0.21463936457744862,
       "y": 0.27752480769341686
     },
     {
+      "color": "#888888",
+      "label": null,
       "name": "Ukraine",
       "x": -0.234649923433698,
       "y": 0.3830401025896393
     },
     {
+      "color": "#4e79a7",
+      "label": "United States",
       "name": "United States",
       "x": -0.5213565781484912,
       "y": 0.4336910509567847
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Uruguay",
       "x": -0.3659013275989292,
       "y": 0.41571633123039353
     },
     {
+      "color": "#f28e2b",
+      "label": null,
       "name": "Venezuela",
       "x": -0.26310707070707073,
       "y": 0.2285162464051353
     },
     {
+      "color": "#e15759",
+      "label": null,
       "name": "Vietnam",
       "x": -0.20836983650316981,
       "y": 0.4272976044880807
     },
     {
+      "color": "#9c755f",
+      "label": null,
       "name": "Zimbabwe",
       "x": -0.14614597549313435,
       "y": 0.17828757955153599
@@ -515,6 +695,21 @@
       "source": "catalog created=2026-08-26"
     }
   },
+  "logos": {
+    "claude": "logos/anthropic.svg",
+    "deepseek": "logos/deepseek.svg",
+    "gemini": "logos/google.svg",
+    "gemma": "logos/google.svg",
+    "glm": "logos/z-ai.svg",
+    "gpt": "logos/openai.svg",
+    "grok": "logos/x-ai.svg",
+    "inkling": "logos/thinkingmachines.svg",
+    "kimi": "logos/moonshotai.svg",
+    "llama": "logos/meta.svg",
+    "mistral": "logos/mistral.svg",
+    "muse": "logos/meta.svg",
+    "qwen": "logos/qwen.svg"
+  },
   "median": {
     "x": -0.2875104140041075,
     "y": 0.36324768081177794
@@ -525,6 +720,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.6-27b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "abf45a27f4bafad0eb264aac33b1e49e9d0404e141966954d0707930d56665e3",
+        "readout": "rated categorical response",
+        "release_created": "2026-04-27",
+        "release_source": "catalog",
+        "run_id": "20260916T141139Z_abf45a27f4ba",
+        "samples": 12
+      },
       "x": -0.45740779531102105,
       "y": 0.6795887184190553
     },
@@ -533,6 +737,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.5-35b-a3b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "7ee20ca2b88f69dd06b9de3018deea4cb7a418e3119e17862cd0b32146daae1a",
+        "readout": "rated categorical response",
+        "release_created": "2026-02-25",
+        "release_source": "catalog",
+        "run_id": "20260916T142959Z_7ee20ca2b88f",
+        "samples": 12
+      },
       "x": -0.538440257742794,
       "y": 0.5530118458934986
     },
@@ -541,6 +754,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.6-max-preview",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "fa9ff591d389ad2d8a4b7e3fc1410ed588508fe286430c06a941180b0590422b",
+        "readout": "rated categorical response",
+        "release_created": "2026-04-27",
+        "release_source": "catalog",
+        "run_id": "20260916T140710Z_fa9ff591d389",
+        "samples": 12
+      },
       "x": -0.4805424128340796,
       "y": 0.6905543787488233
     },
@@ -549,6 +771,15 @@
       "family": "muse",
       "label": "muse-spark-1.3",
       "name": "muse-spark-1.3",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "3c9d4fedebcab41719f4247ca94fa35430f57d0a34f3a539012e0632e35413de",
+        "readout": "rated categorical response",
+        "release_created": "2026-09-02",
+        "release_source": "catalog",
+        "run_id": "20260916T155331Z_3c9d4fedebca",
+        "samples": 12
+      },
       "x": -0.4253104631546661,
       "y": 0.731799663031547
     },
@@ -557,6 +788,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.8-27b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "ed8190c48b2a3778bba8afff7381bb9f1578211b5e8f750d21321b62617c82c3",
+        "readout": "rated categorical response",
+        "release_created": "2026-08-14",
+        "release_source": "catalog",
+        "run_id": "20260916T134026Z_ed8190c48b2a",
+        "samples": 12
+      },
       "x": -0.431934218610816,
       "y": 0.6881570439623662
     },
@@ -565,6 +805,15 @@
       "family": "qwen",
       "label": "qwen3.8-flash",
       "name": "qwen3.8-flash",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "3443c17ae66d3fb529a058128b662024c4bc0601394e614bb693b388ec4c988b",
+        "readout": "rated categorical response",
+        "release_created": "2026-08-26",
+        "release_source": "catalog",
+        "run_id": "20260916T133720Z_3443c17ae66d",
+        "samples": 12
+      },
       "x": -0.4153054353054353,
       "y": 0.6346365065494385
     },
@@ -573,6 +822,15 @@
       "family": "gemma",
       "label": "gemma-4-31b-it",
       "name": "gemma-4-31b-it",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.36,
       "y": 0.66
     },
@@ -581,6 +839,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.5-122b-a10b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "e0a9daef251d975c5e805e159f3813dd0c55b3f0919876b828e572b0530bea88",
+        "readout": "rated categorical response",
+        "release_created": "2026-02-25",
+        "release_source": "catalog",
+        "run_id": "20260916T143453Z_e0a9daef251d",
+        "samples": 12
+      },
       "x": -0.48469169991228817,
       "y": 0.6190010643383659
     },
@@ -589,6 +856,15 @@
       "family": "grok",
       "label": null,
       "name": "grok-4.20",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.59,
       "y": 0.62
     },
@@ -597,6 +873,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.5-plus-20260420",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "6d6ce30e9fbc5fdb07229b0a08e067d77511857069a4e572613d3e48b7c8b261",
+        "readout": "rated categorical response",
+        "release_created": "2026-04-27",
+        "release_source": "catalog",
+        "run_id": "20260916T135722Z_6d6ce30e9fbc",
+        "samples": 12
+      },
       "x": -0.5856201899951899,
       "y": 0.6494018547589976
     },
@@ -605,6 +890,15 @@
       "family": "gemini",
       "label": null,
       "name": "gemini-2.5-pro",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.47,
       "y": 0.7
     },
@@ -613,6 +907,15 @@
       "family": "grok",
       "label": "grok-4.3",
       "name": "grok-4.3",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.44,
       "y": 0.73
     },
@@ -621,6 +924,15 @@
       "family": "deepseek",
       "label": null,
       "name": "deepseek-v4-flash",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.57,
       "y": 0.64
     },
@@ -629,6 +941,15 @@
       "family": "gpt",
       "label": null,
       "name": "gpt-5.4",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.45,
       "y": 0.68
     },
@@ -637,6 +958,15 @@
       "family": "deepseek",
       "label": "deepseek-v4.1-flash",
       "name": "deepseek-v4.1-flash",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "8c27d32cd851de5f217cb354b15dc270cc6f4ec2d02fb15dbb20fde0790c3571",
+        "readout": "rated categorical response",
+        "release_created": "2026-09-10",
+        "release_source": "catalog",
+        "run_id": "20260916T151414Z_8c27d32cd851",
+        "samples": 12
+      },
       "x": -0.5419602854216832,
       "y": 0.595896730624977
     },
@@ -645,6 +975,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-coder-30b-a3b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "39659697ca3437f62be4fb8e129e6b3902a91b5acac3243ca914dfc917dd563b",
+        "readout": "rated categorical response",
+        "release_created": "2025-07-31",
+        "release_source": "catalog",
+        "run_id": "20260916T194257Z_39659697ca34",
+        "samples": 12
+      },
       "x": -0.5030952380952382,
       "y": 0.5846967846967848
     },
@@ -653,6 +992,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-30b-a3b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "8700e79d3eccf358a0de1029f7b40e2db339bb6d11403b8e69cb7a66a7b0c668",
+        "readout": "rated categorical response",
+        "release_created": "2025-04-28",
+        "release_source": "catalog",
+        "run_id": "20260916T145439Z_8700e79d3ecc",
+        "samples": 12
+      },
       "x": -0.6707823388714307,
       "y": 0.6060018656291949
     },
@@ -661,6 +1009,15 @@
       "family": "gpt",
       "label": "gpt-6-astra",
       "name": "gpt-6-astra",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "95bb4d3939e9937823357b5cd87adb1a6640cc5b04e0841dfec03095331a5e44",
+        "readout": "rated categorical response",
+        "release_created": "2026-09-04",
+        "release_source": "catalog",
+        "run_id": "20260916T154406Z_95bb4d3939e9",
+        "samples": 12
+      },
       "x": -0.4569019748367575,
       "y": 0.6751145899955423
     },
@@ -669,6 +1026,15 @@
       "family": "mistral",
       "label": "mistral-large-2512",
       "name": "mistral-large-2512",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.65,
       "y": 0.64
     },
@@ -677,6 +1043,15 @@
       "family": "gemma",
       "label": null,
       "name": "gemma-3-27b-it",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.6,
       "y": 0.6
     },
@@ -685,6 +1060,15 @@
       "family": "llama",
       "label": "llama-4-maverick",
       "name": "llama-4-maverick",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.64,
       "y": 0.64
     },
@@ -693,6 +1077,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-coder",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "304db4b1aa6c80d734f802749c75143feddfcdb740c4131385e927148ba7d05b",
+        "readout": "rated categorical response",
+        "release_created": "2025-07-23",
+        "release_source": "catalog",
+        "run_id": "20260916T195554Z_304db4b1aa6c",
+        "samples": 12
+      },
       "x": -0.598778659611993,
       "y": 0.6204503168788883
     },
@@ -701,6 +1094,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.7-flash",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "82875b6ee164d0d980eba738bf05f69959234567b91f9cfd01fcabca0bd70dac",
+        "readout": "rated categorical response",
+        "release_created": "2026-07-27",
+        "release_source": "catalog",
+        "run_id": "20260916T133001Z_82875b6ee164",
+        "samples": 12
+      },
       "x": -0.6529354469060352,
       "y": 0.5885508561103798
     },
@@ -709,6 +1111,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-vl-235b-a22b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "61ab1adae3781ca3893328a845d4d517daa5fb47e07ea189da1df45388f62d42",
+        "readout": "rated categorical response",
+        "release_created": "2025-09-23",
+        "release_source": "catalog",
+        "run_id": "20260916T192432Z_61ab1adae378",
+        "samples": 12
+      },
       "x": -0.5993276014109347,
       "y": 0.5462479278681369
     },
@@ -717,6 +1128,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen-plus",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "88ba5af838eda5d298b312553d7c941e72a37cbf28890cdb9d8436b5f40e7cfe",
+        "readout": "rated categorical response",
+        "release_created": "2025-02-01",
+        "release_source": "catalog",
+        "run_id": "20260916T200626Z_88ba5af838ed",
+        "samples": 12
+      },
       "x": -0.6025617283950616,
       "y": 0.6287037037037038
     },
@@ -725,6 +1145,15 @@
       "family": "gpt",
       "label": null,
       "name": "gpt-5.3-chat",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.5,
       "y": 0.67
     },
@@ -733,6 +1162,15 @@
       "family": "deepseek",
       "label": null,
       "name": "deepseek-v4-pro",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.55,
       "y": 0.73
     },
@@ -741,6 +1179,15 @@
       "family": "llama",
       "label": null,
       "name": "llama-4-scout",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.62,
       "y": 0.53
     },
@@ -749,6 +1196,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-vl-30b-a3b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "0a798666aeed20785b4661c8c2fe4a6fc6853796bc2f3c45133863469e5b3f82",
+        "readout": "rated categorical response",
+        "release_created": "2025-10-06",
+        "release_source": "catalog",
+        "run_id": "20260916T192223Z_0a798666aeed",
+        "samples": 12
+      },
       "x": -0.5335737179487179,
       "y": 0.5337214372928658
     },
@@ -757,6 +1213,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.5-397b-a17b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "921707cb0d3db143e948e9d78cd8191f4ee720eaf56b6934e2d13d9ce9e3382f",
+        "readout": "rated categorical response",
+        "release_created": "2026-02-16",
+        "release_source": "catalog",
+        "run_id": "20260916T144546Z_921707cb0d3d",
+        "samples": 12
+      },
       "x": -0.5408168991502326,
       "y": 0.6493278669204595
     },
@@ -765,6 +1230,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.5-plus-02-15",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "74e3649a6961000bab284e801fe811d5c8fc4cf1db15af52bb10959f5a5a37c1",
+        "readout": "rated categorical response",
+        "release_created": "2026-02-16",
+        "release_source": "catalog",
+        "run_id": "20260916T144205Z_74e3649a6961",
+        "samples": 12
+      },
       "x": -0.5372045855379188,
       "y": 0.6595114541543113
     },
@@ -773,6 +1247,15 @@
       "family": "glm",
       "label": "glm-5.3",
       "name": "glm-5.3",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "d81f7e66b3c4c720f8dd80768d3dfc25de6edeaf6a352cfed40e961f21fcfa22",
+        "readout": "rated categorical response",
+        "release_created": "2026-08-18",
+        "release_source": "catalog",
+        "run_id": "20260916T161456Z_d81f7e66b3c4",
+        "samples": 12
+      },
       "x": -0.5535321928702047,
       "y": 0.6422322099171051
     },
@@ -781,6 +1264,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.7-plus",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "f095e0d2dbafdb91b51be3d0b3bd5a597730c8e3c397e0461023c87e924d92f8",
+        "readout": "rated categorical response",
+        "release_created": "2026-06-03",
+        "release_source": "catalog",
+        "run_id": "20260916T134925Z_f095e0d2dbaf",
+        "samples": 12
+      },
       "x": -0.5078196649029982,
       "y": 0.6664359119716262
     },
@@ -789,6 +1281,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-30b-a3b-instruct-2507",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "88ed922f271a76721ad18f0b7bb9693a48377e2507d02a4b78fa08b451972d83",
+        "readout": "rated categorical response",
+        "release_created": "2025-07-29",
+        "release_source": "catalog",
+        "run_id": "20260916T195128Z_88ed922f271a",
+        "samples": 12
+      },
       "x": -0.6450907949109246,
       "y": 0.5437992771640354
     },
@@ -797,6 +1298,15 @@
       "family": "gpt",
       "label": null,
       "name": "gpt-5.5",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.42,
       "y": 0.76
     },
@@ -805,6 +1315,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.6-35b-a3b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "b35b916c22649e91ded175aede34f3937a16f42a354f7abab01a17bf2b0dfc97",
+        "readout": "rated categorical response",
+        "release_created": "2026-04-27",
+        "release_source": "catalog",
+        "run_id": "20260916T140418Z_b35b916c2264",
+        "samples": 12
+      },
       "x": -0.6062280543530544,
       "y": 0.5943180448406931
     },
@@ -813,6 +1332,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.6-flash",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "fa37fc90604e5032183ec460bcc2632507566c3be3e9085f61a6ca85582b7d47",
+        "readout": "rated categorical response",
+        "release_created": "2026-04-27",
+        "release_source": "catalog",
+        "run_id": "20260916T140130Z_fa37fc90604e",
+        "samples": 12
+      },
       "x": -0.6514346395123706,
       "y": 0.583014517676874
     },
@@ -821,6 +1349,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.6-plus",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "96d86b64bf7ceff8eed0daff1aa0396ee69609b5867942a7c2c9d33093f03c9d",
+        "readout": "rated categorical response",
+        "release_created": "2026-04-02",
+        "release_source": "catalog",
+        "run_id": "20260916T141839Z_96d86b64bf7c",
+        "samples": 12
+      },
       "x": -0.5196778711484593,
       "y": 0.6698994127565557
     },
@@ -829,6 +1366,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-235b-a22b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "842298c634ec0f57848b605f67fca161631a852a68192cae1a5377b1d9f31566",
+        "readout": "rated categorical response",
+        "release_created": "2025-04-28",
+        "release_source": "catalog",
+        "run_id": "20260916T150950Z_842298c634ec",
+        "samples": 12
+      },
       "x": -0.6427511094043352,
       "y": 0.5554953612269281
     },
@@ -837,6 +1383,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen-2.5-72b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "9c1d40b30945565e488b212177e40c29f730c2e96d4b07d09cbc135ba75a81f0",
+        "readout": "rated categorical response",
+        "release_created": "2024-09-19",
+        "release_source": "catalog",
+        "run_id": "20260916T201119Z_9c1d40b30945",
+        "samples": 12
+      },
       "x": -0.6026546601546601,
       "y": 0.5957470912477916
     },
@@ -845,6 +1400,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen-plus-2025-07-28",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "ac52652ff1f09e1f1972a8b751e1b1deca329cb555df54755aada79791bed940",
+        "readout": "rated categorical response",
+        "release_created": "2025-09-08",
+        "release_source": "catalog",
+        "run_id": "20260916T194044Z_ac52652ff1f0",
+        "samples": 12
+      },
       "x": -0.6417361111111111,
       "y": 0.5127110103300581
     },
@@ -853,6 +1417,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.7-max",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "1c31668055e399de28805046bc08075035efbad0cdb1ff7d8926841a282e07a5",
+        "readout": "rated categorical response",
+        "release_created": "2026-05-21",
+        "release_source": "catalog",
+        "run_id": "20260916T135329Z_1c31668055e3",
+        "samples": 12
+      },
       "x": -0.5036638266417679,
       "y": 0.6503283973522069
     },
@@ -861,6 +1434,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-235b-a22b-2507",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "dc09c3fe433c95591b336b279603c546152daf6534d90699323b3bcde754f5bf",
+        "readout": "rated categorical response",
+        "release_created": "2025-07-21",
+        "release_source": "catalog",
+        "run_id": "20260916T195827Z_dc09c3fe433c",
+        "samples": 12
+      },
       "x": -0.6353621031746031,
       "y": 0.5685931857310826
     },
@@ -869,6 +1451,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.5-9b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "3016d2c1ab8d8f88f01723d2d695be996c7f1fdcd442a51cfbb6c7b7110a25e9",
+        "readout": "rated categorical response",
+        "release_created": "2026-03-10",
+        "release_source": "catalog",
+        "run_id": "20260916T142212Z_3016d2c1ab8d",
+        "samples": 12
+      },
       "x": -0.5017202097104058,
       "y": 0.5916881018254176
     },
@@ -877,6 +1468,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen2.5-vl-72b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "02d386b067d55e0639d33db8b6f1e5c708c30acbada3125dcbabde47dc90edcf",
+        "readout": "rated categorical response",
+        "release_created": "2025-02-01",
+        "release_source": "catalog",
+        "run_id": "20260916T200346Z_02d386b067d5",
+        "samples": 12
+      },
       "x": -0.5849525883130219,
       "y": 0.59521139256589
     },
@@ -885,6 +1485,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-vl-32b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "43ddc43fb5a29c7fbf21c8f32b42a909c2118feb9255959ecaeab7dadb1f3dde",
+        "readout": "rated categorical response",
+        "release_created": "2025-10-23",
+        "release_source": "catalog",
+        "run_id": "20260916T191809Z_43ddc43fb5a2",
+        "samples": 12
+      },
       "x": -0.5966931216931217,
       "y": 0.5338064713064713
     },
@@ -893,6 +1502,15 @@
       "family": "gpt",
       "label": null,
       "name": "gpt-5.6-sol",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "1a70f47789af20900f2799992b09e83af9490be6579098a6178d613d5ba7856c",
+        "readout": "rated categorical response",
+        "release_created": "2026-07-09",
+        "release_source": "catalog",
+        "run_id": "20260916T152843Z_1a70f47789af",
+        "samples": 12
+      },
       "x": -0.5274474357644292,
       "y": 0.6650744376984001
     },
@@ -901,6 +1519,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-max-thinking",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "bca0745bdc1554718d57891098f366214f05e9e896007a916d14a06efa33471a",
+        "readout": "rated categorical response",
+        "release_created": "2026-02-09",
+        "release_source": "catalog",
+        "run_id": "20260916T145109Z_bca0745bdc15",
+        "samples": 12
+      },
       "x": -0.5778139029180694,
       "y": 0.6959770802908057
     },
@@ -909,6 +1536,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-coder-plus",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "182a7e88869698133f1175f18e53e7f6f2f056739559d325b211bd065235a71c",
+        "readout": "rated categorical response",
+        "release_created": "2025-09-23",
+        "release_source": "catalog",
+        "run_id": "20260916T193258Z_182a7e888696",
+        "samples": 12
+      },
       "x": -0.6175297619047618,
       "y": 0.5976147806792967
     },
@@ -917,6 +1553,15 @@
       "family": "inkling",
       "label": "inkling",
       "name": "inkling",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "67a70b1b03ba85be79dc122cc888a080fde239205624135a9147168e7e77293d",
+        "readout": "rated categorical response",
+        "release_created": "2026-07-17",
+        "release_source": "catalog",
+        "run_id": "20260916T191343Z_67a70b1b03ba",
+        "samples": 12
+      },
       "x": -0.5614798614630517,
       "y": 0.6880988993033613
     },
@@ -925,6 +1570,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-vl-8b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "1d7f4015decbcbe955adb79817b970981ca1d3165ed121b458b213ba1060f675",
+        "readout": "rated categorical response",
+        "release_created": "2025-10-14",
+        "release_source": "catalog",
+        "run_id": "20260916T192044Z_1d7f4015decb",
+        "samples": 12
+      },
       "x": -0.6061818582651916,
       "y": 0.6004689754689754
     },
@@ -933,6 +1587,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen-2.5-7b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "66ad076e1a37493e4d3db982a0220048e520103459cefc709bc8f09f3fef6c9a",
+        "readout": "rated categorical response",
+        "release_created": "2024-10-16",
+        "release_source": "catalog",
+        "run_id": "20260916T200857Z_66ad076e1a37",
+        "samples": 12
+      },
       "x": -0.5509667037841642,
       "y": 0.5895236753978316
     },
@@ -941,6 +1604,15 @@
       "family": "kimi",
       "label": "kimi-k3",
       "name": "kimi-k3",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "0043a43d1a2188f7c728ccda08eee7b062232366d8a4e912c72bdc938e37fe44",
+        "readout": "rated categorical response",
+        "release_created": "2026-07-16",
+        "release_source": "catalog",
+        "run_id": "20260916T152010Z_0043a43d1a21",
+        "samples": 12
+      },
       "x": -0.6214472858835399,
       "y": 0.6710244268262847
     },
@@ -949,6 +1621,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3.5-27b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "7058adf367d238c6c92e1b83ae71f6556362e9fc7a243297b6fc65e54e2c2886",
+        "readout": "rated categorical response",
+        "release_created": "2026-02-25",
+        "release_source": "catalog",
+        "run_id": "20260916T143235Z_7058adf367d2",
+        "samples": 12
+      },
       "x": -0.5974338624338624,
       "y": 0.6515634387658198
     },
@@ -957,6 +1638,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-32b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "580a5840948209ecb177dc6fdaf36e265a32ccfe223d791eb3235fea9269f27e",
+        "readout": "rated categorical response",
+        "release_created": "2025-04-28",
+        "release_source": "catalog",
+        "run_id": "20260916T150406Z_580a58409482",
+        "samples": 12
+      },
       "x": -0.6064902599972044,
       "y": 0.5413085527420844
     },
@@ -965,6 +1655,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-14b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "49ae9f7a09090534a15fac734c2611c445a17139cad6c5684fa0581722f3fd70",
+        "readout": "rated categorical response",
+        "release_created": "2025-04-28",
+        "release_source": "catalog",
+        "run_id": "20260916T150121Z_49ae9f7a0909",
+        "samples": 12
+      },
       "x": -0.6137896825396826,
       "y": 0.5819444444444445
     },
@@ -973,6 +1672,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-coder-next",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "57bed80fd5b94157effe68fe998c7c12612fea210c1371dbf230097a7e8e0717",
+        "readout": "rated categorical response",
+        "release_created": "2026-02-04",
+        "release_source": "catalog",
+        "run_id": "20260916T191559Z_57bed80fd5b9",
+        "samples": 12
+      },
       "x": -0.6363133579397021,
       "y": 0.5792251640447779
     },
@@ -981,6 +1689,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-next-80b-a3b-instruct",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "9d8a5189c078672eb884784938b183944fb161d0e716e2c44722540b17603e34",
+        "readout": "rated categorical response",
+        "release_created": "2025-09-11",
+        "release_source": "catalog",
+        "run_id": "20260916T193846Z_9d8a5189c078",
+        "samples": 12
+      },
       "x": -0.6652380952380952,
       "y": 0.7022990677752582
     },
@@ -989,6 +1706,15 @@
       "family": "claude",
       "label": null,
       "name": "claude-opus-4.7",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.59,
       "y": 0.6
     },
@@ -997,6 +1723,15 @@
       "family": "qwen",
       "label": null,
       "name": "qwen3-8b",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "589e10fa7924ecf8f88650d6587ff37c440f47c6c4cc4325c7009ef8d4eeb4ec",
+        "readout": "rated categorical response",
+        "release_created": "2025-04-28",
+        "release_source": "catalog",
+        "run_id": "20260916T181355Z_589e10fa7924",
+        "samples": 12
+      },
       "x": -0.6217724867724868,
       "y": 0.5391326046087952
     },
@@ -1005,6 +1740,15 @@
       "family": "claude",
       "label": null,
       "name": "claude-opus-4.8",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.61,
       "y": 0.58
     },
@@ -1013,6 +1757,15 @@
       "family": "gemini",
       "label": "gemini-3.7-flash",
       "name": "gemini-3.7-flash",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "cd5db529649a179032180cecafe4fd98aff124ee3654f7d60996de704e2b63ef",
+        "readout": "rated categorical response",
+        "release_created": "2026-08-13",
+        "release_source": "catalog",
+        "run_id": "20260916T172946Z_cd5db529649a",
+        "samples": 12
+      },
       "x": -0.4988977072310405,
       "y": 0.6262540369683227
     },
@@ -1021,6 +1774,15 @@
       "family": "claude",
       "label": "fable-5.1",
       "name": "claude-fable-5.1",
+      "provenance": {
+        "items": 12,
+        "protocol_id": "4230ccaa1e160c793a906aef6b786d735d9fdbf71c3333691b0eba17dcf33928",
+        "readout": "rated categorical response",
+        "release_created": "2026-09-01",
+        "release_source": "catalog",
+        "run_id": "20260916T153341Z_4230ccaa1e16",
+        "samples": 12
+      },
       "x": -0.5790919024614678,
       "y": 0.6085929478125246
     },
@@ -1029,11 +1791,1232 @@
       "family": "claude",
       "label": null,
       "name": "claude-opus-4.6",
+      "provenance": {
+        "items": null,
+        "protocol_id": null,
+        "readout": "recovered rounded historical coordinate",
+        "release_created": null,
+        "release_source": "historical coordinate",
+        "run_id": null,
+        "samples": null
+      },
       "x": -0.63,
       "y": 0.63
     }
   ],
-  "schema": 1,
+  "note": "64 models, rated sampling\ngithub.com/wassname/moral-maps",
+  "schema": 2,
+  "title": "Frontier LLMs on the\nWorld Values Survey",
+  "zone_hulls": [
+    {
+      "color": "#4e79a7",
+      "label_anchor": [
+        -0.43268888190925825,
+        0.4642827580345273
+      ],
+      "name": "West",
+      "points": [
+        [
+          -0.17857875212949284,
+          0.2908339802210258
+        ],
+        [
+          -0.1783106503900921,
+          0.289102852700942
+        ],
+        [
+          -0.1782136228163886,
+          0.2873537767496459
+        ],
+        [
+          -0.1782886049575384,
+          0.28560361712493454
+        ],
+        [
+          -0.17853487382855696,
+          0.28386924903348787
+        ],
+        [
+          -0.17895005488140955,
+          0.28216739541850994
+        ],
+        [
+          -0.17953014490063088,
+          0.28051446571550953
+        ],
+        [
+          -0.18026955060271177,
+          0.2789263976309516
+        ],
+        [
+          -0.18116114256707436,
+          0.2774185034693656
+        ],
+        [
+          -0.182196323978628,
+          0.2760053224906389
+        ],
+        [
+          -0.18336511351908352,
+          0.274700480721081
+        ],
+        [
+          -0.1846562416077798,
+          0.2735165595699731
+        ],
+        [
+          -0.18605725906405965,
+          0.27246497451841506
+        ],
+        [
+          -0.18755465714346164,
+          0.27155586505016366
+        ],
+        [
+          -0.18913399779032777,
+          0.2707979968857593
+        ],
+        [
+          -0.19078005285091854,
+          0.2701986774626094
+        ],
+        [
+          -0.1924769509047293,
+          0.26976368547597696
+        ],
+        [
+          -0.1942083302982466,
+          0.2694972151602478
+        ],
+        [
+          -0.19595749690557795,
+          0.2694018358477208
+        ],
+        [
+          -0.1977075850948121,
+          0.2694784671948599
+        ],
+        [
+          -0.19944172034805682,
+          0.26972637031487856
+        ],
+        [
+          -0.31874855352210296,
+          0.29280875988324145
+        ],
+        [
+          -0.32010061508748616,
+          0.2931253921340985
+        ],
+        [
+          -0.32142395276157676,
+          0.29354622922752266
+        ],
+        [
+          -0.3244490903329577,
+          0.2946396289999516
+        ],
+        [
+          -0.3258989984101781,
+          0.29523696467850785
+        ],
+        [
+          -0.32729084952930165,
+          0.29595931764448763
+        ],
+        [
+          -0.5699189132561547,
+          0.43574567226745886
+        ],
+        [
+          -0.5712051861046438,
+          0.436561799076659
+        ],
+        [
+          -0.5724171441578283,
+          0.4374846850321141
+        ],
+        [
+          -0.7126354679428579,
+          0.5540436519317906
+        ],
+        [
+          -0.7139020336901016,
+          0.5552040494077135
+        ],
+        [
+          -0.7150511249536717,
+          0.5564808815666936
+        ],
+        [
+          -0.7160720880227768,
+          0.5578623103581059
+        ],
+        [
+          -0.716955457117272,
+          0.5593355279717358
+        ],
+        [
+          -0.7176930421489086,
+          0.560886875584402
+        ],
+        [
+          -0.7182780046551025,
+          0.5625019699966783
+        ],
+        [
+          -0.7187049212012125,
+          0.564165836985616
+        ],
+        [
+          -0.7189698336634947,
+          0.565863050137093
+        ],
+        [
+          -0.7190702859265404,
+          0.5675778738706202
+        ],
+        [
+          -0.7190053466549609,
+          0.5692944093305585
+        ],
+        [
+          -0.7187756179281908,
+          0.5709967417911301
+        ],
+        [
+          -0.7183832296583555,
+          0.5726690882085672
+        ],
+        [
+          -0.7178318198429557,
+          0.5742959435523823
+        ],
+        [
+          -0.6869807156035405,
+          0.6526834051945076
+        ],
+        [
+          -0.6862467027740711,
+          0.65430575067667
+        ],
+        [
+          -0.6853546148628198,
+          0.6558468408284513
+        ],
+        [
+          -0.6843133396521984,
+          0.6572913219231922
+        ],
+        [
+          -0.6831332512627235,
+          0.6586248027405811
+        ],
+        [
+          -0.6818261067966938,
+          0.6598339979449407
+        ],
+        [
+          -0.6804049292033592,
+          0.6609068604456935
+        ],
+        [
+          -0.6788838775325828,
+          0.6618327014213189
+        ],
+        [
+          -0.6772781058696477,
+          0.6626022968110091
+        ],
+        [
+          -0.6756036123566234,
+          0.6632079792130628
+        ],
+        [
+          -0.6738770798044814,
+          0.6636437142744391
+        ],
+        [
+          -0.6721157094839225,
+          0.6639051608104118
+        ],
+        [
+          -0.6703370497508405,
+          0.6639897140553579
+        ],
+        [
+          -0.668558821213813,
+          0.6638965316137759
+        ],
+        [
+          -0.6667987401854544,
+          0.6636265418529883
+        ],
+        [
+          -0.6650743421765698,
+          0.6631824346539101
+        ],
+        [
+          -0.3929875212242028,
+          0.5784214518619218
+        ],
+        [
+          -0.3907112850059309,
+          0.5775373077574255
+        ],
+        [
+          -0.26258342209313557,
+          0.5173766542326732
+        ],
+        [
+          -0.26108031493810374,
+          0.5165813513689315
+        ],
+        [
+          -0.25965976107117233,
+          0.5156465441825394
+        ],
+        [
+          -0.25833466826543666,
+          0.5145807267400234
+        ],
+        [
+          -0.2571170768930816,
+          0.5133935835243371
+        ],
+        [
+          -0.2184779294841167,
+          0.47194888191316964
+        ],
+        [
+          -0.2174234717642568,
+          0.47070897507942905
+        ],
+        [
+          -0.21648641049707001,
+          0.4693781233893947
+        ],
+        [
+          -0.2156745459703651,
+          0.46796740512212553
+        ],
+        [
+          -0.2149946363089219,
+          0.4664885633822477
+        ],
+        [
+          -0.2144523412184917,
+          0.4649539083479732
+        ],
+        [
+          -0.2140521748732601,
+          0.4633762147986827
+        ],
+        [
+          -0.17857875212949284,
+          0.2908339802210258
+        ]
+      ]
+    },
+    {
+      "color": "#9c755f",
+      "label_anchor": [
+        -0.2622644007371132,
+        0.3109275468936789
+      ],
+      "name": "African-Islamic",
+      "points": [
+        [
+          -0.04555729505468737,
+          0.15239687075610253
+        ],
+        [
+          -0.045073902766880836,
+          0.15071166197351435
+        ],
+        [
+          -0.044758254795397544,
+          0.1489871437500903
+        ],
+        [
+          -0.04461339952358866,
+          0.14723997069196115
+        ],
+        [
+          -0.044640735897238076,
+          0.1454870161952617
+        ],
+        [
+          -0.04483999991418568,
+          0.143745209490609
+        ],
+        [
+          -0.04520926717393907,
+          0.142031372148357
+        ],
+        [
+          -0.04574497146265101,
+          0.14036205562358442
+        ],
+        [
+          -0.04644193919397727,
+          0.1387533814097322
+        ],
+        [
+          -0.047293439373200935,
+          0.13722088534461319
+        ],
+        [
+          -0.04829124860209249,
+          0.13577936757241543
+        ],
+        [
+          -0.04942573049671865,
+          0.1344427496106969
+        ],
+        [
+          -0.05068592875121912,
+          0.13322393990275347
+        ],
+        [
+          -0.052059672948783955,
+          0.13213470915379338
+        ],
+        [
+          -0.05353369609795772,
+          0.1311855766548645
+        ],
+        [
+          -0.055093762759158685,
+          0.1303857086923654
+        ],
+        [
+          -0.05672480652402587,
+          0.12974283002425527
+        ],
+        [
+          -0.05841107551988145,
+          0.12926314927788393
+        ],
+        [
+          -0.060136284534093254,
+          0.1289512989899163
+        ],
+        [
+          -0.06188377228918987,
+          0.12881029086741777
+        ],
+        [
+          -0.06363666234983753,
+          0.12884148670216855
+        ],
+        [
+          -0.15715787539196804,
+          0.13511220803969137
+        ],
+        [
+          -0.15880289421160895,
+          0.13529950854132144
+        ],
+        [
+          -0.16042346479046224,
+          0.13563850617234377
+        ],
+        [
+          -0.16200562912329639,
+          0.13612628113971195
+        ],
+        [
+          -0.16353575999860767,
+          0.13675863222835083
+        ],
+        [
+          -0.16500067837005203,
+          0.1375301129863017
+        ],
+        [
+          -0.16638776686782208,
+          0.13843407863511673
+        ],
+        [
+          -0.2884088489342927,
+          0.22628299582650832
+        ],
+        [
+          -0.2885694221592832,
+          0.22639996324587355
+        ],
+        [
+          -0.32760440012904546,
+          0.25516849674579306
+        ],
+        [
+          -0.3288716885559032,
+          0.256195089220871
+        ],
+        [
+          -0.3300399276971503,
+          0.2573331267314972
+        ],
+        [
+          -0.3310993537561906,
+          0.2585730978973557
+        ],
+        [
+          -0.493940819269103,
+          0.46782359815856556
+        ],
+        [
+          -0.4949297872570141,
+          0.4692292160830342
+        ],
+        [
+          -0.4957789073125994,
+          0.47072347662320224
+        ],
+        [
+          -0.49648029859182713,
+          0.47229251126403193
+        ],
+        [
+          -0.49702745134941423,
+          0.4739217574978975
+        ],
+        [
+          -0.4974152873570044,
+          0.47559609398197616
+        ],
+        [
+          -0.49764020703516776,
+          0.4772999808822942
+        ],
+        [
+          -0.4977001228617787,
+          0.47901760410186883
+        ],
+        [
+          -0.49759447874670437,
+          0.4807330220543371
+        ],
+        [
+          -0.4973242551929824,
+          0.48243031362083777
+        ],
+        [
+          -0.4968919601965863,
+          0.4840937259169302
+        ],
+        [
+          -0.49630160596924044,
+          0.48570782049809796
+        ],
+        [
+          -0.49555867170032264,
+          0.4872576166468762
+        ],
+        [
+          -0.4946700527034704,
+          0.48872873041172704
+        ],
+        [
+          -0.49364399641986906,
+          0.49010750810721776
+        ],
+        [
+          -0.49249002587218843,
+          0.4913811530364606
+        ],
+        [
+          -0.49121885127960624,
+          0.49253784425968045
+        ],
+        [
+          -0.4898422706542353,
+          0.49356684630659475
+        ],
+        [
+          -0.48837306030153943,
+          0.4944586088143465
+        ],
+        [
+          -0.48682485624102273,
+          0.49520485516623036
+        ],
+        [
+          -0.48521202764775045,
+          0.4957986593085397
+        ],
+        [
+          -0.4835495434893141,
+          0.49623451003258257
+        ],
+        [
+          -0.4818528335960087,
+          0.49650836212525307
+        ],
+        [
+          -0.48013764545365584,
+          0.4966176739134205
+        ],
+        [
+          -0.4784198980482055,
+          0.49656143085367865
+        ],
+        [
+          -0.4767155341186134,
+          0.49634015494851574
+        ],
+        [
+          -0.4750403721892612,
+          0.49595589990150996
+        ],
+        [
+          -0.47340995975523653,
+          0.4954122320565181
+        ],
+        [
+          -0.13663399291357853,
+          0.3647708654430001
+        ],
+        [
+          -0.13495467198282562,
+          0.3640175904385825
+        ],
+        [
+          -0.13336190007971108,
+          0.3630952999824929
+        ],
+        [
+          -0.13187263064947974,
+          0.36201381092340645
+        ],
+        [
+          -0.13050271545828274,
+          0.36078463461804067
+        ],
+        [
+          -0.12926673586716653,
+          0.3594208544044104
+        ],
+        [
+          -0.12817784762823897,
+          0.3579369863429338
+        ],
+        [
+          -0.1272476408549999,
+          0.35634882470765694
+        ],
+        [
+          -0.09231736974264501,
+          0.28896481094100157
+        ],
+        [
+          -0.09174761631627085,
+          0.2877571039557324
+        ],
+        [
+          -0.09126979569195023,
+          0.28651016266597296
+        ],
+        [
+          -0.04555729505468737,
+          0.15239687075610253
+        ]
+      ]
+    },
+    {
+      "color": "#e15759",
+      "label_anchor": [
+        -0.32462922740218986,
+        0.5028837727633183
+      ],
+      "name": "East Asia",
+      "points": [
+        [
+          -0.22051677418525356,
+          0.3830976193873204
+        ],
+        [
+          -0.22169646884171426,
+          0.38174771388090806
+        ],
+        [
+          -0.22300568911252247,
+          0.3805230234542168
+        ],
+        [
+          -0.2244312138832836,
+          0.37943591560001333
+        ],
+        [
+          -0.22595864754274197,
+          0.3784973684383438
+        ],
+        [
+          -0.22757256535634976,
+          0.3777168598543783
+        ],
+        [
+          -0.22925666923240082,
+          0.37710227178632444
+        ],
+        [
+          -0.23099395230773073,
+          0.3766598106299541
+        ],
+        [
+          -0.23276687069092042,
+          0.3763939445635365
+        ],
+        [
+          -0.23455752062866034,
+          0.37630735842609836
+        ],
+        [
+          -0.23634781930616713,
+          0.37640092660467267
+        ],
+        [
+          -0.23811968745584658,
+          0.3766737042043321
+        ],
+        [
+          -0.23985523193013483,
+          0.3771229365901769
+        ],
+        [
+          -0.24153692639481367,
+          0.37774408720491776
+        ],
+        [
+          -0.32848306486414436,
+          0.41492356789438145
+        ],
+        [
+          -0.33056608400246856,
+          0.4159806188158823
+        ],
+        [
+          -0.40753175477545023,
+          0.4616063874416509
+        ],
+        [
+          -0.40897279723053936,
+          0.4625577991132724
+        ],
+        [
+          -0.4103151060979531,
+          0.46364407459892487
+        ],
+        [
+          -0.4115461051948268,
+          0.4648550365098713
+        ],
+        [
+          -0.4126542612070894,
+          0.46617933926179517
+        ],
+        [
+          -0.4136291917458653,
+          0.4676045753723499
+        ],
+        [
+          -0.4144617626207804,
+          0.46911739170770267
+        ],
+        [
+          -0.4151441734188113,
+          0.4707036145889516
+        ],
+        [
+          -0.41567003058688473,
+          0.4723483825862852
+        ],
+        [
+          -0.4502546052448333,
+          0.6018188654664807
+        ],
+        [
+          -0.4506241119799223,
+          0.6035379009722229
+        ],
+        [
+          -0.4508226008947932,
+          0.6052849614886197
+        ],
+        [
+          -0.450848143835004,
+          0.6070430757782732
+        ],
+        [
+          -0.450700492672171,
+          0.6087951652255883
+        ],
+        [
+          -0.4503810817143293,
+          0.6105242097412932
+        ],
+        [
+          -0.4498930137728251,
+          0.6122134130984278
+        ],
+        [
+          -0.4492410300210887,
+          0.6138463660936945
+        ],
+        [
+          -0.4484314639380844,
+          0.6154072059491978
+        ],
+        [
+          -0.4474721797838391,
+          0.6168807704061161
+        ],
+        [
+          -0.4463724962047078,
+          0.6182527450134131
+        ],
+        [
+          -0.44514309571048827,
+          0.6195098021808051
+        ],
+        [
+          -0.44379592090273784,
+          0.6206397306451962
+        ],
+        [
+          -0.44234405846234914,
+          0.6216315540929264
+        ],
+        [
+          -0.440801612023348,
+          0.6224756377855134
+        ],
+        [
+          -0.439183565167839,
+          0.623163782153111
+        ],
+        [
+          -0.4375056358729886,
+          0.6236893024464979
+        ],
+        [
+          -0.4357841238239717,
+          0.6240470936738478
+        ],
+        [
+          -0.4340357520761104,
+          0.624233680191472
+        ],
+        [
+          -0.43227750460432324,
+          0.6242472494668012
+        ],
+        [
+          -0.4305264613179593,
+          0.6240876696856309
+        ],
+        [
+          -0.428799632143708,
+          0.6237564910325849
+        ],
+        [
+          -0.31887950913989427,
+          0.5969988638652451
+        ],
+        [
+          -0.31736605684510083,
+          0.5965587888043229
+        ],
+        [
+          -0.3158973536616433,
+          0.5959868492386667
+        ],
+        [
+          -0.3144848637159703,
+          0.5952875095063236
+        ],
+        [
+          -0.3131396123558354,
+          0.5944662283815457
+        ],
+        [
+          -0.3118721000907162,
+          0.5935294164657197
+        ],
+        [
+          -0.28193478414274287,
+          0.5692868579773933
+        ],
+        [
+          -0.28058353435467365,
+          0.5680737223519975
+        ],
+        [
+          -0.2793626105274834,
+          0.5667295054634112
+        ],
+        [
+          -0.27828466301914356,
+          0.5652681351459948
+        ],
+        [
+          -0.19349281747429473,
+          0.4371430614571652
+        ],
+        [
+          -0.1926146666092443,
+          0.4356661969461437
+        ],
+        [
+          -0.19188266613849547,
+          0.43411170248281267
+        ],
+        [
+          -0.19130360635108662,
+          0.43249399809439387
+        ],
+        [
+          -0.19088285880548544,
+          0.4308280901651931
+        ],
+        [
+          -0.19062432650115851,
+          0.4291294322321993
+        ],
+        [
+          -0.1905304076730008,
+          0.4274137816327412
+        ],
+        [
+          -0.19060197354448127,
+          0.4256970533339872
+        ],
+        [
+          -0.19083836024587292,
+          0.4239951723002165
+        ],
+        [
+          -0.19123737497253776,
+          0.42232392576735306
+        ],
+        [
+          -0.19179531632613944,
+          0.4206988167951162
+        ],
+        [
+          -0.19250700865009188,
+          0.4191349204552872
+        ],
+        [
+          -0.19336585004073636,
+          0.4176467439901396
+        ],
+        [
+          -0.19436387358887858,
+          0.41624809223825243
+        ],
+        [
+          -0.22051677418525356,
+          0.3830976193873204
+        ]
+      ]
+    },
+    {
+      "color": "#f28e2b",
+      "label_anchor": [
+        -0.2587065683705874,
+        0.30857035247946313
+      ],
+      "name": "Latin America",
+      "points": [
+        [
+          -0.15779051915937622,
+          0.18078406595792054
+        ],
+        [
+          -0.15807811928643273,
+          0.17909765517587256
+        ],
+        [
+          -0.15852593037092996,
+          0.17744654633891113
+        ],
+        [
+          -0.15912983435903785,
+          0.17584592298157875
+        ],
+        [
+          -0.15988427777247655,
+          0.17431050437585274
+        ],
+        [
+          -0.16078232277809307,
+          0.1728544101732759
+        ],
+        [
+          -0.16181571098791311,
+          0.17149103056117385
+        ],
+        [
+          -0.16297493940296515,
+          0.17023290312699774
+        ],
+        [
+          -0.16424934780250022,
+          0.1690915975631433
+        ],
+        [
+          -0.16562721677497969,
+          0.1680776092724964
+        ],
+        [
+          -0.16709587548934127,
+          0.1672002628531041
+        ],
+        [
+          -0.1686418182154832,
+          0.16646762634952308
+        ],
+        [
+          -0.17025082852244866,
+          0.1658864370593864
+        ],
+        [
+          -0.17190811001218798,
+          0.16546203957746874
+        ],
+        [
+          -0.1735984223866768,
+          0.16519833664699463
+        ],
+        [
+          -0.17530622159712134,
+          0.16509775327015905
+        ],
+        [
+          -0.17701580278644444,
+          0.1651612144078988
+        ],
+        [
+          -0.17871144471055844,
+          0.16538813647398662
+        ],
+        [
+          -0.18037755431033242,
+          0.16577643270166809
+        ],
+        [
+          -0.32026677619955435,
+          0.20553833746357283
+        ],
+        [
+          -0.3220387480763285,
+          0.20614418303942247
+        ],
+        [
+          -0.3624506546737684,
+          0.2223768943600997
+        ],
+        [
+          -0.36398008800316856,
+          0.22307668176012188
+        ],
+        [
+          -0.36543682198020266,
+          0.2239173926702832
+        ],
+        [
+          -0.36680790830545856,
+          0.22489155436271738
+        ],
+        [
+          -0.36808115996570023,
+          0.22599050792133654
+        ],
+        [
+          -0.36924525955913445,
+          0.22720448520731684
+        ],
+        [
+          -0.37028985989106483,
+          0.22852269568400138
+        ],
+        [
+          -0.37120567594577997,
+          0.22993342232947026
+        ],
+        [
+          -0.3719845674171774,
+          0.23142412578425064
+        ],
+        [
+          -0.3726196110645418,
+          0.2329815558084418
+        ],
+        [
+          -0.37310516225033774,
+          0.23459186905755888
+        ],
+        [
+          -0.3734369051130333,
+          0.2362407521302358
+        ],
+        [
+          -0.3736118909289894,
+          0.23791354879406676
+        ],
+        [
+          -0.3837120900412567,
+          0.41469875600537043
+        ],
+        [
+          -0.3837276335374309,
+          0.4164102582456802
+        ],
+        [
+          -0.3835790909274787,
+          0.41811537308400837
+        ],
+        [
+          -0.38326782950412724,
+          0.419798405420356
+        ],
+        [
+          -0.38279671434077545,
+          0.42144386341791124
+        ],
+        [
+          -0.3821700819193034,
+          0.42303660110102753
+        ],
+        [
+          -0.3813937002139827,
+          0.424561957769647
+        ],
+        [
+          -0.3804747155989043,
+          0.4260058929468996
+        ],
+        [
+          -0.379421587067625,
+          0.4273551156177231
+        ],
+        [
+          -0.37824400837052397,
+          0.4285972065688987
+        ],
+        [
+          -0.3769528187865707,
+          0.42972073270439765
+        ],
+        [
+          -0.37555990335082706,
+          0.43071535228379754
+        ],
+        [
+          -0.37407808345605964,
+          0.43157191011507917
+        ],
+        [
+          -0.37252099883544426,
+          0.4322825218255805
+        ],
+        [
+          -0.3709029820126787,
+          0.4328406464354178
+        ],
+        [
+          -0.369238926375154,
+          0.4332411465653564
+        ],
+        [
+          -0.3675441490845346,
+          0.4334803357249336
+        ],
+        [
+          -0.36583425008661563,
+          0.4335560122455616
+        ],
+        [
+          -0.36412496851823273,
+          0.4334674795462641
+        ],
+        [
+          -0.14805910866887914,
+          0.41184574863949547
+        ],
+        [
+          -0.14630456082601934,
+          0.41158149296962665
+        ],
+        [
+          -0.14458494131301916,
+          0.4111442539932637
+        ],
+        [
+          -0.1429172608976172,
+          0.41053835695248325
+        ],
+        [
+          -0.14131801655719367,
+          0.4097697954835264
+        ],
+        [
+          -0.13980302828787358,
+          0.40884617232673326
+        ],
+        [
+          -0.13838728261044325,
+          0.40777662411894683
+        ],
+        [
+          -0.137084784321146,
+          0.40657173101235206
+        ],
+        [
+          -0.13590841795386369,
+          0.40524341201381714
+        ],
+        [
+          -0.13486982032412326,
+          0.4038048070800569
+        ],
+        [
+          -0.13397926541574479,
+          0.40227014713495346
+        ],
+        [
+          -0.13324556274885202,
+          0.40065461329484475
+        ],
+        [
+          -0.13267597023460573,
+          0.3989741866943482
+        ],
+        [
+          -0.13227612237871617,
+          0.39724549039826773
+        ],
+        [
+          -0.1320499745439574,
+          0.3954856249634189
+        ],
+        [
+          -0.13199976382304823,
+          0.3937119992770218
+        ],
+        [
+          -0.13212598690895183,
+          0.39194215834503754
+        ],
+        [
+          -0.15779051915937622,
+          0.18078406595792054
+        ]
+      ]
+    }
+  ],
   "zones": {
     "African-Islamic": [
       "Azerbaijan",
