@@ -8,8 +8,9 @@
   },
   "qwen_toggle": "clicked, family group hidden, country coordinates invariant",
   "tooltip": "pointer hover and focus show model, family, coordinates, readout, samples and release metadata",
+  "visual_contract": "four smooth SVG paths, no zone polygons, source note right of title",
   "hashes": {
     "wvs_map_data.json": "b45e8cd6396b2d78570af67a5a01992a85ec7b2bb3bca776264aaeaa7057589a",
-    "index.html": "f376a62a94a4df7bac9bfb6252b227fa7aac77647e6c32d5b0a2158dd11fd04b"
+    "index.html": "092bb3ba210cbd2b857d1d459773fb81e2699310cb2fa9ed294e7f81aab12d0b"
   }
 }

@@ -63,6 +63,26 @@ export function placeLabels(data, geometry) {
   return placements;
 }
 
+export function roundedHull(points, geometry) {
+  const p = points.slice(0, -1).map(([x, y]) => ({ x: geometry.x(x), y: geometry.y(y) }));
+  if (p.length < 3) throw new Error('a closed hull needs three points');
+  const at = index => p[(index + p.length) % p.length];
+  const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  const toward = (a, b, amount) => ({ x: a.x + (b.x - a.x) * amount, y: a.y + (b.y - a.y) * amount });
+  const corner = index => {
+    const previous = at(index - 1), current = at(index), next = at(index + 1);
+    const radius = Math.min(0.24, 14 / distance(previous, current), 14 / distance(current, next));
+    return { before: toward(current, previous, radius), current, after: toward(current, next, radius) };
+  };
+  const first = corner(0);
+  let path = `M ${first.after.x} ${first.after.y}`;
+  for (let index = 1; index <= p.length; index += 1) {
+    const c = corner(index % p.length);
+    path += ` L ${c.before.x} ${c.before.y} Q ${c.current.x} ${c.current.y} ${c.after.x} ${c.after.y}`;
+  }
+  return `${path} Z`;
+}
+
 export function assertLayout(data) {
   const geometry = projectGeometry(data);
   const labels = placeLabels(data, geometry);

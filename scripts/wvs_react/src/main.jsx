@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { VIEW, assertLayout } from './layout.js';
+import { VIEW, assertLayout, roundedHull } from './layout.js';
 import './style.css';
 
 function Tooltip({ active, geometry, data }) {
@@ -72,13 +72,13 @@ function Map({ data }) {
         <g className="grid">{Array.from({ length: 8 }, (_, index) => <line key={`v${index}`} x1={geometry.bounds.left + index * (geometry.bounds.right - geometry.bounds.left) / 7} y1={geometry.bounds.top} x2={geometry.bounds.left + index * (geometry.bounds.right - geometry.bounds.left) / 7} y2={geometry.bounds.bottom} />)}{Array.from({ length: 6 }, (_, index) => <line key={`h${index}`} x1={geometry.bounds.left} y1={geometry.bounds.top + index * (geometry.bounds.bottom - geometry.bounds.top) / 5} x2={geometry.bounds.right} y2={geometry.bounds.top + index * (geometry.bounds.bottom - geometry.bounds.top) / 5} />)}</g>
         <line className="median" x1={geometry.bounds.left} y1={yMedian} x2={geometry.bounds.right} y2={yMedian} />
         <line className="median" x1={xMedian} y1={geometry.bounds.top} x2={xMedian} y2={geometry.bounds.bottom} />
-        {data.zone_hulls.map(zone => <polygon key={zone.name} className="zone" points={zone.points.map(([px, py]) => `${geometry.x(px)},${geometry.y(py)}`).join(' ')} stroke={zone.color} />)}
+        {data.zone_hulls.map(zone => <path key={zone.name} className="zone" d={roundedHull(zone.points, geometry)} stroke={zone.color} />)}
         {data.countries.map(country => <g key={country.name}><circle className="country" data-country={country.name} data-x={country.x} data-y={country.y} cx={geometry.x(country.x)} cy={geometry.y(country.y)} r="3.5" fill={country.color} />{country.label && <text className="country-label" x={labels[`country:${country.name}`].cx} y={labels[`country:${country.name}`].cy + 4} textAnchor="middle">{country.name}</text>}</g>)}
         {data.zone_hulls.map(zone => <text key={zone.name} className="zone-label" x={labels[`zone:${zone.name}`].cx} y={labels[`zone:${zone.name}`].cy + 5} textAnchor="middle" fill={zone.color}>{zone.name}</text>)}
         {Object.entries(groups).map(([family, models]) => <g key={family} data-family={family} display={hidden.has(family) ? 'none' : 'inline'}>{models.map(model => <ModelMarker key={model.name} model={model} placement={labels} geometry={geometry} setActive={setActive} clearActive={clearActive} markerRef={model.name === focusName ? focusRef : null} logo={data.logos[model.family]} />)}</g>)}
         <g className="poles"><line x1={xMedian} y1="62" x2={xMedian} y2={geometry.bounds.top} markerEnd="url(#arrow)" /><line x1={xMedian} y1={geometry.bounds.bottom} x2={xMedian} y2="838" markerEnd="url(#arrow)" /><line x1="64" y1={yMedian} x2={geometry.bounds.left} y2={yMedian} markerEnd="url(#arrow)" /><line x1={geometry.bounds.right} y1={yMedian} x2="1184" y2={yMedian} markerEnd="url(#arrow)" /><text x={xMedian} y="40" textAnchor="middle">{data.axis.y[1]}</text><text x={xMedian} y="870" textAnchor="middle">{data.axis.y[0]}</text><text x="25" y={yMedian + 7}>{data.axis.x[0]}</text><text x="1136" y={yMedian + 7} textAnchor="end">{data.axis.x[1]}</text></g>
         <text className="map-title" x={geometry.bounds.left + 8} y={geometry.bounds.bottom - 34}>{data.title.split('\n').map((line, index) => <tspan key={line} x={geometry.bounds.left + 8} dy={index ? 17 : 0}>{line}</tspan>)}</text>
-        <text className="map-note" x={geometry.bounds.left + 8} y={geometry.bounds.bottom - 7}>{data.note.split('\n').map((line, index) => <tspan key={line} x={geometry.bounds.left + 8} dy={index ? 11 : 0}>{line}</tspan>)}</text>
+        <text className="map-note" x={geometry.bounds.right - 8} y={geometry.bounds.bottom - 20} textAnchor="end">{data.note.split('\n').map((line, index) => <tspan key={line} x={geometry.bounds.right - 8} dy={index ? 11 : 0}>{line}</tspan>)}</text>
       </svg>
       <Tooltip active={active} geometry={geometry} data={data} />
     </div>

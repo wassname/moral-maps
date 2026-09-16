@@ -44,6 +44,10 @@ def main() -> None:
         screenshot(page, f"{BASE}/", "wvs_vanilla_playwright.png")
         screenshot(page, f"{BASE}/react/", "wvs_react_playwright_default.png")
         page.wait_for_selector("svg .model-mark")
+        assert page.locator("path.zone").count() == 4
+        assert page.locator("polygon.zone").count() == 0
+        assert page.locator(".map-note").get_attribute("text-anchor") == "end"
+        assert float(page.locator(".map-note").get_attribute("x")) > float(page.locator(".map-title").get_attribute("x"))
         assert float(page.locator("svg").get_attribute("data-median-x")) == data["median"]["x"]
         assert float(page.locator("svg").get_attribute("data-median-y")) == data["median"]["y"]
         rendered_models = page.locator(".model-mark").evaluate_all(
@@ -108,6 +112,7 @@ def main() -> None:
                    "numeric_model_country_median_equality": "verified against DOM data attributes"},
         "qwen_toggle": "clicked, family group hidden, country coordinates invariant",
         "tooltip": "pointer hover and focus show model, family, coordinates, readout, samples and release metadata",
+        "visual_contract": "four smooth SVG paths, no zone polygons, source note right of title",
         "hashes": hashes,
     }, indent=2))
 
