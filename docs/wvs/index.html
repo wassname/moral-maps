@@ -14,7 +14,7 @@
 </style>
 <main>
   <h1>Frontier LLMs on the World Values Survey</h1>
-  <p>Rated sampling, 12 items x 12 samples for new points. Filled chips are visible; an outlined, struck-through chip hides that family’s stars and latest-release name. Grey dots are WVS countries, coloured stars are models, and dashed hulls are cultural regions. Coordinates, labels, family membership and colours come from <code>wvs_map_data.json</code>, the generated artifact shared with the static map.</p>
+  <p>Rated sampling, 12 items x 12 samples for new points. Filled chips are visible; an outlined, struck-through chip hides that family’s stars. Each chip carries the family’s latest-release name. Grey dots are WVS countries, coloured stars are models, and dashed hulls are cultural regions. Coordinates, labels, family membership and colours come from <code>wvs_map_data.json</code>, the generated artifact shared with the static map.</p>
   <div id="controls" aria-label="Model family visibility"></div>
   <svg id="map" viewBox="0 0 1000 720" role="img" aria-label="WVS map of model and country coordinates"></svg>
   <p>Historical coordinates are recovered rounded display values. Coder and vision-language Qwen variants are visible but are specialized variants, not direct-instruct size-trend evidence. See the repository CI table and request ledger for sample and protocol evidence.</p>
@@ -33,7 +33,7 @@ fetch('wvs_map_data.json').then(r => { if (!r.ok) throw new Error(`data: ${r.sta
   const groups=new Map(); for(const p of data.models) groups.set(p.family,[...(groups.get(p.family)||[]),p]); const hidden=new Set(new URLSearchParams(location.search).get('hide')?.split(',').filter(Boolean));
   for (const [family,points] of groups) { const group=el('g',{'data-family':family}); for(const p of points) { const star=el('path',{d:`M ${x(p.x)} ${y(p.y)-8} L ${x(p.x)+2.4} ${y(p.y)-2.4} L ${x(p.x)+8} ${y(p.y)-2.4} L ${x(p.x)+3.6} ${y(p.y)+1.6} L ${x(p.x)+5.2} ${y(p.y)+7} L ${x(p.x)} ${y(p.y)+4} L ${x(p.x)-5.2} ${y(p.y)+7} L ${x(p.x)-3.6} ${y(p.y)+1.6} L ${x(p.x)-8} ${y(p.y)-2.4} L ${x(p.x)-2.4} ${y(p.y)-2.4} Z`,fill:p.color,class:'star'}); star.append(el('title',{},p.name)); group.append(star); } svg.append(group);
     const latest=points.find(p=>p.label)?.label ?? points[0].name, button=document.createElement('button'); button.textContent=`${family}: ${latest}`; button.style.setProperty('--color',points[0].color);
-    const setVisible=on=>{group.hidden=!on;button.classList.toggle('off',!on);button.setAttribute('aria-pressed',String(on));}; setVisible(!hidden.has(family)); button.onclick=()=>setVisible(group.hidden); document.querySelector('#controls').append(button);
+    let visible = !hidden.has(family); const setVisible=on=>{visible=on;group.setAttribute('display',on?'inline':'none');button.classList.toggle('off',!on);button.setAttribute('aria-pressed',String(on));}; setVisible(visible); button.onclick=()=>setVisible(!visible); document.querySelector('#controls').append(button);
   }
   for(const [text,px,py,anchor] of [[data.axis.x[0],margin,690,'start'],[data.axis.x[1],1000-margin,690,'end'],[data.axis.y[0],500,700,'middle'],[data.axis.y[1],500,28,'middle']]) svg.append(el('text',{x:px,y:py,'text-anchor':anchor,fill:'#57534e','font-weight':700},text));
 }).catch(error=>{document.body.append(`Could not load map data: ${error.message}`);});
