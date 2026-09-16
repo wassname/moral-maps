@@ -244,6 +244,8 @@ def main() -> None:
     ap.add_argument("--max-think-tokens", type=int, default=64)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--out", default="docs/img/wvs/wvs_map_iw.png")
+    ap.add_argument("--web-data", type=Path,
+                    help="write the coordinates, zones, family colors, and labels shared by the SVG page")
     ap.add_argument("--cache", default="slop/research/wvs/20260916_openrouter/wvs_iw_rated.json",
                     help="durable completed-panel cache, tracked with the request evidence")
     ap.add_argument("--records", default="slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
@@ -401,6 +403,22 @@ def main() -> None:
         if catalogued:
             latest = max(catalogued, key=lambda name: metadata[name]["created"])
             model_labels[latest] = latest.replace("claude-", "")
+    if args.web_data:
+        zones_all, _ = zones_for(countries)
+        zones = maps.select_spread_zones(P, countries, zones_all, 4)
+        sx, sy = maps.orient_geographic(P, countries, zones_all)
+        args.web_data.parent.mkdir(parents=True, exist_ok=True)
+        args.web_data.write_text(json.dumps({
+            "schema": 1,
+            "axis": {"x": (["Self-expression", "Survival"] if sx < 0 else ["Survival", "Self-expression"]),
+                     "y": (["Secular-Rational", "Traditional"] if sy < 0 else ["Traditional", "Secular-Rational"])},
+            "countries": [{"name": name, "x": float(x * sx), "y": float(y * sy)}
+                          for name, (x, y) in zip(countries, P)],
+            "zones": zones,
+            "models": [{"name": name, "x": float(v[0] * sx), "y": float(v[1] * sy),
+                        "family": maps.model_family(name), "color": maps.model_family_color(name),
+                        "label": model_labels.get(name)} for name, v in plot_models.items()],
+        }, indent=2, sort_keys=True) + "\n")
     # Poles in NATURAL data order (x_neg, x_pos, y_neg, y_pos): raw X is high on Self-expression, raw Y
     # high on Secular-Rational. plot_value_map's orient_geographic then flips X so the cultural West
     # lands in the west (Self-expression left) and confirms African-Islamic sits south -- the same

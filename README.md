@@ -14,6 +14,30 @@ The new panel adds Fable 5.1, GPT-6 Astra, DeepSeek V4.1 Flash, Kimi K3, Muse Sp
 
 Every model sits in the top-left, deep in the rich-world corner and often past its edge, and none of them sits near the African or Muslim societies. The push is almost all vertical. Measured in the standard deviations of the 29 Western societies, every model is more secular-rational than the average one, from +0.5 to +2.9 sigma, while on self-expression they land between -0.7 and +1.2 sigma, which is ordinary. So they are not so much an ultra Silicon Valley point as a place north of the map that no society occupies.
 
+### New WVS panels
+
+All rows below are complete 12 x 12 rated panels. The full [64-coordinate CI table](docs/img/wvs/wvs_model_ci.md) carries intervals; incomplete GLM 5.3 Flash and Grok 4.5 runs are deliberately absent.
+
+| model | self-expression | secular-rational | scope |
+|---|---:|---:|---|
+| claude-fable-5.1 | 0.58 | 0.61 | requested target |
+| gpt-6-astra | 0.46 | 0.68 | requested target |
+| deepseek-v4.1-flash | 0.54 | 0.60 | requested target |
+| kimi-k3 | 0.62 | 0.67 | requested target |
+| muse-spark-1.3 | 0.43 | 0.73 | requested target |
+| inkling | 0.56 | 0.69 | requested target, no schema |
+| glm-5.3 | 0.55 | 0.64 | requested target |
+| gemini-3.7-flash | 0.50 | 0.63 | requested target |
+| gpt-5.6-sol | 0.53 | 0.67 | requested target |
+| qwen-2.5-7b-instruct / 72b-instruct | 0.55 / 0.60 | 0.59 / 0.60 | direct-instruct size pair |
+| qwen3-8b / 32b / 235b-a22b | 0.62 / 0.61 / 0.64 | 0.54 / 0.54 / 0.56 | direct-instruct size series |
+| qwen3.5-9b / 122b-a10b / 397b-a17b | 0.50 / 0.48 / 0.54 | 0.59 / 0.62 / 0.65 | direct-instruct size series |
+| qwen3.6-27b / qwen3.7-flash / qwen3.8-27b | 0.46 / 0.65 / 0.43 | 0.68 / 0.59 / 0.69 | releases, not a size series |
+
+### Descriptive family trajectories
+
+These coordinates are descriptive survey measurements, not evidence that capability or release order causes values to change. Gemini moves from 2.5 Pro (0.47, 0.70) to 3.7 Flash (0.50, 0.63), lower on the secular-rational coordinate. The observed Grok series ends at 4.3 (0.44, 0.73); 4.5 is excluded at 143/144, so there is no valid 4.5 continuation. OpenAI's 5.3 Chat, 5.4, 5.5, 5.6 Sol and 6 Astra points vary on both axes rather than making a monotone path. DeepSeek V4 Flash, V4.1 Flash and V4 Pro are also non-monotone, especially on the secular-rational coordinate. Qwen direct-instruct size points overlap broadly across generations; Qwen Coder and VL points are shown on the map but are not used for the direct-instruct comparison.
+
 | model | z self-expr | z secular | Mahalanobis |
 |:------|------------:|----------:|------------:|
 | gpt-5.5 | -0.33 | +2.93 | +4.71 |

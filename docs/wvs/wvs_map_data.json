@@ -1,0 +1,1060 @@
+{
+  "axis": {
+    "x": [
+      "Self-expression",
+      "Survival"
+    ],
+    "y": [
+      "Traditional",
+      "Secular-Rational"
+    ]
+  },
+  "countries": [
+    {
+      "name": "Albania",
+      "x": -0.34060364901247114,
+      "y": 0.3916805236536717
+    },
+    {
+      "name": "Andorra",
+      "x": -0.19605307590900742,
+      "y": 0.2872413869286676
+    },
+    {
+      "name": "Argentina",
+      "x": -0.14983546774957562,
+      "y": 0.3940946003236249
+    },
+    {
+      "name": "Armenia",
+      "x": -0.20967830986161892,
+      "y": 0.29255690096003767
+    },
+    {
+      "name": "Australia",
+      "x": -0.31535990908305356,
+      "y": 0.31032377649703047
+    },
+    {
+      "name": "Austria",
+      "x": -0.5223037925191643,
+      "y": 0.5078291184737752
+    },
+    {
+      "name": "Azerbaijan",
+      "x": -0.47986189813334496,
+      "y": 0.47877999801292975
+    },
+    {
+      "name": "Bangladesh",
+      "x": -0.17771250910617192,
+      "y": 0.2185170445927002
+    },
+    {
+      "name": "Belarus",
+      "x": -0.212349244964338,
+      "y": 0.36911061913779203
+    },
+    {
+      "name": "Bolivia",
+      "x": -0.22977359116420062,
+      "y": 0.20575355630044792
+    },
+    {
+      "name": "Bosnia Herzegovina",
+      "x": -0.28340236345421765,
+      "y": 0.3122307018706097
+    },
+    {
+      "name": "Brazil",
+      "x": -0.35580112848666184,
+      "y": 0.2389311240190899
+    },
+    {
+      "name": "Bulgaria",
+      "x": -0.2033229406927835,
+      "y": 0.4487408597891542
+    },
+    {
+      "name": "Canada",
+      "x": -0.6007567432567432,
+      "y": 0.5379268033553748
+    },
+    {
+      "name": "Chile",
+      "x": -0.2699503964169258,
+      "y": 0.34544118642628935
+    },
+    {
+      "name": "China",
+      "x": -0.2931616820480187,
+      "y": 0.5554226781769104
+    },
+    {
+      "name": "Colombia",
+      "x": -0.3153892218892219,
+      "y": 0.22269841269841267
+    },
+    {
+      "name": "Croatia",
+      "x": -0.36594335295022884,
+      "y": 0.3633910239807433
+    },
+    {
+      "name": "Cyprus",
+      "x": -0.28541627696268346,
+      "y": 0.275419511986288
+    },
+    {
+      "name": "Czechia",
+      "x": -0.39829350897453486,
+      "y": 0.5613889766422442
+    },
+    {
+      "name": "Denmark",
+      "x": -0.6657300149147606,
+      "y": 0.6132750608247824
+    },
+    {
+      "name": "Ecuador",
+      "x": -0.21108824893522313,
+      "y": 0.1983233572911128
+    },
+    {
+      "name": "Egypt",
+      "x": -0.06244315954206919,
+      "y": 0.146641325722886
+    },
+    {
+      "name": "Estonia",
+      "x": -0.30423529124393484,
+      "y": 0.5025275669601471
+    },
+    {
+      "name": "Ethiopia",
+      "x": -0.15746570897181292,
+      "y": 0.19187722789895975
+    },
+    {
+      "name": "Finland",
+      "x": -0.5904731690324967,
+      "y": 0.551258795065921
+    },
+    {
+      "name": "France",
+      "x": -0.5270035214502415,
+      "y": 0.5002291086593103
+    },
+    {
+      "name": "Georgia",
+      "x": -0.1826306508561389,
+      "y": 0.2667335331015857
+    },
+    {
+      "name": "Germany",
+      "x": -0.5635260309183077,
+      "y": 0.5240198123611525
+    },
+    {
+      "name": "Great Britain",
+      "x": -0.5696608975609528,
+      "y": 0.5535328076982802
+    },
+    {
+      "name": "Greece",
+      "x": -0.3159964850208172,
+      "y": 0.36488193744987674
+    },
+    {
+      "name": "Guatemala",
+      "x": -0.28857627815228243,
+      "y": 0.36053619024439865
+    },
+    {
+      "name": "Hong Kong SAR",
+      "x": -0.36391469499921747,
+      "y": 0.4905954961653451
+    },
+    {
+      "name": "Hungary",
+      "x": -0.23152649865277466,
+      "y": 0.45978362150632446
+    },
+    {
+      "name": "Iceland",
+      "x": -0.7012314341663172,
+      "y": 0.5677624977921072
+    },
+    {
+      "name": "Indonesia",
+      "x": -0.12771297289425063,
+      "y": 0.2325335335335335
+    },
+    {
+      "name": "Iran",
+      "x": -0.23320783762949784,
+      "y": 0.31006771630666
+    },
+    {
+      "name": "Iraq",
+      "x": -0.15493449008064397,
+      "y": 0.19472631072631072
+    },
+    {
+      "name": "Italy",
+      "x": -0.4309070673593499,
+      "y": 0.3929868470977711
+    },
+    {
+      "name": "Japan",
+      "x": -0.4330191209998057,
+      "y": 0.6064228638325765
+    },
+    {
+      "name": "Jordan",
+      "x": -0.12159203648151506,
+      "y": 0.18432400980608574
+    },
+    {
+      "name": "Kazakhstan",
+      "x": -0.14308593129168692,
+      "y": 0.34813863139941176
+    },
+    {
+      "name": "Kenya",
+      "x": -0.2779854546506703,
+      "y": 0.2407609642518004
+    },
+    {
+      "name": "Kyrgyzstan",
+      "x": -0.10815566017933205,
+      "y": 0.2807546176327564
+    },
+    {
+      "name": "Latvia",
+      "x": -0.27016564606173954,
+      "y": 0.5012283231174919
+    },
+    {
+      "name": "Lebanon",
+      "x": -0.1511583350829206,
+      "y": 0.31222222222222223
+    },
+    {
+      "name": "Libya",
+      "x": -0.1559643725841997,
+      "y": 0.1529120470604088
+    },
+    {
+      "name": "Lithuania",
+      "x": -0.30962705001722174,
+      "y": 0.47393240841375395
+    },
+    {
+      "name": "Macau SAR",
+      "x": -0.3502817850634504,
+      "y": 0.5291951711604919
+    },
+    {
+      "name": "Malaysia",
+      "x": -0.3073090243090243,
+      "y": 0.314952380952381
+    },
+    {
+      "name": "Maldives",
+      "x": -0.2968042174615827,
+      "y": 0.19067102392882931
+    },
+    {
+      "name": "Mexico",
+      "x": -0.2223763800839733,
+      "y": 0.25423721830646473
+    },
+    {
+      "name": "Mongolia",
+      "x": -0.39843454634185715,
+      "y": 0.47695238095238096
+    },
+    {
+      "name": "Montenegro",
+      "x": -0.3363307985114117,
+      "y": 0.32891164603000833
+    },
+    {
+      "name": "Morocco",
+      "x": -0.31702043262043256,
+      "y": 0.2695294977517199
+    },
+    {
+      "name": "Myanmar",
+      "x": -0.12121613721877203,
+      "y": 0.2638412698412698
+    },
+    {
+      "name": "Netherlands",
+      "x": -0.5910713885704852,
+      "y": 0.5558970262624637
+    },
+    {
+      "name": "New Zealand",
+      "x": -0.6273472343683035,
+      "y": 0.5704989613162689
+    },
+    {
+      "name": "Nicaragua",
+      "x": -0.17550000000000002,
+      "y": 0.18293650793650792
+    },
+    {
+      "name": "Nigeria",
+      "x": -0.18111464192593707,
+      "y": 0.17117185934438867
+    },
+    {
+      "name": "North Macedonia",
+      "x": -0.261513717912872,
+      "y": 0.3289379201464618
+    },
+    {
+      "name": "Northern Ireland",
+      "x": -0.5610131103812875,
+      "y": 0.45120353089243065
+    },
+    {
+      "name": "Norway",
+      "x": -0.6482606082603507,
+      "y": 0.6022098618016261
+    },
+    {
+      "name": "Pakistan",
+      "x": -0.17719135939556657,
+      "y": 0.17695773137839582
+    },
+    {
+      "name": "Peru",
+      "x": -0.21419128606996862,
+      "y": 0.2249236535133877
+    },
+    {
+      "name": "Philippines",
+      "x": -0.21356483685541808,
+      "y": 0.2514514514514515
+    },
+    {
+      "name": "Poland",
+      "x": -0.3183850466544345,
+      "y": 0.3114171762694594
+    },
+    {
+      "name": "Portugal",
+      "x": -0.2864445498559326,
+      "y": 0.37983890694614153
+    },
+    {
+      "name": "Puerto Rico",
+      "x": -0.3513201895764486,
+      "y": 0.26447937989911013
+    },
+    {
+      "name": "Romania",
+      "x": -0.18777913100679502,
+      "y": 0.32834644808937796
+    },
+    {
+      "name": "Russia",
+      "x": -0.20290216042671308,
+      "y": 0.39898594766097434
+    },
+    {
+      "name": "Serbia",
+      "x": -0.3042549694628824,
+      "y": 0.36310433764281264
+    },
+    {
+      "name": "Singapore",
+      "x": -0.2345227370995448,
+      "y": 0.39414713163714865
+    },
+    {
+      "name": "Slovakia",
+      "x": -0.36274437089527634,
+      "y": 0.42741112797882286
+    },
+    {
+      "name": "Slovenia",
+      "x": -0.3898829991301483,
+      "y": 0.5382587376026676
+    },
+    {
+      "name": "South Korea",
+      "x": -0.323098997995992,
+      "y": 0.5796652366652367
+    },
+    {
+      "name": "Spain",
+      "x": -0.47164942718347297,
+      "y": 0.46868098799908825
+    },
+    {
+      "name": "Sweden",
+      "x": -0.6703803299269019,
+      "y": 0.6461499594342325
+    },
+    {
+      "name": "Switzerland",
+      "x": -0.5897355362828434,
+      "y": 0.5298550141086323
+    },
+    {
+      "name": "Taiwan ROC",
+      "x": -0.3214688755688755,
+      "y": 0.43132661232661235
+    },
+    {
+      "name": "Tajikistan",
+      "x": -0.13512499999999994,
+      "y": 0.28067047238475806
+    },
+    {
+      "name": "Thailand",
+      "x": -0.2740718953888065,
+      "y": 0.4148391067244298
+    },
+    {
+      "name": "Tunisia",
+      "x": -0.14877471009391358,
+      "y": 0.3089237903356695
+    },
+    {
+      "name": "Turkey",
+      "x": -0.21463936457744862,
+      "y": 0.27752480769341686
+    },
+    {
+      "name": "Ukraine",
+      "x": -0.234649923433698,
+      "y": 0.3830401025896393
+    },
+    {
+      "name": "United States",
+      "x": -0.5213565781484912,
+      "y": 0.4336910509567847
+    },
+    {
+      "name": "Uruguay",
+      "x": -0.3659013275989292,
+      "y": 0.41571633123039353
+    },
+    {
+      "name": "Venezuela",
+      "x": -0.26310707070707073,
+      "y": 0.2285162464051353
+    },
+    {
+      "name": "Vietnam",
+      "x": -0.20836983650316981,
+      "y": 0.4272976044880807
+    },
+    {
+      "name": "Zimbabwe",
+      "x": -0.14614597549313435,
+      "y": 0.17828757955153599
+    }
+  ],
+  "models": [
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.6-27b",
+      "x": -0.45740779531102105,
+      "y": 0.6795887184190553
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.5-35b-a3b",
+      "x": -0.538440257742794,
+      "y": 0.5530118458934986
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.6-max-preview",
+      "x": -0.4805424128340796,
+      "y": 0.6905543787488233
+    },
+    {
+      "color": "#7c3aed",
+      "family": "muse",
+      "label": "muse-spark-1.3",
+      "name": "muse-spark-1.3",
+      "x": -0.4253104631546661,
+      "y": 0.731799663031547
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.8-27b",
+      "x": -0.431934218610816,
+      "y": 0.6881570439623662
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": "qwen3.8-flash",
+      "name": "qwen3.8-flash",
+      "x": -0.4153054353054353,
+      "y": 0.6346365065494385
+    },
+    {
+      "color": "#14b8a6",
+      "family": "gemma",
+      "label": null,
+      "name": "gemma-4-31b-it",
+      "x": -0.36,
+      "y": 0.66
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.5-122b-a10b",
+      "x": -0.48469169991228817,
+      "y": 0.6190010643383659
+    },
+    {
+      "color": "#2b2d42",
+      "family": "grok",
+      "label": null,
+      "name": "grok-4.20",
+      "x": -0.59,
+      "y": 0.62
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.5-plus-20260420",
+      "x": -0.5856201899951899,
+      "y": 0.6494018547589976
+    },
+    {
+      "color": "#0ea5e9",
+      "family": "gemini",
+      "label": null,
+      "name": "gemini-2.5-pro",
+      "x": -0.47,
+      "y": 0.7
+    },
+    {
+      "color": "#2b2d42",
+      "family": "grok",
+      "label": null,
+      "name": "grok-4.3",
+      "x": -0.44,
+      "y": 0.73
+    },
+    {
+      "color": "#ec4899",
+      "family": "deepseek",
+      "label": null,
+      "name": "deepseek-v4-flash",
+      "x": -0.57,
+      "y": 0.64
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-5.4",
+      "x": -0.45,
+      "y": 0.68
+    },
+    {
+      "color": "#ec4899",
+      "family": "deepseek",
+      "label": "deepseek-v4.1-flash",
+      "name": "deepseek-v4.1-flash",
+      "x": -0.5419602854216832,
+      "y": 0.595896730624977
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-coder-30b-a3b-instruct",
+      "x": -0.5030952380952382,
+      "y": 0.5846967846967848
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-30b-a3b",
+      "x": -0.6707823388714307,
+      "y": 0.6060018656291949
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": "gpt-6-astra",
+      "name": "gpt-6-astra",
+      "x": -0.4569019748367575,
+      "y": 0.6751145899955423
+    },
+    {
+      "color": "#2ca02c",
+      "family": "mistral",
+      "label": null,
+      "name": "mistral-large-2512",
+      "x": -0.65,
+      "y": 0.64
+    },
+    {
+      "color": "#14b8a6",
+      "family": "gemma",
+      "label": null,
+      "name": "gemma-3-27b-it",
+      "x": -0.6,
+      "y": 0.6
+    },
+    {
+      "color": "#6d5ae0",
+      "family": "llama",
+      "label": null,
+      "name": "llama-4-maverick",
+      "x": -0.64,
+      "y": 0.64
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-coder",
+      "x": -0.598778659611993,
+      "y": 0.6204503168788883
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.7-flash",
+      "x": -0.6529354469060352,
+      "y": 0.5885508561103798
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-vl-235b-a22b-instruct",
+      "x": -0.5993276014109347,
+      "y": 0.5462479278681369
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen-plus",
+      "x": -0.6025617283950616,
+      "y": 0.6287037037037038
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-5.3-chat",
+      "x": -0.5,
+      "y": 0.67
+    },
+    {
+      "color": "#ec4899",
+      "family": "deepseek",
+      "label": null,
+      "name": "deepseek-v4-pro",
+      "x": -0.55,
+      "y": 0.73
+    },
+    {
+      "color": "#6d5ae0",
+      "family": "llama",
+      "label": null,
+      "name": "llama-4-scout",
+      "x": -0.62,
+      "y": 0.53
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-vl-30b-a3b-instruct",
+      "x": -0.5335737179487179,
+      "y": 0.5337214372928658
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.5-397b-a17b",
+      "x": -0.5408168991502326,
+      "y": 0.6493278669204595
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.5-plus-02-15",
+      "x": -0.5372045855379188,
+      "y": 0.6595114541543113
+    },
+    {
+      "color": "#dc2626",
+      "family": "glm",
+      "label": "glm-5.3",
+      "name": "glm-5.3",
+      "x": -0.5535321928702047,
+      "y": 0.6422322099171051
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.7-plus",
+      "x": -0.5078196649029982,
+      "y": 0.6664359119716262
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-30b-a3b-instruct-2507",
+      "x": -0.6450907949109246,
+      "y": 0.5437992771640354
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-5.5",
+      "x": -0.42,
+      "y": 0.76
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.6-35b-a3b",
+      "x": -0.6062280543530544,
+      "y": 0.5943180448406931
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.6-flash",
+      "x": -0.6514346395123706,
+      "y": 0.583014517676874
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.6-plus",
+      "x": -0.5196778711484593,
+      "y": 0.6698994127565557
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-235b-a22b",
+      "x": -0.6427511094043352,
+      "y": 0.5554953612269281
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen-2.5-72b-instruct",
+      "x": -0.6026546601546601,
+      "y": 0.5957470912477916
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen-plus-2025-07-28",
+      "x": -0.6417361111111111,
+      "y": 0.5127110103300581
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.7-max",
+      "x": -0.5036638266417679,
+      "y": 0.6503283973522069
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-235b-a22b-2507",
+      "x": -0.6353621031746031,
+      "y": 0.5685931857310826
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.5-9b",
+      "x": -0.5017202097104058,
+      "y": 0.5916881018254176
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen2.5-vl-72b-instruct",
+      "x": -0.5849525883130219,
+      "y": 0.59521139256589
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-vl-32b-instruct",
+      "x": -0.5966931216931217,
+      "y": 0.5338064713064713
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-5.6-sol",
+      "x": -0.5274474357644292,
+      "y": 0.6650744376984001
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-max-thinking",
+      "x": -0.5778139029180694,
+      "y": 0.6959770802908057
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-coder-plus",
+      "x": -0.6175297619047618,
+      "y": 0.5976147806792967
+    },
+    {
+      "color": "#0891b2",
+      "family": "inkling",
+      "label": "inkling",
+      "name": "inkling",
+      "x": -0.5614798614630517,
+      "y": 0.6880988993033613
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-vl-8b-instruct",
+      "x": -0.6061818582651916,
+      "y": 0.6004689754689754
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen-2.5-7b-instruct",
+      "x": -0.5509667037841642,
+      "y": 0.5895236753978316
+    },
+    {
+      "color": "#a16207",
+      "family": "kimi",
+      "label": "kimi-k3",
+      "name": "kimi-k3",
+      "x": -0.6214472858835399,
+      "y": 0.6710244268262847
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3.5-27b",
+      "x": -0.5974338624338624,
+      "y": 0.6515634387658198
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-32b",
+      "x": -0.6064902599972044,
+      "y": 0.5413085527420844
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-14b",
+      "x": -0.6137896825396826,
+      "y": 0.5819444444444445
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-coder-next",
+      "x": -0.6363133579397021,
+      "y": 0.5792251640447779
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-next-80b-a3b-instruct",
+      "x": -0.6652380952380952,
+      "y": 0.7022990677752582
+    },
+    {
+      "color": "#c026d3",
+      "family": "claude",
+      "label": null,
+      "name": "claude-opus-4.7",
+      "x": -0.59,
+      "y": 0.6
+    },
+    {
+      "color": "#7e22ce",
+      "family": "qwen",
+      "label": null,
+      "name": "qwen3-8b",
+      "x": -0.6217724867724868,
+      "y": 0.5391326046087952
+    },
+    {
+      "color": "#c026d3",
+      "family": "claude",
+      "label": null,
+      "name": "claude-opus-4.8",
+      "x": -0.61,
+      "y": 0.58
+    },
+    {
+      "color": "#0ea5e9",
+      "family": "gemini",
+      "label": "gemini-3.7-flash",
+      "name": "gemini-3.7-flash",
+      "x": -0.4988977072310405,
+      "y": 0.6262540369683227
+    },
+    {
+      "color": "#c026d3",
+      "family": "claude",
+      "label": "fable-5.1",
+      "name": "claude-fable-5.1",
+      "x": -0.5790919024614678,
+      "y": 0.6085929478125246
+    },
+    {
+      "color": "#c026d3",
+      "family": "claude",
+      "label": null,
+      "name": "claude-opus-4.6",
+      "x": -0.63,
+      "y": 0.63
+    }
+  ],
+  "schema": 1,
+  "zones": {
+    "African-Islamic": [
+      "Azerbaijan",
+      "Egypt",
+      "Ethiopia",
+      "Indonesia",
+      "Iran",
+      "Iraq",
+      "Jordan",
+      "Kazakhstan",
+      "Kenya",
+      "Kyrgyzstan",
+      "Lebanon",
+      "Libya",
+      "Malaysia",
+      "Morocco",
+      "Nigeria",
+      "Tajikistan",
+      "Tunisia",
+      "Turkey",
+      "Zimbabwe"
+    ],
+    "East Asia": [
+      "China",
+      "Hong Kong SAR",
+      "Japan",
+      "Macau SAR",
+      "Mongolia",
+      "Singapore",
+      "South Korea",
+      "Taiwan ROC",
+      "Vietnam"
+    ],
+    "Latin America": [
+      "Argentina",
+      "Bolivia",
+      "Brazil",
+      "Chile",
+      "Colombia",
+      "Ecuador",
+      "Guatemala",
+      "Mexico",
+      "Nicaragua",
+      "Peru",
+      "Philippines",
+      "Puerto Rico",
+      "Uruguay",
+      "Venezuela"
+    ],
+    "West": [
+      "Andorra",
+      "Australia",
+      "Austria",
+      "Canada",
+      "Croatia",
+      "Czechia",
+      "Denmark",
+      "Estonia",
+      "Finland",
+      "France",
+      "Germany",
+      "Great Britain",
+      "Hungary",
+      "Iceland",
+      "Italy",
+      "Latvia",
+      "Lithuania",
+      "Netherlands",
+      "New Zealand",
+      "Northern Ireland",
+      "Norway",
+      "Poland",
+      "Portugal",
+      "Slovakia",
+      "Slovenia",
+      "Spain",
+      "Sweden",
+      "Switzerland",
+      "United States"
+    ]
+  }
+}

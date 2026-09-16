@@ -168,8 +168,8 @@ def allocate_labels(ax, anchor_sets: list[np.ndarray], texts: list[str], colors:
         # leader line: marker labels only, when the slot is far or contested. Same-colour (model/steer)
         # labels get a looser threshold since their colour already ties them to the marker.
         if not region[i]:
-            thr = 2.6 if colors[i] != "#111" else 1.15       # in text-heights of reach
-            if k > thr or pick is None:
+            thr = 1.0 if colors[i] != "#111" else 1.15       # in text-heights of reach
+            if colors[i] != "#111" or k > thr or pick is None:
                 nx, ny = min(max(ax0, box[0]), box[2]), min(max(ay0, box[1]), box[3])
                 (lx0, ly0), (lx1, ly1) = to_data((ax0, ay0)), to_data((nx, ny))
                 ax.plot([lx0, lx1], [ly0, ly1], "-", color=linecolor, lw=linewidth, zorder=2.5)

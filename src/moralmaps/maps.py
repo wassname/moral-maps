@@ -263,7 +263,7 @@ MODEL_RED = "#d0021b"
 # two share a teal/sea-blue sibling pair, grok is xAI-brand near-black to sit clear of gpt's blue.
 MODEL_FAMILY_COLORS = {
     "deepseek": "#ec4899",   # DeepSeek (China) -> pink
-    "qwen":     "#f97316",   # Qwen / Alibaba (China) -> orange
+    "qwen":     "#7e22ce",   # Qwen / Alibaba -> violet, distinct from the Latin America outline
     "mistral":  "#2ca02c",   # Mistral (France / Europe) -> green
     "gemma":    "#14b8a6",   # Gemma / Google -> teal
     "gemini":   "#0ea5e9",   # Gemini / Google -> sea blue (sibling of gemma, bluer)
