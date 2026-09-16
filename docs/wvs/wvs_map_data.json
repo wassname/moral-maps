@@ -461,6 +461,60 @@
       "y": 0.17828757955153599
     }
   ],
+  "latest_by_family": {
+    "claude": {
+      "name": "claude-fable-5.1",
+      "source": "catalog created=2026-09-01"
+    },
+    "deepseek": {
+      "name": "deepseek-v4.1-flash",
+      "source": "catalog created=2026-09-10"
+    },
+    "gemini": {
+      "name": "gemini-3.7-flash",
+      "source": "catalog created=2026-08-13"
+    },
+    "gemma": {
+      "name": "gemma-4-31b-it",
+      "source": "explicit legacy release-order choice"
+    },
+    "glm": {
+      "name": "glm-5.3",
+      "source": "catalog created=2026-08-18"
+    },
+    "gpt": {
+      "name": "gpt-6-astra",
+      "source": "catalog created=2026-09-04"
+    },
+    "grok": {
+      "name": "grok-4.3",
+      "source": "explicit legacy release-order choice"
+    },
+    "inkling": {
+      "name": "inkling",
+      "source": "catalog created=2026-07-17"
+    },
+    "kimi": {
+      "name": "kimi-k3",
+      "source": "catalog created=2026-07-16"
+    },
+    "llama": {
+      "name": "llama-4-maverick",
+      "source": "explicit legacy release-order choice"
+    },
+    "mistral": {
+      "name": "mistral-large-2512",
+      "source": "explicit legacy release-order choice"
+    },
+    "muse": {
+      "name": "muse-spark-1.3",
+      "source": "catalog created=2026-09-02"
+    },
+    "qwen": {
+      "name": "qwen3.8-flash",
+      "source": "catalog created=2026-08-26"
+    }
+  },
   "models": [
     {
       "color": "#7e22ce",
@@ -513,7 +567,7 @@
     {
       "color": "#14b8a6",
       "family": "gemma",
-      "label": null,
+      "label": "gemma-4-31b-it",
       "name": "gemma-4-31b-it",
       "x": -0.36,
       "y": 0.66
@@ -553,7 +607,7 @@
     {
       "color": "#2b2d42",
       "family": "grok",
-      "label": null,
+      "label": "grok-4.3",
       "name": "grok-4.3",
       "x": -0.44,
       "y": 0.73
@@ -609,7 +663,7 @@
     {
       "color": "#2ca02c",
       "family": "mistral",
-      "label": null,
+      "label": "mistral-large-2512",
       "name": "mistral-large-2512",
       "x": -0.65,
       "y": 0.64
@@ -625,7 +679,7 @@
     {
       "color": "#6d5ae0",
       "family": "llama",
-      "label": null,
+      "label": "llama-4-maverick",
       "name": "llama-4-maverick",
       "x": -0.64,
       "y": 0.64

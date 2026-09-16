@@ -54,6 +54,15 @@ DIGITS = "0123456789"
 
 # OpenRouter model IDs checked against https://openrouter.ai/api/v1/models on 2026-09-16.
 # Selecting a set is explicit because every uncached entry makes paid API calls.
+# These existing plotted families predate the saved OpenRouter catalog. The choice is an explicit
+# release-order decision, not numeric parsing: Grok 4.3 is the observed series endpoint in README.
+LEGACY_LATEST = {
+    "gemma": "gemma-4-31b-it",
+    "grok": "grok-4.3",
+    "llama": "llama-4-maverick",
+    "mistral": "mistral-large-2512",
+}
+
 API_MODEL_SETS = {
     "fable-astra": (
         "anthropic/claude-fable-5.1",
@@ -398,11 +407,18 @@ def main() -> None:
         fams.setdefault(family, []).append(k)
     metadata = json.loads(Path("docs/img/wvs/wvs_model_metadata.json").read_text())["models"]
     model_labels: dict[str, str] = {}
+    label_sources: dict[str, str] = {}
     for family, names in fams.items():
         catalogued = [name for name in names if name in metadata]
         if catalogued:
             latest = max(catalogued, key=lambda name: metadata[name]["created"])
-            model_labels[latest] = latest.replace("claude-", "")
+            label_sources[family] = f"catalog created={metadata[latest]['created']}"
+        else:
+            latest = LEGACY_LATEST[family]
+            if latest not in names:
+                raise ValueError(f"legacy latest {latest} absent from plotted {family} family")
+            label_sources[family] = "explicit legacy release-order choice"
+        model_labels[latest] = latest.replace("claude-", "")
     if args.web_data:
         zones_all, _ = zones_for(countries)
         zones = maps.select_spread_zones(P, countries, zones_all, 4)
@@ -415,6 +431,8 @@ def main() -> None:
             "countries": [{"name": name, "x": float(x * sx), "y": float(y * sy)}
                           for name, (x, y) in zip(countries, P)],
             "zones": zones,
+            "latest_by_family": {family: {"name": name, "source": label_sources[family]}
+                                 for family, names in fams.items() for name in names if name in model_labels},
             "models": [{"name": name, "x": float(v[0] * sx), "y": float(v[1] * sy),
                         "family": maps.model_family(name), "color": maps.model_family_color(name),
                         "label": model_labels.get(name)} for name, v in plot_models.items()],
