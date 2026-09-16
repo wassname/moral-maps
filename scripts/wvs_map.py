@@ -248,6 +248,8 @@ def main() -> None:
                     help="durable completed-panel cache, tracked with the request evidence")
     ap.add_argument("--records", default="slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
                     help="fsynced JSONL request ledger, outside /tmp and retained for reuse")
+    ap.add_argument("--include-all-cached", action="store_true",
+                    help="render every complete durable cache entry without making an API request")
     args = ap.parse_args()
     api_models = list(dict.fromkeys(args.api_models + list(API_MODEL_SETS.get(args.api_model_set, ()))))
     api_reasoning = ({"enabled": False} if args.api_disable_reasoning else
@@ -290,6 +292,9 @@ def main() -> None:
 
     published_ci = Path("docs/img/wvs/wvs_model_ci.md")
     models: dict[str, tuple] = published_models(published_ci) if published_ci.exists() else {}
+    if args.include_all_cached:
+        for entry in cache["completed"].values():
+            models[entry["display_key"]] = tuple(entry["coords"])
 
     def save_cache() -> None:
         """Atomic cache replacement after a complete model panel, so interruption cannot fabricate a hit."""
@@ -402,8 +407,9 @@ def main() -> None:
         ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
         models=plot_models, model_labels=model_labels, emphasize=emph,
         title="Frontier LLMs on the\nWorld Values Survey",
-        note="17 models, rated sampling\ngithub.com/wassname/moral-maps")
+        note=f"{len(plot_models)} models, rated sampling\ngithub.com/wassname/moral-maps")
     fig.savefig(args.out, dpi=200, bbox_inches="tight")
+    fig.savefig(Path(args.out).with_suffix(".svg"), bbox_inches="tight")
     logger.info(f"wrote {args.out}")
 
 

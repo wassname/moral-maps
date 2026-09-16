@@ -1,5 +1,380 @@
 {
   "completed": {
+    "0043a43d1a2188f7c728ccda08eee7b062232366d8a4e912c72bdc938e37fe44": {
+      "coords": [
+        0.6214472858835399,
+        0.6710244268262847,
+        0.03786483811416081,
+        0.06918409770409496
+      ],
+      "display_key": "kimi-k3 (rated)",
+      "model": "moonshotai/kimi-k3",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "0043a43d1a2188f7c728ccda08eee7b062232366d8a4e912c72bdc938e37fe44",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T152010Z_0043a43d1a21"
+    },
+    "02d386b067d55e0639d33db8b6f1e5c708c30acbada3125dcbabde47dc90edcf": {
+      "coords": [
+        0.5849525883130219,
+        0.59521139256589,
+        0.037643038378990704,
+        0.07695278664473065
+      ],
+      "display_key": "qwen2.5-vl-72b-instruct (rated)",
+      "model": "qwen/qwen2.5-vl-72b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "02d386b067d55e0639d33db8b6f1e5c708c30acbada3125dcbabde47dc90edcf",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T200346Z_02d386b067d5"
+    },
+    "0a798666aeed20785b4661c8c2fe4a6fc6853796bc2f3c45133863469e5b3f82": {
+      "coords": [
+        0.5335737179487179,
+        0.5337214372928658,
+        0.029444543942379133,
+        0.09738610052745941
+      ],
+      "display_key": "qwen3-vl-30b-a3b-instruct (rated)",
+      "model": "qwen/qwen3-vl-30b-a3b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "0a798666aeed20785b4661c8c2fe4a6fc6853796bc2f3c45133863469e5b3f82",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T192223Z_0a798666aeed"
+    },
+    "182a7e88869698133f1175f18e53e7f6f2f056739559d325b211bd065235a71c": {
+      "coords": [
+        0.6175297619047618,
+        0.5976147806792967,
+        0.035727022605345674,
+        0.07361977335041572
+      ],
+      "display_key": "qwen3-coder-plus (rated)",
+      "model": "qwen/qwen3-coder-plus",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "182a7e88869698133f1175f18e53e7f6f2f056739559d325b211bd065235a71c",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T193258Z_182a7e888696"
+    },
+    "1a70f47789af20900f2799992b09e83af9490be6579098a6178d613d5ba7856c": {
+      "coords": [
+        0.5274474357644292,
+        0.6650744376984001,
+        0.044561828476471346,
+        0.06617035838663828
+      ],
+      "display_key": "gpt-5.6-sol (rated)",
+      "model": "openai/gpt-5.6-sol",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "1a70f47789af20900f2799992b09e83af9490be6579098a6178d613d5ba7856c",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T152843Z_1a70f47789af"
+    },
+    "1c31668055e399de28805046bc08075035efbad0cdb1ff7d8926841a282e07a5": {
+      "coords": [
+        0.5036638266417679,
+        0.6503283973522069,
+        0.057017134313755345,
+        0.06039652604026301
+      ],
+      "display_key": "qwen3.7-max (rated)",
+      "model": "qwen/qwen3.7-max",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "1c31668055e399de28805046bc08075035efbad0cdb1ff7d8926841a282e07a5",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T135329Z_1c31668055e3"
+    },
+    "1d7f4015decbcbe955adb79817b970981ca1d3165ed121b458b213ba1060f675": {
+      "coords": [
+        0.6061818582651916,
+        0.6004689754689754,
+        0.029738189920548014,
+        0.07794129978765893
+      ],
+      "display_key": "qwen3-vl-8b-instruct (rated)",
+      "model": "qwen/qwen3-vl-8b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "1d7f4015decbcbe955adb79817b970981ca1d3165ed121b458b213ba1060f675",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T192044Z_1d7f4015decb"
+    },
+    "3016d2c1ab8d8f88f01723d2d695be996c7f1fdcd442a51cfbb6c7b7110a25e9": {
+      "coords": [
+        0.5017202097104058,
+        0.5916881018254176,
+        0.04660057418362078,
+        0.07020408831610975
+      ],
+      "display_key": "qwen3.5-9b (rated)",
+      "model": "qwen/qwen3.5-9b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "3016d2c1ab8d8f88f01723d2d695be996c7f1fdcd442a51cfbb6c7b7110a25e9",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T142212Z_3016d2c1ab8d"
+    },
+    "304db4b1aa6c80d734f802749c75143feddfcdb740c4131385e927148ba7d05b": {
+      "coords": [
+        0.598778659611993,
+        0.6204503168788883,
+        0.04059052018905529,
+        0.08949774510806
+      ],
+      "display_key": "qwen3-coder (rated)",
+      "model": "qwen/qwen3-coder",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "304db4b1aa6c80d734f802749c75143feddfcdb740c4131385e927148ba7d05b",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T195554Z_304db4b1aa6c"
+    },
+    "3443c17ae66d3fb529a058128b662024c4bc0601394e614bb693b388ec4c988b": {
+      "coords": [
+        0.4153054353054353,
+        0.6346365065494385,
+        0.07206749839259896,
+        0.07710357656753936
+      ],
+      "display_key": "qwen3.8-flash (rated)",
+      "model": "qwen/qwen3.8-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "3443c17ae66d3fb529a058128b662024c4bc0601394e614bb693b388ec4c988b",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T133720Z_3443c17ae66d"
+    },
+    "39659697ca3437f62be4fb8e129e6b3902a91b5acac3243ca914dfc917dd563b": {
+      "coords": [
+        0.5030952380952382,
+        0.5846967846967848,
+        0.046958286642217247,
+        0.08746316369004264
+      ],
+      "display_key": "qwen3-coder-30b-a3b-instruct (rated)",
+      "model": "qwen/qwen3-coder-30b-a3b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "39659697ca3437f62be4fb8e129e6b3902a91b5acac3243ca914dfc917dd563b",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T194257Z_39659697ca34"
+    },
+    "3c9d4fedebcab41719f4247ca94fa35430f57d0a34f3a539012e0632e35413de": {
+      "coords": [
+        0.4253104631546661,
+        0.731799663031547,
+        0.0936048666617984,
+        0.060012518938080954
+      ],
+      "display_key": "muse-spark-1.3 (rated)",
+      "model": "meta/muse-spark-1.3",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "3c9d4fedebcab41719f4247ca94fa35430f57d0a34f3a539012e0632e35413de",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T155331Z_3c9d4fedebca"
+    },
+    "4230ccaa1e160c793a906aef6b786d735d9fdbf71c3333691b0eba17dcf33928": {
+      "coords": [
+        0.5790919024614678,
+        0.6085929478125246,
+        0.038145029256266345,
+        0.025980758516149186
+      ],
+      "display_key": "claude-fable-5.1 (rated)",
+      "model": "anthropic/claude-fable-5.1",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "4230ccaa1e160c793a906aef6b786d735d9fdbf71c3333691b0eba17dcf33928",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T153341Z_4230ccaa1e16"
+    },
+    "43ddc43fb5a29c7fbf21c8f32b42a909c2118feb9255959ecaeab7dadb1f3dde": {
+      "coords": [
+        0.5966931216931217,
+        0.5338064713064713,
+        0.011307868884765215,
+        0.10204509849192553
+      ],
+      "display_key": "qwen3-vl-32b-instruct (rated)",
+      "model": "qwen/qwen3-vl-32b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "43ddc43fb5a29c7fbf21c8f32b42a909c2118feb9255959ecaeab7dadb1f3dde",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T191809Z_43ddc43fb5a2"
+    },
+    "49ae9f7a09090534a15fac734c2611c445a17139cad6c5684fa0581722f3fd70": {
+      "coords": [
+        0.6137896825396826,
+        0.5819444444444445,
+        0.015958730849444745,
+        0.0834429418953706
+      ],
+      "display_key": "qwen3-14b (rated)",
+      "model": "qwen/qwen3-14b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "49ae9f7a09090534a15fac734c2611c445a17139cad6c5684fa0581722f3fd70",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T150121Z_49ae9f7a0909"
+    },
+    "57bed80fd5b94157effe68fe998c7c12612fea210c1371dbf230097a7e8e0717": {
+      "coords": [
+        0.6363133579397021,
+        0.5792251640447779,
+        0.027397680484314686,
+        0.06607943334210371
+      ],
+      "display_key": "qwen3-coder-next (rated)",
+      "model": "qwen/qwen3-coder-next",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "57bed80fd5b94157effe68fe998c7c12612fea210c1371dbf230097a7e8e0717",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T191559Z_57bed80fd5b9"
+    },
+    "580a5840948209ecb177dc6fdaf36e265a32ccfe223d791eb3235fea9269f27e": {
+      "coords": [
+        0.6064902599972044,
+        0.5413085527420844,
+        0.028266888268597475,
+        0.07251640240693584
+      ],
+      "display_key": "qwen3-32b (rated)",
+      "model": "qwen/qwen3-32b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "580a5840948209ecb177dc6fdaf36e265a32ccfe223d791eb3235fea9269f27e",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T150406Z_580a58409482"
+    },
+    "589e10fa7924ecf8f88650d6587ff37c440f47c6c4cc4325c7009ef8d4eeb4ec": {
+      "coords": [
+        0.6217724867724868,
+        0.5391326046087952,
+        0.015436127385306617,
+        0.05984330714155522
+      ],
+      "display_key": "qwen3-8b (rated)",
+      "model": "qwen/qwen3-8b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "589e10fa7924ecf8f88650d6587ff37c440f47c6c4cc4325c7009ef8d4eeb4ec",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T181355Z_589e10fa7924"
+    },
+    "61ab1adae3781ca3893328a845d4d517daa5fb47e07ea189da1df45388f62d42": {
+      "coords": [
+        0.5993276014109347,
+        0.5462479278681369,
+        0.024660010076102412,
+        0.10518394004968958
+      ],
+      "display_key": "qwen3-vl-235b-a22b-instruct (rated)",
+      "model": "qwen/qwen3-vl-235b-a22b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "61ab1adae3781ca3893328a845d4d517daa5fb47e07ea189da1df45388f62d42",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T192432Z_61ab1adae378"
+    },
+    "66ad076e1a37493e4d3db982a0220048e520103459cefc709bc8f09f3fef6c9a": {
+      "coords": [
+        0.5509667037841642,
+        0.5895236753978316,
+        0.02658132977411291,
+        0.08063463160776993
+      ],
+      "display_key": "qwen-2.5-7b-instruct (rated)",
+      "model": "qwen/qwen-2.5-7b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "66ad076e1a37493e4d3db982a0220048e520103459cefc709bc8f09f3fef6c9a",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T200857Z_66ad076e1a37"
+    },
+    "67a70b1b03ba85be79dc122cc888a080fde239205624135a9147168e7e77293d": {
+      "coords": [
+        0.5614798614630517,
+        0.6880988993033613,
+        0.050774441812280406,
+        0.057780026773918566
+      ],
+      "display_key": "inkling (rated)",
+      "model": "thinkingmachines/inkling",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "67a70b1b03ba85be79dc122cc888a080fde239205624135a9147168e7e77293d",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T191343Z_67a70b1b03ba"
+    },
+    "6d6ce30e9fbc5fdb07229b0a08e067d77511857069a4e572613d3e48b7c8b261": {
+      "coords": [
+        0.5856201899951899,
+        0.6494018547589976,
+        0.06114886163791156,
+        0.08129405199775336
+      ],
+      "display_key": "qwen3.5-plus-20260420 (rated)",
+      "model": "qwen/qwen3.5-plus-20260420",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "6d6ce30e9fbc5fdb07229b0a08e067d77511857069a4e572613d3e48b7c8b261",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T135722Z_6d6ce30e9fbc"
+    },
+    "7058adf367d238c6c92e1b83ae71f6556362e9fc7a243297b6fc65e54e2c2886": {
+      "coords": [
+        0.5974338624338624,
+        0.6515634387658198,
+        0.023795241546514957,
+        0.07922810144513995
+      ],
+      "display_key": "qwen3.5-27b (rated)",
+      "model": "qwen/qwen3.5-27b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "7058adf367d238c6c92e1b83ae71f6556362e9fc7a243297b6fc65e54e2c2886",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T143235Z_7058adf367d2"
+    },
+    "74e3649a6961000bab284e801fe811d5c8fc4cf1db15af52bb10959f5a5a37c1": {
+      "coords": [
+        0.5372045855379188,
+        0.6595114541543113,
+        0.04180484013035134,
+        0.08450011787948054
+      ],
+      "display_key": "qwen3.5-plus-02-15 (rated)",
+      "model": "qwen/qwen3.5-plus-02-15",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "74e3649a6961000bab284e801fe811d5c8fc4cf1db15af52bb10959f5a5a37c1",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T144205Z_74e3649a6961"
+    },
+    "7ee20ca2b88f69dd06b9de3018deea4cb7a418e3119e17862cd0b32146daae1a": {
+      "coords": [
+        0.538440257742794,
+        0.5530118458934986,
+        0.07277582530416211,
+        0.0898393391241473
+      ],
+      "display_key": "qwen3.5-35b-a3b (rated)",
+      "model": "qwen/qwen3.5-35b-a3b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "7ee20ca2b88f69dd06b9de3018deea4cb7a418e3119e17862cd0b32146daae1a",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T142959Z_7ee20ca2b88f"
+    },
     "82875b6ee164d0d980eba738bf05f69959234567b91f9cfd01fcabca0bd70dac": {
       "coords": [
         0.6529354469060352,
@@ -14,6 +389,336 @@
       "protocol_id": "82875b6ee164d0d980eba738bf05f69959234567b91f9cfd01fcabca0bd70dac",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T133001Z_82875b6ee164"
+    },
+    "842298c634ec0f57848b605f67fca161631a852a68192cae1a5377b1d9f31566": {
+      "coords": [
+        0.6427511094043352,
+        0.5554953612269281,
+        0.03535208249381765,
+        0.08497138486454137
+      ],
+      "display_key": "qwen3-235b-a22b (rated)",
+      "model": "qwen/qwen3-235b-a22b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "842298c634ec0f57848b605f67fca161631a852a68192cae1a5377b1d9f31566",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T150950Z_842298c634ec"
+    },
+    "8700e79d3eccf358a0de1029f7b40e2db339bb6d11403b8e69cb7a66a7b0c668": {
+      "coords": [
+        0.6707823388714307,
+        0.6060018656291949,
+        0.03451993837104684,
+        0.09876091230627733
+      ],
+      "display_key": "qwen3-30b-a3b (rated)",
+      "model": "qwen/qwen3-30b-a3b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "8700e79d3eccf358a0de1029f7b40e2db339bb6d11403b8e69cb7a66a7b0c668",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T145439Z_8700e79d3ecc"
+    },
+    "88ba5af838eda5d298b312553d7c941e72a37cbf28890cdb9d8436b5f40e7cfe": {
+      "coords": [
+        0.6025617283950616,
+        0.6287037037037038,
+        0.03396367302553316,
+        0.09406697361625513
+      ],
+      "display_key": "qwen-plus (rated)",
+      "model": "qwen/qwen-plus",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "88ba5af838eda5d298b312553d7c941e72a37cbf28890cdb9d8436b5f40e7cfe",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T200626Z_88ba5af838ed"
+    },
+    "88ed922f271a76721ad18f0b7bb9693a48377e2507d02a4b78fa08b451972d83": {
+      "coords": [
+        0.6450907949109246,
+        0.5437992771640354,
+        0.023312776383531648,
+        0.10024881542221994
+      ],
+      "display_key": "qwen3-30b-a3b-instruct-2507 (rated)",
+      "model": "qwen/qwen3-30b-a3b-instruct-2507",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "88ed922f271a76721ad18f0b7bb9693a48377e2507d02a4b78fa08b451972d83",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T195128Z_88ed922f271a"
+    },
+    "8c27d32cd851de5f217cb354b15dc270cc6f4ec2d02fb15dbb20fde0790c3571": {
+      "coords": [
+        0.5419602854216832,
+        0.595896730624977,
+        0.05193570378692634,
+        0.08265065423220756
+      ],
+      "display_key": "deepseek-v4.1-flash (rated)",
+      "model": "deepseek/deepseek-v4.1-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "8c27d32cd851de5f217cb354b15dc270cc6f4ec2d02fb15dbb20fde0790c3571",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T151414Z_8c27d32cd851"
+    },
+    "921707cb0d3db143e948e9d78cd8191f4ee720eaf56b6934e2d13d9ce9e3382f": {
+      "coords": [
+        0.5408168991502326,
+        0.6493278669204595,
+        0.03917823180041766,
+        0.08760189869507796
+      ],
+      "display_key": "qwen3.5-397b-a17b (rated)",
+      "model": "qwen/qwen3.5-397b-a17b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "921707cb0d3db143e948e9d78cd8191f4ee720eaf56b6934e2d13d9ce9e3382f",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T144546Z_921707cb0d3d"
+    },
+    "95bb4d3939e9937823357b5cd87adb1a6640cc5b04e0841dfec03095331a5e44": {
+      "coords": [
+        0.4569019748367575,
+        0.6751145899955423,
+        0.07644348564506928,
+        0.0567289888770763
+      ],
+      "display_key": "gpt-6-astra (rated)",
+      "model": "openai/gpt-6-astra",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "95bb4d3939e9937823357b5cd87adb1a6640cc5b04e0841dfec03095331a5e44",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T154406Z_95bb4d3939e9"
+    },
+    "96d86b64bf7ceff8eed0daff1aa0396ee69609b5867942a7c2c9d33093f03c9d": {
+      "coords": [
+        0.5196778711484593,
+        0.6698994127565557,
+        0.042934824935707064,
+        0.07801121120269483
+      ],
+      "display_key": "qwen3.6-plus (rated)",
+      "model": "qwen/qwen3.6-plus",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "96d86b64bf7ceff8eed0daff1aa0396ee69609b5867942a7c2c9d33093f03c9d",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T141839Z_96d86b64bf7c"
+    },
+    "9c1d40b30945565e488b212177e40c29f730c2e96d4b07d09cbc135ba75a81f0": {
+      "coords": [
+        0.6026546601546601,
+        0.5957470912477916,
+        0.03274570154412936,
+        0.08673540897470654
+      ],
+      "display_key": "qwen-2.5-72b-instruct (rated)",
+      "model": "qwen/qwen-2.5-72b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "9c1d40b30945565e488b212177e40c29f730c2e96d4b07d09cbc135ba75a81f0",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T201119Z_9c1d40b30945"
+    },
+    "9d8a5189c078672eb884784938b183944fb161d0e716e2c44722540b17603e34": {
+      "coords": [
+        0.6652380952380952,
+        0.7022990677752582,
+        0.026433969418704885,
+        0.06269095940430941
+      ],
+      "display_key": "qwen3-next-80b-a3b-instruct (rated)",
+      "model": "qwen/qwen3-next-80b-a3b-instruct",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "9d8a5189c078672eb884784938b183944fb161d0e716e2c44722540b17603e34",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T193846Z_9d8a5189c078"
+    },
+    "abf45a27f4bafad0eb264aac33b1e49e9d0404e141966954d0707930d56665e3": {
+      "coords": [
+        0.45740779531102105,
+        0.6795887184190553,
+        0.09233310052166174,
+        0.07166972793043255
+      ],
+      "display_key": "qwen3.6-27b (rated)",
+      "model": "qwen/qwen3.6-27b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "abf45a27f4bafad0eb264aac33b1e49e9d0404e141966954d0707930d56665e3",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T141139Z_abf45a27f4ba"
+    },
+    "ac52652ff1f09e1f1972a8b751e1b1deca329cb555df54755aada79791bed940": {
+      "coords": [
+        0.6417361111111111,
+        0.5127110103300581,
+        0.03807268153101321,
+        0.08042423628815949
+      ],
+      "display_key": "qwen-plus-2025-07-28 (rated)",
+      "model": "qwen/qwen-plus-2025-07-28",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "ac52652ff1f09e1f1972a8b751e1b1deca329cb555df54755aada79791bed940",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T194044Z_ac52652ff1f0"
+    },
+    "b35b916c22649e91ded175aede34f3937a16f42a354f7abab01a17bf2b0dfc97": {
+      "coords": [
+        0.6062280543530544,
+        0.5943180448406931,
+        0.04853610852408334,
+        0.0737314840555176
+      ],
+      "display_key": "qwen3.6-35b-a3b (rated)",
+      "model": "qwen/qwen3.6-35b-a3b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "b35b916c22649e91ded175aede34f3937a16f42a354f7abab01a17bf2b0dfc97",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T140418Z_b35b916c2264"
+    },
+    "bca0745bdc1554718d57891098f366214f05e9e896007a916d14a06efa33471a": {
+      "coords": [
+        0.5778139029180694,
+        0.6959770802908057,
+        0.03666290866643542,
+        0.07382269298741832
+      ],
+      "display_key": "qwen3-max-thinking (rated)",
+      "model": "qwen/qwen3-max-thinking",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "bca0745bdc1554718d57891098f366214f05e9e896007a916d14a06efa33471a",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T145109Z_bca0745bdc15"
+    },
+    "cd5db529649a179032180cecafe4fd98aff124ee3654f7d60996de704e2b63ef": {
+      "coords": [
+        0.4988977072310405,
+        0.6262540369683227,
+        0.01537866158910887,
+        0.05342525613259921
+      ],
+      "display_key": "gemini-3.7-flash (rated)",
+      "model": "google/gemini-3.7-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "cd5db529649a179032180cecafe4fd98aff124ee3654f7d60996de704e2b63ef",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T172946Z_cd5db529649a"
+    },
+    "d81f7e66b3c4c720f8dd80768d3dfc25de6edeaf6a352cfed40e961f21fcfa22": {
+      "coords": [
+        0.5535321928702047,
+        0.6422322099171051,
+        0.05892062733798582,
+        0.06715990340387798
+      ],
+      "display_key": "glm-5.3 (rated)",
+      "model": "z-ai/glm-5.3",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "d81f7e66b3c4c720f8dd80768d3dfc25de6edeaf6a352cfed40e961f21fcfa22",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T161456Z_d81f7e66b3c4"
+    },
+    "dc09c3fe433c95591b336b279603c546152daf6534d90699323b3bcde754f5bf": {
+      "coords": [
+        0.6353621031746031,
+        0.5685931857310826,
+        0.03688413980467388,
+        0.08024381413619414
+      ],
+      "display_key": "qwen3-235b-a22b-2507 (rated)",
+      "model": "qwen/qwen3-235b-a22b-2507",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "dc09c3fe433c95591b336b279603c546152daf6534d90699323b3bcde754f5bf",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T195827Z_dc09c3fe433c"
+    },
+    "e0a9daef251d975c5e805e159f3813dd0c55b3f0919876b828e572b0530bea88": {
+      "coords": [
+        0.48469169991228817,
+        0.6190010643383659,
+        0.07699729945533007,
+        0.07041604518532184
+      ],
+      "display_key": "qwen3.5-122b-a10b (rated)",
+      "model": "qwen/qwen3.5-122b-a10b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "e0a9daef251d975c5e805e159f3813dd0c55b3f0919876b828e572b0530bea88",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T143453Z_e0a9daef251d"
+    },
+    "ed8190c48b2a3778bba8afff7381bb9f1578211b5e8f750d21321b62617c82c3": {
+      "coords": [
+        0.431934218610816,
+        0.6881570439623662,
+        0.08092059548185657,
+        0.07158456159738981
+      ],
+      "display_key": "qwen3.8-27b (rated)",
+      "model": "qwen/qwen3.8-27b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "ed8190c48b2a3778bba8afff7381bb9f1578211b5e8f750d21321b62617c82c3",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T134026Z_ed8190c48b2a"
+    },
+    "f095e0d2dbafdb91b51be3d0b3bd5a597730c8e3c397e0461023c87e924d92f8": {
+      "coords": [
+        0.5078196649029982,
+        0.6664359119716262,
+        0.04898292658545207,
+        0.07513374670738206
+      ],
+      "display_key": "qwen3.7-plus (rated)",
+      "model": "qwen/qwen3.7-plus",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "f095e0d2dbafdb91b51be3d0b3bd5a597730c8e3c397e0461023c87e924d92f8",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T134925Z_f095e0d2dbaf"
+    },
+    "fa37fc90604e5032183ec460bcc2632507566c3be3e9085f61a6ca85582b7d47": {
+      "coords": [
+        0.6514346395123706,
+        0.583014517676874,
+        0.044355827535678856,
+        0.07772092035914374
+      ],
+      "display_key": "qwen3.6-flash (rated)",
+      "model": "qwen/qwen3.6-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "fa37fc90604e5032183ec460bcc2632507566c3be3e9085f61a6ca85582b7d47",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T140130Z_fa37fc90604e"
+    },
+    "fa9ff591d389ad2d8a4b7e3fc1410ed588508fe286430c06a941180b0590422b": {
+      "coords": [
+        0.4805424128340796,
+        0.6905543787488233,
+        0.08346396425450253,
+        0.07197747047181104
+      ],
+      "display_key": "qwen3.6-max-preview (rated)",
+      "model": "qwen/qwen3.6-max-preview",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "fa9ff591d389ad2d8a4b7e3fc1410ed588508fe286430c06a941180b0590422b",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260916T140710Z_fa9ff591d389"
     }
   },
   "schema": 2

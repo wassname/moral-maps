@@ -911,3 +911,30 @@ prove total spend remains below the authorized cap, so durable records must reta
 and request phase before the next paid call. -- PI[gpt-5.6-terra]
 
 The next result will replace these bounds with reconciled provider-reported usage.
+
+## 2026-09-16 -- WVS measured OpenRouter usage
+
+This entry records what the durable WVS request ledger reports after the API panels.
+
+The source ledger is `slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl`. It contains 48 complete
+panels and eleven incomplete attempts. Summing the provider `usage.cost` field across every completed request
+phase, including excluded attempts, gives USD 3.59086067. This is provider-reported per-request cost, not a
+completion-token estimate. The first Qwen diagnostic cost USD 0.04310443 and produced 129 valid samples after
+142 rescues. The corrected Qwen 3.7 Flash panel used `reasoning.enabled=false` plus strict JSON schema, cost
+USD 0.00110376, and has 144 distinct item/sample keys, 144 valid parses, zero rescues, and zero request failures.
+Source: `qwen3.7-flash_schema_audit.md` and the raw ledger in the same directory.
+
+The provider usage records expose prompt tokens, completion tokens, total tokens, cost and generation IDs, but
+some omit separate reasoning and cache fields. Those fields remain unknown rather than being counted as zero.
+Each completed cache entry records its exact model, prompt-and-settings protocol hash, contributing run ID and
+coordinate result. The execution matrix in `execution_matrix.md` separates optional reasoning disabled, mandatory
+reasoning at a listed low effort, no advertised reasoning control, and catalog entries whose mandatory effort is
+unknown. It is a catalog snapshot, not a billing statement.
+
+My read: the strict schema plus disabled optional reasoning is probably the protocol change that made the Qwen
+panel complete, because the prior same-model attempts stored partial JSON objects and spent their output allowance
+on reasoning. Several provider/network or deterministic-format failures remain excluded from plotted coordinates.
+The saved ledger permits a later exact-protocol completion calculation without reinterpreting an incomplete panel as
+a valid point. -- PI[gpt-5.6-terra]
+
+The durable records make the measured spend and exclusions available for the next decision.
