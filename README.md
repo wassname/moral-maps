@@ -6,6 +6,8 @@ What do an LLM's values look like next to ours? moralmaps puts models through hu
 
 Start with the World Values Survey: its culture map compares societies by how traditional or secular they are, and how much they weigh survival over self-expression.
 
+See <https://wassname.github.io/moral-maps/> for an interactive plot.
+
 ![World Values Survey map: models cluster toward self-expression (left) and secular-rational values (top), alongside human societies.](docs/img/wvs/wvs_map_iw.png)
 
 The models cluster in the upper-left, around and above the Western societies. These are survey answers, not a test of how the models behave outside the survey.
@@ -52,11 +54,9 @@ The intended value moves, but so do other answers. This is why we need to measur
 
 ## Measurement
 
-The maps use human-comparable survey scores. For local models, we read answer-token probabilities; for APIs without logprobs, we use repeated ratings. We check probability mass on valid answers so broken answer formatting is not mistaken for a value change. Human positions on the World Values Survey map are approximated from [GlobalOpinionQA](https://huggingface.co/datasets/Anthropic/llm_global_opinions), using the [axis definitions](src/moralmaps/iw_axes.py).
+The maps use human-comparable survey scores. For local models, we read answer-token probabilities; for APIs without logprobs, we use repeated ratings. Human positions on the World Values Survey map are approximated from [GlobalOpinionQA](https://huggingface.co/datasets/Anthropic/llm_global_opinions), using the [axis definitions](src/moralmaps/iw_axes.py).
 
-For steering comparisons, we also want a score that considers both intended changes and side effects. The existing [metric](src/moralmaps/metrics.py) is `sel_gated = (on - 0.1 * off) * coh²`: intended logprob movement minus a smaller penalty for other movement, multiplied by a valid-answer mass check. `si_flips` checks whether the model's chosen answers changed. Logprob movement can be visible even when chosen answers stay the same.
-
-A possible replacement is [steering F-beta](https://github.com/wassname/steering-lite#a-simpler-score), which treats desired changes as true positives and unwanted changes as false positives. It is still a proposal; the plots and existing results have not been rescored.
+For steering, we want to change the target concept in either direction without changing unrelated answers. We measure *steering selectivity*: intended logprob movement minus one tenth of unintended movement, comparing the two steering directions. This can detect small changes even when the chosen answer stays the same. See the [results and measurement details](https://github.com/wassname/steering-lite#results), or the [scoring function](src/moralmaps/metrics.py#L80).
 
 ## Install and use
 
