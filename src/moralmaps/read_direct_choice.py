@@ -49,6 +49,10 @@ def _force_choice(n: int) -> str:
     return f'Return ONLY {{"answer": <integer 0 through {n - 1}>}}. No explanation.'
 
 
+_PROMPT_INSTRUCTION_OWN_VIEW = (
+    "Think briefly about which ONE answer best reflects your own view. Do not analyze the survey design. "
+    "Answer immediately."
+)
 _ANSWER_INSTRUCTION_WITH_EXAMPLE = (
     'Respond with ONLY a JSON object such as {{"answer": 0}}. The answer must be an integer from 0 through {max_index}.'
 )
@@ -135,6 +139,7 @@ def balanced_cyclic_plan(items: list[dict], total_samples: int, answer_instructi
 def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_per_order: int,
                                     temperature: float, max_tokens: int, concurrency: int,
                                     request_timeout: float, reasoning: dict, structured_output: bool,
+                                    prompt_instruction: str = _PROMPT_INSTRUCTION_OWN_VIEW,
                                     answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE,
                                     rescue_instruction: str | None = None,
                                     plan_override: list[dict] | None = None) -> str:
@@ -150,7 +155,7 @@ def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_pe
         "request_timeout": request_timeout,
         "reasoning": reasoning,
         "structured_output": structured_output,
-        "prompt_instruction": "Think briefly about which ONE answer best reflects your own view. Do not analyze the survey design. Answer immediately.",
+        "prompt_instruction": prompt_instruction,
         "response_schemas": {item["id"]: _choice_schema(item["n"]) for item in items},
         "rescue_instructions": {item["id"]: rescue_instruction or _force_choice(item["n"]) for item in items},
         "requests": plan,
@@ -172,6 +177,7 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
                              temperature: float, max_tokens: int, concurrency: int,
                              request_timeout: float, reasoning: dict, structured_output: bool,
                              records_path: str | Path, cache_path: str | Path,
+                             prompt_instruction: str = _PROMPT_INSTRUCTION_OWN_VIEW,
                              answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE,
                              rescue_instruction: str | None = None,
                              plan_override: list[dict] | None = None) -> dict:
@@ -188,7 +194,8 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
     protocol_id = direct_choice_protocol_identity(
         model, items, samples_per_order=samples_per_order, temperature=temperature,
         max_tokens=max_tokens, concurrency=concurrency, request_timeout=request_timeout,
-        reasoning=reasoning, structured_output=structured_output, answer_instruction=answer_instruction,
+        reasoning=reasoning, structured_output=structured_output, prompt_instruction=prompt_instruction,
+        answer_instruction=answer_instruction,
         rescue_instruction=rescue_instruction, plan_override=plan_override,
     )
     cache_file = Path(cache_path)
@@ -204,6 +211,7 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
         "model": model, "samples_per_order": samples_per_order, "temperature": temperature,
         "max_tokens": max_tokens, "concurrency": concurrency, "request_timeout": request_timeout,
         "reasoning": reasoning, "structured_output": structured_output,
+        "prompt_instruction": prompt_instruction,
     }
     if plan_override is not None:
         settings.pop("samples_per_order")

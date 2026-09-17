@@ -5,7 +5,7 @@ This preregistered direct-choice pilot is a separate legacy/proxy comparison lay
 ## Exact identity
 
 - model: `google/gemini-3.7-flash`; saved-catalog created UTC: 2026-08-13
-- protocol ID: `075bd0ef0c96982d69be237ef044671193c00d6ead75ef1963ff07f699ceab6d`
+- protocol ID: `3e9c3d54727e46c92af49321604778d9bae85bd83a22e23e1793cbefd06f29e3`
 - cache: `slop/research/wvs/20260917_direct_choice/gemini37_direct_choice_production_cache.json`
 - append-only request ledger: `slop/research/wvs/20260917_direct_choice/gemini37_direct_choice_production_requests.jsonl`
 - 12 WVS items x 20 scheduled samples = 240 initial calls
@@ -31,13 +31,13 @@ n=4 intentionally has 12 canonical and 8 reversed requests: exact equal position
 
 ## Preregistered diagnostics
 
-For every item, record the exact position-balance matrix, canonical-choice entropy normalized by log(n), and first-ten versus last-ten schedule-half total variation and modal sets. Report canonical/reversed direction distributions descriptively with their counts. Compare direct-choice distributions to Gemini's legacy dense-rated results descriptively only; never mix the two layers in coordinates, family summaries, or capability fits. Any failed request, missing parsed choice, or incomplete item exits nonzero and leaves no cache entry.
+For every item, record the exact position-balance matrix, canonical-choice entropy normalized by log(n), and first-ten versus last-ten schedule-half total variation and modal sets. Also report the empirical selected-presented-position distribution, its normalized entropy and TV from uniform. TV >0.25 is a warning, not a hard exclusion; full schedule balance makes it interpretable, while n=3 is near-balanced. Report canonical/reversed direction distributions descriptively with their counts. Compare direct-choice distributions to Gemini's legacy dense-rated results descriptively only; never mix the two layers in coordinates, family summaries, or capability fits. Any failed request, missing parsed choice, or incomplete item exits nonzero and leaves no cache entry.
 
 ## Spend check before dispatch
 
 - rated-ledger observed cost: USD 3.6235153224
-- prior direct-choice observed cost: USD 0.1069845000
-- cumulative observed cost: USD 3.7304998224
+- prior direct-choice observed cost: USD 0.1173120000
+- cumulative observed cost: USD 3.7408273224
 - current output price: USD 3.75000000/M
 - 240 initial 1024-token completion-only ceiling: USD 0.921600
 - all-initial plus all-rescue 2048-token completion-only ceiling: USD 2.764800; prompt tokens are additional

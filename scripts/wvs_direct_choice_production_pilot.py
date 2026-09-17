@@ -85,7 +85,8 @@ def protocol_id(pilot_items: list[dict], request_plan: list[dict]) -> str:
     return direct_choice_protocol_identity(
         MODEL, pilot_items, samples_per_order=10, temperature=TEMPERATURE, max_tokens=MAX_TOKENS,
         concurrency=CONCURRENCY, request_timeout=REQUEST_TIMEOUT, reasoning=REASONING,
-        structured_output=STRUCTURED_OUTPUT, answer_instruction=ANSWER_INSTRUCTION,
+        structured_output=STRUCTURED_OUTPUT, prompt_instruction=PROMPT_INSTRUCTION,
+        answer_instruction=ANSWER_INSTRUCTION,
         rescue_instruction=RESCUE_INSTRUCTION, plan_override=request_plan,
     )
 
@@ -169,7 +170,7 @@ def write_manifest(pilot_items: list[dict], model: dict, request_plan: list[dict
         "",
         "## Preregistered diagnostics",
         "",
-        "For every item, record the exact position-balance matrix, canonical-choice entropy normalized by log(n), and first-ten versus last-ten schedule-half total variation and modal sets. Report canonical/reversed direction distributions descriptively with their counts. Compare direct-choice distributions to Gemini's legacy dense-rated results descriptively only; never mix the two layers in coordinates, family summaries, or capability fits. Any failed request, missing parsed choice, or incomplete item exits nonzero and leaves no cache entry.",
+        "For every item, record the exact position-balance matrix, canonical-choice entropy normalized by log(n), and first-ten versus last-ten schedule-half total variation and modal sets. Also report the empirical selected-presented-position distribution, its normalized entropy and TV from uniform. TV >0.25 is a warning, not a hard exclusion; full schedule balance makes it interpretable, while n=3 is near-balanced. Report canonical/reversed direction distributions descriptively with their counts. Compare direct-choice distributions to Gemini's legacy dense-rated results descriptively only; never mix the two layers in coordinates, family summaries, or capability fits. Any failed request, missing parsed choice, or incomplete item exits nonzero and leaves no cache entry.",
         "",
         "## Spend check before dispatch",
         "",
@@ -231,7 +232,8 @@ def main() -> None:
         MODEL, pilot_items, samples_per_order=10, temperature=TEMPERATURE, max_tokens=MAX_TOKENS,
         concurrency=CONCURRENCY, request_timeout=REQUEST_TIMEOUT, reasoning=REASONING,
         structured_output=STRUCTURED_OUTPUT, records_path=RECORDS_PATH, cache_path=CACHE_PATH,
-        answer_instruction=ANSWER_INSTRUCTION, rescue_instruction=RESCUE_INSTRUCTION,
+        prompt_instruction=PROMPT_INSTRUCTION, answer_instruction=ANSWER_INSTRUCTION,
+        rescue_instruction=RESCUE_INSTRUCTION,
         plan_override=request_plan,
     )
     if result["cached"]:
