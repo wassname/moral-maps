@@ -290,7 +290,7 @@ def main() -> None:
         "",
         "## Decision",
         "",
-        "1. Resolve-condition verdict: **met for mechanics and preregistered diagnostics; not yet met for a broad construct migration.** The complete panel, parser, balance, usage, and cache gates pass. The panel also records schedule/direction variation rather than hiding it.",
+        "1. Resolve-condition verdict: **met for mechanics and preregistered diagnostics; not yet met for a broad construct migration.** The complete panel, parser, position-balance, usage, and cache-replay checks pass. The panel also records schedule/direction variation rather than hiding it.",
         "2. Prediction check: the balanced schedule predicted exact position exposure for n=2/4/10, nearest balance for n=3, and no automatic hard exclusion from the position TV diagnostic. These are supported. No prediction claimed that all items would have low schedule-half TV.",
         "3. Earliest unsupported link: direct choices under this assistant-behavior prompt are a stable substitute for dense-rated WVS coordinates.",
         "4. Validity: define invalid as a result suitable for merging into published rated coordinates or for authorizing the wider paid expansion. P(invalid for that use) is highly likely, about 0.80. The ledger and direct-choice behavioral observations are credible under the exact protocol.",
