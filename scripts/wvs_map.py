@@ -259,7 +259,9 @@ def main() -> None:
     reasoning_group.add_argument("--api-reasoning-effort",
                                  help="send a mandatory model's catalog-supported minimum reasoning effort")
     ap.add_argument("--api-structured-output", action="store_true",
-                    help="request a strict rating JSON schema only for a catalog-confirmed supporting model")
+                    help="request a strict score-all-options JSON schema only for a catalog-confirmed supporting model")
+    ap.add_argument("--api-provider-json",
+                    help="OpenRouter provider policy JSON, included in the score-all-options protocol identity")
     ap.add_argument("--api-require-complete", action="store_true",
                     help="exit nonzero rather than render after an explicitly requested API panel is incomplete")
     ap.add_argument("--max-think-tokens", type=int, default=64)
@@ -277,6 +279,7 @@ def main() -> None:
     api_models = list(dict.fromkeys(args.api_models + list(API_MODEL_SETS.get(args.api_model_set, ()))))
     api_reasoning = ({"enabled": False} if args.api_disable_reasoning else
                      {"effort": args.api_reasoning_effort} if args.api_reasoning_effort else None)
+    api_provider = json.loads(args.api_provider_json) if args.api_provider_json else None
 
     recs = load_wvs_all()
     resolved = resolve_items(recs)
@@ -354,7 +357,7 @@ def main() -> None:
             m, rated_items, n_samples=args.api_samples, temperature=1.0,
             max_tokens=args.api_max_tokens, concurrency=args.api_concurrency,
             req_timeout=args.api_request_timeout, reasoning=api_reasoning,
-            structured_output=args.api_structured_output)
+            structured_output=args.api_structured_output, provider=api_provider)
         completed = cache["completed"].get(protocol_id)
         if completed is not None:
             models[key] = tuple(completed["coords"])
@@ -364,7 +367,7 @@ def main() -> None:
                                 max_tokens=args.api_max_tokens, concurrency=args.api_concurrency,
                                 req_timeout=args.api_request_timeout, reasoning=api_reasoning,
                                 structured_output=args.api_structured_output,
-                                records_path=args.records, verbose_first=True)
+                                records_path=args.records, verbose_first=True, provider=api_provider)
         incomplete = [row["id"] for row in rows if row["valid_samples"] != args.api_samples]
         if incomplete:
             message = f"{key}: incomplete items {incomplete}; raw evidence is in {args.records}; not cached or plotted"

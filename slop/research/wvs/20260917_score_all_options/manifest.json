@@ -1,0 +1,2539 @@
+{
+  "aggregate_concurrency_ceiling": 10,
+  "catalog_sha256": "940edd61d8103a51322710d8a6baee7f698b64b2cf033a933f0321e15c536fd2",
+  "global_stop_usd": "80",
+  "method": "score-all-options",
+  "method_definition": "For every WVS item, return a JSON score 1..5 for each answer option, repeat 12 times, then normalize.",
+  "models": [
+    {
+      "id": "deepseek/deepseek-v4.1-flash",
+      "lane": "deepseek",
+      "status": "complete_cached"
+    },
+    {
+      "id": "openai/gpt-6-astra",
+      "lane": "openai",
+      "reason": "output price exceeds USD 15/M",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-6-astra:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-6-astra-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-6-astra-pro:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1788469704,
+      "id": "qwen/qwen3.8-max-0902",
+      "input_usd_per_million": "2.000000",
+      "lane": "qwen",
+      "output_usd_per_million": "6.000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "2.949120",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1788381519,
+      "id": "meta/muse-spark-1.3-contributor",
+      "input_usd_per_million": "0.1000000",
+      "lane": "muse",
+      "output_usd_per_million": "0.2000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "0.1032192",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "meta/muse-spark-1.3",
+      "lane": "muse",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1788362056,
+      "id": "google/gemini-3.8-flash",
+      "input_usd_per_million": "0.75000000",
+      "lane": "google",
+      "output_usd_per_million": "3.75000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "1.76947200",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.8-flash:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3.8-flash",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1787752741,
+      "id": "z-ai/glm-5.3-flash",
+      "input_usd_per_million": "0.07000000",
+      "lane": "glm",
+      "output_usd_per_million": "0.2333000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "0.1135263744",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "z-ai/glm-5.3-flash:batch",
+      "lane": "glm",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1787336476,
+      "id": "meta/muse-spark-1.2-contributor",
+      "input_usd_per_million": "0.1000000",
+      "lane": "muse",
+      "output_usd_per_million": "0.2000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "0.1032192",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "deepseek/deepseek-v4-flash-vision-exp",
+      "lane": "deepseek",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "deepseek/deepseek-v4-flash-vision-exp:batch",
+      "lane": "deepseek",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "z-ai/glm-5.3",
+      "lane": "glm",
+      "status": "complete_cached"
+    },
+    {
+      "id": "z-ai/glm-5.3:batch",
+      "lane": "glm",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3.8-27b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "google/gemini-3.7-flash",
+      "lane": "google",
+      "status": "complete_cached"
+    },
+    {
+      "id": "google/gemini-3.7-flash:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1786551702,
+      "id": "qwen/qwen3.8-2.4t-a95b",
+      "input_usd_per_million": "2.000000",
+      "lane": "qwen",
+      "output_usd_per_million": "6.000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "2.949120",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "qwen/qwen3.8-2.4t-a95b:batch",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "deepseek/deepseek-v4-pro-0813",
+      "lane": "deepseek",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "deepseek/deepseek-v4-pro-0813:batch",
+      "lane": "deepseek",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1786548957,
+      "id": "x-ai/grok-4.6",
+      "input_usd_per_million": "2.000000",
+      "lane": "xai",
+      "output_usd_per_million": "6.000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "2.949120",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1786302394,
+      "id": "meta/muse-glimmer-30b",
+      "input_usd_per_million": "0.35000000",
+      "lane": "muse",
+      "output_usd_per_million": "1.5000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "0.71516160",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "meta/muse-glimmer-30b:batch",
+      "lane": "muse",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1785959287,
+      "id": "meta/muse-spark-1.2",
+      "input_usd_per_million": "1.25000000",
+      "lane": "muse",
+      "output_usd_per_million": "4.25000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "2.06438400",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1785478908,
+      "id": "deepseek/deepseek-v4-flash-0731",
+      "input_usd_per_million": "0.06000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "0.12000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.06193152",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "deepseek/deepseek-v4-flash-0731:batch",
+      "lane": "deepseek",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3.7-flash",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1784646733,
+      "id": "google/gemini-3.6-flash",
+      "input_usd_per_million": "0.75000000",
+      "lane": "google",
+      "output_usd_per_million": "3.75000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "1.76947200",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.6-flash:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1784646726,
+      "id": "google/gemini-3.5-flash-lite",
+      "input_usd_per_million": "0.3000000",
+      "lane": "google",
+      "output_usd_per_million": "2.5000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "1.1501568",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.5-flash-lite:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "moonshotai/kimi-k3",
+      "lane": "kimi",
+      "status": "complete_cached"
+    },
+    {
+      "id": "moonshotai/kimi-k3:batch",
+      "lane": "kimi",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1784215741,
+      "id": "meta/muse-spark-1.1",
+      "input_usd_per_million": "1.25000000",
+      "lane": "muse",
+      "output_usd_per_million": "4.25000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "2.06438400",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.6-luna-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.6-luna-pro:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1783590864,
+      "id": "openai/gpt-5.6-luna",
+      "input_usd_per_million": "0.2000000",
+      "lane": "openai",
+      "output_usd_per_million": "1.2000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.5603328",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.6-luna:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.6-terra-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.6-terra-pro:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1783590857,
+      "id": "openai/gpt-5.6-terra",
+      "input_usd_per_million": "2.000000",
+      "lane": "openai",
+      "output_usd_per_million": "12.000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "5.603328",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.6-terra:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.6-sol-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.6-sol-pro:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.6-sol",
+      "lane": "openai",
+      "status": "complete_cached"
+    },
+    {
+      "id": "openai/gpt-5.6-sol:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1783523154,
+      "id": "x-ai/grok-4.5",
+      "input_usd_per_million": "2.000000",
+      "lane": "xai",
+      "output_usd_per_million": "6.000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "2.949120",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.1-flash-lite-image",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemini-3.1-flash-image",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemini-3-pro-image",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1781631930,
+      "id": "z-ai/glm-5.2",
+      "input_usd_per_million": "1.4000000",
+      "lane": "glm",
+      "output_usd_per_million": "4.4000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "2.1528576",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "z-ai/glm-5.2:batch",
+      "lane": "glm",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "z-ai/glm-5.2:free",
+      "lane": "glm",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "moonshotai/kimi-k2.7-code",
+      "lane": "kimi",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3.7-plus",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.7-max",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "x-ai/grok-build-0.1",
+      "lane": "xai",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1779193800,
+      "id": "google/gemini-3.5-flash",
+      "input_usd_per_million": "1.5000000",
+      "lane": "google",
+      "output_usd_per_million": "9.000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "4.2024960",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.5-flash:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1778168828,
+      "id": "google/gemini-3.1-flash-lite",
+      "input_usd_per_million": "0.25000000",
+      "lane": "google",
+      "output_usd_per_million": "1.5000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.70041600",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.1-flash-lite:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-chat-latest",
+      "lane": "openai",
+      "reason": "output price exceeds USD 15/M",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1777591821,
+      "id": "x-ai/grok-4.3",
+      "input_usd_per_million": "1.25000000",
+      "lane": "xai",
+      "output_usd_per_million": "2.5000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.29024000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "x-ai/grok-4.3:batch",
+      "lane": "xai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3.5-plus-20260420",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.6-flash",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.6-35b-a3b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.6-max-preview",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.6-27b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "openai/gpt-5.5-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.5-pro:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.5",
+      "lane": "openai",
+      "reason": "output price exceeds USD 15/M",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.5:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "deepseek/deepseek-v4-pro",
+      "lane": "deepseek",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1777000666,
+      "id": "deepseek/deepseek-v4-flash",
+      "input_usd_per_million": "0.088606000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "0.177212000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.091458404352",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.4-image-2",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1776699402,
+      "id": "moonshotai/kimi-k2.6",
+      "input_usd_per_million": "0.95000000",
+      "lane": "kimi",
+      "output_usd_per_million": "4.000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.90955520",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1775578025,
+      "id": "z-ai/glm-5.1",
+      "input_usd_per_million": "0.966000000",
+      "lane": "glm",
+      "output_usd_per_million": "3.036000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.485471744",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemma-4-26b-a4b-it",
+      "lane": "google",
+      "reason": "Gemma is outside the requested Gemini series",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemma-4-26b-a4b-it:free",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemma-4-31b-it",
+      "lane": "google",
+      "reason": "Gemma is outside the requested Gemini series",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemma-4-31b-it:free",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3.6-plus",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1775061458,
+      "id": "z-ai/glm-5v-turbo",
+      "input_usd_per_million": "1.2000000",
+      "lane": "glm",
+      "output_usd_per_million": "4.000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.9464192",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "id": "x-ai/grok-4.20-multi-agent",
+      "lane": "xai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1774979019,
+      "id": "x-ai/grok-4.20",
+      "input_usd_per_million": "1.25000000",
+      "lane": "xai",
+      "output_usd_per_million": "2.5000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.29024000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/lyria-3-pro-preview",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1774907255,
+      "id": "google/lyria-3-clip-preview",
+      "input_usd_per_million": "0",
+      "lane": "google",
+      "output_usd_per_million": "0",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "0",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "calls": 144,
+      "created": 1773748187,
+      "id": "openai/gpt-5.4-nano",
+      "input_usd_per_million": "0.2000000",
+      "lane": "openai",
+      "output_usd_per_million": "1.25000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.58245120",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.4-nano:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1773748178,
+      "id": "openai/gpt-5.4-mini",
+      "input_usd_per_million": "0.75000000",
+      "lane": "openai",
+      "output_usd_per_million": "4.5000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "2.10124800",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.4-mini:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1773583573,
+      "id": "z-ai/glm-5-turbo",
+      "input_usd_per_million": "1.2000000",
+      "lane": "glm",
+      "output_usd_per_million": "4.000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.9464192",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "id": "qwen/qwen3.5-9b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.5-9b:batch",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.4-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.4-pro:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1772734352,
+      "id": "openai/gpt-5.4",
+      "input_usd_per_million": "2.5000000",
+      "lane": "openai",
+      "output_usd_per_million": "15.000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "7.0041600",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.4:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1772512673,
+      "id": "google/gemini-3.1-flash-lite-preview",
+      "input_usd_per_million": "0.25000000",
+      "lane": "google",
+      "output_usd_per_million": "1.5000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.70041600",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.1-flash-image-preview",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3.5-35b-a3b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.5-27b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.5-122b-a10b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1772053776,
+      "id": "qwen/qwen3.5-flash-02-23",
+      "input_usd_per_million": "0.065000000",
+      "lane": "qwen",
+      "output_usd_per_million": "0.26000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.124600320",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.1-pro-preview-customtools",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1771959164,
+      "id": "openai/gpt-5.3-codex",
+      "input_usd_per_million": "1.75000000",
+      "lane": "openai",
+      "output_usd_per_million": "14.000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "6.45120000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3.1-pro-preview",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemini-3.1-pro-preview:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3.5-plus-02-15",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3.5-397b-a17b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1770829182,
+      "id": "z-ai/glm-5",
+      "input_usd_per_million": "0.6000000",
+      "lane": "glm",
+      "output_usd_per_million": "1.92000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.93782016",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "qwen/qwen3-max-thinking",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3-coder-next",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1769487076,
+      "id": "moonshotai/kimi-k2.5",
+      "input_usd_per_million": "0.45000000",
+      "lane": "kimi",
+      "output_usd_per_million": "2.25000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.06168320",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-audio",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-audio-mini",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1768833913,
+      "id": "z-ai/glm-4.7-flash",
+      "input_usd_per_million": "0.0605000000",
+      "lane": "glm",
+      "output_usd_per_million": "0.4000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.1858682880",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1768409315,
+      "id": "openai/gpt-5.2-codex",
+      "input_usd_per_million": "1.75000000",
+      "lane": "openai",
+      "output_usd_per_million": "14.000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "6.45120000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1766378014,
+      "id": "z-ai/glm-4.7",
+      "input_usd_per_million": "0.4000000",
+      "lane": "glm",
+      "output_usd_per_million": "1.75000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.83312640",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1765987078,
+      "id": "google/gemini-3-flash-preview",
+      "input_usd_per_million": "0.5000000",
+      "lane": "google",
+      "output_usd_per_million": "3.000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.4008320",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3-flash-preview:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1765389783,
+      "id": "openai/gpt-5.2-chat",
+      "input_usd_per_million": "1.75000000",
+      "lane": "openai",
+      "output_usd_per_million": "14.000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "6.45120000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.2-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5.2-pro:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1765389775,
+      "id": "openai/gpt-5.2",
+      "input_usd_per_million": "1.75000000",
+      "lane": "openai",
+      "output_usd_per_million": "14.000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "6.45120000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.2:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1765207462,
+      "id": "z-ai/glm-4.6v",
+      "input_usd_per_million": "0.3000000",
+      "lane": "glm",
+      "output_usd_per_million": "0.9000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.4423680",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "calls": 144,
+      "created": 1764878934,
+      "id": "openai/gpt-5.1-codex-max",
+      "input_usd_per_million": "1.25000000",
+      "lane": "openai",
+      "output_usd_per_million": "10.00000",
+      "provider": null,
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "4.60800000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1764594642,
+      "id": "deepseek/deepseek-v3.2",
+      "input_usd_per_million": "0.269000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "0.4000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.216612864",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-3-pro-image-preview",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1763060305,
+      "id": "openai/gpt-5.1",
+      "input_usd_per_million": "1.25000000",
+      "lane": "openai",
+      "output_usd_per_million": "10.00000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "4.60800000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5.1:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1763060298,
+      "id": "openai/gpt-5.1-codex",
+      "input_usd_per_million": "1.25000000",
+      "lane": "openai",
+      "output_usd_per_million": "10.00000",
+      "provider": null,
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "4.60800000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1763057820,
+      "id": "openai/gpt-5.1-codex-mini",
+      "input_usd_per_million": "0.25000000",
+      "lane": "openai",
+      "output_usd_per_million": "2.000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.92160000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "moonshotai/kimi-k2-thinking",
+      "lane": "kimi",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-oss-safeguard-20b",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-vl-32b-instruct",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5-image-mini",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-vl-8b-thinking",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-vl-8b-instruct",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5-image",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemini-2.5-flash-image",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-vl-30b-a3b-thinking",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-vl-30b-a3b-instruct",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5-pro:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1759235576,
+      "id": "z-ai/glm-4.6",
+      "input_usd_per_million": "0.43000000",
+      "lane": "glm",
+      "output_usd_per_million": "1.75000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.83755008",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1759150481,
+      "id": "deepseek/deepseek-v3.2-exp",
+      "input_usd_per_million": "0.27000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "0.41000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.22118400",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "qwen/qwen3-vl-235b-a22b-thinking",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-vl-235b-a22b-instruct",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1758662808,
+      "id": "qwen/qwen3-max",
+      "input_usd_per_million": "0.78000000",
+      "lane": "qwen",
+      "output_usd_per_million": "3.9000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.84025088",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "qwen/qwen3-coder-plus",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1758548275,
+      "id": "deepseek/deepseek-v3.1-terminus",
+      "input_usd_per_million": "0.27000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "1.000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.48218112",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "qwen/qwen3-coder-flash",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-next-80b-a3b-thinking",
+      "lane": "qwen",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-next-80b-a3b-instruct",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen-plus-2025-07-28",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1757021147,
+      "id": "moonshotai/kimi-k2-0905",
+      "input_usd_per_million": "0.6000000",
+      "lane": "kimi",
+      "output_usd_per_million": "2.5000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "1.1943936",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "qwen/qwen3-30b-a3b-thinking-2507",
+      "lane": "qwen",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1755779628,
+      "id": "deepseek/deepseek-chat-v3.1",
+      "input_usd_per_million": "0.25000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "0.95000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.45711360",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1754922288,
+      "id": "z-ai/glm-4.5v",
+      "input_usd_per_million": "0.6000000",
+      "lane": "glm",
+      "output_usd_per_million": "1.8000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.8847360",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "calls": 144,
+      "created": 1754587413,
+      "id": "openai/gpt-5",
+      "input_usd_per_million": "1.25000000",
+      "lane": "openai",
+      "output_usd_per_million": "10.00000",
+      "provider": null,
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "4.60800000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1754587407,
+      "id": "openai/gpt-5-mini",
+      "input_usd_per_million": "0.25000000",
+      "lane": "openai",
+      "output_usd_per_million": "2.000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "minimal"
+      },
+      "reasoning_label": "minimal",
+      "reserve_usd": "0.92160000",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-5-mini:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-5-nano",
+      "lane": "openai",
+      "status": "complete_cached"
+    },
+    {
+      "id": "openai/gpt-5-nano:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1754414231,
+      "id": "openai/gpt-oss-120b",
+      "input_usd_per_million": "0.037000000",
+      "lane": "openai",
+      "output_usd_per_million": "0.17000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "0.080658432",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-oss-120b:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1754414229,
+      "id": "openai/gpt-oss-20b",
+      "input_usd_per_million": "0.03000000",
+      "lane": "openai",
+      "output_usd_per_million": "0.13000000",
+      "provider": null,
+      "reasoning": {
+        "effort": "low"
+      },
+      "reasoning_label": "low",
+      "reserve_usd": "0.06193152",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "qwen/qwen3-coder-30b-a3b-instruct",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-30b-a3b-instruct-2507",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1753471347,
+      "id": "z-ai/glm-4.5",
+      "input_usd_per_million": "0.6000000",
+      "lane": "glm",
+      "output_usd_per_million": "2.2000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.0616832",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "calls": 144,
+      "created": 1753471258,
+      "id": "z-ai/glm-4.5-air",
+      "input_usd_per_million": "0.13000000",
+      "lane": "glm",
+      "output_usd_per_million": "0.85000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.39518208",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "id": "qwen/qwen3-235b-a22b-thinking-2507",
+      "lane": "qwen",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-coder",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1753200276,
+      "id": "google/gemini-2.5-flash-lite",
+      "input_usd_per_million": "0.1000000",
+      "lane": "google",
+      "output_usd_per_million": "0.4000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.1916928",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-2.5-flash-lite:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-235b-a22b-2507",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1752263252,
+      "id": "moonshotai/kimi-k2",
+      "input_usd_per_million": "0.57000000",
+      "lane": "kimi",
+      "output_usd_per_million": "2.3000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "1.10149632",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "calls": 144,
+      "created": 1750172488,
+      "id": "google/gemini-2.5-flash",
+      "input_usd_per_million": "0.3000000",
+      "lane": "google",
+      "output_usd_per_million": "2.5000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "1.1501568",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "google/gemini-2.5-flash:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemini-2.5-pro",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemini-2.5-pro:batch",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/o3-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemini-2.5-pro-preview",
+      "lane": "google",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "deepseek/deepseek-r1-0528",
+      "lane": "deepseek",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen3-30b-a3b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3-8b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3-14b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3-32b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen3-235b-a22b",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "openai/o4-mini-high",
+      "lane": "openai",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1744823457,
+      "id": "openai/o3",
+      "input_usd_per_million": "2.000000",
+      "lane": "openai",
+      "output_usd_per_million": "8.000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "3.833856",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/o3:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1744820942,
+      "id": "openai/o4-mini",
+      "input_usd_per_million": "1.1000000",
+      "lane": "openai",
+      "output_usd_per_million": "4.4000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "2.1086208",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/o4-mini:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1744651385,
+      "id": "openai/gpt-4.1",
+      "input_usd_per_million": "2.000000",
+      "lane": "openai",
+      "output_usd_per_million": "8.000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "3.833856",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-4.1:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1744651381,
+      "id": "openai/gpt-4.1-mini",
+      "input_usd_per_million": "0.4000000",
+      "lane": "openai",
+      "output_usd_per_million": "1.6000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "0.7667712",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-4.1-mini:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1744651369,
+      "id": "openai/gpt-4.1-nano",
+      "input_usd_per_million": "0.1000000",
+      "lane": "openai",
+      "output_usd_per_million": "0.4000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "0.1916928",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-4.1-nano:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1742824755,
+      "id": "deepseek/deepseek-chat-v3-0324",
+      "input_usd_per_million": "0.25000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "1.000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "0.47923200",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/o1-pro",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemma-3-4b-it",
+      "lane": "google",
+      "reason": "Gemma is outside the requested Gemini series",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemma-3-12b-it",
+      "lane": "google",
+      "reason": "Gemma is outside the requested Gemini series",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemma-3-27b-it",
+      "lane": "google",
+      "reason": "Gemma is outside the requested Gemini series",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/o3-mini-high",
+      "lane": "openai",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen2.5-vl-72b-instruct",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen-plus",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1738351721,
+      "id": "openai/o3-mini",
+      "input_usd_per_million": "1.1000000",
+      "lane": "openai",
+      "output_usd_per_million": "4.4000000",
+      "provider": null,
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "2.1086208",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/o3-mini:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1737663169,
+      "id": "deepseek/deepseek-r1-distill-llama-70b",
+      "input_usd_per_million": "0.8000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "0.8000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled, optional",
+      "reserve_usd": "0.4718592",
+      "status": "runnable",
+      "structured_output": false
+    },
+    {
+      "id": "deepseek/deepseek-r1",
+      "lane": "deepseek",
+      "reason": "mandatory reasoning lacks minimal/low",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1735241320,
+      "id": "deepseek/deepseek-chat",
+      "input_usd_per_million": "0.2574000000",
+      "lane": "deepseek",
+      "output_usd_per_million": "1.0287000000",
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "0.4930191360",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/o1",
+      "lane": "openai",
+      "reason": "output price exceeds USD 15/M",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1732127594,
+      "id": "openai/gpt-4o-2024-11-20",
+      "input_usd_per_million": "2.5000000",
+      "lane": "openai",
+      "output_usd_per_million": "10.00000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "4.7923200",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "qwen/qwen-2.5-coder-32b-instruct",
+      "lane": "qwen",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "qwen/qwen-2.5-7b-instruct",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "id": "qwen/qwen-2.5-72b-instruct",
+      "lane": "qwen",
+      "status": "complete_cached"
+    },
+    {
+      "calls": 144,
+      "created": 1722902400,
+      "id": "openai/gpt-4o-2024-08-06",
+      "input_usd_per_million": "2.5000000",
+      "lane": "openai",
+      "output_usd_per_million": "10.00000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "4.7923200",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1721260800,
+      "id": "openai/gpt-4o-mini",
+      "input_usd_per_million": "0.15000000",
+      "lane": "openai",
+      "output_usd_per_million": "0.6000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "0.28753920",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1721260800,
+      "id": "openai/gpt-4o-mini-2024-07-18",
+      "input_usd_per_million": "0.15000000",
+      "lane": "openai",
+      "output_usd_per_million": "0.6000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "0.28753920",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-4o-mini:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "google/gemma-2-27b-it",
+      "lane": "google",
+      "reason": "Gemma is outside the requested Gemini series",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1715558400,
+      "id": "openai/gpt-4o",
+      "input_usd_per_million": "2.5000000",
+      "lane": "openai",
+      "output_usd_per_million": "10.00000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "4.7923200",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1715558400,
+      "id": "openai/gpt-4o-2024-05-13",
+      "input_usd_per_million": "5.000000",
+      "lane": "openai",
+      "output_usd_per_million": "15.000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "7.372800",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-4o:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-4-turbo",
+      "lane": "openai",
+      "reason": "output price exceeds USD 15/M",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-4-turbo:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "calls": 144,
+      "created": 1706140800,
+      "id": "openai/gpt-3.5-turbo-0613",
+      "input_usd_per_million": "1.000000",
+      "lane": "openai",
+      "output_usd_per_million": "2.000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "1.032192",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1695859200,
+      "id": "openai/gpt-3.5-turbo-instruct",
+      "input_usd_per_million": "1.5000000",
+      "lane": "openai",
+      "output_usd_per_million": "2.000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "1.1059200",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1693180800,
+      "id": "openai/gpt-3.5-turbo-16k",
+      "input_usd_per_million": "3.000000",
+      "lane": "openai",
+      "output_usd_per_million": "4.000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "2.211840",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "calls": 144,
+      "created": 1685232000,
+      "id": "openai/gpt-3.5-turbo",
+      "input_usd_per_million": "0.5000000",
+      "lane": "openai",
+      "output_usd_per_million": "1.5000000",
+      "provider": null,
+      "reasoning": null,
+      "reasoning_label": "omitted, not advertised",
+      "reserve_usd": "0.7372800",
+      "status": "runnable",
+      "structured_output": true
+    },
+    {
+      "id": "openai/gpt-3.5-turbo:batch",
+      "lane": "openai",
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
+    },
+    {
+      "id": "openai/gpt-4",
+      "lane": "openai",
+      "reason": "output price exceeds USD 15/M",
+      "status": "excluded"
+    }
+  ],
+  "observed_before_refresh_usd": "5.34309727235",
+  "oss_provider_policy": {
+    "allow_fallbacks": true,
+    "quantizations": [
+      "fp8",
+      "int8",
+      "bf16",
+      "fp16"
+    ],
+    "require_parameters": true
+  },
+  "schema": 1
+}

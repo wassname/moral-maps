@@ -162,7 +162,7 @@ def _force_msg(n: int) -> str:
 
 async def _force_answer(model: str, prompt: str, phase1_msg: dict, temperature: float,
                         max_tokens: int, req_timeout: float, reasoning: dict | None,
-                        response_format: dict | None, n: int) -> dict:
+                        response_format: dict | None, n: int, provider: dict | None) -> dict:
     """Phase-2 rescue (wassname's bounded-thinking pattern, gist 72eed3a1): a reasoning model that
     spent its whole budget thinking and truncated the JSON mid-object gets a follow-up in the SAME
     conversation -- feed its (truncated) reasoning back as the assistant turn, then demand a compact
@@ -178,6 +178,8 @@ async def _force_answer(model: str, prompt: str, phase1_msg: dict, temperature: 
         payload["reasoning"] = reasoning
     if response_format is not None:
         payload["response_format"] = response_format
+    if provider is not None:
+        payload["provider"] = provider
     return await asyncio.wait_for(openrouter_request(payload), timeout=req_timeout)
 
 
@@ -205,7 +207,8 @@ def _rate_plan(items: list[dict], n_samples: int, per_call: int = 1) -> list[dic
 
 def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, temperature: float,
                             max_tokens: int, concurrency: int, req_timeout: float,
-                            reasoning: dict | None, structured_output: bool) -> str:
+                            reasoning: dict | None, structured_output: bool,
+                            provider: dict | None = None) -> str:
     """Hash the exact model, rendered prompts, and request settings that define a cacheable panel."""
     plan = _rate_plan(items, n_samples)
     protocol = {
@@ -217,6 +220,7 @@ def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, te
         "req_timeout": req_timeout,
         "reasoning": reasoning,
         "structured_output": structured_output,
+        "provider": provider,
         "rate_prompt": _RATE_PROMPT,
         "rescue_prompt": _force_msg(10),
         "requests": [{key: req[key] for key in ("i", "perm", "prompt", "cnt", "sample", "presented_options")}
@@ -237,7 +241,7 @@ def _append_record(path: Path, record: dict) -> None:
 def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temperature: float = 1.0,
                      max_tokens: int = 512, concurrency: int = 8, req_timeout: float = 90.0,
                      reasoning: dict | None = None, structured_output: bool = False, records_path: str | Path,
-                     verbose_first: bool = False) -> list[dict]:
+                     verbose_first: bool = False, provider: dict | None = None) -> list[dict]:
     """Run one dense rating panel and write an fsynced JSONL event for every paid request phase.
 
     The record is the source of truth. It preserves dispatches, responses, rescues, provider usage,
@@ -249,13 +253,13 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
     protocol_id = rated_protocol_identity(model, items, n_samples=n_samples, temperature=temperature,
                                           max_tokens=max_tokens, concurrency=concurrency,
                                           req_timeout=req_timeout, reasoning=reasoning,
-                                          structured_output=structured_output)
+                                          structured_output=structured_output, provider=provider)
     run_id = f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}_{protocol_id[:12]}"
     rpath = Path(records_path)
     rpath.parent.mkdir(parents=True, exist_ok=True)
     settings = {"model": model, "n_samples": n_samples, "temperature": temperature,
                 "max_tokens": max_tokens, "concurrency": concurrency, "req_timeout": req_timeout,
-                "reasoning": reasoning, "structured_output": structured_output}
+                "reasoning": reasoning, "structured_output": structured_output, "provider": provider}
     _append_record(rpath, {"event": "run_started", "run_id": run_id, "protocol_id": protocol_id,
                            "settings": settings, "items": items, "planned_requests": len(plan)})
 
@@ -273,6 +277,8 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                        "temperature": temperature, "n": req["cnt"], "max_tokens": max_tokens}
             if reasoning is not None:
                 payload["reasoning"] = reasoning
+            if provider is not None:
+                payload["provider"] = provider
             response_format = _rating_schema(item["n"]) if structured_output else None
             if response_format is not None:
                 payload["response_format"] = response_format
@@ -283,7 +289,8 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                                            **request_meta, "payload": payload})
                     data = await asyncio.wait_for(openrouter_request(payload), timeout=req_timeout)
                     _append_record(rpath, {"event": "request_completed", "phase": phase,
-                                           **request_meta, "response": data, "usage": data.get("usage")})
+                                           **request_meta, "response": data, "provider": data.get("provider"),
+                                           "usage": data.get("usage")})
                     if len(data["choices"]) != req["cnt"]:
                         raise ValueError(f"expected {req['cnt']} choices, got {len(data['choices'])}")
                     message = data["choices"][0]["message"]
@@ -303,13 +310,16 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                             rescue_payload["response_format"] = response_format
                         if reasoning is not None:
                             rescue_payload["reasoning"] = reasoning
+                        if provider is not None:
+                            rescue_payload["provider"] = provider
                         _append_record(rpath, {"event": "request_started", "phase": phase,
                                                **request_meta, "payload": rescue_payload,
                                                "initial_response_message": message})
                         rescue = await _force_answer(model, req["prompt"], message, temperature,
-                                                     max_tokens, req_timeout, reasoning, response_format, item["n"])
+                                                     max_tokens, req_timeout, reasoning, response_format, item["n"], provider)
                         _append_record(rpath, {"event": "request_completed", "phase": phase,
-                                               **request_meta, "response": rescue, "usage": rescue.get("usage")})
+                                               **request_meta, "response": rescue, "provider": rescue.get("provider"),
+                                               "usage": rescue.get("usage")})
                         if len(rescue["choices"]) != 1:
                             raise ValueError(f"expected one rescue choice, got {len(rescue['choices'])}")
                         text = rescue["choices"][0]["message"].get("content") or ""

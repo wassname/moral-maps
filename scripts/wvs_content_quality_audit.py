@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit dense-rated WVS response discrimination without making API requests."""
+"""Audit score-all-options WVS response discrimination without making API requests."""
 
 from __future__ import annotations
 
@@ -264,7 +264,7 @@ def main() -> None:
         "",
         "## Definitions",
         "",
-        "Each dense-rated reply assigns a 1-5 rating to every answer in a card. A flat reply gives every "
+        "Each score-all-options reply assigns a 1-5 rating to every answer in a card. A flat reply gives every "
         "answer the same rating. Normalized spread is `(max rating - min rating) / 4`. "
         "A unique argmax has one highest-rated option; tie size counts all highest-rated options. "
         "Distance from uniform is total variation, `0.5 * sum(abs(p - uniform))`, after normalizing a reply's ratings to p.",
@@ -344,7 +344,7 @@ def main() -> None:
         "",
         "The table shows that flat replies and coordinate sensitivity vary across model and item, so Nano alone cannot "
         "supply a general rejection threshold. Saved mismatch rationale is evidence against interpreting those replies as attitudes. "
-        "For other cells, no saved rationale does not establish genuine indifference. Preserve the published dense-rated "
+        "For other cells, no saved rationale does not establish genuine indifference. Preserve the published score-all-options "
         "readout and report this diagnostic rather than silently replace or filter it.",
         "",
         "-- PI[gpt-5.6-terra]",
