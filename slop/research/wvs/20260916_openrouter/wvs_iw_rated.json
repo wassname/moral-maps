@@ -1,5 +1,20 @@
 {
   "completed": {
+    "00220612ec353054f53baca3eccb90ea2bea8632c2c2fdae99ef7a074bd75d05": {
+      "coords": [
+        0.5467309986851505,
+        0.5724812695525422,
+        0.06104656289606268,
+        0.10460593729500693
+      ],
+      "display_key": "grok-4.3 (rated)",
+      "model": "x-ai/grok-4.3",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "00220612ec353054f53baca3eccb90ea2bea8632c2c2fdae99ef7a074bd75d05",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T122425Z_00220612ec35"
+    },
     "0043a43d1a2188f7c728ccda08eee7b062232366d8a4e912c72bdc938e37fe44": {
       "coords": [
         0.6214472858835399,
@@ -14,6 +29,21 @@
       "protocol_id": "0043a43d1a2188f7c728ccda08eee7b062232366d8a4e912c72bdc938e37fe44",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T152010Z_0043a43d1a21"
+    },
+    "009e9bcb85966922ddafb0bb61fd0f750528edf0a13a21cf954b226476428210": {
+      "coords": [
+        0.3863756613756613,
+        0.6708921222810112,
+        0.05550492956346581,
+        0.07459772141856083
+      ],
+      "display_key": "gemini-2.5-flash-lite (rated)",
+      "model": "google/gemini-2.5-flash-lite",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "009e9bcb85966922ddafb0bb61fd0f750528edf0a13a21cf954b226476428210",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T130434Z_009e9bcb8596"
     },
     "02d386b067d55e0639d33db8b6f1e5c708c30acbada3125dcbabde47dc90edcf": {
       "coords": [
@@ -45,6 +75,51 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T192223Z_0a798666aeed"
     },
+    "11929820262d34605efabc00ce84137857e03ef6c53d827ea6c405555b905f26": {
+      "coords": [
+        0.6151755041791274,
+        0.6364257870168759,
+        0.06075682882091517,
+        0.0850053325551206
+      ],
+      "display_key": "gpt-5.4 (rated)",
+      "model": "openai/gpt-5.4",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "11929820262d34605efabc00ce84137857e03ef6c53d827ea6c405555b905f26",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T124555Z_11929820262d"
+    },
+    "134c21f0377c1a88f8ecfe9e9191341b0f53e0afbadb05d36ca0ba36c641f340": {
+      "coords": [
+        0.5672038109538109,
+        0.6522156084656084,
+        0.0657887759000581,
+        0.0790074678539591
+      ],
+      "display_key": "gemini-3.5-flash-lite (rated)",
+      "model": "google/gemini-3.5-flash-lite",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "134c21f0377c1a88f8ecfe9e9191341b0f53e0afbadb05d36ca0ba36c641f340",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T124448Z_134c21f0377c"
+    },
+    "1486c2f54e34ad1075f7b519a1dfc2b43f9f7e052d563a083fbc139fc41bd6ee": {
+      "coords": [
+        0.5941946410337214,
+        0.6441922202164339,
+        0.06777104459972463,
+        0.07883221721567056
+      ],
+      "display_key": "glm-4.5-air (rated)",
+      "model": "z-ai/glm-4.5-air",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "1486c2f54e34ad1075f7b519a1dfc2b43f9f7e052d563a083fbc139fc41bd6ee",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T125444Z_1486c2f54e34"
+    },
     "182a7e88869698133f1175f18e53e7f6f2f056739559d325b211bd065235a71c": {
       "coords": [
         0.6175297619047618,
@@ -59,6 +134,21 @@
       "protocol_id": "182a7e88869698133f1175f18e53e7f6f2f056739559d325b211bd065235a71c",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T193258Z_182a7e888696"
+    },
+    "1a14a0f088ae0c3cc56637a32bd4c2290e4dde93dfeebb0f888a5a68c784af0d": {
+      "coords": [
+        0.5780312225900461,
+        0.608531746031746,
+        0.06478224722015172,
+        0.101427539255001
+      ],
+      "display_key": "gemini-3.1-flash-lite-preview (rated)",
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "1a14a0f088ae0c3cc56637a32bd4c2290e4dde93dfeebb0f888a5a68c784af0d",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T125623Z_1a14a0f088ae"
     },
     "1a70f47789af20900f2799992b09e83af9490be6579098a6178d613d5ba7856c": {
       "coords": [
@@ -105,6 +195,36 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T192044Z_1d7f4015decb"
     },
+    "27cc1b32407e6ebca063ce550d1848751a64f4393f93b6af393a01b4f62fe162": {
+      "coords": [
+        0.5442434494517827,
+        0.6391828271087302,
+        0.04443386786526795,
+        0.054686704767473275
+      ],
+      "display_key": "glm-5.3-flash (rated)",
+      "model": "z-ai/glm-5.3-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "27cc1b32407e6ebca063ce550d1848751a64f4393f93b6af393a01b4f62fe162",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T114916Z_27cc1b32407e"
+    },
+    "29b17fd9e04c4b7f93e1763b460892f9ec2f4fc4698b6dd7571fcfebc76b8500": {
+      "coords": [
+        0.5429175317746331,
+        0.694532627865961,
+        0.06309666696112717,
+        0.07571315515523741
+      ],
+      "display_key": "glm-5.1 (rated)",
+      "model": "z-ai/glm-5.1",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "29b17fd9e04c4b7f93e1763b460892f9ec2f4fc4698b6dd7571fcfebc76b8500",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T120826Z_29b17fd9e04c"
+    },
     "3016d2c1ab8d8f88f01723d2d695be996c7f1fdcd442a51cfbb6c7b7110a25e9": {
       "coords": [
         0.5017202097104058,
@@ -134,6 +254,21 @@
       "protocol_id": "304db4b1aa6c80d734f802749c75143feddfcdb740c4131385e927148ba7d05b",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T195554Z_304db4b1aa6c"
+    },
+    "3194398c99baf1d5ebb273314207d4aa1bfe5d12c8b16cb192818aacd78d759f": {
+      "coords": [
+        0.4215300954189843,
+        0.7190489551600663,
+        0.07543950734136469,
+        0.06523372720374179
+      ],
+      "display_key": "grok-4.6 (rated)",
+      "model": "x-ai/grok-4.6",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "3194398c99baf1d5ebb273314207d4aa1bfe5d12c8b16cb192818aacd78d759f",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T114916Z_3194398c99ba"
     },
     "333ece6448f97447c57f24f9e9fcf0a7fb72a1b0f96696aef3c38a9c1d2d2308": {
       "coords": [
@@ -240,6 +375,66 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T150121Z_49ae9f7a0909"
     },
+    "4f0d6ed370f069e233ea6c4cb83000e79398c3a2aa10b355b10f99c8633c47f6": {
+      "coords": [
+        0.5923129031462364,
+        0.6683453376721874,
+        0.042111115261344804,
+        0.08216742430172869
+      ],
+      "display_key": "glm-5 (rated)",
+      "model": "z-ai/glm-5",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "4f0d6ed370f069e233ea6c4cb83000e79398c3a2aa10b355b10f99c8633c47f6",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T123002Z_4f0d6ed370f0"
+    },
+    "5478eac564ec02f01e161ce017e1814954f4239b9fa1bedfe73172c5c630848f": {
+      "coords": [
+        0.4566709514410664,
+        0.670101976591992,
+        0.05775584971748114,
+        0.07962287120217941
+      ],
+      "display_key": "gpt-5.4-mini (rated)",
+      "model": "openai/gpt-5.4-mini",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "5478eac564ec02f01e161ce017e1814954f4239b9fa1bedfe73172c5c630848f",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T124216Z_5478eac564ec"
+    },
+    "54e721734c251e2e13cf43beab962703409108bfc5203c19e7747770ce13a801": {
+      "coords": [
+        0.593257275132275,
+        0.6186534585344109,
+        0.03571288070419747,
+        0.06312818330951275
+      ],
+      "display_key": "gemini-3.6-flash (rated)",
+      "model": "google/gemini-3.6-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "54e721734c251e2e13cf43beab962703409108bfc5203c19e7747770ce13a801",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T124016Z_54e721734c25"
+    },
+    "568bb3fc2517dd40b1399c71e0cf52033dcce79dc7537c4943ace860fe3a1297": {
+      "coords": [
+        0.6123449635867936,
+        0.7514717187100795,
+        0.04454897242429451,
+        0.049069808495596626
+      ],
+      "display_key": "gpt-5.1 (rated)",
+      "model": "openai/gpt-5.1",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "568bb3fc2517dd40b1399c71e0cf52033dcce79dc7537c4943ace860fe3a1297",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T125409Z_568bb3fc2517"
+    },
     "57bed80fd5b94157effe68fe998c7c12612fea210c1371dbf230097a7e8e0717": {
       "coords": [
         0.6363133579397021,
@@ -284,6 +479,36 @@
       "protocol_id": "589e10fa7924ecf8f88650d6587ff37c440f47c6c4cc4325c7009ef8d4eeb4ec",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T181355Z_589e10fa7924"
+    },
+    "5c920b68e50c5b4fd43542f379ac25b98e8d79107ea1722c1db12aa22fa34211": {
+      "coords": [
+        0.5907043650793651,
+        0.5776102655592599,
+        0.04137996061944377,
+        0.07845514485495916
+      ],
+      "display_key": "gemini-3.5-flash (rated)",
+      "model": "google/gemini-3.5-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "5c920b68e50c5b4fd43542f379ac25b98e8d79107ea1722c1db12aa22fa34211",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T124812Z_5c920b68e50c"
+    },
+    "6067c0208cc500e5837d123052d6b33b3568d616e5c157f601baa8dcb7ef159b": {
+      "coords": [
+        0.5189766385048643,
+        0.6372836916088428,
+        0.052897459249729474,
+        0.08224247455566645
+      ],
+      "display_key": "grok-4.20 (rated)",
+      "model": "x-ai/grok-4.20",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "6067c0208cc500e5837d123052d6b33b3568d616e5c157f601baa8dcb7ef159b",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T122709Z_6067c0208cc5"
     },
     "61ab1adae3781ca3893328a845d4d517daa5fb47e07ea189da1df45388f62d42": {
       "coords": [
@@ -330,6 +555,21 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T191343Z_67a70b1b03ba"
     },
+    "6af9f017856f4c733214bf8e26992a4af3c7cb94dac8a5a4b881e8669b3917a7": {
+      "coords": [
+        0.5220108722106056,
+        0.6395004417804221,
+        0.04704769940966264,
+        0.09470717560391326
+      ],
+      "display_key": "gpt-5-mini (rated)",
+      "model": "openai/gpt-5-mini",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "6af9f017856f4c733214bf8e26992a4af3c7cb94dac8a5a4b881e8669b3917a7",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T130236Z_6af9f017856f"
+    },
     "6d6ce30e9fbc5fdb07229b0a08e067d77511857069a4e572613d3e48b7c8b261": {
       "coords": [
         0.5856201899951899,
@@ -344,6 +584,21 @@
       "protocol_id": "6d6ce30e9fbc5fdb07229b0a08e067d77511857069a4e572613d3e48b7c8b261",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T135722Z_6d6ce30e9fbc"
+    },
+    "6f7a7bbc4d70e7cfceff8e25b2da2008fbf6105538825f42bfbbc47ff3459387": {
+      "coords": [
+        0.5605366161616162,
+        0.573015873015873,
+        0.07008299148165956,
+        0.09640175208725496
+      ],
+      "display_key": "gemini-3.1-flash-lite (rated)",
+      "model": "google/gemini-3.1-flash-lite",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "6f7a7bbc4d70e7cfceff8e25b2da2008fbf6105538825f42bfbbc47ff3459387",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T125248Z_6f7a7bbc4d70"
     },
     "7058adf367d238c6c92e1b83ae71f6556362e9fc7a243297b6fc65e54e2c2886": {
       "coords": [
@@ -374,6 +629,21 @@
       "protocol_id": "74e3649a6961000bab284e801fe811d5c8fc4cf1db15af52bb10959f5a5a37c1",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T144205Z_74e3649a6961"
+    },
+    "7809cffa4ab1327c0a20b2d9ec23d0647b9382ddef65dd36c2ab5669da4f7d9f": {
+      "coords": [
+        0.5595998356229528,
+        0.5926290303237558,
+        0.04045393842948997,
+        0.058480296424785895
+      ],
+      "display_key": "glm-4.7-flash (rated)",
+      "model": "z-ai/glm-4.7-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "7809cffa4ab1327c0a20b2d9ec23d0647b9382ddef65dd36c2ab5669da4f7d9f",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T123743Z_7809cffa4ab1"
     },
     "7ee20ca2b88f69dd06b9de3018deea4cb7a418e3119e17862cd0b32146daae1a": {
       "coords": [
@@ -419,6 +689,21 @@
       "protocol_id": "82875b6ee164d0d980eba738bf05f69959234567b91f9cfd01fcabca0bd70dac",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T133001Z_82875b6ee164"
+    },
+    "840da516c1c04e69e5d80dd104803f019a4d6c6640359ad0e4bbcb71e722aa6c": {
+      "coords": [
+        0.5595320767195766,
+        0.6334656084656085,
+        0.05158017344603731,
+        0.06609164737112991
+      ],
+      "display_key": "gemini-3-flash-preview (rated)",
+      "model": "google/gemini-3-flash-preview",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "840da516c1c04e69e5d80dd104803f019a4d6c6640359ad0e4bbcb71e722aa6c",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T125926Z_840da516c1c0"
     },
     "842298c634ec0f57848b605f67fca161631a852a68192cae1a5377b1d9f31566": {
       "coords": [
@@ -510,6 +795,21 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T144546Z_921707cb0d3d"
     },
+    "94428060f3776ab79ab3d146382e869d248c259c86858f4e5dbc9c5a1f4633db": {
+      "coords": [
+        0.48311026165192833,
+        0.6007697469838861,
+        0.05313376200674668,
+        0.06690255611782707
+      ],
+      "display_key": "gpt-5.4-nano (rated)",
+      "model": "openai/gpt-5.4-nano",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "94428060f3776ab79ab3d146382e869d248c259c86858f4e5dbc9c5a1f4633db",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T123850Z_94428060f377"
+    },
     "95bb4d3939e9937823357b5cd87adb1a6640cc5b04e0841dfec03095331a5e44": {
       "coords": [
         0.4569019748367575,
@@ -585,6 +885,51 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260917T112151Z_a2df2f1a32fd"
     },
+    "a544b24e1874f8d1930042f65a61ea53299057a6299b0eb2ded110691c0d4edb": {
+      "coords": [
+        0.6298593073593075,
+        0.6495670432204361,
+        0.03865121082002784,
+        0.08563182969926275
+      ],
+      "display_key": "gemini-2.5-flash (rated)",
+      "model": "google/gemini-2.5-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "a544b24e1874f8d1930042f65a61ea53299057a6299b0eb2ded110691c0d4edb",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T130734Z_a544b24e1874"
+    },
+    "a742f028f72ec35cc6586661ca261df77a51eecce778ff080062968942d822ae": {
+      "coords": [
+        0.5253620889368438,
+        0.6943301071633757,
+        0.06029287144663362,
+        0.07390235325207269
+      ],
+      "display_key": "glm-5.2 (rated)",
+      "model": "z-ai/glm-5.2",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "a742f028f72ec35cc6586661ca261df77a51eecce778ff080062968942d822ae",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T115959Z_a742f028f72e"
+    },
+    "a9a69a3ef43e7544f73290e6fd9d3c9f37013b15a9e50be755d4d227d6cc30eb": {
+      "coords": [
+        0.524187458188895,
+        0.708147541423977,
+        0.05959262807078437,
+        0.06778136701328388
+      ],
+      "display_key": "grok-4.5 (rated)",
+      "model": "x-ai/grok-4.5",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "a9a69a3ef43e7544f73290e6fd9d3c9f37013b15a9e50be755d4d227d6cc30eb",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T121142Z_a9a69a3ef43e"
+    },
     "abf45a27f4bafad0eb264aac33b1e49e9d0404e141966954d0707930d56665e3": {
       "coords": [
         0.45740779531102105,
@@ -630,6 +975,21 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T140418Z_b35b916c2264"
     },
+    "b5fdfe76425ee50c9f475587863990f2f6fd088d7f64c5c5119e7062a6a1396b": {
+      "coords": [
+        0.552530712157149,
+        0.63810610515893,
+        0.053278822950175,
+        0.08499253722116974
+      ],
+      "display_key": "gpt-5.2 (rated)",
+      "model": "openai/gpt-5.2",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "b5fdfe76425ee50c9f475587863990f2f6fd088d7f64c5c5119e7062a6a1396b",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T125001Z_b5fdfe76425e"
+    },
     "bca0745bdc1554718d57891098f366214f05e9e896007a916d14a06efa33471a": {
       "coords": [
         0.5778139029180694,
@@ -645,6 +1005,51 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T145109Z_bca0745bdc15"
     },
+    "be8b6978ea49ace083544a82e1837e17898ca264b959e08939da01a63424e2f9": {
+      "coords": [
+        0.56922050588427,
+        0.7223026320129816,
+        0.036665367096187215,
+        0.053812885345722886
+      ],
+      "display_key": "gpt-5 (rated)",
+      "model": "openai/gpt-5",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "be8b6978ea49ace083544a82e1837e17898ca264b959e08939da01a63424e2f9",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T125811Z_be8b6978ea49"
+    },
+    "c2911249c065c9b0cd2f69104d1f931bf8783940bd503fd60aa99ec6c6c0a761": {
+      "coords": [
+        0.5489586575370888,
+        0.6356739354917721,
+        0.05257011593980756,
+        0.0883451278287498
+      ],
+      "display_key": "gpt-5.6-terra (rated)",
+      "model": "openai/gpt-5.6-terra",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "c2911249c065c9b0cd2f69104d1f931bf8783940bd503fd60aa99ec6c6c0a761",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T123400Z_c2911249c065"
+    },
+    "c4e310179ab86b9d786c221d8bab6b6891f42d18836a8affc64249769eaffdef": {
+      "coords": [
+        0.5713445083420574,
+        0.5644094213660266,
+        0.04068128275908349,
+        0.08447489368900887
+      ],
+      "display_key": "deepseek-v3.2 (rated)",
+      "model": "deepseek/deepseek-v3.2",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "c4e310179ab86b9d786c221d8bab6b6891f42d18836a8affc64249769eaffdef",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T114916Z_c4e310179ab8"
+    },
     "c64ced76e82ec32cf6be896420d813403a95a421474eefcbbcbba421f8189192": {
       "coords": [
         0.48767589171684006,
@@ -659,6 +1064,36 @@
       "protocol_id": "c64ced76e82ec32cf6be896420d813403a95a421474eefcbbcbba421f8189192",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260917T111805Z_c64ced76e82e"
+    },
+    "c7e906b267d13cb638b0a646e9643e15bd8917152cb4ef6a2e888ba309501565": {
+      "coords": [
+        0.5803524402579809,
+        0.6040068811440846,
+        0.04571011970861469,
+        0.08797307424268631
+      ],
+      "display_key": "deepseek-v3.2-exp (rated)",
+      "model": "deepseek/deepseek-v3.2-exp",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "c7e906b267d13cb638b0a646e9643e15bd8917152cb4ef6a2e888ba309501565",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T115739Z_c7e906b267d1"
+    },
+    "cc5d6fdd3ce85c73322e963fe44186c44015427f93cdbcecec838da8b2dd4ab4": {
+      "coords": [
+        0.5896480994850559,
+        0.5981282109666797,
+        0.035112198239544395,
+        0.08647066879117997
+      ],
+      "display_key": "deepseek-chat-v3-0324 (rated)",
+      "model": "deepseek/deepseek-chat-v3-0324",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "cc5d6fdd3ce85c73322e963fe44186c44015427f93cdbcecec838da8b2dd4ab4",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T122110Z_cc5d6fdd3ce8"
     },
     "cd5db529649a179032180cecafe4fd98aff124ee3654f7d60996de704e2b63ef": {
       "coords": [
@@ -690,6 +1125,21 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260917T112521Z_d21d1e81010d"
     },
+    "d4580ea120a65129dc484875ee13aa8a721bb133a93a18b19f974cc876f00178": {
+      "coords": [
+        0.619008820472186,
+        0.6035800722347154,
+        0.0369775280569868,
+        0.08938873815444547
+      ],
+      "display_key": "deepseek-chat-v3.1 (rated)",
+      "model": "deepseek/deepseek-chat-v3.1",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "d4580ea120a65129dc484875ee13aa8a721bb133a93a18b19f974cc876f00178",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T121651Z_d4580ea120a6"
+    },
     "d81f7e66b3c4c720f8dd80768d3dfc25de6edeaf6a352cfed40e961f21fcfa22": {
       "coords": [
         0.5535321928702047,
@@ -704,6 +1154,21 @@
       "protocol_id": "d81f7e66b3c4c720f8dd80768d3dfc25de6edeaf6a352cfed40e961f21fcfa22",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T161456Z_d81f7e66b3c4"
+    },
+    "da8a3ff2c0318113bd43c5d8b1813b9d0947fcd6330bfe600ec28a203e6507b8": {
+      "coords": [
+        0.5974867724867725,
+        0.5792094488085178,
+        0.04341830148688508,
+        0.09828751212663685
+      ],
+      "display_key": "gpt-5.6-luna (rated)",
+      "model": "openai/gpt-5.6-luna",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "da8a3ff2c0318113bd43c5d8b1813b9d0947fcd6330bfe600ec28a203e6507b8",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T122950Z_da8a3ff2c031"
     },
     "dc09c3fe433c95591b336b279603c546152daf6534d90699323b3bcde754f5bf": {
       "coords": [
@@ -720,6 +1185,21 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T195827Z_dc09c3fe433c"
     },
+    "dc89e0b249b6189f2f85b9c5eebd98efb1595ea416761f9c2803ca57324275f6": {
+      "coords": [
+        0.3810994858696008,
+        0.6397686012218032,
+        0.08204078442843406,
+        0.039637685403670346
+      ],
+      "display_key": "gemini-3.8-flash (rated)",
+      "model": "google/gemini-3.8-flash",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "dc89e0b249b6189f2f85b9c5eebd98efb1595ea416761f9c2803ca57324275f6",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T123103Z_dc89e0b249b6"
+    },
     "e0a9daef251d975c5e805e159f3813dd0c55b3f0919876b828e572b0530bea88": {
       "coords": [
         0.48469169991228817,
@@ -734,6 +1214,21 @@
       "protocol_id": "e0a9daef251d975c5e805e159f3813dd0c55b3f0919876b828e572b0530bea88",
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T143453Z_e0a9daef251d"
+    },
+    "e3abbf27f8d036c12dd728740d2c263bb9be98f160437d5af3cb05b33dbfa761": {
+      "coords": [
+        0.5255845653943481,
+        0.6176120675327024,
+        0.03757041296270222,
+        0.06469679141919639
+      ],
+      "display_key": "qwen3.8-2.4t-a95b (rated)",
+      "model": "qwen/qwen3.8-2.4t-a95b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "e3abbf27f8d036c12dd728740d2c263bb9be98f160437d5af3cb05b33dbfa761",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T122025Z_e3abbf27f8d0"
     },
     "ed8190c48b2a3778bba8afff7381bb9f1578211b5e8f750d21321b62617c82c3": {
       "coords": [

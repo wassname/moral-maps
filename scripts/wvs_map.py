@@ -65,13 +65,16 @@ LEGACY_LATEST = {
     "mistral": "mistral-large-2512",
 }
 
-# These historical Grok coordinates predate the local metadata file. Their dates remain traceable
+# These historical coordinates predate the local metadata file. Their dates remain traceable
 # to exact IDs in the saved 2026-09-17 OpenRouter catalog, not inferred from version strings.
 LEGACY_CATALOG_IDS = {
     "grok-4.20": "x-ai/grok-4.20",
     "grok-4.3": "x-ai/grok-4.3",
+    "gpt-5.4": "openai/gpt-5.4",
+    "gpt-5.5": "openai/gpt-5.5",
 }
 SAVED_CATALOG_PATH = Path("slop/research/wvs/20260917_openrouter_models.json")
+CAPABILITY_MAPPING_PATH = Path("slop/research/wvs/20260917_artificialanalysis/wvs_hle_mapping.json")
 RATED_PROTOCOL_DIAGNOSTICS = {"gpt-5-nano (rated)"}
 
 API_MODEL_SETS = {
@@ -472,6 +475,17 @@ def main() -> None:
 
         completed = {entry["display_key"].replace(" (rated)", ""): entry
                      for entry in cache["completed"].values()}
+        capability_source = json.loads(CAPABILITY_MAPPING_PATH.read_text())
+        raw_capability_source = CAPABILITY_MAPPING_PATH.parent / capability_source["source"]["decoded_models"]
+        raw_source_hash = hashlib.sha256(raw_capability_source.read_bytes()).hexdigest()
+        if raw_source_hash != capability_source["source"]["decoded_models_sha256"]:
+            raise ValueError(f"Artificial Analysis HLE source hash mismatch: {raw_capability_source}")
+        capability_by_model = {entry["plotted_model"]: entry for entry in capability_source["mappings"]}
+        if len(capability_by_model) != len(capability_source["mappings"]):
+            raise ValueError("Artificial Analysis mapping repeats a plotted model")
+        unknown_capability_models = set(capability_by_model) - set(plot_models)
+        if unknown_capability_models:
+            raise ValueError(f"Artificial Analysis mapping names absent plotted models: {sorted(unknown_capability_models)}")
         family_logos = {
             "claude": "logos/anthropic.svg", "deepseek": "logos/deepseek.svg",
             "gemini": "logos/google.svg", "gemma": "logos/google.svg",
@@ -484,29 +498,45 @@ def main() -> None:
         def model_provenance(name: str) -> dict[str, object]:
             panel = completed.get(name)
             catalog = metadata.get(name)
+            if catalog is None and panel is not None and panel["model"] in saved_catalog:
+                catalog = {"created": datetime.fromtimestamp(
+                    saved_catalog[panel["model"]]["created"], tz=timezone.utc).date().isoformat()}
             if panel is None:
                 legacy_date = legacy_release_dates.get(name)
-                return {"readout": "recovered rounded historical coordinate", "items": None,
-                        "samples": None, "run_id": None, "protocol_id": None,
-                        "release_created": legacy_date,
-                        "release_source": (f"saved OpenRouter catalog 2026-09-17: {LEGACY_CATALOG_IDS[name]}"
-                                           if legacy_date else "historical coordinate")}
-            return {"readout": "rated categorical response", "items": panel["n_items"],
-                    "samples": panel["n_samples"], "run_id": panel["run_id"],
-                    "protocol_id": panel["protocol_id"],
-                    "release_created": catalog["created"] if catalog else None,
-                    "release_source": "catalog" if catalog else "request ledger"}
+                provenance = {"readout": "recovered rounded historical coordinate", "items": None,
+                              "samples": None, "run_id": None, "protocol_id": None,
+                              "release_created": legacy_date,
+                              "release_source": (f"saved OpenRouter catalog 2026-09-17: {LEGACY_CATALOG_IDS[name]}"
+                                                 if legacy_date else "historical coordinate")}
+            else:
+                provenance = {"readout": "rated categorical response", "items": panel["n_items"],
+                              "samples": panel["n_samples"], "run_id": panel["run_id"],
+                              "protocol_id": panel["protocol_id"],
+                              "release_created": catalog["created"] if catalog else None,
+                              "release_source": "catalog" if catalog else "request ledger"}
+            capability = capability_by_model.get(name)
+            provenance["hle_score"] = capability["hle_score"] if capability else None
+            provenance["hle_source_name"] = capability["source_name"] if capability else None
+            provenance["hle_source_effort"] = capability["source_effort"] if capability else None
+            return provenance
 
         args.web_data.parent.mkdir(parents=True, exist_ok=True)
         args.web_data.write_text(json.dumps({
-            "schema": 2,
+            "schema": 3,
             "capability_x": {
-                "label": "Artificial Analysis Intelligence Index",
-                "source_url": "https://artificialanalysis.ai/models",
-                "status": "blocked",
-                "blocker": "Capability scores are omitted until the source owner confirms redistribution permission.",
+                "label": "HLE score",
+                "source_url": capability_source["source"]["hle_url"],
+                "fetched_utc": capability_source["source"]["fetched_utc"],
+                "raw_source": str(raw_capability_source),
+                "raw_source_sha256": raw_source_hash,
+                "mapping": str(CAPABILITY_MAPPING_PATH),
+                "selection_rule": capability_source["selection_rule"],
+                "matched_models": len(capability_by_model),
+                "status": "available",
+                "metric": capability_source["source"]["metric"],
+                "protocol": capability_source["source"]["protocol"],
             },
-            "title": "Frontier LLMs on the\nWorld Values Survey",
+            "title": "Moral Maps: Where Do Frontier\nModels' Cultural Values Lie?",
             "note": "source: github.com/wassname/moral-maps",
             "axis": {"x": (["Self-expression", "Survival"] if sx < 0 else ["Survival", "Self-expression"]),
                      "y": (["Secular-Rational", "Traditional"] if sy < 0 else ["Traditional", "Secular-Rational"])},

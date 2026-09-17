@@ -1,0 +1,649 @@
+{
+  "schema": 2,
+  "source": {
+    "models_url": "https://artificialanalysis.ai/models",
+    "hle_url": "https://artificialanalysis.ai/evaluations/humanitys-last-exam",
+    "fetched_utc": "2026-09-17T10:13:20Z",
+    "manifest_html": "artificialanalysis_models_hle_manifest_2026-09-17T101320Z.html",
+    "manifest_html_sha256": "2477a135dbba9beb804e1a5d4e1b7b6885b4db3370e5cadd5c75b941c17a603f",
+    "encrypted_models": "artificialanalysis_hle_models_2026-09-17T101320Z.txt",
+    "encrypted_models_sha256": "92c745e965335282fdfc1482a5ccae04c6ff424f0c5cf13a94e55dfdbf3d161d",
+    "decoded_models": "artificialanalysis_hle_models_decoded_2026-09-17T101320Z.json",
+    "decoded_models_sha256": "d0b33c6d5d5a76fb65eeea9893b646c991342ca4b93996910520e02404df1818",
+    "decoded_collection": "models",
+    "canonical_configuration_rows": 652,
+    "non_null_hle_rows": 615,
+    "metric": "Humanity's Last Exam score",
+    "protocol": "Artificial Analysis HLE evaluation as supplied per model configuration; HLE score is a fraction correct."
+  },
+  "selection_rule": "For each exact canonical release mapping, select the highest non-null HLE score among saved AA configurations for that release. The selected configuration and effort remain in each mapping. This is a capability ceiling, not the score of the WVS request configuration.",
+  "mappings": [
+    {
+      "plotted_model": "qwen3.6-27b",
+      "source_release_slug": "qwen3-6-27b",
+      "source_release_name": "Qwen3.6 27B",
+      "source_configuration_slug": "qwen3-6-27b",
+      "source_name": "Qwen3.6 27B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-04-22",
+      "hle_score": 0.230769230769231,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3.5-35b-a3b",
+      "source_release_slug": "qwen3-5-35b-a3b",
+      "source_release_name": "Qwen3.5 35B A3B",
+      "source_configuration_slug": "qwen3-5-35b-a3b",
+      "source_name": "Qwen3.5 35B A3B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-02-24",
+      "hle_score": 0.210379981464319,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3.6-max-preview",
+      "source_release_slug": "qwen3-6-max",
+      "source_release_name": "Qwen3.6 Max Preview",
+      "source_configuration_slug": "qwen3-6-max",
+      "source_name": "Qwen3.6 Max Preview",
+      "source_effort": null,
+      "source_release_date": "2026-04-20",
+      "hle_score": 0.308155699721965,
+      "match_basis": "AA release name and saved OpenRouter display name are both Qwen3.6 Max Preview; AA release date 2026-04-20 predates catalog indexing on 2026-04-27.",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "muse-spark-1.3",
+      "source_release_slug": "muse-spark-1-3",
+      "source_release_name": "Muse Spark 1.3",
+      "source_configuration_slug": "muse-spark-1-3",
+      "source_name": "Muse Spark 1.3 (max)",
+      "source_effort": "max",
+      "source_release_date": "2026-09-02",
+      "hle_score": 0.487025023169602,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3.8-27b",
+      "source_release_slug": "qwen3-8-27b",
+      "source_release_name": "Qwen3.8 27B",
+      "source_configuration_slug": "qwen3-8-27b",
+      "source_name": "Qwen3.8 27B (xhigh)",
+      "source_effort": "xhigh",
+      "source_release_date": "2026-08-14",
+      "hle_score": 0.33920296570899,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 4
+    },
+    {
+      "plotted_model": "gemma-4-31b-it",
+      "source_release_slug": "gemma-4-31b",
+      "source_release_name": "Gemma 4 31B",
+      "source_configuration_slug": "gemma-4-31b",
+      "source_name": "Gemma 4 31B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-04-02",
+      "hle_score": 0.236329935125116,
+      "match_basis": "AA release and saved OpenRouter catalog both identify Google Gemma 4 31B on 2026-04-02; catalog suffix -it is not printed in either display name.",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3.5-122b-a10b",
+      "source_release_slug": "qwen3-5-122b-a10b",
+      "source_release_name": "Qwen3.5 122B A10B",
+      "source_configuration_slug": "qwen3-5-122b-a10b",
+      "source_name": "Qwen3.5 122B A10B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-02-24",
+      "hle_score": 0.252085264133457,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "grok-4.20",
+      "source_release_slug": "grok-4-20",
+      "source_release_name": "Grok 4.20 0309 v2",
+      "source_configuration_slug": "grok-4-20",
+      "source_name": "Grok 4.20 0309 v2 (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-04-07",
+      "hle_score": 0.345227062094532,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "gemini-2.5-pro",
+      "source_release_slug": "gemini-2-5-pro",
+      "source_release_name": "Gemini 2.5 Pro",
+      "source_configuration_slug": "gemini-2-5-pro",
+      "source_name": "Gemini 2.5 Pro",
+      "source_effort": null,
+      "source_release_date": "2025-06-05",
+      "hle_score": 0.225208526413346,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "grok-4.3",
+      "source_release_slug": "grok-4-3",
+      "source_release_name": "Grok 4.3",
+      "source_configuration_slug": "grok-4-3",
+      "source_name": "Grok 4.3 (high)",
+      "source_effort": "high",
+      "source_release_date": "2026-04-30",
+      "hle_score": 0.372103799814643,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 4
+    },
+    {
+      "plotted_model": "deepseek-v4-flash",
+      "source_release_slug": "deepseek-v4-flash",
+      "source_release_name": "DeepSeek V4 Flash 0731",
+      "source_configuration_slug": "deepseek-v4-flash",
+      "source_name": "DeepSeek V4 Flash 0731 (Reasoning, Max Effort)",
+      "source_effort": "max",
+      "source_release_date": "2026-07-31",
+      "hle_score": 0.385542168674699,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "gpt-5.4",
+      "source_release_slug": "gpt-5-4",
+      "source_release_name": "GPT-5.4",
+      "source_configuration_slug": "gpt-5-4",
+      "source_name": "GPT-5.4 (xhigh)",
+      "source_effort": "xhigh",
+      "source_release_date": "2026-03-05",
+      "hle_score": 0.437442075996293,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 3
+    },
+    {
+      "plotted_model": "deepseek-v4.1-flash",
+      "source_release_slug": "deepseek-v4-1-flash",
+      "source_release_name": "DeepSeek V4.1 Flash",
+      "source_configuration_slug": "deepseek-v4-1-flash",
+      "source_name": "DeepSeek V4.1 Flash (Reasoning, Max Effort)",
+      "source_effort": "max",
+      "source_release_date": "2026-09-10",
+      "hle_score": 0.392493049119555,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3-coder-30b-a3b-instruct",
+      "source_release_slug": "qwen3-coder-30b-a3b-instruct",
+      "source_release_name": "Qwen3 Coder 30B A3B Instruct",
+      "source_configuration_slug": "qwen3-coder-30b-a3b-instruct",
+      "source_name": "Qwen3 Coder 30B A3B Instruct",
+      "source_effort": null,
+      "source_release_date": "2025-07-31",
+      "hle_score": 0.0384615384615385,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "gpt-6-astra",
+      "source_release_slug": "gpt-6-astra",
+      "source_release_name": "GPT-6 Astra",
+      "source_configuration_slug": "gpt-6-astra",
+      "source_name": "GPT-6 Astra (max)",
+      "source_effort": "max",
+      "source_release_date": "2026-09-03",
+      "hle_score": 0.546802594995366,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 5
+    },
+    {
+      "plotted_model": "gemma-3-27b-it",
+      "source_release_slug": "gemma-3-27b-instruct",
+      "source_release_name": "Gemma 3 27B Instruct",
+      "source_configuration_slug": "gemma-3-27b",
+      "source_name": "Gemma 3 27B Instruct",
+      "source_effort": null,
+      "source_release_date": "2025-03-12",
+      "hle_score": 0.044,
+      "match_basis": "AA names Gemma 3 27B Instruct; saved OpenRouter ID suffix -it and display name Gemma 3 27B identify the same 2025-03-12 Google release.",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "llama-4-maverick",
+      "source_release_slug": "llama-4-maverick",
+      "source_release_name": "Llama 4 Maverick",
+      "source_configuration_slug": "llama-4-maverick",
+      "source_name": "Llama 4 Maverick",
+      "source_effort": null,
+      "source_release_date": "2025-04-05",
+      "hle_score": 0.0491195551436515,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3-vl-235b-a22b-instruct",
+      "source_release_slug": "qwen3-vl-235b-a22b-instruct",
+      "source_release_name": "Qwen3 VL 235B A22B Instruct",
+      "source_configuration_slug": "qwen3-vl-235b-a22b-instruct",
+      "source_name": "Qwen3 VL 235B A22B Instruct",
+      "source_effort": null,
+      "source_release_date": "2025-09-23",
+      "hle_score": 0.0662650602409639,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "deepseek-v4-pro",
+      "source_release_slug": "deepseek-v4-pro",
+      "source_release_name": "DeepSeek V4 Pro 0813",
+      "source_configuration_slug": "deepseek-v4-pro",
+      "source_name": "DeepSeek V4 Pro 0813 (Reasoning, Max Effort)",
+      "source_effort": "max",
+      "source_release_date": "2026-08-13",
+      "hle_score": 0.410101946246525,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "llama-4-scout",
+      "source_release_slug": "llama-4-scout",
+      "source_release_name": "Llama 4 Scout",
+      "source_configuration_slug": "llama-4-scout",
+      "source_name": "Llama 4 Scout",
+      "source_effort": null,
+      "source_release_date": "2025-04-05",
+      "hle_score": 0.0378,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3-vl-30b-a3b-instruct",
+      "source_release_slug": "qwen3-vl-30b-a3b-instruct",
+      "source_release_name": "Qwen3 VL 30B A3B Instruct",
+      "source_configuration_slug": "qwen3-vl-30b-a3b-instruct",
+      "source_name": "Qwen3 VL 30B A3B Instruct",
+      "source_effort": null,
+      "source_release_date": "2025-10-03",
+      "hle_score": 0.0630213160333642,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3.5-397b-a17b",
+      "source_release_slug": "qwen3-5-397b-a17b",
+      "source_release_name": "Qwen3.5 397B A17B",
+      "source_configuration_slug": "qwen3-5-397b-a17b",
+      "source_name": "Qwen3.5 397B A17B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-02-16",
+      "hle_score": 0.289620018535681,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "glm-5.3",
+      "source_release_slug": "glm-5-3",
+      "source_release_name": "GLM-5.3",
+      "source_configuration_slug": "glm-5-3",
+      "source_name": "GLM-5.3 (max)",
+      "source_effort": "max",
+      "source_release_date": "2026-08-18",
+      "hle_score": 0.422613531047266,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3.7-plus",
+      "source_release_slug": "qwen3-7-plus",
+      "source_release_name": "Qwen3.7 Plus",
+      "source_configuration_slug": "qwen3-7-plus",
+      "source_name": "Qwen3.7 Plus",
+      "source_effort": null,
+      "source_release_date": "2026-06-01",
+      "hle_score": 0.356348470806302,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "gpt-5.5",
+      "source_release_slug": "gpt-5-5",
+      "source_release_name": "GPT-5.5",
+      "source_configuration_slug": "gpt-5-5",
+      "source_name": "GPT-5.5 (xhigh)",
+      "source_effort": "xhigh",
+      "source_release_date": "2026-04-23",
+      "hle_score": 0.457831325301205,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 5
+    },
+    {
+      "plotted_model": "qwen3.6-35b-a3b",
+      "source_release_slug": "qwen3-6-35b-a3b",
+      "source_release_name": "Qwen3.6 35B A3B",
+      "source_configuration_slug": "qwen3-6-35b-a3b",
+      "source_name": "Qwen3.6 35B A3B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-04-16",
+      "hle_score": 0.222428174235403,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3.6-plus",
+      "source_release_slug": "qwen3-6-plus",
+      "source_release_name": "Qwen3.6 Plus",
+      "source_configuration_slug": "qwen3-6-plus",
+      "source_name": "Qwen3.6 Plus",
+      "source_effort": null,
+      "source_release_date": "2026-04-02",
+      "hle_score": 0.278498609823911,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3-235b-a22b",
+      "source_release_slug": "qwen3-235b-a22b-instruct",
+      "source_release_name": "Qwen3 235B A22B",
+      "source_configuration_slug": "qwen3-235b-a22b-instruct-reasoning",
+      "source_name": "Qwen3 235B A22B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2025-04-28",
+      "hle_score": 0.1098,
+      "match_basis": "AA release name and saved OpenRouter display name are both Qwen3 235B A22B on 2025-04-28; AA release slug adds its Instruct configuration label.",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3.7-max",
+      "source_release_slug": "qwen3-7-max",
+      "source_release_name": "Qwen3.7 Max",
+      "source_configuration_slug": "qwen3-7-max",
+      "source_name": "Qwen3.7 Max",
+      "source_effort": null,
+      "source_release_date": "2026-05-19",
+      "hle_score": 0.405004633920297,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3.5-9b",
+      "source_release_slug": "qwen3-5-9b",
+      "source_release_name": "Qwen3.5 9B",
+      "source_configuration_slug": "qwen3-5-9b",
+      "source_name": "Qwen3.5 9B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-03-02",
+      "hle_score": 0.149212233549583,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3-vl-32b-instruct",
+      "source_release_slug": "qwen3-vl-32b-instruct",
+      "source_release_name": "Qwen3 VL 32B Instruct",
+      "source_configuration_slug": "qwen3-vl-32b-instruct",
+      "source_name": "Qwen3 VL 32B Instruct",
+      "source_effort": null,
+      "source_release_date": "2025-10-21",
+      "hle_score": 0.0681186283595922,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "gpt-5.6-sol",
+      "source_release_slug": "gpt-5-6-sol",
+      "source_release_name": "GPT-5.6 Sol",
+      "source_configuration_slug": "gpt-5-6-sol",
+      "source_name": "GPT-5.6 Sol (max)",
+      "source_effort": "max",
+      "source_release_date": "2026-07-09",
+      "hle_score": 0.494902687673772,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 6
+    },
+    {
+      "plotted_model": "qwen3-max-thinking",
+      "source_release_slug": "qwen3-max-thinking",
+      "source_release_name": "Qwen3 Max Thinking",
+      "source_configuration_slug": "qwen3-max-thinking",
+      "source_name": "Qwen3 Max Thinking",
+      "source_effort": null,
+      "source_release_date": "2026-01-26",
+      "hle_score": 0.279888785912882,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "inkling",
+      "source_release_slug": "inkling",
+      "source_release_name": "Inkling",
+      "source_configuration_slug": "inkling",
+      "source_name": "Inkling (xhigh)",
+      "source_effort": "xhigh",
+      "source_release_date": "2026-07-15",
+      "hle_score": 0.318813716404078,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3-vl-8b-instruct",
+      "source_release_slug": "qwen3-vl-8b-instruct",
+      "source_release_name": "Qwen3 VL 8B Instruct",
+      "source_configuration_slug": "qwen3-vl-8b-instruct",
+      "source_name": "Qwen3 VL 8B Instruct",
+      "source_effort": null,
+      "source_release_date": "2025-10-14",
+      "hle_score": 0.0268767377201112,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "kimi-k3",
+      "source_release_slug": "kimi-k3",
+      "source_release_name": "Kimi K3",
+      "source_configuration_slug": "kimi-k3",
+      "source_name": "Kimi K3 (max)",
+      "source_effort": "max",
+      "source_release_date": "2026-07-16",
+      "hle_score": 0.468952734012975,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3.5-27b",
+      "source_release_slug": "qwen3-5-27b",
+      "source_release_name": "Qwen3.5 27B",
+      "source_configuration_slug": "qwen3-5-27b",
+      "source_name": "Qwen3.5 27B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2026-02-24",
+      "hle_score": 0.239110287303058,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3-32b",
+      "source_release_slug": "qwen3-32b-instruct",
+      "source_release_name": "Qwen3 32B",
+      "source_configuration_slug": "qwen3-32b-instruct-reasoning",
+      "source_name": "Qwen3 32B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2025-04-28",
+      "hle_score": 0.0741,
+      "match_basis": "AA release name and saved OpenRouter display name are both Qwen3 32B on 2025-04-28; AA release slug adds its Instruct configuration label.",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3-coder-next",
+      "source_release_slug": "qwen3-coder-next",
+      "source_release_name": "Qwen3 Coder Next",
+      "source_configuration_slug": "qwen3-coder-next",
+      "source_name": "Qwen3 Coder Next",
+      "source_effort": null,
+      "source_release_date": "2026-02-03",
+      "hle_score": 0.101482854494903,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "qwen3-next-80b-a3b-instruct",
+      "source_release_slug": "qwen3-next-80b-a3b-instruct",
+      "source_release_name": "Qwen3 Next 80B A3B Instruct",
+      "source_configuration_slug": "qwen3-next-80b-a3b-instruct",
+      "source_name": "Qwen3 Next 80B A3B Instruct",
+      "source_effort": null,
+      "source_release_date": "2025-09-11",
+      "hle_score": 0.0764596848934198,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "claude-opus-4.7",
+      "source_release_slug": "claude-opus-4-7",
+      "source_release_name": "Claude Opus 4.7",
+      "source_configuration_slug": "claude-opus-4-7",
+      "source_name": "Claude Opus 4.7 (Adaptive Reasoning, Max Effort)",
+      "source_effort": "max",
+      "source_release_date": "2026-04-16",
+      "hle_score": 0.423076923076923,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "qwen3-8b",
+      "source_release_slug": "qwen3-8b-instruct",
+      "source_release_name": "Qwen3 8B",
+      "source_configuration_slug": "qwen3-8b-instruct-reasoning",
+      "source_name": "Qwen3 8B (Reasoning)",
+      "source_effort": null,
+      "source_release_date": "2025-04-28",
+      "hle_score": 0.0389,
+      "match_basis": "AA release name and saved OpenRouter display name are both Qwen3 8B on 2025-04-28; AA release slug adds its Instruct configuration label.",
+      "candidate_configurations_with_hle": 2
+    },
+    {
+      "plotted_model": "claude-opus-4.8",
+      "source_release_slug": "claude-opus-4-8",
+      "source_release_name": "Claude Opus 4.8",
+      "source_configuration_slug": "claude-opus-4-8",
+      "source_name": "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)",
+      "source_effort": "max",
+      "source_release_date": "2026-05-28",
+      "hle_score": 0.486561631139944,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 1
+    },
+    {
+      "plotted_model": "gemini-3.7-flash",
+      "source_release_slug": "gemini-3-7-flash",
+      "source_release_name": "Gemini 3.7 Flash",
+      "source_configuration_slug": "gemini-3-7-flash",
+      "source_name": "Gemini 3.7 Flash (high)",
+      "source_effort": "high",
+      "source_release_date": "2026-08-13",
+      "hle_score": 0.478683966635774,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 3
+    },
+    {
+      "plotted_model": "claude-fable-5.1",
+      "source_release_slug": "claude-fable-5-1",
+      "source_release_name": "Claude Fable 5.1",
+      "source_configuration_slug": "claude-fable-5-1",
+      "source_name": "Claude Fable 5.1 (Adaptive Reasoning, Max Effort, Default Fallback)",
+      "source_effort": "max",
+      "source_release_date": "2026-09-01",
+      "hle_score": 0.591288229842447,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 5
+    },
+    {
+      "plotted_model": "claude-opus-4.6",
+      "source_release_slug": "claude-opus-4-6",
+      "source_release_name": "Claude Opus 4.6",
+      "source_configuration_slug": "claude-opus-4-6-adaptive",
+      "source_name": "Claude Opus 4.6 (Adaptive Reasoning, Max Effort)",
+      "source_effort": "max",
+      "source_release_date": "2026-02-05",
+      "hle_score": 0.399443929564411,
+      "match_basis": "exact canonical release slug after replacing dots in the plotted ID with hyphens",
+      "candidate_configurations_with_hle": 2
+    }
+  ],
+  "omitted": [
+    {
+      "plotted_model": "qwen3.8-flash",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3.5-plus-20260420",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3-30b-a3b",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "mistral-large-2512",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3-coder",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3.7-flash",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen-plus",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "gpt-5.3-chat",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3.5-plus-02-15",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3-30b-a3b-instruct-2507",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3.6-flash",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen-2.5-72b-instruct",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen-plus-2025-07-28",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3-235b-a22b-2507",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen2.5-vl-72b-instruct",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3-coder-plus",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen-2.5-7b-instruct",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    },
+    {
+      "plotted_model": "qwen3-14b",
+      "reason": "no exact canonical release or reviewed same-release alias in saved AA HLE table"
+    }
+  ],
+  "unmatched_policy": "A plotted model is omitted unless it has an exact canonical release mapping or a separately reviewed alias with direct evidence for identical weights and release."
+}

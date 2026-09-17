@@ -51,10 +51,12 @@ def main() -> None:
     if chrome is None:
         raise RuntimeError("google-chrome is required for the Playwright UAT")
     data = json.loads((ROOT / "docs/wvs/wvs_map_data.json").read_text())
-    assert data["schema"] == 2
-    assert data["capability_x"]["status"] == "blocked"
-    assert data["capability_x"]["source_url"] == "https://artificialanalysis.ai/models"
-    assert len(data["models"]) == 64
+    assert data["schema"] == 3
+    assert data["capability_x"]["status"] == "available"
+    assert data["capability_x"]["source_url"] == "https://artificialanalysis.ai/evaluations/humanitys-last-exam"
+    assert data["capability_x"]["fetched_utc"] == "2026-09-17T10:13:20Z"
+    capability_matched = [model for model in data["models"] if model["provenance"]["hle_score"] is not None]
+    assert len(capability_matched) == data["capability_x"]["matched_models"] == 46
     assert len(data["countries"]) == 90
     assert len(data["zone_hulls"]) == 4
     assert len(data["latest_by_family"]) == 13
@@ -79,20 +81,23 @@ def main() -> None:
 
         screenshot(page, f"{BASE}/", "wvs_react_root_playwright_default.png")
         page.wait_for_selector("svg .model-mark")
-        assert page.title() == "Frontier LLMs on the World Values Survey"
+        assert page.title() == "Moral Maps: Where Do Frontier Models' Cultural Values Lie?"
         assert page.locator("html").get_attribute("lang") == "en"
         assert page.locator('meta[name="viewport"]').count() == 1
-        assert page.locator("h1").inner_text().startswith("How do AI models score on human values surveys?")
+        assert page.locator("h1").inner_text() == "Moral Maps: Where Do Frontier Models' Cultural Values Lie?"
         assert page.locator(".lede").inner_text() == "We start with the World Values Survey, a map of human values across about ninety countries."
         visible_copy = page.locator("main").inner_text()
         for absent in ("React/SVG rendering", "Historical coordinates", "Dated releases only"):
             assert absent not in visible_copy
-        assert "Artificial Analysis Intelligence Index, unavailable pending redistribution permission" in visible_copy
-        assert data["capability_x"]["blocker"] in visible_copy
+        assert "Artificial Analysis HLE score" in visible_copy
+        assert "redistribution permission" not in visible_copy
         capability_option = page.get_by_label("Release-panel x axis").locator('option[value="capability"]')
-        assert capability_option.get_attribute("disabled") is not None
+        assert capability_option.get_attribute("disabled") is None
+        assert page.locator('.release-axis-selector a[href="https://artificialanalysis.ai/evaluations/humanitys-last-exam"]').count() == 1
+        assert "saved 2026-09-17" in page.locator(".release-axis-selector").inner_text()
         layout_order = page.locator("main > *").evaluate_all("nodes => nodes.map(node => node.className.baseVal || node.className || node.tagName)")
         assert layout_order.index("chart-shell") < layout_order.index("map-explanation") < layout_order.index("release-panels") < layout_order.index("caption")
+        assert page.locator(".release-panels .release-axis-selector").count() == 1
         assert "weak descriptive correlations" in page.locator(".caption").inner_text()
         assert "code and records" in page.locator(".caption").inner_text()
 
@@ -100,8 +105,9 @@ def main() -> None:
         svg_description(page, "svg[data-median-x]", "map-svg-title", "map-svg-desc")
         assert page.locator("path.zone").count() == 4
         assert page.locator("polygon.zone").count() == 0
-        assert page.locator(".map-note").get_attribute("text-anchor") == "end"
-        assert float(page.locator(".map-note").get_attribute("x")) > float(page.locator(".map-title").get_attribute("x"))
+        assert page.locator(".map-note").get_attribute("text-anchor") == "start"
+        assert float(page.locator(".map-note").get_attribute("x")) == float(page.locator(".map-title").get_attribute("x"))
+        assert float(page.locator(".map-note").get_attribute("y")) > float(page.locator(".map-title").get_attribute("y"))
         assert float(map_svg.get_attribute("data-median-x")) == data["median"]["x"]
         assert float(map_svg.get_attribute("data-median-y")) == data["median"]["y"]
         models_dom = page.locator(".model-mark").evaluate_all(
@@ -123,6 +129,10 @@ def main() -> None:
         svg_description(page, '.release-panel[data-coordinate="y"] svg', "release-y-svg-title", "release-y-svg-desc")
         svg_description(page, '.release-panel[data-coordinate="x"] svg', "release-x-svg-title", "release-x-svg-desc")
         assert page.locator(".release-mark").count() == len(dated) * 2
+        assert page.locator(".frontier-label").count() > 0
+        frontier_boxes = page.locator('.frontier-label text').evaluate_all("nodes => nodes.map(node => { const b = node.getBBox(); return [b.x, b.y, b.width, b.height]; })")
+        assert all(x >= 96 and y >= 42 and x + width <= 1165 and y + height <= 272 for x, y, width, height in frontier_boxes)
+        assert all(a[0] + a[2] <= b[0] or b[0] + b[2] <= a[0] or a[1] + a[3] <= b[1] or b[1] + b[3] <= a[1] for index, a in enumerate(frontier_boxes) for b in frontier_boxes[index + 1:])
         for grok_name in grok_dates:
             assert page.locator(f'[data-release-model="{grok_name}"]').count() == 2
         self_expression_panel = page.locator('.release-panel[data-coordinate="x"]')
@@ -143,6 +153,27 @@ def main() -> None:
             assert int(panel.locator("svg").get_attribute("data-fit-n")) == len(dated)
             assert panel.locator(".release-fit line").count() == 1
         page.screenshot(path=OUT / "wvs_react_playwright_release_fit_all_families.png", full_page=True)
+
+        page.get_by_label("Release-panel x axis").select_option("capability")
+        assert page.locator('.release-panel[data-coordinate="y"] svg').get_attribute("data-axis-mode") == "capability"
+        assert page.locator('.release-mark').count() == len(capability_matched) * 2
+        assert all(int(panel.locator("svg").get_attribute("data-fit-n")) == len(capability_matched) for panel in page.locator(".release-panel").all())
+        assert all(int(panel.locator("svg").get_attribute("data-omitted-model-count")) == len(data["models"]) - len(capability_matched) for panel in page.locator(".release-panel").all())
+        page.screenshot(path=OUT / "wvs_react_playwright_capability_all_families.png", full_page=True)
+        page.get_by_role("button", name="qwen", exact=True).click()
+        assert all(int(panel.locator("svg").get_attribute("data-fit-n")) == sum(model["family"] != "qwen" for model in capability_matched) for panel in page.locator(".release-panel").all())
+        page.screenshot(path=OUT / "wvs_react_playwright_capability_qwen_hidden.png", full_page=True)
+        page.get_by_role("button", name="qwen", exact=True).click()
+        for family in sorted(families - {"gpt"}):
+            page.get_by_role("button", name=family, exact=True).click()
+        page.wait_for_timeout(100)
+        gpt_capability = sum(model["family"] == "gpt" for model in capability_matched)
+        gpt_fit_n = [int(panel.locator("svg").get_attribute("data-fit-n")) for panel in page.locator(".release-panel").all()]
+        assert gpt_fit_n == [gpt_capability, gpt_capability], (gpt_fit_n, gpt_capability)
+        page.screenshot(path=OUT / "wvs_react_playwright_capability_gpt_only.png", full_page=True)
+        for family in sorted(families - {"gpt"}):
+            page.get_by_role("button", name=family, exact=True).click()
+        page.get_by_label("Release-panel x axis").select_option("release-date")
 
         page.get_by_role("button", name="qwen", exact=True).click()
         page.wait_for_timeout(100)
@@ -243,8 +274,11 @@ def main() -> None:
         "qwen_toggle": "clicked, map and dated-panel family groups hidden, country coordinates invariant",
         "tooltip": "map and release-panel pointer hover and focus show panel-specific model name, coordinate, and release date only",
         "release_panels": {"panels": 2, "dated_models": len(dated), "date_order": "DOM order verified; both catalog-dated Grok models rendered in each panel",
-                           "ols": "line, n, and R squared recompute from currently visible dated models; the Self-expression panel renders negative stored x, so upward means Self-expression; fewer than two distinct dates hide the fit"},
-        "copy": "one short linked WVS sentence above the map; history and axes below it; weak descriptive-fit method and code link below the release panels; capability selector remains visible but scores are absent pending redistribution permission",
+                           "ols": "line, n, and R squared recompute from currently visible matched models; the Self-expression panel renders negative stored x, so upward means Self-expression; fewer than two distinct x values hide the fit"},
+        "capability_panels": {"matched_models": len(capability_matched), "omitted_models": len(data["models"]) - len(capability_matched),
+                              "source": data["capability_x"]["source_url"], "fetched_utc": data["capability_x"]["fetched_utc"],
+                              "selector": "enabled; all-family and Qwen-hidden fits checked"},
+        "copy": "one short linked WVS sentence above the map; history and axes below it; source credit beside the enabled lower-panel selector; weak descriptive-fit method and code link below the release panels",
         "hashes": hashes,
     }, indent=2))
 
