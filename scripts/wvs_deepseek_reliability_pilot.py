@@ -244,8 +244,9 @@ def smoke() -> None:
         raise RuntimeError("one-request smoke was not parse-valid")
     atomic_json(OUT / "smoke.json", {"full_panel_protocol_id": full_identity, "smoke_model": row["id"],
                                       "smoke_item": items[0]["id"], "seed": replicate["seed_schedule"][0],
-                                      "settings": row["v1_settings"], "endpoint_advertises_seed": row["endpoint_advertises_seed"],
-                                      "result": smoke_result})
+                                      "v1_settings": row["v1_settings"],
+                                      "full_replicate_config": protocol_settings(row["id"], row["v1_settings"], replicate["seed_schedule"]),
+                                      "endpoint_advertises_seed": row["endpoint_advertises_seed"], "result": smoke_result})
 
 
 def main() -> None:
