@@ -1,0 +1,3 @@
+item_id,canonical_n,reversed_n,anchor_canonical_distribution,anchor_reversed_distribution,anchor_order_tv,anchor_canonical_modal,anchor_reversed_modal,screen_passes,task1628_order_tv,task1628_canonical_modal,task1628_reversed_modal
+Homosexuality,12,12,"[0.000, 0.000, 0.000, 0.000, 0.917, 0.000, 0.000, 0.000, 0.000, 0.083]","[0.000, 0.000, 0.000, 0.000, 0.833, 0.000, 0.000, 0.000, 0.000, 0.167]",0.08333333333333329,[4],[4],True,0.8333333333333333,[5],[9]
+Religion,12,12,"[0.000, 0.000, 0.000, 1.000]","[0.000, 0.000, 0.000, 1.000]",0.0,[3],[3],True,0.08333333333333334,[3],[3]
