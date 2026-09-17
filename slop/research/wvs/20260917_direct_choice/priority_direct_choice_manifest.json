@@ -61,9 +61,9 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.2000000",
       "output_usd_per_million": "1.2000000",
-      "protocol_id": "8db405bf3f111cd8755e531e3ba9758399a0589741e2a4af996340905d8f2f95",
+      "protocol_id": "fe4d5389063d0d6c93c48f21ae162ec1d12155f6c328aab1d2e66caf7a9e522a",
       "reasoning": {
-        "enabled": false
+        "effort": "none"
       },
       "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.6-luna_requests.jsonl",
@@ -79,9 +79,9 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.000000",
       "output_usd_per_million": "12.000000",
-      "protocol_id": "08008a2aafc8f2c0435328570269c2a5e5c7659e727a3ec03030ad1629e09305",
+      "protocol_id": "9860a6923ef9c54111e3764280588b4b43395e706329a3a286d2d7db94794ff3",
       "reasoning": {
-        "enabled": false
+        "effort": "none"
       },
       "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.6-terra_requests.jsonl",
@@ -97,9 +97,9 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.2000000",
       "output_usd_per_million": "1.25000000",
-      "protocol_id": "35b43cf1fc2442767fffe2dd37427522dd256ca1e9ad92c8b5f019e747fa39c5",
+      "protocol_id": "8aeb61dba0aba732cc7f3e8f75bb21c0cc692f9d79c5444e972de8f5a57ce83e",
       "reasoning": {
-        "enabled": false
+        "effort": "none"
       },
       "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.4-nano_requests.jsonl",
@@ -115,9 +115,9 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.75000000",
       "output_usd_per_million": "4.5000000",
-      "protocol_id": "c6ac5d81c26e9ad2777c679e44e5a8db14bbbe75afe6fcddd48d86e3e9e4c26f",
+      "protocol_id": "a130ac7f62e407eff6fe0ac8a78c6e0cac603a74a6477d7d5ea1cc9e2b828d89",
       "reasoning": {
-        "enabled": false
+        "effort": "none"
       },
       "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.4-mini_requests.jsonl",
@@ -149,9 +149,9 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.75000000",
       "output_usd_per_million": "14.000000",
-      "protocol_id": "1f2abde83666ba74d488d87ebc72a445b673c312d75b1d1cb638c6624aaf7111",
+      "protocol_id": "bb6322d4ac157f48cc0581c9b4a434f6b77e2f4b37e835799fbdaff845ebaa1f",
       "reasoning": {
-        "enabled": false
+        "effort": "none"
       },
       "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.2_requests.jsonl",
@@ -167,9 +167,9 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.25000000",
       "output_usd_per_million": "10.00000",
-      "protocol_id": "2df1e492a8fdafa7a73614a46f05eb4e8da90d77c426c1d42b8f3499bf51ca05",
+      "protocol_id": "80c8c1e4782ee2d85cddfaede339b5f981cfbb2e08525de0ff8fe0b60d9fbe37",
       "reasoning": {
-        "enabled": false
+        "effort": "none"
       },
       "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.1_requests.jsonl",
@@ -261,7 +261,7 @@
       "reasoning": {
         "enabled": false
       },
-      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
+      "reasoning_label": "unverified compatibility probe (optional reasoning parameter; no efforts advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__o3_requests.jsonl",
       "structured_output": true
     },
@@ -279,7 +279,7 @@
       "reasoning": {
         "enabled": false
       },
-      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
+      "reasoning_label": "unverified compatibility probe (optional reasoning parameter; no efforts advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__o4-mini_requests.jsonl",
       "structured_output": true
     },
@@ -345,7 +345,7 @@
       "reasoning": {
         "enabled": false
       },
-      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
+      "reasoning_label": "unverified compatibility probe (optional reasoning parameter; no efforts advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__o3-mini_requests.jsonl",
       "structured_output": true
     },
@@ -617,7 +617,7 @@
       "reasoning": {
         "enabled": false
       },
-      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
+      "reasoning_label": "unverified compatibility probe (optional reasoning parameter; no efforts advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/google__gemini-2.5-flash-lite_requests.jsonl",
       "structured_output": true
     },
@@ -635,7 +635,7 @@
       "reasoning": {
         "enabled": false
       },
-      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
+      "reasoning_label": "unverified compatibility probe (optional reasoning parameter; no efforts advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/google__gemini-2.5-flash_requests.jsonl",
       "structured_output": true
     },

@@ -192,7 +192,7 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
     """
     assert samples_per_order > 0
     assert temperature > 0
-    assert reasoning is None or reasoning == {"enabled": False} or reasoning.get("effort") in {"minimal", "low"}
+    assert reasoning is None or reasoning == {"enabled": False} or reasoning.get("effort") in {"minimal", "low", "none"}
     assert structured_output
     plan = _plan(items, samples_per_order, answer_instruction) if plan_override is None else plan_override
     protocol_id = direct_choice_protocol_identity(
@@ -285,11 +285,13 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
                             raise ValueError(f"expected one rescue choice, got {len(response['choices'])}")
                         text = response["choices"][0]["message"].get("content") or ""
                         rescued = True
-                    return {"text": text, "rescued": rescued, "error": None}
+                    if fail_fast_first_request and sequence == 0 and _parse_choice(text, item["n"]) is None:
+                        return {"text": text, "rescued": rescued, "error": "ParseError: first response remained invalid after rescue", "parse_invalid": True}
+                    return {"text": text, "rescued": rescued, "error": None, "parse_invalid": False}
                 except Exception as exc:
                     _append_record(records, {"event": "request_failed", "phase": phase, **request_meta,
                                              "error_type": type(exc).__name__, "error": str(exc)})
-                    return {"text": None, "rescued": phase == "rescue", "error": f"{type(exc).__name__}: {exc}"}
+                    return {"text": None, "rescued": phase == "rescue", "error": f"{type(exc).__name__}: {exc}", "parse_invalid": False}
 
         if not fail_fast_first_request:
             return await asyncio.gather(*(call(sequence, request) for sequence, request in enumerate(plan)))
@@ -301,6 +303,16 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
 
     results = asyncio.run(run_all())
     if fail_fast_first_request and results[0]["error"] is not None:
+        if results[0]["parse_invalid"]:
+            request = plan[0]
+            _append_record(records, {
+                "event": "answer_parsed", "run_id": run_id, "protocol_id": protocol_id,
+                "construct": "direct_choice", "model": model, "item_id": request["item_id"],
+                "sample": request["sample"], "order_name": request["order_name"],
+                "repetition": request["repetition"], "presented_order": request["presented_order"],
+                "text": results[0]["text"], "parsed": False, "presented_choice": None,
+                "canonical_choice": None,
+            })
         summary = {
             "run_id": run_id, "protocol_id": protocol_id, "model": model, "settings": settings,
             "planned_requests": len(plan), "failed_requests": 1, "rescued_requests": int(results[0]["rescued"]),

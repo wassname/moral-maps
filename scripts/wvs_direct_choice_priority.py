@@ -70,9 +70,9 @@ def reasoning_setting(model: dict) -> tuple[dict | None, str]:
     efforts = set(metadata.get("supported_efforts", []))
     optional = not metadata.get("mandatory")
     if optional and "none" in efforts:
-        return {"enabled": False}, "disabled (optional, none advertised)"
+        return {"effort": "none"}, "disabled (optional, none advertised)"
     if optional and not efforts and "reasoning" in model["supported_parameters"]:
-        return {"enabled": False}, "disabled (optional, parameter advertised without efforts)"
+        return {"enabled": False}, "unverified compatibility probe (optional reasoning parameter; no efforts advertised)"
     if "minimal" in efforts:
         return {"effort": "minimal"}, "minimal"
     if "low" in efforts:
@@ -178,7 +178,7 @@ def write_manifest(priority: list[dict]) -> None:
         f"- final response: `{ANSWER_INSTRUCTION}`",
         f"- rescue response: `{RESCUE_INSTRUCTION}`",
         "- strict structured output; each model has an isolated append-only ledger, cache, and model-specific protocol ID",
-        "- compatibility probe: run scheduled sample 0 first; a configuration or request failure records a failed run and exits before the other 239 requests",
+        "- compatibility probe: run scheduled sample 0 first; a configuration/request failure or a final parse-invalid response after rescue records a failed run and exits before the other 239 requests",
         "",
         "## Spend checks before any later dispatch",
         "",
@@ -190,7 +190,8 @@ def write_manifest(priority: list[dict]) -> None:
         "",
         "## Ordered panels",
         "",
-        "The order is Grok, OpenAI, Google, then Muse. Optional entries advertising `none` disable reasoning; otherwise `minimal` is used when advertised, then `low`. Optional metadata with no effort list disables reasoning only when the `reasoning` parameter itself is advertised; models with no reasoning metadata omit the field.",
+        "The order is Grok, OpenAI, Google, then Muse. Optional entries advertising `none` send `reasoning.effort=none`, as documented by OpenRouter. Otherwise `minimal` is used when advertised, then `low`. Optional metadata with no effort list uses an explicitly labelled, unverified `enabled:false` compatibility probe only when the `reasoning` parameter itself is advertised; models with no reasoning metadata omit the field.",
+        "- source for `effort=none` and mandatory-model rejection: <https://openrouter.ai/docs/guides/best-practices/reasoning-tokens>, fetched 2026-09-17; the saved catalog's `supported_efforts` remains the exact per-model source.",
         "",
         "| family | exact ID | created UTC | input USD/M | output USD/M | reasoning | structured | protocol ID | calls | completion-only ceiling | conservative reserve | isolated ledger |",
         "|---|---|---:|---:|---:|---|---|---|---:|---:|---:|---|",
