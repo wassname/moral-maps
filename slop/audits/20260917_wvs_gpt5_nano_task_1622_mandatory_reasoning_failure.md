@@ -32,7 +32,7 @@ The priority manifest required the cheapest new model to establish whether a 12 
 
 ## Chronology and raw evidence
 
-The saved catalog entry for `openai/gpt-5-nano` includes `reasoning`, `reasoning_effort`, and `structured_outputs` support. The task instead selected the prior optional-reasoning setting. The provider repeatedly returned:
+The saved catalog entry for `openai/gpt-5-nano` includes `reasoning`, `reasoning_effort`, and `structured_outputs` support. The task instead selected the prior optional-reasoning setting. This is a wrapper/config regression, not a newly discovered mandatory-reasoning model-class issue: the ledger's Astra run `20260916T154406Z_95bb4d3939e9` used `reasoning: {"effort": "low"}` and strict schema, completed 144/144 samples with zero rescue starts, and recorded USD 0.69797. The provider repeatedly returned:
 
 > `HTTP error for model openai/gpt-5-nano: {"error":{"message":"Reasoning is mandatory for this endpoint and cannot be disabled.","code":400,...}}`
 >
