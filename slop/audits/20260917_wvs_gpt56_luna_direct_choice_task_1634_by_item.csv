@@ -1,0 +1,13 @@
+item,n,canonical_reversed,position_balance,presented_position_tv,presented_position_entropy,choice_entropy,schedule_half_tv,direction_tv,canonical_choice_probabilities
+Abortion,10,10/10,exact,0.300,0.857,0.783,0.700,0.700,"[0.05,0,0.20,0.05,0.35,0.05,0.05,0,0.15,0.10]"
+Attending peaceful demonstrations,3,11/9,nearest 6/7,0.033,0.998,0.000,0.000,0.000,"[0,0,1]"
+"Determination, perseverance",2,10/10,exact,0.000,1.000,0.000,0.000,0.000,"[1,0]"
+God,2,10/10,exact,0.000,1.000,0.000,0.000,0.000,"[0,1]"
+Homosexuality,10,10/10,exact,0.000,1.000,0.000,0.000,0.000,"[0,0,0,0,0,0,0,0,0,1]"
+Imagination,2,10/10,exact,0.000,1.000,0.000,0.000,0.000,"[1,0]"
+Independence,2,10/10,exact,0.000,1.000,0.000,0.000,0.000,"[1,0]"
+Joining in boycotts,3,11/9,nearest 6/7,0.083,0.984,0.385,0.300,0.131,"[0,0.15,0.85]"
+Obedience,2,10/10,exact,0.350,0.610,0.934,0.100,0.100,"[0.65,0.35]"
+Religion,4,12/8,exact,0.050,0.993,0.143,0.100,0.125,"[0,0,0.05,0.95]"
+Signing a petition,3,11/9,nearest 6/7,0.217,0.887,0.455,0.200,0.162,"[0,0.20,0.80]"
+dealing with people?,2,10/10,exact,0.500,0.000,1.000,0.000,0.000,"[0.50,0.50]"
