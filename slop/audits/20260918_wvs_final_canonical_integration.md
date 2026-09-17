@@ -20,3 +20,9 @@ I inspected `slop/research/wvs/20260916_openrouter/wvs_react_root_playwright_def
 - `gpt-5-nano` is a completed cache diagnostic but is not plotted because its existing content-quality audit excluded it.
 - Incomplete/partial score-all-options panels and all DeepSeek reliability-pilot data are excluded.
 - The 16 historical rounded inputs remain distinct provenance; four duplicate canonical names resolve to the canonical panel.
+
+## Fresh-eyes review
+
+`slop/reviews/20260918_wvs_final_canonical_fresh_eyes_kimi.md` found no blockers. It records minor visual findings only, including static-export label collisions and the deliberately mirrored horizontal axis relative to the canonical WVS presentation. No site artifact changed after this review.
+
+-- PI[k3]
