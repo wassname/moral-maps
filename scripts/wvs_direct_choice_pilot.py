@@ -166,7 +166,11 @@ def main() -> None:
     items = selected_items()
     model = catalog_model()
     checks = preflight(items, model)
-    write_manifest(items, model, checks)
+    if args.run:
+        registered = MANIFEST_PATH.read_text()
+        assert f"- protocol ID: `{checks['protocol_id']}`" in registered
+    else:
+        write_manifest(items, model, checks)
     if args.smoke:
         smoke(items, checks)
     if not args.run:
