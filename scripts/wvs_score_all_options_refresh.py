@@ -216,7 +216,7 @@ def main() -> None:
         runnable = [row for row in rows if row["status"] == "runnable"]
         assert all(row["calls"] == 144 for row in runnable)
         assert all(row["provider"] == OSS_PROVIDER for row in runnable if row["lane"] in {"muse", "kimi", "glm", "deepseek", "qwen"} or row["id"].startswith("openai/gpt-oss-"))
-        assert all(row["provider"] is None for row in runnable if row["lane"] in {"openai", "google", "xai"})
+        assert all(row["provider"] is None for row in runnable if row["lane"] in {"google", "xai"} or (row["lane"] == "openai" and not row["id"].startswith("openai/gpt-oss-")))
         print(f"smoke: {len(runnable)} score-all-options panels, {len(LANES)} provider lanes, concurrency <= 8")
     if args.queue:
         queue(rows)
