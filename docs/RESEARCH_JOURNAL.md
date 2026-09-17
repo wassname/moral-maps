@@ -977,3 +977,20 @@ or token scope, but a screenshot or export would be needed to identify which one
 ledger remains the stronger project-cost source. -- PI[gpt-5.6-sol]
 
 The measured panel costs support inventorying more compatible family members before authorizing another bounded run.
+
+## 2026-09-17 -- Priority WVS API phase pre-run record
+
+This entry records the bounded next evaluation phase before any new provider request is sent.
+
+`slop/research/wvs/20260917_priority_phase_manifest.md` was generated from the saved 444-record catalog and the durable request ledger at commit `db0ef75`. It states:
+
+> - A complete panel is 144 initial calls, 12 items x 12 samples.
+> - Existing ledger spend is USD 3.5908606724; the global stop remains USD 80.
+> - This priority phase stops before USD 35 of new observed provider cost, even if the manifest has remaining models.
+> - Run only `openai/gpt-5-nano` before any other manifest model.
+
+The first panel is the lowest listed new completion-price model, `openai/gpt-5-nano`, with a USD 0.40 per million completion-token catalog price and a completion-only 144 by 1024-token ceiling of USD 0.0590. The manifest records 42 priority models, 8 deferred Qwen/GLM/Mistral models, 6,048 expected initial requests for the priority list, and no authorization to start the later panels until the first panel is audited. The evidence source is the saved catalog snapshot `slop/research/wvs/20260917_openrouter_models.json` and the append-only request ledger `slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl`.
+
+My read: the diagnostic is very likely to remain below the phase stop, but actual provider `usage.cost`, rescues and failures can differ from its completion-only ceiling. A passing audit requires 144 distinct item/sample keys, cache replay without network calls, and no parser or refusal pattern that makes the panel incomparable.
+
+The first result will decide whether the priority batch can begin.
