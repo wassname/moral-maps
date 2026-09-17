@@ -1,0 +1,25 @@
+{
+  "root": "React app loaded at /",
+  "compatibility": "/wvs/ and /wvs/react/ redirect to the root React app; shared data remains at /wvs/wvs_map_data.json",
+  "shared": {
+    "models": 64,
+    "countries": 90,
+    "buffered_hulls": 4,
+    "latest_labels": 13,
+    "numeric_model_country_median_equality": "verified against DOM data attributes"
+  },
+  "svg_accessibility": "main map and both release panels have stable title/desc aria-labelledby; descriptions update after family visibility change",
+  "qwen_toggle": "clicked, map and dated-panel family groups hidden, country coordinates invariant",
+  "tooltip": "map and release-panel pointer hover and focus show model-specific fields",
+  "release_panels": {
+    "panels": 2,
+    "dated_models": 48,
+    "date_order": "DOM order verified",
+    "ols": "line, n, and R squared recompute from currently visible dated models; fewer than two distinct dates hide the fit"
+  },
+  "copy": "reader-facing WVS introduction; no model-count, archaeological, implementation, or Artificial Analysis text",
+  "hashes": {
+    "wvs_map_data.json": "c0b7aa0554ebbf5d819308932e058f4ff6e19d1e817ffebbbe381dbd2d063ffe",
+    "index.html": "324afb7ec7e686e1eb9b7f660f51665475ffcd55e9f546f528674781aab771a6"
+  }
+}

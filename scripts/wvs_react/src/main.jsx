@@ -34,18 +34,34 @@ function ModelMarker({ model, placement, geometry, setActive, clearActive, marke
     onPointerEnter={() => setActive(model)} onPointerLeave={clearActive}
     onFocus={() => setActive(model)} onBlur={clearActive}>
     {leader && <line className="leader" x1={cx} y1={cy} x2={label.cx} y2={label.cy} />}
-    <circle className="model-ring" cx={cx} cy={cy} r="11" stroke={model.color} />
-    <image href={`${LOGO_ROOT}${logo}`} x={cx - 7} y={cy - 7} width="14" height="14" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" />
+    <circle className="model-ring" cx={cx} cy={cy} r="8" stroke={model.color} />
+    <image href={`${LOGO_ROOT}${logo}`} x={cx - 5} y={cy - 5} width="10" height="10" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" />
     {label && <text className="model-label" x={label.cx} y={label.cy + 4} textAnchor="middle">{model.label}</text>}
   </g>;
+}
+
+function ordinaryLeastSquares(models, field) {
+  const x = models.map(model => Date.parse(model.provenance.release_created));
+  const y = models.map(model => model[field]);
+  const uniqueX = new Set(x);
+  if (uniqueX.size < 2) return null;
+  const xMean = x.reduce((sum, value) => sum + value, 0) / x.length;
+  const yMean = y.reduce((sum, value) => sum + value, 0) / y.length;
+  const slope = x.reduce((sum, value, index) => sum + (value - xMean) * (y[index] - yMean), 0)
+    / x.reduce((sum, value) => sum + (value - xMean) ** 2, 0);
+  const intercept = yMean - slope * xMean;
+  const residual = y.reduce((sum, value, index) => sum + (value - (intercept + slope * x[index])) ** 2, 0);
+  const total = y.reduce((sum, value) => sum + (value - yMean) ** 2, 0);
+  return { slope, intercept, n: models.length, r2: total === 0 ? null : 1 - residual / total };
 }
 
 function ReleaseScatter({ data, hidden, field, title }) {
   const dated = useMemo(() => data.models.filter(model => Number.isFinite(Date.parse(model.provenance.release_created ?? '')))
     .toSorted((a, b) => a.provenance.release_created.localeCompare(b.provenance.release_created) || a.name.localeCompare(b.name)), [data]);
   const visible = dated.filter(model => !hidden.has(model.family));
+  const fit = ordinaryLeastSquares(visible, field);
   const [active, setActive] = useState(null);
-  const width = 1200, height = 320, left = 74, right = 35, top = 42, bottom = 48;
+  const width = 1200, height = 320, left = 96, right = 35, top = 42, bottom = 48;
   const dates = dated.map(model => Date.parse(model.provenance.release_created));
   const values = dated.map(model => model[field]);
   const minDate = Math.min(...dates), maxDate = Math.max(...dates);
@@ -54,6 +70,9 @@ function ReleaseScatter({ data, hidden, field, title }) {
   const valueY = value => top + (maxValue - value) / (maxValue - minValue || 1) * (height - top - bottom);
   const panelId = `release-${field}`;
   const tooltipId = `${panelId}-tooltip`;
+  const yDirection = field === 'y' ? data.axis.y : data.axis.x;
+  const visibleDates = visible.map(model => Date.parse(model.provenance.release_created));
+  const fitEnd = fit && [Math.min(...visibleDates), Math.max(...visibleDates)].map(date => [dateX(date), valueY(fit.intercept + fit.slope * date)]);
   const activate = (model, event) => {
     const box = event.currentTarget.closest('.scatter-shell').getBoundingClientRect();
     const point = event.currentTarget.getBoundingClientRect();
@@ -62,22 +81,26 @@ function ReleaseScatter({ data, hidden, field, title }) {
   return <section className="release-panel" data-coordinate={field} aria-labelledby={`${panelId}-heading`}>
     <h2 id={`${panelId}-heading`}>{title}</h2>
     <div className="scatter-shell">
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-labelledby={`${panelId}-svg-title ${panelId}-svg-desc`} data-panel-model-count={visible.length}>
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-labelledby={`${panelId}-svg-title ${panelId}-svg-desc`} data-panel-model-count={visible.length} data-fit-n={fit?.n ?? 0} data-fit-r2={fit?.r2 ?? ''}>
         <title id={`${panelId}-svg-title`}>{title}</title>
-        <desc id={`${panelId}-svg-desc`}>Scatter plot with release date on the horizontal axis and {field === 'y' ? 'Secular-Rational' : 'Self-expression'} on the vertical axis. {visible.length} dated models are visible from {visibleFamilyNames(Object.groupBy(data.models, model => model.family), hidden).join(', ') || 'no families'}. Each white-ring logo mark is a model. Hover or keyboard focus a mark for model-specific details.</desc>
+        <desc id={`${panelId}-svg-desc`}>Scatter plot with release date on the horizontal axis and {yDirection.join(' to ')} increasing upward on the vertical axis. {visible.length} dated models are visible from {visibleFamilyNames(Object.groupBy(data.models, model => model.family), hidden).join(', ') || 'no families'}. Each white-ring logo mark is a model. {fit ? `The thin line is an ordinary least squares descriptive fit to the ${fit.n} currently visible dated models${fit.r2 === null ? '; R squared is unavailable because the y values are constant' : `; R squared is ${fit.r2.toFixed(2)}`}.` : 'The fit is hidden because fewer than two distinct release dates are visible.'} Hover or keyboard focus a mark for model-specific details.</desc>
+        <defs><marker id={`${panelId}-arrow`} markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" className="scatter-arrow" /></marker><clipPath id={`${panelId}-fit-clip`}><rect x={left} y={top} width={width - left - right} height={height - top - bottom} /></clipPath></defs>
         <rect className="canvas" width={width} height={height} />
         <g className="scatter-grid">{Array.from({ length: 5 }, (_, index) => <line key={index} x1={left} x2={width - right} y1={top + index * (height - top - bottom) / 4} y2={top + index * (height - top - bottom) / 4} />)}</g>
         <line className="scatter-axis" x1={left} x2={width - right} y1={height - bottom} y2={height - bottom} />
-        <line className="scatter-axis" x1={left} x2={left} y1={top} y2={height - bottom} />
+        <line className="scatter-axis" x1={left} x2={left} y1={height - bottom} y2={top} markerEnd={`url(#${panelId}-arrow)`} />
+        <text className="scatter-y-label" x="17" y={(top + height - bottom) / 2} textAnchor="middle" transform={`rotate(-90 17 ${(top + height - bottom) / 2})`}>{yDirection.join(' -> ')} {'↑'}</text>
         <text className="scatter-tick" x={left} y={height - 18}>{new Date(minDate).toISOString().slice(0, 10)}</text>
         <text className="scatter-tick" x={width - right} y={height - 18} textAnchor="end">{new Date(maxDate).toISOString().slice(0, 10)}</text>
         <text className="scatter-tick" x={left - 8} y={top + 4} textAnchor="end">{maxValue.toFixed(2)}</text>
         <text className="scatter-tick" x={left - 8} y={height - bottom} textAnchor="end">{minValue.toFixed(2)}</text>
+        {fitEnd && <g className="release-fit" data-fit-n={fit.n} data-fit-r2={fit.r2 ?? ''}><line clipPath={`url(#${panelId}-fit-clip)`} x1={fitEnd[0][0]} y1={fitEnd[0][1]} x2={fitEnd[1][0]} y2={fitEnd[1][1]} /> <text x={left + 6} y={top + 13}>OLS, n={fit.n}, R² {fit.r2 === null ? 'unavailable' : fit.r2.toFixed(2)}</text></g>}
+        {!fit && <text className="release-fit-unavailable" x={left + 6} y={top + 13}>Fit unavailable: fewer than two release dates</text>}
         {dated.map(model => <g key={model.name} className="release-mark" data-family={model.family} data-release-model={model.name} data-release-date={model.provenance.release_created} display={hidden.has(model.family) ? 'none' : 'inline'}
           tabIndex="0" role="button" aria-label={`${model.name}, ${model.family}, ${model.provenance.release_created}`} aria-describedby={tooltipId}
           onPointerEnter={event => activate(model, event)} onPointerLeave={() => setActive(null)} onFocus={event => activate(model, event)} onBlur={() => setActive(null)}>
-          <circle className="model-ring" cx={dateX(Date.parse(model.provenance.release_created))} cy={valueY(model[field])} r="10" stroke={model.color} />
-          <image href={`${LOGO_ROOT}${data.logos[model.family]}`} x={dateX(Date.parse(model.provenance.release_created)) - 6.5} y={valueY(model[field]) - 6.5} width="13" height="13" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" />
+          <circle className="model-ring" cx={dateX(Date.parse(model.provenance.release_created))} cy={valueY(model[field])} r="8" stroke={model.color} />
+          <image href={`${LOGO_ROOT}${data.logos[model.family]}`} x={dateX(Date.parse(model.provenance.release_created)) - 5} y={valueY(model[field]) - 5} width="10" height="10" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" />
         </g>)}
       </svg>
       <Tooltip active={active} geometry={null} data={data} id={tooltipId} />
@@ -153,7 +176,7 @@ function App() {
   return <main>
     <h1>How do AI models score on human values surveys? Which culture are they most similar to? Is it changing over time?</h1>
     <p className="lede">To answer these we start with the <a href="https://www.worldvaluessurvey.org/">World Values Survey</a>, the standard culture map of the world. Since 1981 it has asked people in about ninety countries the same questions. Two axes drawn from it sort societies by how traditional or secular they are and how much they weigh survival over self-expression.</p>
-    <p className="caption">Use the family controls to compare saved model coordinates. Hover or keyboard focus a mark for its model-specific provenance. See the <a href="https://github.com/wassname/moral-maps">code and records</a>.</p>
+    <p className="caption">Use the family controls to compare saved model coordinates. The release-date panels fit ordinary least squares lines only to the dated models currently shown; n and R² update with visibility and describe correlation, not cause. Hover or keyboard focus a mark for model-specific provenance. See the <a href="https://github.com/wassname/moral-maps">code and records</a>.</p>
     {data && <Map data={data} />}
   </main>;
 }
