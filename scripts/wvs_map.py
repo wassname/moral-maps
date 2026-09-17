@@ -250,6 +250,8 @@ def main() -> None:
                                  help="send a mandatory model's catalog-supported minimum reasoning effort")
     ap.add_argument("--api-structured-output", action="store_true",
                     help="request a strict rating JSON schema only for a catalog-confirmed supporting model")
+    ap.add_argument("--api-require-complete", action="store_true",
+                    help="exit nonzero rather than render after an explicitly requested API panel is incomplete")
     ap.add_argument("--max-think-tokens", type=int, default=64)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--out", default="docs/img/wvs/wvs_map_iw.png")
@@ -354,7 +356,10 @@ def main() -> None:
                                 records_path=args.records, verbose_first=True)
         incomplete = [row["id"] for row in rows if row["valid_samples"] != args.api_samples]
         if incomplete:
-            logger.warning(f"{key}: incomplete items {incomplete}; raw evidence is in {args.records}; not cached or plotted")
+            message = f"{key}: incomplete items {incomplete}; raw evidence is in {args.records}; not cached or plotted"
+            logger.warning(message)
+            if args.api_require_complete:
+                raise RuntimeError(message)
             continue
         psamples = {row["id"]: np.array(row["p_samples"]) for row in rows}
         models[key] = model_coord_ci(psamples, resolved, rng)

@@ -133,6 +133,8 @@ def main() -> None:
         "|---|---:|---:|---:|---|---:|---|",
         row(catalog["openai/gpt-5-nano"], "required cheapest new 144-call diagnostic"),
         "",
+        "This model's provider rejects `reasoning.enabled=false`; its retry uses `reasoning.effort=low` with strict structured output and fails nonzero unless all 144 samples are valid.",
+        "",
         "## Priority manifest after diagnostic pass",
         "",
         "The order is Grok, OpenAI, Google, then the requested Muse points. `Flash` entries are retained because the user excluded `Fast`, not `Flash`.",
@@ -152,7 +154,7 @@ def main() -> None:
     for name, models in groups:
         lines.append(f"| **{name}** | | | | | | |")
         for model in models:
-            rationale = "clean new full attempt" if model["id"] == "x-ai/grok-4.5" else "new direct panel"
+            rationale = "fresh 144-sample run, separate from incomplete attempts" if model["id"] == "x-ai/grok-4.5" else "new direct panel"
             lines.append(row(model, rationale))
 
     lines.extend([

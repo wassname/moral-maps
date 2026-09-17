@@ -19,6 +19,8 @@ Run only this panel before any other manifest model. Audit repeats, parser outco
 |---|---:|---:|---:|---|---:|---|
 | `openai/gpt-5-nano` | 2025-08-07 | 0.05000000 | 0.4000000 | yes | USD 0.0590 | required cheapest new 144-call diagnostic |
 
+This model's provider rejects `reasoning.enabled=false`; its retry uses `reasoning.effort=low` with strict structured output and fails nonzero unless all 144 samples are valid.
+
 ## Priority manifest after diagnostic pass
 
 The order is Grok, OpenAI, Google, then the requested Muse points. `Flash` entries are retained because the user excluded `Fast`, not `Flash`.
@@ -27,7 +29,7 @@ The order is Grok, OpenAI, Google, then the requested Muse points. `Flash` entri
 |---|---:|---:|---:|---|---:|---|
 | **Grok** | | | | | | |
 | `x-ai/grok-4.6` | 2026-08-12 | 2.000000 | 6.000000 | yes | USD 0.8847 | new direct panel |
-| `x-ai/grok-4.5` | 2026-07-08 | 2.000000 | 6.000000 | yes | USD 0.8847 | clean new full attempt |
+| `x-ai/grok-4.5` | 2026-07-08 | 2.000000 | 6.000000 | yes | USD 0.8847 | fresh 144-sample run, separate from incomplete attempts |
 | **OpenAI** | | | | | | |
 | `openai/gpt-5.6-luna` | 2026-07-09 | 0.2000000 | 1.2000000 | yes | USD 0.1769 | new direct panel |
 | `openai/gpt-5.6-terra` | 2026-07-09 | 2.000000 | 12.000000 | yes | USD 1.7695 | new direct panel |
