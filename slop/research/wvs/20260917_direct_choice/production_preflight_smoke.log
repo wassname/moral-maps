@@ -1,0 +1,4 @@
+smoke: 12 WVS items x 20 samples = 240 requests
+smoke: exact position balance for n=2,4,10; n=3 is nearest balance with max position difference 1
+smoke: direction counts n=2/10 are 10/10, n=3 is 11/9, n=4 is 12/8
+smoke: distinct production protocol 075bd0ef0c96982d69be237ef044671193c00d6ead75ef1963ff07f699ceab6d

@@ -9,6 +9,7 @@ import re
 from datetime import UTC, datetime
 from pathlib import Path
 
+import numpy as np
 from openrouter_wrapper.retry import openrouter_request
 
 
@@ -83,12 +84,61 @@ def _choice_prompt(item: dict, order: list[int], answer_instruction: str = _ANSW
     )
 
 
+def balanced_cyclic_plan(items: list[dict], total_samples: int, answer_instruction: str) -> list[dict]:
+    """Complete canonical/reversed rotation blocks give each option equal exposure at every position."""
+    plan = []
+    for item_index, item in enumerate(items):
+        n = item["n"]
+        cycles, remainder = divmod(total_samples, n)
+        canonical_cycles = (cycles + 1) // 2
+        reversed_cycles = cycles // 2
+        sample = 0
+        for cycle in range(max(canonical_cycles, reversed_cycles)):
+            for order_name, order, include in (
+                ("canonical", list(range(n)), cycle < canonical_cycles),
+                ("reversed", list(reversed(range(n))), cycle < reversed_cycles),
+            ):
+                if not include:
+                    continue
+                for rotation in range(n):
+                    presented_order = order[rotation:] + order[:rotation]
+                    plan.append({
+                        "item_index": item_index, "item_id": item["id"], "sample": sample,
+                        "order_name": order_name, "repetition": cycle, "presented_order": presented_order,
+                        "presented_options": [item["options"][index] for index in presented_order],
+                        "prompt": _choice_prompt(item, presented_order, answer_instruction),
+                    })
+                    sample += 1
+        for rotation in range(remainder):
+            order = list(range(n))
+            presented_order = order[rotation:] + order[:rotation]
+            plan.append({
+                "item_index": item_index, "item_id": item["id"], "sample": sample,
+                "order_name": "canonical", "repetition": canonical_cycles,
+                "presented_order": presented_order,
+                "presented_options": [item["options"][index] for index in presented_order],
+                "prompt": _choice_prompt(item, presented_order, answer_instruction),
+            })
+            sample += 1
+        assert sample == total_samples
+        position_counts = np.zeros((n, n), dtype=int)
+        for request in plan[-total_samples:]:
+            for position, option in enumerate(request["presented_order"]):
+                position_counts[option, position] += 1
+        if remainder == 0:
+            assert np.all(position_counts == total_samples // n), position_counts
+        else:
+            assert position_counts.max() - position_counts.min() <= 1, position_counts
+    return plan
+
+
 def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_per_order: int,
                                     temperature: float, max_tokens: int, concurrency: int,
                                     request_timeout: float, reasoning: dict, structured_output: bool,
                                     answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE,
-                                    rescue_instruction: str | None = None) -> str:
-    plan = _plan(items, samples_per_order, answer_instruction)
+                                    rescue_instruction: str | None = None,
+                                    plan_override: list[dict] | None = None) -> str:
+    plan = _plan(items, samples_per_order, answer_instruction) if plan_override is None else plan_override
     protocol = {
         "schema": 1,
         "construct": "direct_choice",
@@ -105,6 +155,9 @@ def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_pe
         "rescue_instructions": {item["id"]: rescue_instruction or _force_choice(item["n"]) for item in items},
         "requests": plan,
     }
+    if plan_override is not None:
+        protocol.pop("samples_per_order")
+        protocol["samples_per_item"] = {item["id"]: sum(request["item_id"] == item["id"] for request in plan) for item in items}
     encoded = json.dumps(protocol, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
     return hashlib.sha256(encoded).hexdigest()
 
@@ -120,7 +173,8 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
                              request_timeout: float, reasoning: dict, structured_output: bool,
                              records_path: str | Path, cache_path: str | Path,
                              answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE,
-                             rescue_instruction: str | None = None) -> dict:
+                             rescue_instruction: str | None = None,
+                             plan_override: list[dict] | None = None) -> dict:
     """Sample exactly one selected option per prompt, including canonical and reversed option orders.
 
     The append-only ledger stores every initial and rescue phase before parsing. A cache entry is written only
@@ -130,12 +184,12 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
     assert temperature > 0
     assert reasoning == {"effort": "low"}, "the registered Gemini pilot uses catalog-supported low reasoning"
     assert structured_output
-    plan = _plan(items, samples_per_order, answer_instruction)
+    plan = _plan(items, samples_per_order, answer_instruction) if plan_override is None else plan_override
     protocol_id = direct_choice_protocol_identity(
         model, items, samples_per_order=samples_per_order, temperature=temperature,
         max_tokens=max_tokens, concurrency=concurrency, request_timeout=request_timeout,
         reasoning=reasoning, structured_output=structured_output, answer_instruction=answer_instruction,
-        rescue_instruction=rescue_instruction,
+        rescue_instruction=rescue_instruction, plan_override=plan_override,
     )
     cache_file = Path(cache_path)
     cache = json.loads(cache_file.read_text()) if cache_file.exists() else {"schema": 1, "completed": {}}
@@ -151,11 +205,16 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
         "max_tokens": max_tokens, "concurrency": concurrency, "request_timeout": request_timeout,
         "reasoning": reasoning, "structured_output": structured_output,
     }
+    if plan_override is not None:
+        settings.pop("samples_per_order")
+        settings["samples_per_item"] = {item["id"]: sum(request["item_id"] == item["id"] for request in plan) for item in items}
+        settings["schedule"] = "balanced_cyclic_rotations"
     _append_record(records, {
         "event": "run_started", "run_id": run_id, "protocol_id": protocol_id,
         "construct": "direct_choice", "settings": settings, "items": items,
-        "planned_requests": len(plan), "canonical_requests": len(plan) // 2,
-        "reversed_requests": len(plan) // 2,
+        "planned_requests": len(plan),
+        "canonical_requests": sum(request["order_name"] == "canonical" for request in plan),
+        "reversed_requests": sum(request["order_name"] == "reversed" for request in plan),
     })
 
     async def run_all() -> list[dict]:
@@ -245,8 +304,8 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
             })
 
     item_results = []
-    expected_samples = 2 * samples_per_order
     for item in items:
+        expected_samples = sum(request["item_id"] == item["id"] for request in plan)
         samples = by_item[item["id"]]
         canonical = sum(sample["order_name"] == "canonical" for sample in samples)
         reversed_order = sum(sample["order_name"] == "reversed" for sample in samples)
