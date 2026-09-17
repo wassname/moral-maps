@@ -208,7 +208,7 @@ def _rate_plan(items: list[dict], n_samples: int, per_call: int = 1) -> list[dic
 def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, temperature: float,
                             max_tokens: int, concurrency: int, req_timeout: float,
                             reasoning: dict | None, structured_output: bool,
-                            provider: dict | None = None, probe_first: bool = False) -> str:
+                            provider: dict | None = None) -> str:
     """Hash the exact model, rendered prompts, and request settings that define a cacheable panel."""
     plan = _rate_plan(items, n_samples)
     protocol = {
@@ -221,7 +221,6 @@ def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, te
         "reasoning": reasoning,
         "structured_output": structured_output,
         "provider": provider,
-        "probe_first": probe_first,
         "rate_prompt": _RATE_PROMPT,
         "rescue_prompt": _force_msg(10),
         "requests": [{key: req[key] for key in ("i", "perm", "prompt", "cnt", "sample", "presented_options")}
@@ -255,8 +254,7 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
     protocol_id = rated_protocol_identity(model, items, n_samples=n_samples, temperature=temperature,
                                           max_tokens=max_tokens, concurrency=concurrency,
                                           req_timeout=req_timeout, reasoning=reasoning,
-                                          structured_output=structured_output, provider=provider,
-                                          probe_first=probe_first)
+                                          structured_output=structured_output, provider=provider)
     run_id = f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}_{protocol_id[:12]}"
     rpath = Path(records_path)
     rpath.parent.mkdir(parents=True, exist_ok=True)

@@ -272,29 +272,9 @@
       "structured_output": true
     },
     {
-      "calls": 144,
-      "created": 1786302394,
       "id": "meta/muse-glimmer-30b",
-      "input_usd_per_million": "0.35000000",
       "lane": "muse",
-      "output_usd_per_million": "1.5000000",
-      "provider": {
-        "allow_fallbacks": true,
-        "quantizations": [
-          "fp8",
-          "int8",
-          "bf16",
-          "fp16"
-        ],
-        "require_parameters": true
-      },
-      "reasoning": {
-        "effort": "low"
-      },
-      "reasoning_label": "low",
-      "reserve_usd": "0.71516160",
-      "status": "runnable",
-      "structured_output": true
+      "status": "complete_cached"
     },
     {
       "id": "meta/muse-glimmer-30b:batch",
@@ -746,29 +726,9 @@
       "status": "excluded"
     },
     {
-      "calls": 144,
-      "created": 1776699402,
       "id": "moonshotai/kimi-k2.6",
-      "input_usd_per_million": "0.95000000",
       "lane": "kimi",
-      "output_usd_per_million": "4.000000",
-      "provider": {
-        "allow_fallbacks": true,
-        "quantizations": [
-          "fp8",
-          "int8",
-          "bf16",
-          "fp16"
-        ],
-        "require_parameters": true
-      },
-      "reasoning": {
-        "enabled": false
-      },
-      "reasoning_label": "disabled, optional",
-      "reserve_usd": "1.90955520",
-      "status": "runnable",
-      "structured_output": true
+      "status": "complete_cached"
     },
     {
       "calls": 144,

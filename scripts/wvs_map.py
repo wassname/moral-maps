@@ -46,6 +46,7 @@ from moralmaps.zones import zones_for, zone_of, IW_MACRO
 from moralmaps.instrument import Instrument, InstrItem
 from moralmaps.read import read_items, resolve_answer_ids
 from moralmaps.read_api import rated_protocol_identity, read_items_rated
+from moralmaps.rated_cache import merge_completed
 from moralmaps.iw_axes import AXIS_ITEMS, X_AXIS, Y_AXIS, SKIP, resolve_items, positiveness
 
 # option labels are single digits 0..n-1 -- single-token (unlike '10' on the justifiable scale) and
@@ -326,10 +327,9 @@ def main() -> None:
                 models[entry["display_key"]] = tuple(entry["coords"])
 
     def save_cache() -> None:
-        """Atomic cache replacement after a complete model panel, so interruption cannot fabricate a hit."""
-        temp = cpath.with_suffix(cpath.suffix + ".tmp")
-        temp.write_text(json.dumps(cache, indent=2, sort_keys=True) + "\n")
-        temp.replace(cpath)
+        """Merge completed panels under a lock so parallel lanes cannot erase one another."""
+        nonlocal cache
+        cache = merge_completed(cpath, cache["completed"])
 
     rng = np.random.default_rng(0)                       # deterministic bootstrap
 
@@ -359,8 +359,7 @@ def main() -> None:
             m, rated_items, n_samples=args.api_samples, temperature=1.0,
             max_tokens=args.api_max_tokens, concurrency=args.api_concurrency,
             req_timeout=args.api_request_timeout, reasoning=api_reasoning,
-            structured_output=args.api_structured_output, provider=api_provider,
-            probe_first=args.api_probe_first)
+            structured_output=args.api_structured_output, provider=api_provider)
         completed = cache["completed"].get(protocol_id)
         if completed is not None:
             models[key] = tuple(completed["coords"])
