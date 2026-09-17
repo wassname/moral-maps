@@ -664,8 +664,8 @@
       "source": "catalog created=2026-09-10"
     },
     "gemini": {
-      "name": "gemini-3.7-flash",
-      "source": "catalog created=2026-08-13"
+      "name": "gemini-3.8-flash",
+      "source": "catalog created=2026-09-02"
     },
     "gemma": {
       "name": "gemma-4-31b-it",
@@ -680,8 +680,8 @@
       "source": "catalog created=2026-09-04"
     },
     "grok": {
-      "name": "grok-4.5",
-      "source": "catalog created=2026-07-08"
+      "name": "grok-4.6",
+      "source": "catalog created=2026-08-12"
     },
     "inkling": {
       "name": "inkling",
@@ -909,6 +909,26 @@
       "y": 0.5760765801607652
     },
     {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-oss-120b",
+      "provenance": {
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "b5a600e549f8aaef4077c383d11a93d6b1f4395af26e0cc0f8f50d3b6f360996",
+        "readout": "rated categorical response",
+        "release_created": "2025-08-05",
+        "release_source": "catalog",
+        "run_id": "20260917T130652Z_b5a600e549f8",
+        "samples": 12
+      },
+      "x": -0.47891715945637514,
+      "y": 0.5996774327014757
+    },
+    {
       "color": "#7e22ce",
       "family": "qwen",
       "label": "qwen3.8-flash",
@@ -1111,7 +1131,7 @@
     {
       "color": "#2b2d42",
       "family": "grok",
-      "label": null,
+      "label": "grok-4.6",
       "name": "grok-4.6",
       "provenance": {
         "hle_score": null,
@@ -1409,26 +1429,6 @@
       "y": 0.64
     },
     {
-      "color": "#0ea5e9",
-      "family": "gemini",
-      "label": null,
-      "name": "gemini-2.5-flash-lite",
-      "provenance": {
-        "hle_score": null,
-        "hle_source_effort": null,
-        "hle_source_name": null,
-        "items": 12,
-        "protocol_id": "009e9bcb85966922ddafb0bb61fd0f750528edf0a13a21cf954b226476428210",
-        "readout": "rated categorical response",
-        "release_created": "2025-07-22",
-        "release_source": "catalog",
-        "run_id": "20260917T130434Z_009e9bcb8596",
-        "samples": 12
-      },
-      "x": -0.3863756613756613,
-      "y": 0.6708921222810112
-    },
-    {
       "color": "#7e22ce",
       "family": "qwen",
       "label": null,
@@ -1571,7 +1571,7 @@
     {
       "color": "#2b2d42",
       "family": "grok",
-      "label": "grok-4.5",
+      "label": null,
       "name": "grok-4.5",
       "provenance": {
         "hle_score": null,
@@ -1851,7 +1851,7 @@
     {
       "color": "#0ea5e9",
       "family": "gemini",
-      "label": null,
+      "label": "gemini-3.8-flash",
       "name": "gemini-3.8-flash",
       "provenance": {
         "hle_score": null,
@@ -2129,6 +2129,26 @@
       "y": 0.6482142857142857
     },
     {
+      "color": "#0ea5e9",
+      "family": "gemini",
+      "label": null,
+      "name": "gemini-2.5-flash",
+      "provenance": {
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "a544b24e1874f8d1930042f65a61ea53299057a6299b0eb2ded110691c0d4edb",
+        "readout": "rated categorical response",
+        "release_created": "2025-06-17",
+        "release_source": "catalog",
+        "run_id": "20260917T130734Z_a544b24e1874",
+        "samples": 12
+      },
+      "x": -0.6298593073593075,
+      "y": 0.6495670432204361
+    },
+    {
       "color": "#7e22ce",
       "family": "qwen",
       "label": null,
@@ -2167,6 +2187,26 @@
       },
       "x": -0.5966931216931217,
       "y": 0.5338064713064713
+    },
+    {
+      "color": "#0ea5e9",
+      "family": "gemini",
+      "label": null,
+      "name": "gemini-2.5-flash-lite",
+      "provenance": {
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "009e9bcb85966922ddafb0bb61fd0f750528edf0a13a21cf954b226476428210",
+        "readout": "rated categorical response",
+        "release_created": "2025-07-22",
+        "release_source": "catalog",
+        "run_id": "20260917T130434Z_009e9bcb8596",
+        "samples": 12
+      },
+      "x": -0.3863756613756613,
+      "y": 0.6708921222810112
     },
     {
       "color": "#2563eb",
@@ -2591,7 +2631,7 @@
     {
       "color": "#0ea5e9",
       "family": "gemini",
-      "label": "gemini-3.7-flash",
+      "label": null,
       "name": "gemini-3.7-flash",
       "provenance": {
         "hle_score": 0.478683966635774,

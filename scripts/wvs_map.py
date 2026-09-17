@@ -475,13 +475,24 @@ def main() -> None:
         name: datetime.fromtimestamp(saved_catalog[model_id]["created"], tz=timezone.utc).date().isoformat()
         for name, model_id in LEGACY_CATALOG_IDS.items()
     }
+    completed_by_name = {entry["display_key"].replace(" (rated)", ""): entry
+                         for entry in cache["completed"].values()}
+
+    def release_created(name: str) -> str | None:
+        if name in metadata:
+            return metadata[name]["created"]
+        panel = completed_by_name.get(name)
+        if panel is not None and panel["model"] in saved_catalog:
+            return datetime.fromtimestamp(saved_catalog[panel["model"]]["created"], tz=timezone.utc).date().isoformat()
+        return legacy_release_dates.get(name)
+
     model_labels: dict[str, str] = {}
     label_sources: dict[str, str] = {}
     for family, names in fams.items():
-        catalogued = [name for name in names if name in metadata]
-        if catalogued:
-            latest = max(catalogued, key=lambda name: metadata[name]["created"])
-            label_sources[family] = f"catalog created={metadata[latest]['created']}"
+        dated = [name for name in names if release_created(name) is not None]
+        if dated:
+            latest = max(dated, key=release_created)
+            label_sources[family] = f"catalog created={release_created(latest)}"
         else:
             latest = LEGACY_LATEST[family]
             if latest not in names:
