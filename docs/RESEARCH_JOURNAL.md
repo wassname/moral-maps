@@ -994,3 +994,19 @@ The first panel is the lowest listed new completion-price model, `openai/gpt-5-n
 My read: the diagnostic is very likely to remain below the phase stop, but actual provider `usage.cost`, rescues and failures can differ from its completion-only ceiling. A passing audit requires 144 distinct item/sample keys, cache replay without network calls, and no parser or refusal pattern that makes the panel incomparable.
 
 The first result will decide whether the priority batch can begin.
+
+## 2026-09-17 -- Nano mandatory-reasoning wrapper regression
+
+This entry records the failed Nano protocol diagnostic and the evidence for its retry.
+
+Task 1622 attempted `openai/gpt-5-nano` with strict structured output and `reasoning.enabled=false`. The append-only ledger for run `20260917T015752Z_d52a29ad7c67` contains 144 `request_started`, 144 `request_failed`, zero `request_completed`, and zero usage objects. The provider response in `slop/research/wvs/20260917_priority_phase/task_1622_full.log` says:
+
+> `Reasoning is mandatory for this endpoint and cannot be disabled.`
+
+The first item therefore had no replies and `valid=0/12`; the reader excluded all twelve items rather than caching or plotting a coordinate. Source: the run's event records in `slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl`, and task 1622's full 1,678-line log.
+
+This is not the first mandatory-reasoning panel. The same ledger records Astra run `20260916T154406Z_95bb4d3939e9` with `reasoning.effort=low` and strict structured output. Its twelve item records each have 12 valid samples, it has zero rescue and failure events, and the completed requests sum to USD 0.69797. Source: the Astra run events in the same ledger, cross-checked in `slop/audits/20260917_wvs_gpt5_nano_task_1622_mandatory_reasoning_failure.md`.
+
+My read: task 1622 was almost certainly a wrapper/config regression despite the Astra precedent, not evidence of a new model-class problem. Nano is only the cheapest protocol diagnostic, with a manifest completion-only ceiling of USD 0.0590, not a priority result. Task 1623 now uses catalog-supported `reasoning.effort=low` plus strict structured output; it is still running, so its result and cost are not evidence yet.
+
+The retry audit will determine whether the priority panels can start.
