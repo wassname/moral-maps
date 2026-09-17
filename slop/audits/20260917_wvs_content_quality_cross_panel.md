@@ -6,6 +6,7 @@
 - complete panels: 49
 - per-item/model table: `slop/audits/20260917_wvs_content_quality_by_item.csv`
 - coordinate-sensitivity table: `slop/audits/20260917_wvs_content_quality_coordinate_sensitivity.csv`
+- binary position/equivalent-example table: `slop/audits/20260917_wvs_dense_example_position_effects.csv`
 
 ## Definitions
 
@@ -141,6 +142,15 @@ Rows below have at least six flat replies. They are retained as observations, no
 | `qwen/qwen3.7-flash` | Homosexuality | 6/12 | 0.500 | 0.066 | no_saved_rationale=6 |
 | `qwen/qwen3.7-max` | Determination, perseverance | 6/12 | 0.500 | 0.167 | no_saved_rationale=6 |
 | `qwen/qwen3.7-max` | dealing with people? | 6/12 | 0.208 | 0.044 | no_saved_rationale=6 |
+
+## Dense example and binary-position appendix
+
+The dense prompt's literal example is `0:2,1:5`. The count below is descriptive: a reply has the same first two presented ratings, regardless of any further options. It does not establish copying, because that pair can also arise without the example.
+
+- literal `0:2,1:5` pairs: 143/7056 dense replies
+- binary item/model cells: 294; canonical-versus-reversed TV median 0.056, p90 0.278, maximum 0.667
+- mean presented-position rating difference (position 0 minus 1) across binary cells: median 0.000, p10 -1.000, p90 1.083
+- the CSV retains every binary cell's canonical/reversed normalized distribution and total variation. These are supporting observations, not a filter or a new quality threshold.
 
 ## Saved-reasoning examples
 

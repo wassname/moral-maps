@@ -16,6 +16,7 @@ CACHE_PATH = Path("slop/research/wvs/20260916_openrouter/wvs_iw_rated.json")
 LEDGER_PATH = Path("slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl")
 ITEM_CSV_PATH = Path("slop/audits/20260917_wvs_content_quality_by_item.csv")
 COORD_CSV_PATH = Path("slop/audits/20260917_wvs_content_quality_coordinate_sensitivity.csv")
+BINARY_CSV_PATH = Path("slop/audits/20260917_wvs_dense_example_position_effects.csv")
 REPORT_PATH = Path("slop/audits/20260917_wvs_content_quality_cross_panel.md")
 
 CONSTRUCT_MISMATCH = (
@@ -49,9 +50,13 @@ def compact_quote(reasoning: str | None) -> str:
     return "" if reasoning is None else " ".join(reasoning.split())[:280].rstrip()
 
 
-def canonical_ratings(answer: dict) -> np.ndarray:
+def presented_ratings(answer: dict) -> np.ndarray:
     parsed = json.loads(answer["text"])
-    presented = np.array([parsed[str(index)] for index in range(len(parsed))], dtype=float)
+    return np.array([parsed[str(index)] for index in range(len(parsed))], dtype=float)
+
+
+def canonical_ratings(answer: dict) -> np.ndarray:
+    presented = presented_ratings(answer)
     canonical = np.empty_like(presented)
     canonical[np.array(answer["presented_order"], dtype=int)] = presented
     return canonical
@@ -61,8 +66,13 @@ def normalized_spread(rating: np.ndarray) -> float:
     return float((rating.max() - rating.min()) / 4)
 
 
-def total_variation(p: np.ndarray) -> float:
-    return float(0.5 * np.abs(p - 1 / len(p)).sum())
+def total_variation(p: np.ndarray, q: np.ndarray | None = None) -> float:
+    q = np.full(len(p), 1 / len(p)) if q is None else q
+    return float(0.5 * np.abs(p - q).sum())
+
+
+def display(p: np.ndarray) -> str:
+    return "[" + ", ".join(f"{value:.3f}" for value in p) + "]"
 
 
 def rating_sum(rating: np.ndarray) -> np.ndarray:
@@ -140,6 +150,7 @@ def main() -> None:
     expected_ids = {item["suffix"] for axis in (X_AXIS, Y_AXIS) for item in resolved[axis]}
     item_rows: list[dict] = []
     coord_rows: list[dict] = []
+    binary_rows: list[dict] = []
     examples: list[tuple[dict, str]] = []
 
     for run_id, entry in sorted(entries.items(), key=lambda pair: pair[1]["model"]):
@@ -156,8 +167,10 @@ def main() -> None:
         flat_missing: dict[str, list[np.ndarray]] = {}
         for item_id, item_answers in sorted(by_item.items()):
             assert len(item_answers) == 12, f"sample count drift for {entry['model']} {item_id}"
+            presented = [presented_ratings(answer) for answer in item_answers]
             ratings = [canonical_ratings(answer) for answer in item_answers]
             flats = [normalized_spread(rating) == 0 for rating in ratings]
+            literal_example_pairs = sum(rating[0] == 2 and rating[1] == 5 for rating in presented)
             current[item_id] = [rating_sum(rating) for rating in ratings]
             argmax[item_id] = [argmax_split(rating) for rating in ratings]
             minshift_nonflat[item_id] = [min_shift(rating) for rating, flat in zip(ratings, flats) if not flat]
@@ -184,6 +197,7 @@ def main() -> None:
                 "mean_argmax_tie_size": float(np.mean(ties)),
                 "mean_sample_tv_from_uniform": float(np.mean([total_variation(p) for p in current[item_id]])),
                 "aggregate_tv_from_uniform": total_variation(aggregate),
+                "literal_example_pair_0_2_1_5": literal_example_pairs,
                 "explicit_prompt_or_persona_mismatch": rationale_counts["explicit_prompt_or_persona_mismatch"],
                 "explicit_indifference": rationale_counts["explicit_indifference"],
                 "explicit_neutral_policy": rationale_counts["explicit_neutral_policy"],
@@ -192,6 +206,22 @@ def main() -> None:
                 "rationale_example": " || ".join(item_examples),
             }
             item_rows.append(row)
+            if len(ratings[0]) == 2:
+                canonical_half = [rating_sum(rating) for rating, answer in zip(ratings, item_answers)
+                                  if answer["presented_order"] == [0, 1]]
+                reversed_half = [rating_sum(rating) for rating, answer in zip(ratings, item_answers)
+                                 if answer["presented_order"] == [1, 0]]
+                assert len(canonical_half) == len(reversed_half) == 6
+                canonical_p = np.mean(canonical_half, axis=0)
+                reversed_p = np.mean(reversed_half, axis=0)
+                binary_rows.append({
+                    "model": entry["model"], "run_id": run_id, "protocol_id": entry["protocol_id"],
+                    "item_id": item_id, "canonical_n": len(canonical_half), "reversed_n": len(reversed_half),
+                    "canonical_p": display(canonical_p), "reversed_p": display(reversed_p),
+                    "canonical_reversed_tv": total_variation(canonical_p, reversed_p),
+                    "mean_presented_position0_minus1": float(np.mean([rating[0] - rating[1] for rating in presented])),
+                    "literal_example_pair_0_2_1_5": literal_example_pairs,
+                })
             if item_examples:
                 examples.append((row, item_examples[0]))
 
@@ -216,6 +246,7 @@ def main() -> None:
 
     write_csv(ITEM_CSV_PATH, item_rows)
     write_csv(COORD_CSV_PATH, coord_rows)
+    write_csv(BINARY_CSV_PATH, binary_rows)
     by_model: dict[str, list[dict]] = defaultdict(list)
     for row in item_rows:
         by_model[row["model"]].append(row)
@@ -229,6 +260,7 @@ def main() -> None:
         f"- complete panels: {len(by_model)}",
         f"- per-item/model table: `{ITEM_CSV_PATH}`",
         f"- coordinate-sensitivity table: `{COORD_CSV_PATH}`",
+        f"- binary position/equivalent-example table: `{BINARY_CSV_PATH}`",
         "",
         "## Definitions",
         "",
@@ -290,6 +322,19 @@ def main() -> None:
             f"{row['mean_normalized_spread']:.3f} | {row['aggregate_tv_from_uniform']:.3f} | {evidence} |"
         )
 
+    literal_pairs = sum(row["literal_example_pair_0_2_1_5"] for row in item_rows)
+    binary_tvs = np.array([row["canonical_reversed_tv"] for row in binary_rows])
+    position_bias = np.array([row["mean_presented_position0_minus1"] for row in binary_rows])
+    lines.extend([
+        "", "## Dense example and binary-position appendix", "",
+        "The dense prompt's literal example is `0:2,1:5`. The count below is descriptive: a reply has the same first two presented ratings, regardless of any further options. It does not establish copying, because that pair can also arise without the example.",
+        "",
+        f"- literal `0:2,1:5` pairs: {literal_pairs}/{len(item_rows) * 12} dense replies",
+        f"- binary item/model cells: {len(binary_rows)}; canonical-versus-reversed TV median {np.median(binary_tvs):.3f}, p90 {np.quantile(binary_tvs, 0.9):.3f}, maximum {binary_tvs.max():.3f}",
+        f"- mean presented-position rating difference (position 0 minus 1) across binary cells: median {np.median(position_bias):.3f}, p10 {np.quantile(position_bias, 0.1):.3f}, p90 {np.quantile(position_bias, 0.9):.3f}",
+        "- the CSV retains every binary cell's canonical/reversed normalized distribution and total variation. These are supporting observations, not a filter or a new quality threshold.",
+    ])
+
     lines.extend(["", "## Saved-reasoning examples", ""])
     for row, example in sorted(examples, key=lambda pair: (-pair[0]["flat_ratings"], pair[0]["model"], pair[0]["item_id"])):
         lines.extend([f"### `{row['model']}` / {row['item_id']}", "", f"> {example}", ""])
@@ -308,6 +353,7 @@ def main() -> None:
     REPORT_PATH.write_text("\n".join(lines))
     print(f"wrote {ITEM_CSV_PATH}: {len(item_rows)} model/item rows")
     print(f"wrote {COORD_CSV_PATH}: {len(coord_rows)} model rows")
+    print(f"wrote {BINARY_CSV_PATH}: {len(binary_rows)} binary item/model rows")
     print(f"wrote {REPORT_PATH}: stable through {ledger_through}")
 
 
