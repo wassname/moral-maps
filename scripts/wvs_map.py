@@ -184,12 +184,32 @@ def read_model(rows: list[dict], meta: dict[str, dict]) -> dict[str, np.ndarray]
     return {r["id"]: np.asarray(r["p"], float)[: meta[r["id"]]["n"]] for r in rows}
 
 
+def _sample_only_coord_se(psamples: dict[str, np.ndarray], resolved: dict[str, list[dict]],
+                          rng: np.random.Generator, n_draws: int, B: int = 500) -> tuple[float, float]:
+    """Response-mean bootstrap SE with the WVS item set held fixed."""
+    samples = []
+    for _ in range(B):
+        xy = []
+        for axis in (X_AXIS, Y_AXIS):
+            vals = []
+            for it in resolved[axis]:
+                ps = psamples[it["suffix"]]
+                mean_p = ps[rng.integers(0, len(ps), n_draws)].mean(0)
+                vals.append(positiveness(mean_p, it["pole_idx"], it["n"]))
+            xy.append(float(np.mean(vals)))
+        samples.append(xy)
+    return tuple(np.std(samples, axis=0))
+
+
 def model_coord_ci(psamples: dict[str, np.ndarray], resolved: dict[str, list[dict]],
                    rng: np.random.Generator, B: int = 500) -> tuple[float, float, float, float]:
-    """(x, y, x_se, y_se). Point estimate = mean positiveness over each axis's items on the mean-over-
-    samples p. The SE is a bootstrap over BOTH noise sources: resample the axis's items with
-    replacement (item-set noise, only ~3-7 items/axis) and, per item, draw one of its N rating samples
-    (readout noise). std over B replicates -> the CI drawn as error bars on the map."""
+    """(x, y, x_se, y_se), combined item-and-response-mean bootstrap uncertainty.
+
+    The point uses each item's mean over its N ratings. Each replicate resamples items and, for every
+    selected item, resamples N ratings then averages them. This estimates uncertainty of the N-sample
+    mean rather than uncertainty of a single response. The separate `_sample_only_coord_se` keeps the
+    fixed-item response component available for diagnostics.
+    """
     def axis_coords(getp) -> list[float]:
         return [float(np.mean([positiveness(getp(it), it["pole_idx"], it["n"]) for it in resolved[axis]]))
                 for axis in (X_AXIS, Y_AXIS)]
@@ -199,15 +219,28 @@ def model_coord_ci(psamples: dict[str, np.ndarray], resolved: dict[str, list[dic
         xy = []
         for axis in (X_AXIS, Y_AXIS):
             items = resolved[axis]
-            idx = rng.integers(0, len(items), len(items))
             vals = []
-            for j in idx:
+            for j in rng.integers(0, len(items), len(items)):
                 it = items[j]
                 ps = psamples[it["suffix"]]
-                vals.append(positiveness(ps[int(rng.integers(0, len(ps)))], it["pole_idx"], it["n"]))
+                mean_p = ps[rng.integers(0, len(ps), len(ps))].mean(0)
+                vals.append(positiveness(mean_p, it["pole_idx"], it["n"]))
             xy.append(float(np.mean(vals)))
         bx.append(xy[0]); by.append(xy[1])
     return x, y, float(np.std(bx)), float(np.std(by))
+
+
+def ci_bootstrap_smoke() -> None:
+    """Sample-only SE must shrink by roughly sqrt(N) when ratings are averaged."""
+    resolved = {axis: [{"suffix": f"{axis}{i}", "pole_idx": 1, "n": 2} for i in range(3)]
+                for axis in (X_AXIS, Y_AXIS)}
+    psamples = {item["suffix"]: np.tile([[1.0, 0.0], [0.0, 1.0]], (128, 1))
+                for items in resolved.values() for item in items}
+    se_one = _sample_only_coord_se(psamples, resolved, np.random.default_rng(0), n_draws=1, B=10_000)
+    se_sixteen = _sample_only_coord_se(psamples, resolved, np.random.default_rng(1), n_draws=16, B=10_000)
+    ratio = float(np.mean(se_one) / np.mean(se_sixteen))
+    assert 3.5 < ratio < 4.5, f"sample-only SE ratio {ratio:.3f}, expected sqrt(16)=4"
+    print(f"ci smoke: sample-only SE ratio N=1/N=16 is {ratio:.3f}, expected 4.000")
 
 
 def cluster_outlier_sd(countries: list[str], P: np.ndarray, models: dict[str, tuple],
@@ -257,6 +290,8 @@ def main() -> None:
     ap.add_argument("--api-request-timeout", type=float, default=90.0)
     ap.add_argument("--api-max-tokens", type=int, default=1024,
                     help="output budget per rating call; large enough that a reasoning model finishes the JSON")
+    ap.add_argument("--ci-smoke", action="store_true",
+                    help="check that response-mean bootstrap SE falls approximately as 1/sqrt(N)")
     reasoning_group = ap.add_mutually_exclusive_group()
     reasoning_group.add_argument("--api-disable-reasoning", action="store_true",
                                  help="send reasoning.enabled=false for models whose catalog metadata says optional")
@@ -282,6 +317,9 @@ def main() -> None:
     ap.add_argument("--include-all-cached", action="store_true",
                     help="render every complete durable cache entry without making an API request")
     args = ap.parse_args()
+    if args.ci_smoke:
+        ci_bootstrap_smoke()
+        return
     api_models = list(dict.fromkeys(args.api_models + list(API_MODEL_SETS.get(args.api_model_set, ()))))
     api_reasoning = ({"enabled": False} if args.api_disable_reasoning else
                      {"effort": args.api_reasoning_effort} if args.api_reasoning_effort else None)
@@ -392,6 +430,7 @@ def main() -> None:
             "protocol_id": protocol_id,
             "n_items": len(rows),
             "n_samples": args.api_samples,
+            "ci_method": "combined item and N-response-mean bootstrap",
         }
         save_cache()
         x, y, xs, ys = models[key]

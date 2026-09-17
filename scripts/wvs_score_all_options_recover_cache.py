@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 
 from moralmaps.iw_axes import X_AXIS, Y_AXIS, resolve_items
-from moralmaps.rated_cache import merge_completed
+from moralmaps.rated_cache import merge_completed, update_coords
 from wvs_map import load_wvs_all, model_coord_ci
 
 CACHE = Path("slop/research/wvs/20260916_openrouter/wvs_iw_rated.json")
@@ -99,6 +99,8 @@ def recovery_nonoverwriting_smoke() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--refresh-ci", action="store_true",
+                        help="recompute only existing complete panels' coordinate CI summaries from the ledger")
     args = parser.parse_args()
     if args.smoke:
         concurrency_smoke()
@@ -106,14 +108,21 @@ def main() -> None:
         print("smoke: concurrent writers merge, and recovery never overwrites an existing entry")
     records = read_records()
     existing = json.loads(CACHE.read_text())["completed"] if CACHE.exists() else {}
-    existing_hash = hashlib.sha256(json.dumps(existing, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    def stable_entry(entry: dict) -> dict:
+        return {key: value for key, value in entry.items() if key not in {"coords", "ci_method"}}
+    existing_hash = hashlib.sha256(json.dumps({key: stable_entry(value) for key, value in existing.items()},
+                                              sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     entries = recovered_entries(records)
     additions = {key: value for key, value in entries.items() if key not in existing}
     overlaps = {key: entry for key, entry in entries.items() if key in existing}
     point_coordinates_match = all(existing[key]["coords"][:2] == entry["coords"][:2] for key, entry in overlaps.items())
-    merged = merge_completed(CACHE, additions)
+    if args.refresh_ci:
+        merged = update_coords(CACHE, {key: entry["coords"] for key, entry in overlaps.items()})
+    else:
+        merged = merge_completed(CACHE, additions)
     preserved = {key: merged["completed"][key] for key in existing}
-    preserved_hash = hashlib.sha256(json.dumps(preserved, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    preserved_hash = hashlib.sha256(json.dumps({key: stable_entry(value) for key, value in preserved.items()},
+                                               sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     audit = {
         "ledger": str(RECORDS),
         "ledger_valid_lines": len(records),
@@ -121,6 +130,7 @@ def main() -> None:
         "existing_entries_sha256_before": existing_hash,
         "existing_entries_sha256_after": preserved_hash,
         "new_complete_runs_added": len(additions),
+        "ci_summaries_refreshed": len(overlaps) if args.refresh_ci else 0,
         "new_protocol_ids": sorted(additions),
         "new_models": sorted(entry["model"] for entry in additions.values()),
         "overlap_complete_runs": len(overlaps),
