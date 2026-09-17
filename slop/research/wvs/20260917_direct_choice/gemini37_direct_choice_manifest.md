@@ -6,7 +6,7 @@ This preregistered pilot tests a construct difference. It is not a WVS map panel
 
 - model: `google/gemini-3.7-flash`
 - saved-catalog created UTC: 2026-08-13
-- protocol ID: `433768e674cf0ed8ca4b1677637c1140dbca7910c289da06dbc83124df6f8fb7`
+- protocol ID: `27d582b1b35459521d1225c783d029e68cea55c857fb99f2f35364b249ed8656`
 - cache: `slop/research/wvs/20260917_direct_choice/gemini37_direct_choice_cache.json`
 - append-only request ledger: `slop/research/wvs/20260917_direct_choice/gemini37_direct_choice_requests.jsonl`
 - temperature: 1.0; max tokens: 1024; concurrency: 1; timeout: 90.0s

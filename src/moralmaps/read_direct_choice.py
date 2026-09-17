@@ -94,7 +94,8 @@ def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_pe
         "reasoning": reasoning,
         "structured_output": structured_output,
         "prompt_instruction": "Think briefly about which ONE answer best reflects your own view. Do not analyze the survey design. Answer immediately.",
-        "rescue_instruction": _force_choice(10),
+        "response_schemas": {item["id"]: _choice_schema(item["n"]) for item in items},
+        "rescue_instructions": {item["id"]: _force_choice(item["n"]) for item in items},
         "requests": plan,
     }
     encoded = json.dumps(protocol, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
