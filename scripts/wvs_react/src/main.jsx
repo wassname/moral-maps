@@ -3,6 +3,12 @@ import { createRoot } from 'react-dom/client';
 import { VIEW, assertLayout, roundedHull } from './layout.js';
 import './style.css';
 
+const LOGO_ROOT = 'wvs/';
+
+function visibleFamilyNames(groups, hidden) {
+  return Object.keys(groups).filter(family => !hidden.has(family));
+}
+
 function Tooltip({ active, geometry, data, id = 'model-tooltip' }) {
   if (!active) return null;
   const { provenance } = active;
@@ -29,7 +35,7 @@ function ModelMarker({ model, placement, geometry, setActive, clearActive, marke
     onFocus={() => setActive(model)} onBlur={clearActive}>
     {leader && <line className="leader" x1={cx} y1={cy} x2={label.cx} y2={label.cy} />}
     <circle className="model-ring" cx={cx} cy={cy} r="11" stroke={model.color} />
-    <image href={`../${logo}`} x={cx - 7} y={cy - 7} width="14" height="14" preserveAspectRatio="xMidYMid meet" />
+    <image href={`${LOGO_ROOT}${logo}`} x={cx - 7} y={cy - 7} width="14" height="14" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" />
     {label && <text className="model-label" x={label.cx} y={label.cy + 4} textAnchor="middle">{model.label}</text>}
   </g>;
 }
@@ -37,6 +43,7 @@ function ModelMarker({ model, placement, geometry, setActive, clearActive, marke
 function ReleaseScatter({ data, hidden, field, title }) {
   const dated = useMemo(() => data.models.filter(model => Number.isFinite(Date.parse(model.provenance.release_created ?? '')))
     .toSorted((a, b) => a.provenance.release_created.localeCompare(b.provenance.release_created) || a.name.localeCompare(b.name)), [data]);
+  const visible = dated.filter(model => !hidden.has(model.family));
   const [active, setActive] = useState(null);
   const width = 1200, height = 320, left = 74, right = 35, top = 42, bottom = 48;
   const dates = dated.map(model => Date.parse(model.provenance.release_created));
@@ -45,16 +52,19 @@ function ReleaseScatter({ data, hidden, field, title }) {
   const minValue = Math.min(...values), maxValue = Math.max(...values);
   const dateX = date => left + (date - minDate) / (maxDate - minDate) * (width - left - right);
   const valueY = value => top + (maxValue - value) / (maxValue - minValue || 1) * (height - top - bottom);
+  const panelId = `release-${field}`;
+  const tooltipId = `${panelId}-tooltip`;
   const activate = (model, event) => {
     const box = event.currentTarget.closest('.scatter-shell').getBoundingClientRect();
     const point = event.currentTarget.getBoundingClientRect();
     setActive({ ...model, tooltipLeft: `${Math.min(82, (point.left - box.left) / box.width * 100)}%`, tooltipTop: `${Math.min(78, (point.top - box.top) / box.height * 100)}%` });
   };
-  return <section className="release-panel" data-coordinate={field} aria-labelledby={`release-${field}`}>
-    <h2 id={`release-${field}`}>{title}</h2>
-    <p>Dated releases only. Positions are descriptive, not a capability trend.</p>
+  return <section className="release-panel" data-coordinate={field} aria-labelledby={`${panelId}-heading`}>
+    <h2 id={`${panelId}-heading`}>{title}</h2>
     <div className="scatter-shell">
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title} data-panel-model-count={dated.length}>
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-labelledby={`${panelId}-svg-title ${panelId}-svg-desc`} data-panel-model-count={visible.length}>
+        <title id={`${panelId}-svg-title`}>{title}</title>
+        <desc id={`${panelId}-svg-desc`}>Scatter plot with release date on the horizontal axis and {field === 'y' ? 'Secular-Rational' : 'Self-expression'} on the vertical axis. {visible.length} dated models are visible from {visibleFamilyNames(Object.groupBy(data.models, model => model.family), hidden).join(', ') || 'no families'}. Each white-ring logo mark is a model. Hover or keyboard focus a mark for model-specific details.</desc>
         <rect className="canvas" width={width} height={height} />
         <g className="scatter-grid">{Array.from({ length: 5 }, (_, index) => <line key={index} x1={left} x2={width - right} y1={top + index * (height - top - bottom) / 4} y2={top + index * (height - top - bottom) / 4} />)}</g>
         <line className="scatter-axis" x1={left} x2={width - right} y1={height - bottom} y2={height - bottom} />
@@ -64,13 +74,13 @@ function ReleaseScatter({ data, hidden, field, title }) {
         <text className="scatter-tick" x={left - 8} y={top + 4} textAnchor="end">{maxValue.toFixed(2)}</text>
         <text className="scatter-tick" x={left - 8} y={height - bottom} textAnchor="end">{minValue.toFixed(2)}</text>
         {dated.map(model => <g key={model.name} className="release-mark" data-family={model.family} data-release-model={model.name} data-release-date={model.provenance.release_created} display={hidden.has(model.family) ? 'none' : 'inline'}
-          tabIndex="0" role="button" aria-label={`${model.name}, ${model.family}, ${model.provenance.release_created}`} aria-describedby="release-tooltip"
+          tabIndex="0" role="button" aria-label={`${model.name}, ${model.family}, ${model.provenance.release_created}`} aria-describedby={tooltipId}
           onPointerEnter={event => activate(model, event)} onPointerLeave={() => setActive(null)} onFocus={event => activate(model, event)} onBlur={() => setActive(null)}>
           <circle className="model-ring" cx={dateX(Date.parse(model.provenance.release_created))} cy={valueY(model[field])} r="10" stroke={model.color} />
-          <image href={`../${data.logos[model.family]}`} x={dateX(Date.parse(model.provenance.release_created)) - 6.5} y={valueY(model[field]) - 6.5} width="13" height="13" preserveAspectRatio="xMidYMid meet" />
+          <image href={`${LOGO_ROOT}${data.logos[model.family]}`} x={dateX(Date.parse(model.provenance.release_created)) - 6.5} y={valueY(model[field]) - 6.5} width="13" height="13" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" />
         </g>)}
       </svg>
-      <Tooltip active={active} geometry={null} data={data} id="release-tooltip" />
+      <Tooltip active={active} geometry={null} data={data} id={tooltipId} />
     </div>
   </section>;
 }
@@ -90,6 +100,8 @@ function Map({ data }) {
   const focusRef = useRef(null);
   const groups = useMemo(() => Object.groupBy(data.models, model => model.family), [data]);
   const { labels, geometry } = useMemo(() => assertLayout(data), [data]);
+  const visibleFamilies = visibleFamilyNames(groups, hidden);
+  const visibleModelCount = data.models.filter(model => !hidden.has(model.family)).length;
 
   useEffect(() => {
     if (focusName) focusRef.current?.focus();
@@ -106,14 +118,16 @@ function Map({ data }) {
   });
   const xMedian = geometry.x(data.median.x), yMedian = geometry.y(data.median.y);
   return <>
-    <section className="controls" aria-label="Model-family visibility">{Object.entries(groups).map(([family, models]) => {
+    <section className="controls" aria-label="Model-family visibility">{Object.entries(groups).map(([family]) => {
       const visible = !hidden.has(family);
       return <button key={family} className="chip" type="button" aria-pressed={visible} onClick={() => toggle(family)}>
-        <img src={`../${data.logos[family]}`} alt="" />{family}
+        <img src={`${LOGO_ROOT}${data.logos[family]}`} alt="" aria-hidden="true" />{family}
       </button>;
     })}</section>
     <div className="chart-shell">
-      <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} role="img" aria-label="Frontier LLMs on the World Values Survey" data-median-x={data.median.x} data-median-y={data.median.y}>
+      <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} role="img" aria-labelledby="map-svg-title map-svg-desc" data-median-x={data.median.x} data-median-y={data.median.y} data-visible-model-count={visibleModelCount}>
+        <title id="map-svg-title">Frontier LLMs on the World Values Survey</title>
+        <desc id="map-svg-desc">World Values Survey cultural map. Horizontal direction runs from Self-expression on the left to Survival on the right. Vertical direction runs from Traditional below to Secular-Rational above. Coloured dots are selected WVS countries, outlines are cultural regions, and white-ring logo marks are models. {visibleModelCount} model marks are visible from {visibleFamilies.join(', ') || 'no families'}. Use the family controls to hide marks and labels. Hover or keyboard focus a model for model-specific details.</desc>
         <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" className="arrow" /></marker></defs>
         <rect className="canvas" width={VIEW.width} height={VIEW.height} />
         <g className="grid">{Array.from({ length: 8 }, (_, index) => <line key={`v${index}`} x1={geometry.bounds.left + index * (geometry.bounds.right - geometry.bounds.left) / 7} y1={geometry.bounds.top} x2={geometry.bounds.left + index * (geometry.bounds.right - geometry.bounds.left) / 7} y2={geometry.bounds.bottom} />)}{Array.from({ length: 6 }, (_, index) => <line key={`h${index}`} x1={geometry.bounds.left} y1={geometry.bounds.top + index * (geometry.bounds.bottom - geometry.bounds.top) / 5} x2={geometry.bounds.right} y2={geometry.bounds.top + index * (geometry.bounds.bottom - geometry.bounds.top) / 5} />)}</g>
@@ -135,8 +149,13 @@ function Map({ data }) {
 
 function App() {
   const [data, setData] = useState(null);
-  useEffect(() => { fetch('../wvs_map_data.json').then(response => response.json()).then(setData); }, []);
-  return <main><h1>Frontier LLMs on the World Values Survey</h1><p className="lede">React/SVG rendering of the shared WVS coordinate artifact. White-ring marks use locally saved lab logos. Focus or hover a model for its measured readout and release provenance.</p>{data && <Map data={data} />}</main>;
+  useEffect(() => { fetch('wvs/wvs_map_data.json').then(response => response.json()).then(setData); }, []);
+  return <main>
+    <h1>How do AI models score on human values surveys? Which culture are they most similar to? Is it changing over time?</h1>
+    <p className="lede">To answer these we start with the <a href="https://www.worldvaluessurvey.org/">World Values Survey</a>, the standard culture map of the world. Since 1981 it has asked people in about ninety countries the same questions. Two axes drawn from it sort societies by how traditional or secular they are and how much they weigh survival over self-expression.</p>
+    <p className="caption">Use the family controls to compare saved model coordinates. Hover or keyboard focus a mark for its model-specific provenance. See the <a href="https://github.com/wassname/moral-maps">code and records</a>.</p>
+    {data && <Map data={data} />}
+  </main>;
 }
 
 createRoot(document.getElementById('root')).render(<App/>);
