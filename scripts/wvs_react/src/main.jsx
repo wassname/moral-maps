@@ -101,6 +101,14 @@ function ReleaseScatter({ data, hidden, field, title, axisMode }) {
         }
         if (found) break;
       }
+      if (!found) {
+        for (let cy = bounds.top + size.height / 2; cy <= bounds.bottom - size.height / 2 && !found; cy += size.height + 4) {
+          for (let cx = bounds.left + size.width / 2; cx <= bounds.right - size.width / 2; cx += 12) {
+            const candidate = box(cx, cy, size.width, size.height);
+            if (!taken.some(obstacle => hits(candidate, obstacle))) { found = candidate; break; }
+          }
+        }
+      }
       if (!found) throw new Error(`no frontier label location for ${model.name}`);
       placement[model.name] = { ...found, anchor };
       taken.push(found);
