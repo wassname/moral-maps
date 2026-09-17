@@ -10,16 +10,16 @@
   },
   "svg_accessibility": "main map and both release panels have stable title/desc aria-labelledby; descriptions update after family visibility change",
   "qwen_toggle": "clicked, map and dated-panel family groups hidden, country coordinates invariant",
-  "tooltip": "map and release-panel pointer hover and focus show model-specific fields",
+  "tooltip": "map and release-panel pointer hover and focus show panel-specific model name, coordinate, and release date only",
   "release_panels": {
     "panels": 2,
-    "dated_models": 48,
-    "date_order": "DOM order verified",
-    "ols": "line, n, and R squared recompute from currently visible dated models; fewer than two distinct dates hide the fit"
+    "dated_models": 50,
+    "date_order": "DOM order verified; both catalog-dated Grok models rendered in each panel",
+    "ols": "line, n, and R squared recompute from currently visible dated models; the Self-expression panel renders negative stored x, so upward means Self-expression; fewer than two distinct dates hide the fit"
   },
-  "copy": "reader-facing WVS introduction; no model-count, archaeological, implementation, or Artificial Analysis text",
+  "copy": "one short linked WVS sentence above the map; history and axes below it; weak descriptive-fit method and code link below the release panels; capability selector remains visible but scores are absent pending redistribution permission",
   "hashes": {
-    "wvs_map_data.json": "c0b7aa0554ebbf5d819308932e058f4ff6e19d1e817ffebbbe381dbd2d063ffe",
-    "index.html": "324afb7ec7e686e1eb9b7f660f51665475ffcd55e9f546f528674781aab771a6"
+    "wvs_map_data.json": "f67f80fb535655e27d1943ca0709cb56aa3f64bc43e6c6943be34badd2fddc4b",
+    "index.html": "a0465beadb26958485695ea11f5f77957626ff333538c1792e8cf222c6b170e2"
   }
 }

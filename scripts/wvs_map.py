@@ -26,6 +26,7 @@ import ast
 import hashlib
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 import dotenv
@@ -62,6 +63,15 @@ LEGACY_LATEST = {
     "llama": "llama-4-maverick",
     "mistral": "mistral-large-2512",
 }
+
+# These historical Grok coordinates predate the local metadata file. Their dates remain traceable
+# to exact IDs in the saved 2026-09-17 OpenRouter catalog, not inferred from version strings.
+LEGACY_CATALOG_IDS = {
+    "grok-4.20": "x-ai/grok-4.20",
+    "grok-4.3": "x-ai/grok-4.3",
+}
+SAVED_CATALOG_PATH = Path("slop/research/wvs/20260917_openrouter_models.json")
+RATED_PROTOCOL_DIAGNOSTICS = {"gpt-5-nano (rated)"}
 
 API_MODEL_SETS = {
     "fable-astra": (
@@ -307,7 +317,8 @@ def main() -> None:
     models: dict[str, tuple] = published_models(published_ci) if published_ci.exists() else {}
     if args.include_all_cached:
         for entry in cache["completed"].values():
-            models[entry["display_key"]] = tuple(entry["coords"])
+            if entry["display_key"] not in RATED_PROTOCOL_DIAGNOSTICS:
+                models[entry["display_key"]] = tuple(entry["coords"])
 
     def save_cache() -> None:
         """Atomic cache replacement after a complete model panel, so interruption cannot fabricate a hit."""
@@ -411,6 +422,11 @@ def main() -> None:
             raise ValueError(f"model has no explicit family: {k}")
         fams.setdefault(family, []).append(k)
     metadata = json.loads(Path("docs/img/wvs/wvs_model_metadata.json").read_text())["models"]
+    saved_catalog = {entry["id"]: entry for entry in json.loads(SAVED_CATALOG_PATH.read_text())["data"]}
+    legacy_release_dates = {
+        name: datetime.fromtimestamp(saved_catalog[model_id]["created"], tz=timezone.utc).date().isoformat()
+        for name, model_id in LEGACY_CATALOG_IDS.items()
+    }
     model_labels: dict[str, str] = {}
     label_sources: dict[str, str] = {}
     for family, names in fams.items():
@@ -463,9 +479,12 @@ def main() -> None:
             panel = completed.get(name)
             catalog = metadata.get(name)
             if panel is None:
+                legacy_date = legacy_release_dates.get(name)
                 return {"readout": "recovered rounded historical coordinate", "items": None,
                         "samples": None, "run_id": None, "protocol_id": None,
-                        "release_created": None, "release_source": "historical coordinate"}
+                        "release_created": legacy_date,
+                        "release_source": (f"saved OpenRouter catalog 2026-09-17: {LEGACY_CATALOG_IDS[name]}"
+                                           if legacy_date else "historical coordinate")}
             return {"readout": "rated categorical response", "items": panel["n_items"],
                     "samples": panel["n_samples"], "run_id": panel["run_id"],
                     "protocol_id": panel["protocol_id"],
@@ -475,6 +494,12 @@ def main() -> None:
         args.web_data.parent.mkdir(parents=True, exist_ok=True)
         args.web_data.write_text(json.dumps({
             "schema": 2,
+            "capability_x": {
+                "label": "Artificial Analysis Intelligence Index",
+                "source_url": "https://artificialanalysis.ai/models",
+                "status": "blocked",
+                "blocker": "Capability scores are omitted until the source owner confirms redistribution permission.",
+            },
             "title": "Frontier LLMs on the\nWorld Values Survey",
             "note": "source: github.com/wassname/moral-maps",
             "axis": {"x": (["Self-expression", "Survival"] if sx < 0 else ["Survival", "Self-expression"]),

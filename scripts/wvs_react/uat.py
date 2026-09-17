@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+from datetime import date
 import subprocess
 from pathlib import Path
 
@@ -36,6 +37,14 @@ def country_positions(page) -> list[list[str]]:
     )
 
 
+def ols_slope(models: list[dict], value: str) -> float:
+    dates = [date.fromisoformat(model["provenance"]["release_created"]).toordinal() for model in models]
+    coordinates = [model[value] for model in models]
+    date_mean = sum(dates) / len(dates)
+    coordinate_mean = sum(coordinates) / len(coordinates)
+    return sum((date - date_mean) * (coordinate - coordinate_mean) for date, coordinate in zip(dates, coordinates)) / sum((date - date_mean) ** 2 for date in dates)
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     chrome = shutil.which("google-chrome")
@@ -43,12 +52,18 @@ def main() -> None:
         raise RuntimeError("google-chrome is required for the Playwright UAT")
     data = json.loads((ROOT / "docs/wvs/wvs_map_data.json").read_text())
     assert data["schema"] == 2
+    assert data["capability_x"]["status"] == "blocked"
+    assert data["capability_x"]["source_url"] == "https://artificialanalysis.ai/models"
     assert len(data["models"]) == 64
     assert len(data["countries"]) == 90
     assert len(data["zone_hulls"]) == 4
     assert len(data["latest_by_family"]) == 13
     assert all(len(zone["points"]) >= 30 for zone in data["zone_hulls"])
     dated = [model for model in data["models"] if model["provenance"]["release_created"]]
+    grok_dates = {model["name"]: model["provenance"]["release_created"] for model in data["models"] if model["name"] in {"grok-4.20", "grok-4.3"}}
+    assert grok_dates == {"grok-4.20": "2026-03-31", "grok-4.3": "2026-04-30"}
+    assert all(model["provenance"]["release_source"].startswith("saved OpenRouter catalog 2026-09-17: x-ai/")
+               for model in data["models"] if model["name"] in grok_dates)
     families = {model["family"] for model in data["models"]}
 
     with sync_playwright() as playwright:
@@ -68,10 +83,18 @@ def main() -> None:
         assert page.locator("html").get_attribute("lang") == "en"
         assert page.locator('meta[name="viewport"]').count() == 1
         assert page.locator("h1").inner_text().startswith("How do AI models score on human values surveys?")
+        assert page.locator(".lede").inner_text() == "We start with the World Values Survey, a map of human values across about ninety countries."
         visible_copy = page.locator("main").inner_text()
-        for absent in ("React/SVG rendering", "Artificial Analysis", "Historical coordinates", "Dated releases only"):
+        for absent in ("React/SVG rendering", "Historical coordinates", "Dated releases only"):
             assert absent not in visible_copy
-        assert "ordinary least squares" in visible_copy
+        assert "Artificial Analysis Intelligence Index, unavailable pending redistribution permission" in visible_copy
+        assert data["capability_x"]["blocker"] in visible_copy
+        capability_option = page.get_by_label("Release-panel x axis").locator('option[value="capability"]')
+        assert capability_option.get_attribute("disabled") is not None
+        layout_order = page.locator("main > *").evaluate_all("nodes => nodes.map(node => node.className.baseVal || node.className || node.tagName)")
+        assert layout_order.index("chart-shell") < layout_order.index("map-explanation") < layout_order.index("release-panels") < layout_order.index("caption")
+        assert "weak descriptive correlations" in page.locator(".caption").inner_text()
+        assert "code and records" in page.locator(".caption").inner_text()
 
         map_svg = page.locator("svg[data-median-x]")
         svg_description(page, "svg[data-median-x]", "map-svg-title", "map-svg-desc")
@@ -100,6 +123,16 @@ def main() -> None:
         svg_description(page, '.release-panel[data-coordinate="y"] svg', "release-y-svg-title", "release-y-svg-desc")
         svg_description(page, '.release-panel[data-coordinate="x"] svg', "release-x-svg-title", "release-x-svg-desc")
         assert page.locator(".release-mark").count() == len(dated) * 2
+        for grok_name in grok_dates:
+            assert page.locator(f'[data-release-model="{grok_name}"]').count() == 2
+        self_expression_panel = page.locator('.release-panel[data-coordinate="x"]')
+        assert self_expression_panel.locator(".scatter-y-label").text_content() == "Survival -> Self-expression ↑"
+        qwen = next(model for model in dated if model["name"] == "qwen3.8-flash")
+        qwen_self_expression = self_expression_panel.locator('[data-release-model="qwen3.8-flash"]')
+        assert float(qwen_self_expression.get_attribute("data-coordinate-value")) == -qwen["x"]
+        rendered_slope = float(self_expression_panel.locator("svg").get_attribute("data-fit-slope"))
+        expected_slope = -ols_slope(dated, "x") / 86_400_000
+        assert abs(rendered_slope - expected_slope) < 1e-18
         for panel in page.locator(".release-panel").all():
             dates = panel.locator(".release-mark").evaluate_all("nodes => nodes.map(node => node.dataset.releaseDate)")
             assert dates == sorted(dates)
@@ -123,8 +156,10 @@ def main() -> None:
         marker = page.locator('[data-model="qwen3.8-flash"]')
         marker.locator(".model-ring").hover()
         page.wait_for_selector("#model-tooltip")
-        for required in ("qwen3.8-flash", "qwen", "rated categorical response", "12 items x 12 samples"):
-            assert required in page.locator("#model-tooltip").inner_text()
+        assert page.locator("#model-tooltip strong").inner_text() == "qwen3.8-flash"
+        assert page.locator("#model-tooltip span").all_text_contents() == [
+            "Self-expression/Survival: -0.415", "Traditional/Secular-Rational: 0.635", "release 2026-08-26",
+        ]
         page.screenshot(path=OUT / "wvs_react_root_playwright_tooltip_hover.png", full_page=True)
         marker.focus()
         assert page.evaluate("document.activeElement.dataset.model") == "qwen3.8-flash"
@@ -134,7 +169,8 @@ def main() -> None:
         release_y_marker = page.locator('.release-panel[data-coordinate="y"] [data-release-model="qwen3.8-flash"]')
         release_y_marker.locator(".model-ring").hover()
         page.wait_for_selector("#release-y-tooltip")
-        assert "qwen3.8-flash" in page.locator("#release-y-tooltip").inner_text()
+        assert page.locator("#release-y-tooltip strong").inner_text() == "qwen3.8-flash"
+        assert page.locator("#release-y-tooltip span").all_text_contents() == ["Secular-Rational: 0.635", "release 2026-08-26"]
         page.screenshot(path=OUT / "wvs_react_root_playwright_release_panel_hover.png", full_page=True)
         release_y_marker.focus()
         assert page.evaluate("document.activeElement.dataset.releaseModel") == "qwen3.8-flash"
@@ -145,6 +181,17 @@ def main() -> None:
         page.wait_for_selector("#release-x-tooltip")
         assert release_y_marker.get_attribute("aria-describedby") == "release-y-tooltip"
         assert release_x_marker.get_attribute("aria-describedby") == "release-x-tooltip"
+        assert page.locator("#release-x-tooltip strong").inner_text() == "qwen3.8-flash"
+        assert page.locator("#release-x-tooltip span").all_text_contents() == ["Self-expression: 0.415", "release 2026-08-26"]
+        page.screenshot(path=OUT / "wvs_react_root_playwright_release_self_expression_hover.png", full_page=True)
+        for grok_name, grok_date in grok_dates.items():
+            grok = next(model for model in dated if model["name"] == grok_name)
+            grok_marker = page.locator(f'.release-panel[data-coordinate="y"] [data-release-model="{grok_name}"]')
+            grok_marker.locator(".model-ring").hover()
+            assert page.locator("#release-y-tooltip strong").inner_text() == grok_name
+            assert page.locator("#release-y-tooltip span").all_text_contents() == [
+                f"Secular-Rational: {grok['y']:.3f}", f"release {grok_date}",
+            ]
 
         qwen_dated = sum(model["family"] == "qwen" and bool(model["provenance"]["release_created"]) for model in data["models"])
         for family in sorted(families - {"qwen"}):
@@ -194,10 +241,10 @@ def main() -> None:
                    "numeric_model_country_median_equality": "verified against DOM data attributes"},
         "svg_accessibility": "main map and both release panels have stable title/desc aria-labelledby; descriptions update after family visibility change",
         "qwen_toggle": "clicked, map and dated-panel family groups hidden, country coordinates invariant",
-        "tooltip": "map and release-panel pointer hover and focus show model-specific fields",
-        "release_panels": {"panels": 2, "dated_models": len(dated), "date_order": "DOM order verified",
-                           "ols": "line, n, and R squared recompute from currently visible dated models; fewer than two distinct dates hide the fit"},
-        "copy": "reader-facing WVS introduction; no model-count, archaeological, implementation, or Artificial Analysis text",
+        "tooltip": "map and release-panel pointer hover and focus show panel-specific model name, coordinate, and release date only",
+        "release_panels": {"panels": 2, "dated_models": len(dated), "date_order": "DOM order verified; both catalog-dated Grok models rendered in each panel",
+                           "ols": "line, n, and R squared recompute from currently visible dated models; the Self-expression panel renders negative stored x, so upward means Self-expression; fewer than two distinct dates hide the fit"},
+        "copy": "one short linked WVS sentence above the map; history and axes below it; weak descriptive-fit method and code link below the release panels; capability selector remains visible but scores are absent pending redistribution permission",
         "hashes": hashes,
     }, indent=2))
 

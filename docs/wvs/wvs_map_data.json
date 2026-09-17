@@ -9,6 +9,12 @@
       "Secular-Rational"
     ]
   },
+  "capability_x": {
+    "blocker": "Capability scores are omitted until the source owner confirms redistribution permission.",
+    "label": "Artificial Analysis Intelligence Index",
+    "source_url": "https://artificialanalysis.ai/models",
+    "status": "blocked"
+  },
   "countries": [
     {
       "color": "#888888",
@@ -860,8 +866,8 @@
         "items": null,
         "protocol_id": null,
         "readout": "recovered rounded historical coordinate",
-        "release_created": null,
-        "release_source": "historical coordinate",
+        "release_created": "2026-03-31",
+        "release_source": "saved OpenRouter catalog 2026-09-17: x-ai/grok-4.20",
         "run_id": null,
         "samples": null
       },
@@ -911,8 +917,8 @@
         "items": null,
         "protocol_id": null,
         "readout": "recovered rounded historical coordinate",
-        "release_created": null,
-        "release_source": "historical coordinate",
+        "release_created": "2026-04-30",
+        "release_source": "saved OpenRouter catalog 2026-09-17: x-ai/grok-4.3",
         "run_id": null,
         "samples": null
       },
