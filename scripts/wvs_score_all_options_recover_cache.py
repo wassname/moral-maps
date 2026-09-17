@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import multiprocessing
 import tempfile
@@ -42,7 +43,6 @@ def recovered_entries(records: list[dict]) -> dict[str, dict]:
     resolved = resolve_items(load_wvs_all())
     expected_ids = [item["suffix"] for axis in (X_AXIS, Y_AXIS) for item in resolved[axis]]
     entries = {}
-    rng = np.random.default_rng(0)
     for finish in finished:
         run_id = finish["run_id"]
         start = starts[run_id]
@@ -52,7 +52,7 @@ def recovered_entries(records: list[dict]) -> dict[str, dict]:
         if any(row["valid_samples"] != 12 for row in rows.values()):
             raise ValueError(f"complete run {run_id} has non-12 item samples")
         psamples = {item_id: np.asarray(rows[item_id]["p_samples"]) for item_id in expected_ids}
-        coords = model_coord_ci(psamples, resolved, rng)
+        coords = model_coord_ci(psamples, resolved, np.random.default_rng(0))
         model = finish["model"]
         entries[finish["protocol_id"]] = {
             "model": model,
@@ -84,22 +84,48 @@ def concurrency_smoke() -> None:
         assert set(json.loads(path.read_text())["completed"]) == {"a", "b"}
 
 
+def recovery_nonoverwriting_smoke() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / "cache.json"
+        original = {"schema": 2, "completed": {"existing": {"coords": [1, 2, 3, 4]}}}
+        path.write_text(json.dumps(original, sort_keys=True))
+        recovered = {"existing": {"coords": [9, 9, 9, 9]}, "missing": {"coords": [5, 6, 7, 8]}}
+        additions = {key: value for key, value in recovered.items() if key not in original["completed"]}
+        merged = merge_completed(path, additions)
+        assert merged["completed"]["existing"] == original["completed"]["existing"]
+        assert merged["completed"]["missing"] == recovered["missing"]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
     if args.smoke:
         concurrency_smoke()
-        print("smoke: two concurrent cache writers preserve both completed entries")
+        recovery_nonoverwriting_smoke()
+        print("smoke: concurrent writers merge, and recovery never overwrites an existing entry")
     records = read_records()
+    existing = json.loads(CACHE.read_text())["completed"] if CACHE.exists() else {}
+    existing_hash = hashlib.sha256(json.dumps(existing, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     entries = recovered_entries(records)
-    merged = merge_completed(CACHE, entries)
+    additions = {key: value for key, value in entries.items() if key not in existing}
+    overlaps = {key: entry for key, entry in entries.items() if key in existing}
+    point_coordinates_match = all(existing[key]["coords"][:2] == entry["coords"][:2] for key, entry in overlaps.items())
+    merged = merge_completed(CACHE, additions)
+    preserved = {key: merged["completed"][key] for key in existing}
+    preserved_hash = hashlib.sha256(json.dumps(preserved, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     audit = {
         "ledger": str(RECORDS),
         "ledger_valid_lines": len(records),
-        "recovered_complete_runs": len(entries),
+        "existing_entries_preserved_count": len(existing),
+        "existing_entries_sha256_before": existing_hash,
+        "existing_entries_sha256_after": preserved_hash,
+        "new_complete_runs_added": len(additions),
+        "new_protocol_ids": sorted(additions),
+        "new_models": sorted(entry["model"] for entry in additions.values()),
+        "overlap_complete_runs": len(overlaps),
+        "overlap_point_coordinates_equal": point_coordinates_match,
         "cache_completed_entries_after_merge": len(merged["completed"]),
-        "recovered_models": sorted(entry["model"] for entry in entries.values()),
     }
     AUDIT.write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")
     print(json.dumps(audit, indent=2, sort_keys=True))
