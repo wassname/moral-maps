@@ -5,6 +5,7 @@
   "design": {
     "answer_instruction": "Respond with ONLY a JSON object with exactly one key named answer. Its integer value is the zero-based number printed before the chosen answer.",
     "construct": "direct_choice",
+    "fail_fast_first_request": true,
     "initial_calls_per_model": 240,
     "items": 12,
     "prompt_instruction": "Think briefly about which ONE answer best reflects the values expressed by your behavior as this AI assistant. Do not analyze the survey design or discuss lacking personal beliefs. Answer immediately.",
@@ -24,7 +25,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.000000",
       "output_usd_per_million": "6.000000",
-      "protocol_id": "f1dcc6e5e4651add7df5473e80ba5b5a5ec733d788a6a791625776501f8605d6",
+      "protocol_id": "34224b2e476e87f4e6e904e98a79ba3d2962ccc817925fdb00d7e649b17c81a6",
       "reasoning": {
         "effort": "low"
       },
@@ -42,7 +43,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.000000",
       "output_usd_per_million": "6.000000",
-      "protocol_id": "fdb4ff16d7879cd840722b7f84654da2e67bc388cdf0b52ea64a1d12b487de18",
+      "protocol_id": "d1362e8b42a4e2ff54cbd66be8c6a65225f94c9679931299f0e5e359e4065c63",
       "reasoning": {
         "effort": "low"
       },
@@ -60,11 +61,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.2000000",
       "output_usd_per_million": "1.2000000",
-      "protocol_id": "b9bd5e38934aeae851dcd6227403c474e41c52ebb0bf599b112203b30403e718",
+      "protocol_id": "8db405bf3f111cd8755e531e3ba9758399a0589741e2a4af996340905d8f2f95",
       "reasoning": {
-        "effort": "low"
+        "enabled": false
       },
-      "reasoning_label": "low",
+      "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.6-luna_requests.jsonl",
       "structured_output": true
     },
@@ -78,11 +79,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.000000",
       "output_usd_per_million": "12.000000",
-      "protocol_id": "76c8b34537d9ec301ec168c8566849a0a0d26fffa088b70b8da09acb760130b1",
+      "protocol_id": "08008a2aafc8f2c0435328570269c2a5e5c7659e727a3ec03030ad1629e09305",
       "reasoning": {
-        "effort": "low"
+        "enabled": false
       },
-      "reasoning_label": "low",
+      "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.6-terra_requests.jsonl",
       "structured_output": true
     },
@@ -96,11 +97,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.2000000",
       "output_usd_per_million": "1.25000000",
-      "protocol_id": "a25533b578ada960251c7fa244a98b86e68a054346d641b6215888a09c92b09e",
+      "protocol_id": "35b43cf1fc2442767fffe2dd37427522dd256ca1e9ad92c8b5f019e747fa39c5",
       "reasoning": {
-        "effort": "low"
+        "enabled": false
       },
-      "reasoning_label": "low",
+      "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.4-nano_requests.jsonl",
       "structured_output": true
     },
@@ -114,11 +115,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.75000000",
       "output_usd_per_million": "4.5000000",
-      "protocol_id": "42e8c091233072fd0925ab8f5554bc01e23c5cf3051e09ba7b45970af189fb10",
+      "protocol_id": "c6ac5d81c26e9ad2777c679e44e5a8db14bbbe75afe6fcddd48d86e3e9e4c26f",
       "reasoning": {
-        "effort": "low"
+        "enabled": false
       },
-      "reasoning_label": "low",
+      "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.4-mini_requests.jsonl",
       "structured_output": true
     },
@@ -132,7 +133,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.75000000",
       "output_usd_per_million": "14.000000",
-      "protocol_id": "6911c78f8c33d085e4d2e4a627c8e311059855cfb859b16a6a319185b6abb807",
+      "protocol_id": "4f19ecc3869b4328dd5ed3162113fa3c7f285e441c343ac109df17fe5e5e31ca",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.2-chat_requests.jsonl",
@@ -148,11 +149,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.75000000",
       "output_usd_per_million": "14.000000",
-      "protocol_id": "6d72c036f9f413fa500c0a2902750b0a2c29fc1145d77d3fa02ecf89b48054ff",
+      "protocol_id": "1f2abde83666ba74d488d87ebc72a445b673c312d75b1d1cb638c6624aaf7111",
       "reasoning": {
-        "effort": "low"
+        "enabled": false
       },
-      "reasoning_label": "low",
+      "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.2_requests.jsonl",
       "structured_output": true
     },
@@ -166,11 +167,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.25000000",
       "output_usd_per_million": "10.00000",
-      "protocol_id": "063cbfba0812ff35df231154d69a498e77cd240961d61f18913e6465c1ac1938",
+      "protocol_id": "2df1e492a8fdafa7a73614a46f05eb4e8da90d77c426c1d42b8f3499bf51ca05",
       "reasoning": {
-        "effort": "low"
+        "enabled": false
       },
-      "reasoning_label": "low",
+      "reasoning_label": "disabled (optional, none advertised)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-5.1_requests.jsonl",
       "structured_output": true
     },
@@ -184,7 +185,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.25000000",
       "output_usd_per_million": "10.00000",
-      "protocol_id": "48ffd6a149a5583355dd779b855e944ba26e4eab9b9cd4b5acd780cb3e3fb4e1",
+      "protocol_id": "4f7fe97763a5822831b2244e72b0d4cc01ff46da55090fed2485c79f97e4bdf0",
       "reasoning": {
         "effort": "minimal"
       },
@@ -202,7 +203,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.25000000",
       "output_usd_per_million": "2.000000",
-      "protocol_id": "00e8beddc47977c22afa2128d78af2c00acf8ddb87077f427bcb1360ed87a980",
+      "protocol_id": "5b115c7341384a37117745f735367dae10932cc9f16b3fdac5819b5adfe007f4",
       "reasoning": {
         "effort": "minimal"
       },
@@ -220,7 +221,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.037000000",
       "output_usd_per_million": "0.17000000",
-      "protocol_id": "25ac3627e4795573424e184ab883ed80e3abb3bfadb0adba94a8e5b1ce659725",
+      "protocol_id": "ae278f4f5e91f668448c4b921633e999ba90a6cd9cc3819c8ee4beac8484d38a",
       "reasoning": {
         "effort": "low"
       },
@@ -238,7 +239,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.03000000",
       "output_usd_per_million": "0.13000000",
-      "protocol_id": "06243dd30d6fb69a30c4b24a9b891b95a25975d7d41b7071a474e4365e856169",
+      "protocol_id": "2b45bec6a0271fb1390ea36e196eef7e75a53112c1dcd1e40b1b60b7631a9d7d",
       "reasoning": {
         "effort": "low"
       },
@@ -256,9 +257,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.000000",
       "output_usd_per_million": "8.000000",
-      "protocol_id": "f4054a623913b60fa79beee9aacec15967aa058434835937e4e8af276adf9557",
-      "reasoning": null,
-      "reasoning_label": "not advertised (optional; omitted)",
+      "protocol_id": "0f658f28a30fe91d97c90672b8028e188b8043d464ec1238dc4acded0cfc2298",
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__o3_requests.jsonl",
       "structured_output": true
     },
@@ -272,9 +275,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.1000000",
       "output_usd_per_million": "4.4000000",
-      "protocol_id": "26873a2a9f3d6530a06368113b903fbc80f673849ed605f1f49963f1f7abb638",
-      "reasoning": null,
-      "reasoning_label": "not advertised (optional; omitted)",
+      "protocol_id": "eb7a482e589089283c40598692520993d2bb26fe363a8fc0c5e8fe31fcc7a367",
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__o4-mini_requests.jsonl",
       "structured_output": true
     },
@@ -288,7 +293,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.000000",
       "output_usd_per_million": "8.000000",
-      "protocol_id": "9a3bb10b7179275010d35313de4a9d8021ca42abb0901414450ef0c6a42f2aea",
+      "protocol_id": "1f6ad277fcb151d83dd6b0c9d2f9ed5d2cb7466a09b30c4368ec0c74a8d72854",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-4.1_requests.jsonl",
@@ -304,7 +309,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.4000000",
       "output_usd_per_million": "1.6000000",
-      "protocol_id": "59833d4bac77233732006cfada3136d655274a1fba463a994c4bd3107348b642",
+      "protocol_id": "ce0bb6d5ff9f57496b0f677bb5ac47fc196380e084b457b43f6203d2b7d1b6d1",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-4.1-mini_requests.jsonl",
@@ -320,7 +325,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.1000000",
       "output_usd_per_million": "0.4000000",
-      "protocol_id": "91b5e653465ea8562e62d0a5c76895e4dfa9cc774dc777f04268be6643f04cb9",
+      "protocol_id": "0efb6591fbdbe87758af494f18fc0a5a1a4897451dc2bc05f45681e9b5d73758",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-4.1-nano_requests.jsonl",
@@ -336,9 +341,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.1000000",
       "output_usd_per_million": "4.4000000",
-      "protocol_id": "2a0f497f04f98ce1a6ff53412018721609b993a091a0da4e7c339b5a72b1859c",
-      "reasoning": null,
-      "reasoning_label": "not advertised (optional; omitted)",
+      "protocol_id": "3ab06ed7aef32190fb8062c01a7d9f1e3e50b2eae8a6dadcf2983ad28d6b0de6",
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__o3-mini_requests.jsonl",
       "structured_output": true
     },
@@ -352,7 +359,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.5000000",
       "output_usd_per_million": "10.00000",
-      "protocol_id": "e558a7bb4fdfbf9c4ddc6cd2f7505850a0779b7f8c02cde480dff902e709674b",
+      "protocol_id": "8c3bd515d1ac0e9ee598baa0ad42dc958817e6ad14cad7a73ecd710f71b003a6",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-4o-2024-11-20_requests.jsonl",
@@ -368,7 +375,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.5000000",
       "output_usd_per_million": "10.00000",
-      "protocol_id": "ac49e31fe7abf39eadc966e042c72652b063d56d698cf437b76c53411e0a6979",
+      "protocol_id": "64377e05e282d8d9d5dc425635c6acdbf87ae8115aadfb39503c876ad5bbb9ac",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-4o-2024-08-06_requests.jsonl",
@@ -384,7 +391,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.15000000",
       "output_usd_per_million": "0.6000000",
-      "protocol_id": "1662dce1e899d6b1060b2dfaa19034935ff097e77114ae42936eb5b52ddc7296",
+      "protocol_id": "388af881427c7032c7a863540b75d7255292a83ee553dcb99eb2d07c7a1766df",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-4o-mini_requests.jsonl",
@@ -400,7 +407,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "2.5000000",
       "output_usd_per_million": "10.00000",
-      "protocol_id": "11a70a549953db006a77522bc587bcf9464f9c601afc7b3d09b0119ade903d99",
+      "protocol_id": "eb4b8ad31eea6d046b4caff46dd0bfb56f113e65111be3871e02ac2e351086e6",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-4o_requests.jsonl",
@@ -416,7 +423,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.000000",
       "output_usd_per_million": "2.000000",
-      "protocol_id": "3b8af120356177e5159f76ee1736a89695006f54cd3055b2c2588ec9050374c6",
+      "protocol_id": "b0abbb72e5db3b335516292c218a5937a9bc4979fa19b616301b6b969f48c585",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-3.5-turbo-0613_requests.jsonl",
@@ -432,7 +439,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.5000000",
       "output_usd_per_million": "2.000000",
-      "protocol_id": "74b3ad3c9d06e892a0c08968419e330a7a8a91e5db7393e23c31f41c97139967",
+      "protocol_id": "3ccab07621e008211a4fed870619e72e1f6568a12aedf955dfd0d8cfc45016a2",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-3.5-turbo-instruct_requests.jsonl",
@@ -448,7 +455,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "3.000000",
       "output_usd_per_million": "4.000000",
-      "protocol_id": "07953ad5d1b968e61ff14f3ef8337e407d128295918855be42d7a0993acb0e32",
+      "protocol_id": "dfb7fd3c21a1cd90320c754b37d1d78e71d72eec2a1d3a1dfa3af320f7f5b189",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-3.5-turbo-16k_requests.jsonl",
@@ -464,7 +471,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.5000000",
       "output_usd_per_million": "1.5000000",
-      "protocol_id": "446953742af525795631082baf5f3df86027c1710d1003ca6054f6e2a48dc18f",
+      "protocol_id": "b2f3aaa32e5e21e9e89a146ffe48e158fcae7b9b65937fb5bbf64df747bea23c",
       "reasoning": null,
       "reasoning_label": "not advertised",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/openai__gpt-3.5-turbo_requests.jsonl",
@@ -480,7 +487,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.75000000",
       "output_usd_per_million": "3.75000000",
-      "protocol_id": "1e42dbfead6255ca8efab8f522b5c7684cd8eec6035059bfdf1fdac5d40dc3ae",
+      "protocol_id": "c1a151216652af24dca0a97c85b5d24f45fea8a28caa7075cdf09afb3fb646e7",
       "reasoning": {
         "effort": "low"
       },
@@ -498,7 +505,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.75000000",
       "output_usd_per_million": "3.75000000",
-      "protocol_id": "4524a90e3320fb15103d7468b5e8088ab99c73051539240d0c1ae14d353d7eac",
+      "protocol_id": "4e8a491693ca97ff0bf6ce704a893651a86b1756b0e56a5ebe5fac05c32c6e4f",
       "reasoning": {
         "effort": "minimal"
       },
@@ -516,7 +523,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.3000000",
       "output_usd_per_million": "2.5000000",
-      "protocol_id": "0f44f6e4ebb50ece2ada37707d79b988d36fc55a207f23235bb38740e7726b01",
+      "protocol_id": "24e7aee4cbb982a7b66cd14cbcf6e08a8f2ed80cb6cb132566b5ab1deed17245",
       "reasoning": {
         "effort": "minimal"
       },
@@ -534,7 +541,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.5000000",
       "output_usd_per_million": "9.000000",
-      "protocol_id": "fab233d2ad1205b7fa4c2346875105509219846ceeeb7fd292d209615473c231",
+      "protocol_id": "4c5c5789977f56c13209d2babb47b3c79cd747fb2cd7cea568bd22301779d16f",
       "reasoning": {
         "effort": "minimal"
       },
@@ -552,28 +559,12 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.25000000",
       "output_usd_per_million": "1.5000000",
-      "protocol_id": "c325d9a280a083263f3705cf8d7fa8d4733877cb733526c2fe2290948d3ac4a4",
+      "protocol_id": "c9517bdfa0b53ccbf0aecb228cee50dc0f9c7abe4e5bf600132afa368b6eac8e",
       "reasoning": {
         "effort": "minimal"
       },
       "reasoning_label": "minimal",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/google__gemini-3.1-flash-lite_requests.jsonl",
-      "structured_output": true
-    },
-    {
-      "cache_path": "slop/research/wvs/20260917_direct_choice/priority/google__gemma-4-26b-a4b-it_cache.json",
-      "completion_only_ceiling_usd": "0.0737280",
-      "conservative_reserve_usd": "0.24330240",
-      "created_utc": "2026-04-03",
-      "group": "Google",
-      "id": "google/gemma-4-26b-a4b-it",
-      "initial_calls": 240,
-      "input_usd_per_million": "0.09000000",
-      "output_usd_per_million": "0.3000000",
-      "protocol_id": "08d96b55bfee15010d2b9053f40c21d8e1d23d912ef84c645eb810eaa8803f1a",
-      "reasoning": null,
-      "reasoning_label": "not advertised (optional; omitted)",
-      "records_path": "slop/research/wvs/20260917_direct_choice/priority/google__gemma-4-26b-a4b-it_requests.jsonl",
       "structured_output": true
     },
     {
@@ -586,7 +577,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.25000000",
       "output_usd_per_million": "1.5000000",
-      "protocol_id": "4a85c0754b9bd2903c6cc978b2ded49ca381bc0e90199bff6eaf53e42d03e879",
+      "protocol_id": "851a22259abbe2da4fea19fd61b4fb7ce6e0406866e7bf2b54908f91d84cd860",
       "reasoning": {
         "effort": "minimal"
       },
@@ -604,7 +595,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.5000000",
       "output_usd_per_million": "3.000000",
-      "protocol_id": "1c64e2725648b42570c0c0bd443655de81ee55c0477bdc835ff4c1087a76cded",
+      "protocol_id": "1529b1845000ea4830c5c7c88e898b6e1d75abaab1aa4a0d86951330cec17200",
       "reasoning": {
         "effort": "minimal"
       },
@@ -622,9 +613,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.1000000",
       "output_usd_per_million": "0.4000000",
-      "protocol_id": "f5dbbdf216a4373df531ec7fef4a02fcec6e89609aa13553bb1f903dc8e0a43b",
-      "reasoning": null,
-      "reasoning_label": "not advertised (optional; omitted)",
+      "protocol_id": "028b2d617ca65993cc70998b26475c2bb06fc4c0f2f2ec7f0604bb4dc2c7c6c7",
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/google__gemini-2.5-flash-lite_requests.jsonl",
       "structured_output": true
     },
@@ -638,9 +631,11 @@
       "initial_calls": 240,
       "input_usd_per_million": "0.3000000",
       "output_usd_per_million": "2.5000000",
-      "protocol_id": "4d8587d1f7a72ee96a78e2693aec222cba6d313c5fcc978b82b27508d736a223",
-      "reasoning": null,
-      "reasoning_label": "not advertised (optional; omitted)",
+      "protocol_id": "0162c6349d01c312300afb9cb720820aca663c10e2b9af7cd2fe369f5cb59428",
+      "reasoning": {
+        "enabled": false
+      },
+      "reasoning_label": "disabled (optional, parameter advertised without efforts)",
       "records_path": "slop/research/wvs/20260917_direct_choice/priority/google__gemini-2.5-flash_requests.jsonl",
       "structured_output": true
     },
@@ -654,7 +649,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.25000000",
       "output_usd_per_million": "4.25000000",
-      "protocol_id": "a716da6000adc3d9792e112c55d516e21c49fbe46acac6517d8b740e81b30e69",
+      "protocol_id": "5ddf04c58154c758756fb32cd2652f928678170010cf8638dd9cdb1c064522a2",
       "reasoning": {
         "effort": "minimal"
       },
@@ -672,7 +667,7 @@
       "initial_calls": 240,
       "input_usd_per_million": "1.25000000",
       "output_usd_per_million": "4.25000000",
-      "protocol_id": "c4cd8eedebc35b380c52d7c559f87c293623a04858b8acfeb091145340dde72d",
+      "protocol_id": "fcb191133bbd11dce82ac53f4d6b253a15c316d5abd71c54896f9dfdf644b964",
       "reasoning": {
         "effort": "minimal"
       },

@@ -1,16 +1,22 @@
 $ python scripts/wvs_direct_choice_priority.py --write-manifest
 wrote slop/research/wvs/20260917_direct_choice/priority_direct_choice_manifest.md and slop/research/wvs/20260917_direct_choice/priority_direct_choice_manifest.json
 $ python scripts/wvs_direct_choice_priority.py --model x-ai/grok-4.6 --smoke
-smoke: x-ai/grok-4.6, 240 direct-choice requests, protocol=f1dcc6e5e4651add7df5473e80ba5b5a5ec733d788a6a791625776501f8605d6
+smoke: x-ai/grok-4.6, 240 direct-choice requests, protocol=34224b2e476e87f4e6e904e98a79ba3d2962ccc817925fdb00d7e649b17c81a6
 smoke: reasoning={'effort': 'low'}, reserve=USD 4.915200
+$ python scripts/wvs_direct_choice_priority.py --model openai/gpt-5.6-luna --smoke
+smoke: openai/gpt-5.6-luna, 240 direct-choice requests, protocol=8db405bf3f111cd8755e531e3ba9758399a0589741e2a4af996340905d8f2f95
+smoke: reasoning={'enabled': False}, reserve=USD 0.9338880
+$ python scripts/wvs_direct_choice_priority.py --model openai/o3 --smoke
+smoke: openai/o3, 240 direct-choice requests, protocol=0f658f28a30fe91d97c90672b8028e188b8043d464ec1238dc4acded0cfc2298
+smoke: reasoning={'enabled': False}, reserve=USD 6.389760
 $ python scripts/wvs_direct_choice_priority.py --model openai/gpt-5.2-chat --smoke
-smoke: openai/gpt-5.2-chat, 240 direct-choice requests, protocol=6911c78f8c33d085e4d2e4a627c8e311059855cfb859b16a6a319185b6abb807
+smoke: openai/gpt-5.2-chat, 240 direct-choice requests, protocol=4f19ecc3869b4328dd5ed3162113fa3c7f285e441c343ac109df17fe5e5e31ca
 smoke: reasoning=None, reserve=USD 10.75200000
-$ python scripts/wvs_direct_choice_priority.py --model google/gemini-3.6-flash --smoke
-smoke: google/gemini-3.6-flash, 240 direct-choice requests, protocol=4524a90e3320fb15103d7468b5e8088ab99c73051539240d0c1ae14d353d7eac
-smoke: reasoning={'effort': 'minimal'}, reserve=USD 2.94912000
 $ python scripts/wvs_direct_choice_priority.py --model meta/muse-spark-1.2 --smoke
-smoke: meta/muse-spark-1.2, 240 direct-choice requests, protocol=a716da6000adc3d9792e112c55d516e21c49fbe46acac6517d8b740e81b30e69
+smoke: meta/muse-spark-1.2, 240 direct-choice requests, protocol=5ddf04c58154c758756fb32cd2652f928678170010cf8638dd9cdb1c064522a2
 smoke: reasoning={'effort': 'minimal'}, reserve=USD 3.44064000
-verified manifest: 39 unique structured direct-choice protocols, 240 calls each, output <= USD 15/M
-wrapper syntax: valid; no --run execution invoked
+$ python scripts/wvs_direct_choice_priority_smoke.py
+smoke: 38 unique 240-call protocols cover omitted, disabled, low, and minimal reasoning settings
+smoke: synthetic first request exits before remaining 239 and writes no cache
+smoke: None omits reasoning; optional disabled mode sends reasoning.enabled=false
+verified manifest: 38 distinct strict-schema 240-call protocols; Gemma excluded; fail-fast probe encoded

@@ -142,7 +142,8 @@ def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_pe
                                     prompt_instruction: str = _PROMPT_INSTRUCTION_OWN_VIEW,
                                     answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE,
                                     rescue_instruction: str | None = None,
-                                    plan_override: list[dict] | None = None) -> str:
+                                    plan_override: list[dict] | None = None,
+                                    fail_fast_first_request: bool = False) -> str:
     plan = _plan(items, samples_per_order, answer_instruction) if plan_override is None else plan_override
     protocol = {
         "schema": 1,
@@ -163,6 +164,8 @@ def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_pe
     if plan_override is not None:
         protocol.pop("samples_per_order")
         protocol["samples_per_item"] = {item["id"]: sum(request["item_id"] == item["id"] for request in plan) for item in items}
+    if fail_fast_first_request:
+        protocol["fail_fast_first_request"] = True
     encoded = json.dumps(protocol, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
     return hashlib.sha256(encoded).hexdigest()
 
@@ -180,7 +183,8 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
                              prompt_instruction: str = _PROMPT_INSTRUCTION_OWN_VIEW,
                              answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE,
                              rescue_instruction: str | None = None,
-                             plan_override: list[dict] | None = None) -> dict:
+                             plan_override: list[dict] | None = None,
+                             fail_fast_first_request: bool = False) -> dict:
     """Sample exactly one selected option per prompt, including canonical and reversed option orders.
 
     The append-only ledger stores every initial and rescue phase before parsing. A cache entry is written only
@@ -197,6 +201,7 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
         reasoning=reasoning, structured_output=structured_output, prompt_instruction=prompt_instruction,
         answer_instruction=answer_instruction,
         rescue_instruction=rescue_instruction, plan_override=plan_override,
+        fail_fast_first_request=fail_fast_first_request,
     )
     cache_file = Path(cache_path)
     cache = json.loads(cache_file.read_text()) if cache_file.exists() else {"schema": 1, "completed": {}}
@@ -211,7 +216,7 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
         "model": model, "samples_per_order": samples_per_order, "temperature": temperature,
         "max_tokens": max_tokens, "concurrency": concurrency, "request_timeout": request_timeout,
         "reasoning": reasoning, "structured_output": structured_output,
-        "prompt_instruction": prompt_instruction,
+        "prompt_instruction": prompt_instruction, "fail_fast_first_request": fail_fast_first_request,
     }
     if plan_override is not None:
         settings.pop("samples_per_order")
@@ -242,9 +247,10 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
             response_format = _choice_schema(item["n"])
             payload = {
                 "model": model, "messages": [{"role": "user", "content": request["prompt"]}],
-                "temperature": temperature, "max_tokens": max_tokens, "reasoning": reasoning,
-                "response_format": response_format,
+                "temperature": temperature, "max_tokens": max_tokens, "response_format": response_format,
             }
+            if reasoning is not None:
+                payload["reasoning"] = reasoning
             phase = "initial"
             async with semaphore:
                 try:
@@ -266,8 +272,10 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
                                 {"role": "assistant", "content": assistant_tail},
                                 {"role": "user", "content": rescue_instruction or _force_choice(item["n"])},
                             ], "temperature": temperature, "max_tokens": max(max_tokens, 2048),
-                            "reasoning": reasoning, "response_format": response_format,
+                            "response_format": response_format,
                         }
+                        if reasoning is not None:
+                            rescue_payload["reasoning"] = reasoning
                         _append_record(records, {"event": "request_started", "phase": phase, **request_meta,
                                                  "payload": rescue_payload, "initial_response_message": message})
                         response = await asyncio.wait_for(openrouter_request(rescue_payload), timeout=request_timeout)
@@ -283,9 +291,23 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
                                              "error_type": type(exc).__name__, "error": str(exc)})
                     return {"text": None, "rescued": phase == "rescue", "error": f"{type(exc).__name__}: {exc}"}
 
-        return await asyncio.gather(*(call(sequence, request) for sequence, request in enumerate(plan)))
+        if not fail_fast_first_request:
+            return await asyncio.gather(*(call(sequence, request) for sequence, request in enumerate(plan)))
+        first = await call(0, plan[0])
+        if first["error"] is not None:
+            return [first]
+        remaining = await asyncio.gather(*(call(sequence, request) for sequence, request in enumerate(plan[1:], start=1)))
+        return [first, *remaining]
 
     results = asyncio.run(run_all())
+    if fail_fast_first_request and results[0]["error"] is not None:
+        summary = {
+            "run_id": run_id, "protocol_id": protocol_id, "model": model, "settings": settings,
+            "planned_requests": len(plan), "failed_requests": 1, "rescued_requests": int(results[0]["rescued"]),
+            "complete": False, "items": [], "failure": results[0]["error"],
+        }
+        _append_record(records, {"event": "run_finished", "construct": "direct_choice", **summary})
+        raise RuntimeError(f"first scheduled request failed before remaining {len(plan) - 1} requests: {results[0]['error']}")
     by_item = {item["id"]: [] for item in items}
     failed = 0
     rescues = 0

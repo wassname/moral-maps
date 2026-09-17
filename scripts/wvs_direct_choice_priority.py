@@ -47,7 +47,7 @@ GROUPS = {
     ),
     "Google": (
         "google/gemini-3.8-flash", "google/gemini-3.6-flash", "google/gemini-3.5-flash-lite",
-        "google/gemini-3.5-flash", "google/gemini-3.1-flash-lite", "google/gemma-4-26b-a4b-it",
+        "google/gemini-3.5-flash", "google/gemini-3.1-flash-lite",
         "google/gemini-3.1-flash-lite-preview", "google/gemini-3-flash-preview",
         "google/gemini-2.5-flash-lite", "google/gemini-2.5-flash",
     ),
@@ -68,13 +68,16 @@ def reasoning_setting(model: dict) -> tuple[dict | None, str]:
     if metadata is None:
         return None, "not advertised"
     efforts = set(metadata.get("supported_efforts", []))
+    optional = not metadata.get("mandatory")
+    if optional and "none" in efforts:
+        return {"enabled": False}, "disabled (optional, none advertised)"
+    if optional and not efforts and "reasoning" in model["supported_parameters"]:
+        return {"enabled": False}, "disabled (optional, parameter advertised without efforts)"
     if "minimal" in efforts:
         return {"effort": "minimal"}, "minimal"
     if "low" in efforts:
         return {"effort": "low"}, "low"
-    if not metadata.get("mandatory") and "none" in efforts:
-        return {"enabled": False}, "disabled (optional, none advertised)"
-    if not metadata.get("mandatory") and not efforts:
+    if optional and not efforts:
         return None, "not advertised (optional; omitted)"
     raise ValueError(f"no allowed minimal/low reasoning setting for {model['id']}: {metadata}")
 
@@ -100,7 +103,7 @@ def entry(model: dict, pilot_items: list[dict], request_plan: list[dict]) -> dic
         max_tokens=MAX_TOKENS, concurrency=CONCURRENCY, request_timeout=REQUEST_TIMEOUT,
         reasoning=reasoning, structured_output=True, prompt_instruction=PROMPT_INSTRUCTION,
         answer_instruction=ANSWER_INSTRUCTION, rescue_instruction=RESCUE_INSTRUCTION,
-        plan_override=request_plan,
+        plan_override=request_plan, fail_fast_first_request=True,
     )
     input_rate = rate_per_million(model, "prompt")
     output_rate = rate_per_million(model, "completion")
@@ -152,6 +155,7 @@ def write_manifest(priority: list[dict]) -> None:
             "initial_calls_per_model": 240, "schedule": "balanced_cyclic_rotations",
             "prompt_instruction": PROMPT_INSTRUCTION, "answer_instruction": ANSWER_INSTRUCTION,
             "rescue_instruction": RESCUE_INSTRUCTION, "strict_structured_output": True,
+            "fail_fast_first_request": True,
         },
         "stop_usd": {"priority_phase": str(PHASE_STOP_USD), "global": str(GLOBAL_STOP_USD)},
         "current_observed_cost_usd": str(current_cost),
@@ -174,6 +178,7 @@ def write_manifest(priority: list[dict]) -> None:
         f"- final response: `{ANSWER_INSTRUCTION}`",
         f"- rescue response: `{RESCUE_INSTRUCTION}`",
         "- strict structured output; each model has an isolated append-only ledger, cache, and model-specific protocol ID",
+        "- compatibility probe: run scheduled sample 0 first; a configuration or request failure records a failed run and exits before the other 239 requests",
         "",
         "## Spend checks before any later dispatch",
         "",
@@ -185,7 +190,7 @@ def write_manifest(priority: list[dict]) -> None:
         "",
         "## Ordered panels",
         "",
-        "The order is Grok, OpenAI, Google, then Muse. `minimal` is used when catalog metadata advertises it; otherwise `low`; disabled is used only when the catalog says reasoning is optional and accepts `none`.",
+        "The order is Grok, OpenAI, Google, then Muse. Optional entries advertising `none` disable reasoning; otherwise `minimal` is used when advertised, then `low`. Optional metadata with no effort list disables reasoning only when the `reasoning` parameter itself is advertised; models with no reasoning metadata omit the field.",
         "",
         "| family | exact ID | created UTC | input USD/M | output USD/M | reasoning | structured | protocol ID | calls | completion-only ceiling | conservative reserve | isolated ledger |",
         "|---|---|---:|---:|---:|---|---|---|---:|---:|---:|---|",
@@ -204,6 +209,7 @@ def write_manifest(priority: list[dict]) -> None:
         "- Already plotted dense-rated IDs are not repeated in this prepared direct-choice list, including Grok 4.3/4.20, GPT-6 Astra, GPT-5.6 Sol, GPT-5.5, GPT-5.4, GPT-5.3 Chat, Gemini 3.7 Flash, Gemini 2.5 Pro, and Muse 1.3.",
         "- GPT-5 Nano is retained as a completed dense-rated protocol diagnostic, not silently relabelled as a direct-choice panel.",
         "- Pro/Fast, batch/free aliases, output price above USD 15/M, and code/image/audio/safeguard/multi-agent entries remain excluded. `Flash` is included where it is a general chat model.",
+        "- `google/gemma-4-26b-a4b-it` is excluded: it is Gemma, not an identified member of the requested Gemini release series.",
         "- `openai/o4-mini-high` and `openai/o3-mini-high` are excluded because their catalog entries advertise only `high` reasoning, not the registered minimal/low policy.",
         "- The deferred Qwen/GLM/Mistral shortlist remains outside this priority manifest until a direct-choice expansion decision is made.",
         "",
@@ -258,6 +264,7 @@ def main() -> None:
         structured_output=True, records_path=records_path, cache_path=cache_path,
         prompt_instruction=PROMPT_INSTRUCTION, answer_instruction=ANSWER_INSTRUCTION,
         rescue_instruction=RESCUE_INSTRUCTION, plan_override=request_plan,
+        fail_fast_first_request=True,
     )
     if result["cached"]:
         print(f"priority direct-choice cache hit: {args.model}, protocol={result['protocol_id'][:12]}")
