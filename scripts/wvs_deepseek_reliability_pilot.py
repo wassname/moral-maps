@@ -228,18 +228,24 @@ def smoke() -> None:
     items, _ = rated_items()
     full_identity = replicate["protocol_id"]
     record = OUT / "smoke.jsonl"
-    rows = read_items_rated(row["id"], [items[0]], n_samples=1, temperature=row["v1_settings"]["temperature"],
-                            max_tokens=row["v1_settings"]["max_tokens"], concurrency=1, req_timeout=row["v1_settings"]["req_timeout"],
-                            reasoning=row["v1_settings"]["reasoning"], structured_output=row["v1_settings"]["structured_output"],
-                            provider=row["v1_settings"].get("provider", OSS_PROVIDER), records_path=record, probe_first=True,
-                            eval_version=EVAL_VERSION, identity_eval_version=EVAL_VERSION,
-                            seed_schedule=[replicate["seed_schedule"][0]])
-    if rows[0]["valid_samples"] != 1:
+    if record.exists():
+        item_results = [json.loads(line) for line in record.read_text().splitlines()
+                        if json.loads(line).get("event") == "item_result"]
+        smoke_result = item_results[-1]
+    else:
+        rows = read_items_rated(row["id"], [items[0]], n_samples=1, temperature=row["v1_settings"]["temperature"],
+                                max_tokens=row["v1_settings"]["max_tokens"], concurrency=1, req_timeout=row["v1_settings"]["req_timeout"],
+                                reasoning=row["v1_settings"]["reasoning"], structured_output=row["v1_settings"]["structured_output"],
+                                provider=row["v1_settings"].get("provider", OSS_PROVIDER), records_path=record, probe_first=True,
+                                eval_version=EVAL_VERSION, identity_eval_version=EVAL_VERSION,
+                                seed_schedule=[replicate["seed_schedule"][0]])
+        smoke_result = rows[0]
+    if smoke_result["valid_samples"] != 1:
         raise RuntimeError("one-request smoke was not parse-valid")
     atomic_json(OUT / "smoke.json", {"full_panel_protocol_id": full_identity, "smoke_model": row["id"],
                                       "smoke_item": items[0]["id"], "seed": replicate["seed_schedule"][0],
                                       "settings": row["v1_settings"], "endpoint_advertises_seed": row["endpoint_advertises_seed"],
-                                      "result": rows[0]})
+                                      "result": smoke_result})
 
 
 def main() -> None:
