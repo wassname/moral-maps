@@ -188,7 +188,7 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
     """
     assert samples_per_order > 0
     assert temperature > 0
-    assert reasoning == {"effort": "low"}, "the registered Gemini pilot uses catalog-supported low reasoning"
+    assert reasoning is None or reasoning == {"enabled": False} or reasoning.get("effort") in {"minimal", "low"}
     assert structured_output
     plan = _plan(items, samples_per_order, answer_instruction) if plan_override is None else plan_override
     protocol_id = direct_choice_protocol_identity(
