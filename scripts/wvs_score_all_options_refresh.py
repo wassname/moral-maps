@@ -111,6 +111,7 @@ def write_manifest() -> list[dict]:
         "global_stop_usd": str(GLOBAL_STOP_USD),
         "observed_before_refresh_usd": str(PRIOR_OBSERVED_USD),
         "aggregate_concurrency_ceiling": 10,
+        "first_request_probe": "Sample 0 runs before the other 143 requests and aborts the panel if it is not parse-valid.",
         "oss_provider_policy": OSS_PROVIDER,
         "models": rows,
     }
@@ -217,6 +218,7 @@ def main() -> None:
         assert all(row["calls"] == 144 for row in runnable)
         assert all(row["provider"] == OSS_PROVIDER for row in runnable if row["lane"] in {"muse", "kimi", "glm", "deepseek", "qwen"} or row["id"].startswith("openai/gpt-oss-"))
         assert all(row["provider"] is None for row in runnable if row["lane"] in {"google", "xai"} or (row["lane"] == "openai" and not row["id"].startswith("openai/gpt-oss-")))
+        assert all("--api-probe-first" in command(row) for row in runnable)
         print(f"smoke: {len(runnable)} score-all-options panels, {len(LANES)} provider lanes, concurrency <= 8")
     if args.queue:
         queue(rows)

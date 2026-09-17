@@ -1,6 +1,7 @@
 {
   "aggregate_concurrency_ceiling": 10,
   "catalog_sha256": "940edd61d8103a51322710d8a6baee7f698b64b2cf033a933f0321e15c536fd2",
+  "first_request_probe": "Sample 0 runs before the other 143 requests and aborts the panel if it is not parse-valid.",
   "global_stop_usd": "80",
   "method": "score-all-options",
   "method_definition": "For every WVS item, return a JSON score 1..5 for each answer option, repeat 12 times, then normalize.",
@@ -734,29 +735,9 @@
       "status": "excluded"
     },
     {
-      "calls": 144,
-      "created": 1777000666,
       "id": "deepseek/deepseek-v4-flash",
-      "input_usd_per_million": "0.088606000000",
       "lane": "deepseek",
-      "output_usd_per_million": "0.177212000000",
-      "provider": {
-        "allow_fallbacks": true,
-        "quantizations": [
-          "fp8",
-          "int8",
-          "bf16",
-          "fp16"
-        ],
-        "require_parameters": true
-      },
-      "reasoning": {
-        "enabled": false
-      },
-      "reasoning_label": "disabled, optional",
-      "reserve_usd": "0.091458404352",
-      "status": "runnable",
-      "structured_output": true
+      "status": "complete_cached"
     },
     {
       "id": "openai/gpt-5.4-image-2",
