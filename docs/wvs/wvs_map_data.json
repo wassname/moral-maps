@@ -1804,7 +1804,7 @@
       "y": 0.63
     }
   ],
-  "note": "64 models, rated sampling\ngithub.com/wassname/moral-maps",
+  "note": "source: github.com/wassname/moral-maps",
   "schema": 2,
   "title": "Frontier LLMs on the\nWorld Values Survey",
   "zone_hulls": [

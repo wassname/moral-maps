@@ -1,0 +1,23 @@
+{
+  "shared": {
+    "models": 64,
+    "countries": 90,
+    "buffered_hulls": 4,
+    "latest_labels": 13,
+    "numeric_model_country_median_equality": "verified against DOM data attributes"
+  },
+  "qwen_toggle": "clicked, map and dated-panel family groups hidden, country coordinates invariant",
+  "tooltip": "map and release-panel pointer hover and focus show model, family, coordinates, readout, samples and release metadata",
+  "release_panels": {
+    "panels": 2,
+    "dated_models": 48,
+    "date_order": "DOM order verified",
+    "no_paths": true
+  },
+  "copy": "source caption only; no model-count wording or archaeological paragraph",
+  "visual_contract": "four smooth SVG paths, no zone polygons, source note right of title",
+  "hashes": {
+    "wvs_map_data.json": "c0b7aa0554ebbf5d819308932e058f4ff6e19d1e817ffebbbe381dbd2d063ffe",
+    "index.html": "bbb653dff6c1bf4ddeab10dd5c4fb5a2a14291c16b59a9845cdd7aa1537d5a5f"
+  }
+}

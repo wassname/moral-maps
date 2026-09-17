@@ -471,7 +471,7 @@ def main() -> None:
         args.web_data.write_text(json.dumps({
             "schema": 2,
             "title": "Frontier LLMs on the\nWorld Values Survey",
-            "note": f"{len(plot_models)} models, rated sampling\ngithub.com/wassname/moral-maps",
+            "note": "source: github.com/wassname/moral-maps",
             "axis": {"x": (["Self-expression", "Survival"] if sx < 0 else ["Survival", "Self-expression"]),
                      "y": (["Secular-Rational", "Traditional"] if sy < 0 else ["Traditional", "Secular-Rational"])},
             "median": {"x": float(np.median(Pplot[:, 0])), "y": float(np.median(Pplot[:, 1]))},
