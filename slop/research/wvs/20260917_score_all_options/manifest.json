@@ -327,29 +327,9 @@
       "structured_output": true
     },
     {
-      "calls": 144,
-      "created": 1785478908,
       "id": "deepseek/deepseek-v4-flash-0731",
-      "input_usd_per_million": "0.06000000",
       "lane": "deepseek",
-      "output_usd_per_million": "0.12000000",
-      "provider": {
-        "allow_fallbacks": true,
-        "quantizations": [
-          "fp8",
-          "int8",
-          "bf16",
-          "fp16"
-        ],
-        "require_parameters": true
-      },
-      "reasoning": {
-        "enabled": false
-      },
-      "reasoning_label": "disabled, optional",
-      "reserve_usd": "0.06193152",
-      "status": "runnable",
-      "structured_output": true
+      "status": "complete_cached"
     },
     {
       "id": "deepseek/deepseek-v4-flash-0731:batch",

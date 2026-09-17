@@ -162,7 +162,7 @@ def command(row: dict) -> list[str]:
         "uv", "run", "--offline", "--with", "datasets>=4.0,<5", "python", "scripts/wvs_map.py",
         "--api-models", row["id"], "--api-samples", "12", "--api-concurrency", "1",
         "--api-max-tokens", "1024", "--api-request-timeout", "90", "--api-require-complete",
-        "--cache", str(CACHE), "--records", str(RECORDS), "--out", "/tmp/wvs_score_all_options.png",
+        "--api-probe-first", "--cache", str(CACHE), "--records", str(RECORDS), "--out", "/tmp/wvs_score_all_options.png",
     ]
     if row["reasoning"] is not None:
         if row["reasoning"] == {"enabled": False}:

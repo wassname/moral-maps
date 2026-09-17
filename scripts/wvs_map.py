@@ -264,6 +264,8 @@ def main() -> None:
                     help="OpenRouter provider policy JSON, included in the score-all-options protocol identity")
     ap.add_argument("--api-require-complete", action="store_true",
                     help="exit nonzero rather than render after an explicitly requested API panel is incomplete")
+    ap.add_argument("--api-probe-first", action="store_true",
+                    help="send sample 0 first and abort before the other 143 calls if it is not parse-valid")
     ap.add_argument("--max-think-tokens", type=int, default=64)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--out", default="docs/img/wvs/wvs_map_iw.png")
@@ -350,14 +352,15 @@ def main() -> None:
             models[key] = model_axis_scores(read_model(rows, meta), meta, resolved)
             save_cache()
 
-    # API models: dense rated readout -> (x, y, x_se, y_se) with bootstrap CI.
+    # API models: score-all-options readout -> (x, y, x_se, y_se) with bootstrap CI.
     for m in api_models:
         key = m.split("/")[-1] + " (rated)"
         protocol_id = rated_protocol_identity(
             m, rated_items, n_samples=args.api_samples, temperature=1.0,
             max_tokens=args.api_max_tokens, concurrency=args.api_concurrency,
             req_timeout=args.api_request_timeout, reasoning=api_reasoning,
-            structured_output=args.api_structured_output, provider=api_provider)
+            structured_output=args.api_structured_output, provider=api_provider,
+            probe_first=args.api_probe_first)
         completed = cache["completed"].get(protocol_id)
         if completed is not None:
             models[key] = tuple(completed["coords"])
@@ -367,7 +370,8 @@ def main() -> None:
                                 max_tokens=args.api_max_tokens, concurrency=args.api_concurrency,
                                 req_timeout=args.api_request_timeout, reasoning=api_reasoning,
                                 structured_output=args.api_structured_output,
-                                records_path=args.records, verbose_first=True, provider=api_provider)
+                                records_path=args.records, verbose_first=True, provider=api_provider,
+                                probe_first=args.api_probe_first)
         incomplete = [row["id"] for row in rows if row["valid_samples"] != args.api_samples]
         if incomplete:
             message = f"{key}: incomplete items {incomplete}; raw evidence is in {args.records}; not cached or plotted"
