@@ -344,8 +344,8 @@ def main() -> None:
         "",
         "The table shows that flat replies and coordinate sensitivity vary across model and item, so Nano alone cannot "
         "supply a general rejection threshold. Saved mismatch rationale is evidence against interpreting those replies as attitudes. "
-        "For other cells, no saved rationale does not establish genuine indifference. The direct-choice pilot should therefore compare "
-        "the construct rather than silently replace or filter the published rated readout.",
+        "For other cells, no saved rationale does not establish genuine indifference. Preserve the published dense-rated "
+        "readout and report this diagnostic rather than silently replace or filter it.",
         "",
         "-- PI[gpt-5.6-terra]",
         "",
