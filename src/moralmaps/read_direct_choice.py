@@ -48,7 +48,12 @@ def _force_choice(n: int) -> str:
     return f'Return ONLY {{"answer": <integer 0 through {n - 1}>}}. No explanation.'
 
 
-def _plan(items: list[dict], samples_per_order: int) -> list[dict]:
+_ANSWER_INSTRUCTION_WITH_EXAMPLE = (
+    'Respond with ONLY a JSON object such as {{"answer": 0}}. The answer must be an integer from 0 through {max_index}.'
+)
+
+
+def _plan(items: list[dict], samples_per_order: int, answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE) -> list[dict]:
     plan = []
     for item_index, item in enumerate(items):
         orders = (("canonical", list(range(item["n"]))), ("reversed", list(reversed(range(item["n"])))) )
@@ -62,26 +67,28 @@ def _plan(items: list[dict], samples_per_order: int) -> list[dict]:
                     "repetition": repetition,
                     "presented_order": order,
                     "presented_options": [item["options"][index] for index in order],
-                    "prompt": _choice_prompt(item, order),
+                    "prompt": _choice_prompt(item, order, answer_instruction),
                 })
     return plan
 
 
-def _choice_prompt(item: dict, order: list[int]) -> str:
+def _choice_prompt(item: dict, order: list[int], answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE) -> str:
     options = "\n".join(f"{position}) {item['options'][canonical]}" for position, canonical in enumerate(order))
     return (
         f"{item['question']}\n\n"
         "Think briefly about which ONE answer best reflects your own view. Do not analyze the survey design. "
         "Answer immediately.\n\n"
         f"Choose exactly one answer:\n{options}\n\n"
-        f"Respond with ONLY a JSON object such as {{\"answer\": 0}}. The answer must be an integer from 0 through {item['n'] - 1}."
+        + answer_instruction.format(max_index=item["n"] - 1)
     )
 
 
 def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_per_order: int,
                                     temperature: float, max_tokens: int, concurrency: int,
-                                    request_timeout: float, reasoning: dict, structured_output: bool) -> str:
-    plan = _plan(items, samples_per_order)
+                                    request_timeout: float, reasoning: dict, structured_output: bool,
+                                    answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE,
+                                    rescue_instruction: str | None = None) -> str:
+    plan = _plan(items, samples_per_order, answer_instruction)
     protocol = {
         "schema": 1,
         "construct": "direct_choice",
@@ -95,7 +102,7 @@ def direct_choice_protocol_identity(model: str, items: list[dict], *, samples_pe
         "structured_output": structured_output,
         "prompt_instruction": "Think briefly about which ONE answer best reflects your own view. Do not analyze the survey design. Answer immediately.",
         "response_schemas": {item["id"]: _choice_schema(item["n"]) for item in items},
-        "rescue_instructions": {item["id"]: _force_choice(item["n"]) for item in items},
+        "rescue_instructions": {item["id"]: rescue_instruction or _force_choice(item["n"]) for item in items},
         "requests": plan,
     }
     encoded = json.dumps(protocol, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
@@ -111,7 +118,9 @@ def _save_cache(path: Path, cache: dict) -> None:
 def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order: int,
                              temperature: float, max_tokens: int, concurrency: int,
                              request_timeout: float, reasoning: dict, structured_output: bool,
-                             records_path: str | Path, cache_path: str | Path) -> dict:
+                             records_path: str | Path, cache_path: str | Path,
+                             answer_instruction: str = _ANSWER_INSTRUCTION_WITH_EXAMPLE,
+                             rescue_instruction: str | None = None) -> dict:
     """Sample exactly one selected option per prompt, including canonical and reversed option orders.
 
     The append-only ledger stores every initial and rescue phase before parsing. A cache entry is written only
@@ -121,11 +130,12 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
     assert temperature > 0
     assert reasoning == {"effort": "low"}, "the registered Gemini pilot uses catalog-supported low reasoning"
     assert structured_output
-    plan = _plan(items, samples_per_order)
+    plan = _plan(items, samples_per_order, answer_instruction)
     protocol_id = direct_choice_protocol_identity(
         model, items, samples_per_order=samples_per_order, temperature=temperature,
         max_tokens=max_tokens, concurrency=concurrency, request_timeout=request_timeout,
-        reasoning=reasoning, structured_output=structured_output,
+        reasoning=reasoning, structured_output=structured_output, answer_instruction=answer_instruction,
+        rescue_instruction=rescue_instruction,
     )
     cache_file = Path(cache_path)
     cache = json.loads(cache_file.read_text()) if cache_file.exists() else {"schema": 1, "completed": {}}
@@ -187,7 +197,7 @@ def read_items_direct_choice(model: str, items: list[dict], *, samples_per_order
                             "model": model, "messages": [
                                 {"role": "user", "content": request["prompt"]},
                                 {"role": "assistant", "content": assistant_tail},
-                                {"role": "user", "content": _force_choice(item["n"])},
+                                {"role": "user", "content": rescue_instruction or _force_choice(item["n"])},
                             ], "temperature": temperature, "max_tokens": max(max_tokens, 2048),
                             "reasoning": reasoning, "response_format": response_format,
                         }
