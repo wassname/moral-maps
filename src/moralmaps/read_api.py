@@ -208,7 +208,8 @@ def _rate_plan(items: list[dict], n_samples: int, per_call: int = 1) -> list[dic
 def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, temperature: float,
                             max_tokens: int, concurrency: int, req_timeout: float,
                             reasoning: dict | None, structured_output: bool,
-                            provider: dict | None = None) -> str:
+                            provider: dict | None = None, eval_version: str | None = None,
+                            seed_schedule: list[int] | None = None) -> str:
     """Hash the exact model, rendered prompts, and request settings that define a cacheable panel."""
     plan = _rate_plan(items, n_samples)
     protocol = {
@@ -226,6 +227,10 @@ def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, te
         "requests": [{key: req[key] for key in ("i", "perm", "prompt", "cnt", "sample", "presented_options")}
                      for req in plan],
     }
+    if eval_version is not None:
+        protocol["eval_version"] = eval_version
+    if seed_schedule is not None:
+        protocol["seed_schedule"] = seed_schedule
     encoded = json.dumps(protocol, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
     return hashlib.sha256(encoded).hexdigest()
 
@@ -242,7 +247,8 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                      max_tokens: int = 512, concurrency: int = 8, req_timeout: float = 90.0,
                      reasoning: dict | None = None, structured_output: bool = False, records_path: str | Path,
                      verbose_first: bool = False, provider: dict | None = None,
-                     probe_first: bool = False) -> list[dict]:
+                     probe_first: bool = False, eval_version: str = "wvs-score-all-options-v1",
+                     identity_eval_version: str | None = None, seed_schedule: list[int] | None = None) -> list[dict]:
     """Run one score-all-options panel and write an fsynced JSONL event for every paid request phase.
 
     The record is the source of truth. It preserves dispatches, responses, rescues, provider usage,
@@ -251,17 +257,21 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
     """
     assert temperature > 0, "sampling readout needs temperature > 0"
     plan = _rate_plan(items, n_samples)
+    if seed_schedule is not None and len(seed_schedule) != len(plan):
+        raise ValueError(f"seed schedule has {len(seed_schedule)} entries, expected {len(plan)}")
     protocol_id = rated_protocol_identity(model, items, n_samples=n_samples, temperature=temperature,
                                           max_tokens=max_tokens, concurrency=concurrency,
                                           req_timeout=req_timeout, reasoning=reasoning,
-                                          structured_output=structured_output, provider=provider)
+                                          structured_output=structured_output, provider=provider,
+                                          eval_version=identity_eval_version, seed_schedule=seed_schedule)
     run_id = f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}_{protocol_id[:12]}"
     rpath = Path(records_path)
     rpath.parent.mkdir(parents=True, exist_ok=True)
     settings = {"model": model, "n_samples": n_samples, "temperature": temperature,
                 "max_tokens": max_tokens, "concurrency": concurrency, "req_timeout": req_timeout,
                 "reasoning": reasoning, "structured_output": structured_output, "provider": provider,
-                "probe_first": probe_first}
+                "probe_first": probe_first, "eval_version": eval_version,
+                "identity_eval_version": identity_eval_version, "seed_schedule": seed_schedule}
     _append_record(rpath, {"event": "run_started", "run_id": run_id, "protocol_id": protocol_id,
                            "settings": settings, "items": items, "planned_requests": len(plan)})
 
@@ -271,12 +281,16 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
         async def call(seq: int, req: dict) -> dict:
             item = items[req["i"]]
             request_id = f"{run_id}_{seq:03d}"
+            seed = seed_schedule[seq] if seed_schedule is not None else None
             request_meta = {"request_id": request_id, "run_id": run_id, "protocol_id": protocol_id,
                             "model": model, "item_id": item["id"], "canonical_options": item["options"],
                             "presented_options": req["presented_options"], "presented_order": req["perm"],
-                            "sample": req["sample"], "prompt": req["prompt"], "settings": settings}
+                            "sample": req["sample"], "prompt": req["prompt"], "settings": settings,
+                            "eval_version": eval_version, "seed": seed}
             payload = {"model": model, "messages": [{"role": "user", "content": req["prompt"]}],
                        "temperature": temperature, "n": req["cnt"], "max_tokens": max_tokens}
+            if seed is not None:
+                payload["seed"] = seed
             if reasoning is not None:
                 payload["reasoning"] = reasoning
             if provider is not None:
