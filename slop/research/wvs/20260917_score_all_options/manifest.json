@@ -607,7 +607,7 @@
     {
       "id": "moonshotai/kimi-k2.7-code",
       "lane": "kimi",
-      "reason": "mandatory reasoning lacks minimal/low",
+      "reason": "batch/free/pro/fast or specialized variant",
       "status": "excluded"
     },
     {
@@ -864,29 +864,10 @@
       "status": "complete_cached"
     },
     {
-      "calls": 144,
-      "created": 1775061458,
       "id": "z-ai/glm-5v-turbo",
-      "input_usd_per_million": "1.2000000",
       "lane": "glm",
-      "output_usd_per_million": "4.000000",
-      "provider": {
-        "allow_fallbacks": true,
-        "quantizations": [
-          "fp8",
-          "int8",
-          "bf16",
-          "fp16"
-        ],
-        "require_parameters": true
-      },
-      "reasoning": {
-        "enabled": false
-      },
-      "reasoning_label": "disabled, optional",
-      "reserve_usd": "1.9464192",
-      "status": "runnable",
-      "structured_output": false
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
       "id": "x-ai/grok-4.20-multi-agent",
@@ -917,18 +898,10 @@
       "status": "excluded"
     },
     {
-      "calls": 144,
-      "created": 1774907255,
       "id": "google/lyria-3-clip-preview",
-      "input_usd_per_million": "0",
       "lane": "google",
-      "output_usd_per_million": "0",
-      "provider": null,
-      "reasoning": null,
-      "reasoning_label": "omitted, not advertised",
-      "reserve_usd": "0",
-      "status": "runnable",
-      "structured_output": false
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
       "calls": 144,
@@ -1113,20 +1086,10 @@
       "status": "excluded"
     },
     {
-      "calls": 144,
-      "created": 1771959164,
       "id": "openai/gpt-5.3-codex",
-      "input_usd_per_million": "1.75000000",
       "lane": "openai",
-      "output_usd_per_million": "14.000000",
-      "provider": null,
-      "reasoning": {
-        "enabled": false
-      },
-      "reasoning_label": "disabled, optional",
-      "reserve_usd": "6.45120000",
-      "status": "runnable",
-      "structured_output": true
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
       "id": "google/gemini-3.1-pro-preview",
@@ -1249,20 +1212,10 @@
       "structured_output": true
     },
     {
-      "calls": 144,
-      "created": 1768409315,
       "id": "openai/gpt-5.2-codex",
-      "input_usd_per_million": "1.75000000",
       "lane": "openai",
-      "output_usd_per_million": "14.000000",
-      "provider": null,
-      "reasoning": {
-        "effort": "low"
-      },
-      "reasoning_label": "low",
-      "reserve_usd": "6.45120000",
-      "status": "runnable",
-      "structured_output": true
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
       "calls": 144,
@@ -1360,45 +1313,16 @@
       "status": "excluded"
     },
     {
-      "calls": 144,
-      "created": 1765207462,
       "id": "z-ai/glm-4.6v",
-      "input_usd_per_million": "0.3000000",
       "lane": "glm",
-      "output_usd_per_million": "0.9000000",
-      "provider": {
-        "allow_fallbacks": true,
-        "quantizations": [
-          "fp8",
-          "int8",
-          "bf16",
-          "fp16"
-        ],
-        "require_parameters": true
-      },
-      "reasoning": {
-        "enabled": false
-      },
-      "reasoning_label": "disabled, optional",
-      "reserve_usd": "0.4423680",
-      "status": "runnable",
-      "structured_output": false
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
-      "calls": 144,
-      "created": 1764878934,
       "id": "openai/gpt-5.1-codex-max",
-      "input_usd_per_million": "1.25000000",
       "lane": "openai",
-      "output_usd_per_million": "10.00000",
-      "provider": null,
-      "reasoning": {
-        "effort": "low"
-      },
-      "reasoning_label": "low",
-      "reserve_usd": "4.60800000",
-      "status": "runnable",
-      "structured_output": true
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
       "calls": 144,
@@ -1454,36 +1378,16 @@
       "status": "excluded"
     },
     {
-      "calls": 144,
-      "created": 1763060298,
       "id": "openai/gpt-5.1-codex",
-      "input_usd_per_million": "1.25000000",
       "lane": "openai",
-      "output_usd_per_million": "10.00000",
-      "provider": null,
-      "reasoning": {
-        "effort": "low"
-      },
-      "reasoning_label": "low",
-      "reserve_usd": "4.60800000",
-      "status": "runnable",
-      "structured_output": true
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
-      "calls": 144,
-      "created": 1763057820,
       "id": "openai/gpt-5.1-codex-mini",
-      "input_usd_per_million": "0.25000000",
       "lane": "openai",
-      "output_usd_per_million": "2.000000",
-      "provider": null,
-      "reasoning": {
-        "enabled": false
-      },
-      "reasoning_label": "disabled, optional",
-      "reserve_usd": "0.92160000",
-      "status": "runnable",
-      "structured_output": true
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
       "id": "moonshotai/kimi-k2-thinking",
@@ -1752,29 +1656,10 @@
       "structured_output": true
     },
     {
-      "calls": 144,
-      "created": 1754922288,
       "id": "z-ai/glm-4.5v",
-      "input_usd_per_million": "0.6000000",
       "lane": "glm",
-      "output_usd_per_million": "1.8000000",
-      "provider": {
-        "allow_fallbacks": true,
-        "quantizations": [
-          "fp8",
-          "int8",
-          "bf16",
-          "fp16"
-        ],
-        "require_parameters": true
-      },
-      "reasoning": {
-        "enabled": false
-      },
-      "reasoning_label": "disabled, optional",
-      "reserve_usd": "0.8847360",
-      "status": "runnable",
-      "structured_output": false
+      "reason": "batch/free/pro/fast or specialized variant",
+      "status": "excluded"
     },
     {
       "calls": 144,
@@ -1838,7 +1723,16 @@
       "input_usd_per_million": "0.037000000",
       "lane": "openai",
       "output_usd_per_million": "0.17000000",
-      "provider": null,
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
       "reasoning": {
         "effort": "low"
       },
@@ -1860,7 +1754,16 @@
       "input_usd_per_million": "0.03000000",
       "lane": "openai",
       "output_usd_per_million": "0.13000000",
-      "provider": null,
+      "provider": {
+        "allow_fallbacks": true,
+        "quantizations": [
+          "fp8",
+          "int8",
+          "bf16",
+          "fp16"
+        ],
+        "require_parameters": true
+      },
       "reasoning": {
         "effort": "low"
       },

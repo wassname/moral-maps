@@ -29,7 +29,7 @@ OSS_PROVIDER = {
     "quantizations": ["fp8", "int8", "bf16", "fp16"],
 }
 LANES = ("openai", "google", "xai", "muse", "kimi", "glm", "deepseek", "qwen")
-SPECIALIZED = ("batch", "free", "-pro", "-fast", "vision", "-vl", "coder", "audio", "image", "guard", "safeguard", "multi-agent", "embedding", "rerank")
+SPECIALIZED = ("batch", "free", "-pro", "-fast", "vision", "-vl", "-5v", "-4.6v", "-4.5v", "-code", "-codex", "coder", "audio", "clip", "image", "guard", "safeguard", "multi-agent", "embedding", "rerank")
 
 
 def lane_for(model_id: str) -> str | None:
@@ -84,7 +84,7 @@ def entry(model: dict, completed: set[str]) -> dict:
         setting, setting_label = reasoning(model)
     except ValueError as error:
         return {"id": model_id, "lane": lane, "status": "excluded", "reason": str(error)}
-    provider = OSS_PROVIDER if lane in {"muse", "kimi", "glm", "deepseek", "qwen"} else None
+    provider = OSS_PROVIDER if lane in {"muse", "kimi", "glm", "deepseek", "qwen"} or model_id.startswith("openai/gpt-oss-") else None
     reserve = Decimal(144) * (Decimal(1024 + 2048) * price(model, "completion") + Decimal(1024) * price(model, "prompt")) / Decimal(1_000_000)
     return {
         "id": model_id, "lane": lane, "status": "runnable", "created": model["created"],
@@ -215,7 +215,7 @@ def main() -> None:
     if args.smoke:
         runnable = [row for row in rows if row["status"] == "runnable"]
         assert all(row["calls"] == 144 for row in runnable)
-        assert all(row["provider"] == OSS_PROVIDER for row in runnable if row["lane"] in {"muse", "kimi", "glm", "deepseek", "qwen"})
+        assert all(row["provider"] == OSS_PROVIDER for row in runnable if row["lane"] in {"muse", "kimi", "glm", "deepseek", "qwen"} or row["id"].startswith("openai/gpt-oss-"))
         assert all(row["provider"] is None for row in runnable if row["lane"] in {"openai", "google", "xai"})
         print(f"smoke: {len(runnable)} score-all-options panels, {len(LANES)} provider lanes, concurrency <= 8")
     if args.queue:
