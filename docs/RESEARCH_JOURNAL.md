@@ -938,3 +938,42 @@ The saved ledger permits a later exact-protocol completion calculation without r
 a valid point. -- PI[gpt-5.6-terra]
 
 The durable records make the measured spend and exclusions available for the next decision.
+
+## 2026-09-17 -- Billing-dashboard cross-check and practical panel costs
+
+This entry cross-checks the saved request ledger against the user's billing dashboard.
+
+Wassname reported these dashboard observations in the project session after checking account usage:
+
+> "only this project used qwen and it used 450k tokens. at $0.1. grok 4.5 200k tokens"
+>
+> "astra was also used by other projects but cost $1.7 so we used less or equal to that. fable was 5.59 between this and other projects"
+
+These are user-reported dashboard readings. Qwen is attributable to this project according to the user. The Astra
+and Fable amounts include other projects, so they are upper bounds for this project rather than project costs.
+
+I re-aggregated every `request_completed` event in
+`slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl` by exact model ID. The table below preserves the
+provider-reported ledger separately from the dashboard observations.
+
+| target | billing-dashboard observation | durable project ledger | practical same-protocol estimate |
+|---|---:|---:|---:|
+| Qwen family | about 450,000 tokens and USD 0.10 | 458,934 completion tokens, 1,717,174 total tokens, USD 0.53184756 across all complete and incomplete Qwen runs | complete panels had median USD 0.008221 and mean USD 0.011232; observed range USD 0.001104 to USD 0.047896 |
+| Grok 4.5 | about 200,000 tokens | 203,830 total tokens and USD 0.56676560 across two incomplete near-full attempts | USD 0.279541 to USD 0.287225 per near-full attempt; allow about USD 0.60 if one retry is needed |
+| GPT-6 Astra | account total at most USD 1.70 for this project | 35,569 total tokens and USD 0.69797000 for one complete panel | about USD 0.70 per complete panel |
+| Claude Fable 5.1 | account total at most USD 5.59 for this project | 69,000 total tokens and USD 0.83688000 for one complete panel | about USD 0.84 per complete panel |
+
+Table source: raw ledger above; Grok attempt-level counts also appear in
+`slop/audits/20260916_wvs_request_ledger.md`. The Qwen panel distribution uses the thirty-nine publication-eligible
+Qwen run IDs in `slop/research/wvs/20260916_openrouter/wvs_iw_rated.json`: total ledger cost USD 0.43803289,
+median USD 0.008221, mean USD 0.011232, and maximum USD 0.047896 per complete panel.
+
+My read: the original output-allowance bounds were intentionally conservative and overstate normal panel cost by
+roughly an order of magnitude for Astra and Fable. A useful planning budget under this protocol is about USD 0.05
+per Qwen model, USD 0.60 for Grok when allowing one failed near-full retry, USD 0.70 for Astra, and USD 0.84 for
+Fable. The Qwen dashboard cost of USD 0.10 does not reconcile with the ledger's USD 0.53184756, although its token
+count is close to the ledger's completion-token count. It is plausible that the dashboard view used a different cost
+or token scope, but a screenshot or export would be needed to identify which one. Until then, the durable per-request
+ledger remains the stronger project-cost source. -- PI[gpt-5.6-sol]
+
+The measured panel costs support inventorying more compatible family members before authorizing another bounded run.
