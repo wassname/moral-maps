@@ -22,6 +22,7 @@ LOCK = OUT / "budget.lock"
 GLOBAL_STOP_USD = Decimal("80")
 # Includes the discarded pick-one-option spend. It remains spending under the USD 80 cap.
 PRIOR_OBSERVED_USD = Decimal("5.34309727235")
+DENSE_BASELINE_USD = Decimal("3.5908606723")
 OSS_PROVIDER = {
     "allow_fallbacks": True,
     "require_parameters": True,
@@ -140,7 +141,7 @@ def rated_cost() -> Decimal:
 def reserve(row: dict) -> bool:
     with budget_state() as state:
         held = sum(Decimal(value["reserve_usd"]) for value in state["reservations"].values())
-        observed = max(PRIOR_OBSERVED_USD, rated_cost())
+        observed = PRIOR_OBSERVED_USD + max(Decimal(), rated_cost() - DENSE_BASELINE_USD)
         required = Decimal(row["reserve_usd"])
         if observed + held + required >= GLOBAL_STOP_USD:
             print(f"stop: observed={observed} held={held} required={required} cap={GLOBAL_STOP_USD}")
