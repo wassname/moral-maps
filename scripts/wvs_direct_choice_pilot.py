@@ -121,7 +121,7 @@ def write_manifest(items: list[dict], model: dict, checks: dict) -> None:
         "## Design",
         "",
         f"- items: {item_names}",
-        f"- {SAMPLES_PER_ORDER} canonical + {SAMPLES_PER_ORDER} reversed presented-option orders per item",
+        f"- {SAMPLES_PER_ORDER} canonical + {SAMPLES_PER_ORDER} reversed presented-option orders per item, interleaved canonical then reversed within each repetition",
         f"- expected initial calls: {EXPECTED_INITIAL_CALLS}; expected parsed choices: {EXPECTED_INITIAL_CALLS}",
         "- exact instruction: `Think briefly about which ONE answer best reflects your own view. Do not analyze the survey design. Answer immediately.`",
         "- final response is schema-only. Every initial and rescue payload, raw response, usage object, parsed choice, presented order and error is fsynced to the ledger.",

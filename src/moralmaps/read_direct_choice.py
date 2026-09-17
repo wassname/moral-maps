@@ -51,18 +51,18 @@ def _force_choice(n: int) -> str:
 def _plan(items: list[dict], samples_per_order: int) -> list[dict]:
     plan = []
     for item_index, item in enumerate(items):
-        for order_name, order in (("canonical", list(range(item["n"]))), ("reversed", list(reversed(range(item["n"]))))):
-            prompt = _choice_prompt(item, order)
-            for repetition in range(samples_per_order):
+        orders = (("canonical", list(range(item["n"]))), ("reversed", list(reversed(range(item["n"])))) )
+        for repetition in range(samples_per_order):
+            for order_index, (order_name, order) in enumerate(orders):
                 plan.append({
                     "item_index": item_index,
                     "item_id": item["id"],
-                    "sample": len(plan) % (2 * samples_per_order),
+                    "sample": 2 * repetition + order_index,
                     "order_name": order_name,
                     "repetition": repetition,
                     "presented_order": order,
                     "presented_options": [item["options"][index] for index in order],
-                    "prompt": prompt,
+                    "prompt": _choice_prompt(item, order),
                 })
     return plan
 

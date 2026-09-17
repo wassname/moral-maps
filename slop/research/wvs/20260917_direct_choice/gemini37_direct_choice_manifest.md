@@ -6,7 +6,7 @@ This preregistered pilot tests a construct difference. It is not a WVS map panel
 
 - model: `google/gemini-3.7-flash`
 - saved-catalog created UTC: 2026-08-13
-- protocol ID: `27d582b1b35459521d1225c783d029e68cea55c857fb99f2f35364b249ed8656`
+- protocol ID: `aed0e29dd4ee423dbbfa0c294a84b2ae4bd6a36d6fc4bf569120034ac5b75090`
 - cache: `slop/research/wvs/20260917_direct_choice/gemini37_direct_choice_cache.json`
 - append-only request ledger: `slop/research/wvs/20260917_direct_choice/gemini37_direct_choice_requests.jsonl`
 - temperature: 1.0; max tokens: 1024; concurrency: 1; timeout: 90.0s
@@ -16,7 +16,7 @@ This preregistered pilot tests a construct difference. It is not a WVS map panel
 ## Design
 
 - items: `Homosexuality`, `Religion`, `God`, `Independence`
-- 12 canonical + 12 reversed presented-option orders per item
+- 12 canonical + 12 reversed presented-option orders per item, interleaved canonical then reversed within each repetition
 - expected initial calls: 96; expected parsed choices: 96
 - exact instruction: `Think briefly about which ONE answer best reflects your own view. Do not analyze the survey design. Answer immediately.`
 - final response is schema-only. Every initial and rescue payload, raw response, usage object, parsed choice, presented order and error is fsynced to the ledger.

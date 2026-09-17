@@ -1,3 +1,3 @@
 smoke: 4 items x 12 canonical x 12 reversed = 96 requests
-smoke: distinct direct-choice protocol 27d582b1b35459521d1225c783d029e68cea55c857fb99f2f35364b249ed8656
-identity smoke: hashes exact per-item schemas and rescue instructions
+smoke: distinct direct-choice protocol aed0e29dd4ee423dbbfa0c294a84b2ae4bd6a36d6fc4bf569120034ac5b75090
+planner/parser smoke: 96 requests, canonical/reversed interleaved per item; strict schema and rescues are hashed
