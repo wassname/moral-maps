@@ -145,17 +145,47 @@ def manifest() -> dict:
     }
 
 
-def usage(records: Path) -> tuple[Decimal, Counter, int, int]:
-    cost, providers, rescues, failures = Decimal(), Counter(), 0, 0
-    for line in records.read_text().splitlines():
-        record = json.loads(line)
-        if record["event"] == "request_completed":
+def replicate_result(records: Path, replicate: dict, items: list[dict], resolved: dict) -> dict | None:
+    events = [json.loads(line) for line in records.read_text().splitlines()] if records.exists() else []
+    finished = [record for record in events if record["event"] == "run_finished"
+                and record["protocol_id"] == replicate["protocol_id"]]
+    if not finished:
+        return None
+    final = finished[-1]
+    run_id = final["run_id"]
+    item_rows = {record["id"]: record for record in events
+                 if record["event"] == "item_result" and record["run_id"] == run_id}
+    cost, providers = Decimal(), Counter()
+    for record in events:
+        if record.get("run_id") == run_id and record["event"] == "request_completed":
             cost += Decimal(str(record.get("usage", {}).get("cost", 0)))
             providers[record.get("provider")] += 1
-        if record["event"] == "item_result":
-            rescues += record["rescued_samples"]
-            failures += record["failed_samples"]
-    return cost, providers, rescues, failures
+    result = {
+        "replicate": replicate["replicate"], "protocol_id": replicate["protocol_id"],
+        "records": str(records), "run_id": run_id, "provider_requests": dict(providers),
+        "rescues": final["rescued_samples"], "failures": final["failed_samples"],
+        "usage_cost_usd": str(cost), "valid_samples": final["valid_samples"],
+    }
+    complete = (final["valid_samples"] == len(items) * N_SAMPLES
+                and final["failed_samples"] == 0
+                and len(item_rows) == len(items)
+                and all(row["valid_samples"] == N_SAMPLES for row in item_rows.values()))
+    if not complete:
+        return result | {"status": "incomplete"}
+    psamples = {item["id"]: np.asarray(item_rows[item["id"]]["p_samples"]) for item in items}
+    coords = model_coord_ci(psamples, resolved, np.random.default_rng(0))
+    response_se = _sample_only_coord_se(psamples, resolved, np.random.default_rng(1), n_draws=N_SAMPLES)
+    return result | {"status": "complete", "coords": list(coords), "response_mean_se": list(response_se)}
+
+
+def pilot_spend() -> Decimal:
+    cost = Decimal()
+    for records in (OUT / "records").glob("**/*.jsonl"):
+        for line in records.read_text().splitlines():
+            record = json.loads(line)
+            if record["event"] == "request_completed":
+                cost += Decimal(str(record.get("usage", {}).get("cost", 0)))
+    return cost
 
 
 def v1_coords(model: str) -> list[float]:
@@ -168,22 +198,19 @@ def v1_coords(model: str) -> list[float]:
 
 def run_replicate(model: str, replicate: dict, v1: dict, items: list[dict], resolved: dict) -> dict:
     records = Path(replicate["records"])
+    prior = replicate_result(records, replicate, items, resolved)
+    if prior is not None:
+        return prior
     records.parent.mkdir(parents=True, exist_ok=True)
-    seeds = replicate["seed_schedule"]
-    rows = read_items_rated(model, items, n_samples=N_SAMPLES, temperature=v1["temperature"],
-                            max_tokens=v1["max_tokens"], concurrency=1, req_timeout=v1["req_timeout"],
-                            reasoning=v1["reasoning"], structured_output=v1["structured_output"], provider=v1.get("provider", OSS_PROVIDER),
-                            records_path=records, verbose_first=True, probe_first=True, eval_version=EVAL_VERSION,
-                            identity_eval_version=EVAL_VERSION, seed_schedule=seeds)
-    if any(row["valid_samples"] != N_SAMPLES for row in rows):
-        raise RuntimeError(f"incomplete replicate {model} {replicate['replicate']}")
-    psamples = {row["id"]: np.asarray(row["p_samples"]) for row in rows}
-    coords = model_coord_ci(psamples, resolved, np.random.default_rng(0))
-    response_se = _sample_only_coord_se(psamples, resolved, np.random.default_rng(1), n_draws=N_SAMPLES)
-    cost, providers, rescues, failures = usage(records)
-    return {"replicate": replicate["replicate"], "protocol_id": replicate["protocol_id"], "records": str(records),
-            "coords": list(coords), "response_mean_se": list(response_se), "provider_requests": dict(providers),
-            "rescues": rescues, "failures": failures, "usage_cost_usd": str(cost)}
+    read_items_rated(model, items, n_samples=N_SAMPLES, temperature=v1["temperature"],
+                     max_tokens=v1["max_tokens"], concurrency=1, req_timeout=v1["req_timeout"],
+                     reasoning=v1["reasoning"], structured_output=v1["structured_output"], provider=v1.get("provider", OSS_PROVIDER),
+                     records_path=records, verbose_first=True, probe_first=True, eval_version=EVAL_VERSION,
+                     identity_eval_version=EVAL_VERSION, seed_schedule=replicate["seed_schedule"])
+    result = replicate_result(records, replicate, items, resolved)
+    if result is None:
+        raise RuntimeError(f"replicate {model} {replicate['replicate']} did not write run_finished")
+    return result
 
 
 def run() -> None:
@@ -191,31 +218,35 @@ def run() -> None:
     items, resolved = rated_items()
     if not reserve({"id": PILOT_RESERVATION_ID, "lane": "deepseek", "reserve_usd": str(PILOT_CAP_USD)}):
         raise RuntimeError("global USD 80 cap would be exceeded by the USD 1 pilot reservation")
-    pilot_state(lambda state: state.update({"reserved_usd": str(PILOT_CAP_USD), "started_utc": datetime.now(UTC).isoformat()}))
+    pilot_state(lambda state: state.update({"reserved_usd": str(PILOT_CAP_USD), "started_utc": datetime.now(UTC).isoformat(),
+                                             "spent_usd": str(pilot_spend())}))
     results = {"eval_version": EVAL_VERSION, "models": [], "not_published": True}
     try:
         for row in data["models"]:
             reps = []
             for replicate in row["replicates"]:
+                if Decimal(pilot_state(lambda state: state)["spent_usd"]) >= PILOT_CAP_USD:
+                    raise RuntimeError(f"pilot cap reached before {row['id']}: {pilot_spend()}")
                 result = run_replicate(row["id"], replicate, row["v1_settings"], items, resolved)
-                spent = pilot_state(lambda state: state.update({"spent_usd": str(Decimal(state["spent_usd"]) + Decimal(result["usage_cost_usd"]))}))
-                if Decimal(spent["spent_usd"]) >= PILOT_CAP_USD:
-                    raise RuntimeError(f"pilot cap reached: {spent['spent_usd']} >= {PILOT_CAP_USD}")
+                pilot_state(lambda state: state.update({"spent_usd": str(pilot_spend())}))
                 reps.append(result)
                 atomic_json(RESULTS, results | {"models": results["models"] + [{"id": row["id"], "replicates": reps}]})
-            values = np.asarray([rep["coords"][:2] for rep in reps])
-            aggregate_samples = {}
-            for rep in reps:
-                rows = [json.loads(line) for line in Path(rep["records"]).read_text().splitlines()]
-                for record in rows:
-                    if record["event"] == "item_result":
-                        aggregate_samples.setdefault(record["id"], []).extend(record["p_samples"])
-            aggregate = model_coord_ci({key: np.asarray(value) for key, value in aggregate_samples.items()}, resolved, np.random.default_rng(2))
-            v1 = v1_coords(row["id"])
-            results["models"].append({"id": row["id"], "v1_coords": v1, "replicates": reps,
-                                      "between_replicate_coordinate_sd": np.std(values, axis=0, ddof=1).tolist(),
-                                      "aggregate_n72_coords": list(aggregate),
-                                      "delta_aggregate_minus_v1": (np.asarray(aggregate[:2]) - np.asarray(v1[:2])).tolist()})
+            model_result = {"id": row["id"], "v1_coords": v1_coords(row["id"]), "replicates": reps}
+            if all(rep["status"] == "complete" for rep in reps):
+                values = np.asarray([rep["coords"][:2] for rep in reps])
+                aggregate_samples = {}
+                for rep in reps:
+                    records = [json.loads(line) for line in Path(rep["records"]).read_text().splitlines()]
+                    for record in records:
+                        if record["event"] == "item_result" and record["run_id"] == rep["run_id"]:
+                            aggregate_samples.setdefault(record["id"], []).extend(record["p_samples"])
+                aggregate = model_coord_ci({key: np.asarray(value) for key, value in aggregate_samples.items()}, resolved, np.random.default_rng(2))
+                model_result |= {"status": "complete", "between_replicate_coordinate_sd": np.std(values, axis=0, ddof=1).tolist(),
+                                 "aggregate_n72_coords": list(aggregate),
+                                 "delta_aggregate_minus_v1": (np.asarray(aggregate[:2]) - np.asarray(model_result["v1_coords"][:2])).tolist()}
+            else:
+                model_result |= {"status": "incomplete", "aggregate_excluded_reason": "at least one replicate has fewer than 288 valid samples"}
+            results["models"].append(model_result)
             atomic_json(RESULTS, results)
     finally:
         release(PILOT_RESERVATION_ID)
