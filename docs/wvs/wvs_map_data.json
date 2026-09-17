@@ -734,6 +734,8 @@
       "label": null,
       "name": "gemini-3.1-flash-lite",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -754,6 +756,8 @@
       "label": null,
       "name": "gemini-3.1-flash-lite-preview",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -774,6 +778,8 @@
       "label": null,
       "name": "grok-4.3",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.372103799814643,
         "hle_source_effort": "high",
         "hle_source_name": "Grok 4.3 (high)",
@@ -794,6 +800,8 @@
       "label": null,
       "name": "qwen3.6-27b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.230769230769231,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.6 27B (Reasoning)",
@@ -814,6 +822,8 @@
       "label": null,
       "name": "qwen3.5-35b-a3b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.210379981464319,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.5 35B A3B (Reasoning)",
@@ -834,6 +844,8 @@
       "label": null,
       "name": "qwen3.6-max-preview",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.308155699721965,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.6 Max Preview",
@@ -854,6 +866,8 @@
       "label": "muse-spark-1.3",
       "name": "muse-spark-1.3",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.487025023169602,
         "hle_source_effort": "max",
         "hle_source_name": "Muse Spark 1.3 (max)",
@@ -874,6 +888,8 @@
       "label": null,
       "name": "qwen3.8-27b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.33920296570899,
         "hle_source_effort": "xhigh",
         "hle_source_name": "Qwen3.8 27B (xhigh)",
@@ -894,6 +910,8 @@
       "label": null,
       "name": "deepseek-v4-flash-0731",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -914,6 +932,8 @@
       "label": null,
       "name": "gpt-oss-120b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -934,6 +954,8 @@
       "label": "qwen3.8-flash",
       "name": "qwen3.8-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -954,6 +976,8 @@
       "label": "gemma-4-31b-it",
       "name": "gemma-4-31b-it",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.236329935125116,
         "hle_source_effort": null,
         "hle_source_name": "Gemma 4 31B (Reasoning)",
@@ -974,6 +998,8 @@
       "label": null,
       "name": "qwen3.5-122b-a10b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.252085264133457,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.5 122B A10B (Reasoning)",
@@ -994,6 +1020,8 @@
       "label": null,
       "name": "glm-4.5-air",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1014,6 +1042,8 @@
       "label": null,
       "name": "gpt-5.4",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.437442075996293,
         "hle_source_effort": "xhigh",
         "hle_source_name": "GPT-5.4 (xhigh)",
@@ -1034,6 +1064,8 @@
       "label": null,
       "name": "gemini-3.5-flash-lite",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1054,6 +1086,8 @@
       "label": null,
       "name": "qwen3.5-plus-20260420",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1074,6 +1108,8 @@
       "label": null,
       "name": "gpt-5-mini",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1094,6 +1130,8 @@
       "label": null,
       "name": "gpt-5.6-luna",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1114,6 +1152,8 @@
       "label": null,
       "name": "gpt-5.6-terra",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1134,6 +1174,8 @@
       "label": "grok-4.6",
       "name": "grok-4.6",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1154,6 +1196,8 @@
       "label": null,
       "name": "glm-5.1",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1174,6 +1218,8 @@
       "label": null,
       "name": "gpt-5.2",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1194,6 +1240,8 @@
       "label": null,
       "name": "gemini-2.5-pro",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.225208526413346,
         "hle_source_effort": null,
         "hle_source_name": "Gemini 2.5 Pro",
@@ -1214,6 +1262,8 @@
       "label": null,
       "name": "gpt-5.4-mini",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1234,6 +1284,8 @@
       "label": null,
       "name": "grok-4.20",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.345227062094532,
         "hle_source_effort": null,
         "hle_source_name": "Grok 4.20 0309 v2 (Reasoning)",
@@ -1249,11 +1301,35 @@
       "y": 0.6372836916088428
     },
     {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-4o-mini",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "252fea691e8f00a7b3a658876047b1d93af94b89f127d549bac93f95644b933c",
+        "readout": "rated categorical response",
+        "release_created": "2024-07-18",
+        "release_source": "catalog",
+        "run_id": "20260917T135119Z_252fea691e8f",
+        "samples": 12
+      },
+      "x": -0.6137290564373897,
+      "y": 0.5741318151453763
+    },
+    {
       "color": "#ec4899",
       "family": "deepseek",
       "label": "deepseek-v4.1-flash",
       "name": "deepseek-v4.1-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.392493049119555,
         "hle_source_effort": "max",
         "hle_source_name": "DeepSeek V4.1 Flash (Reasoning, Max Effort)",
@@ -1274,6 +1350,8 @@
       "label": null,
       "name": "qwen3-coder-30b-a3b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.0384615384615385,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 Coder 30B A3B Instruct",
@@ -1294,6 +1372,8 @@
       "label": null,
       "name": "glm-5.2",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1314,6 +1394,8 @@
       "label": null,
       "name": "deepseek-v3.2-exp",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1334,6 +1416,8 @@
       "label": null,
       "name": "qwen3-30b-a3b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1354,6 +1438,8 @@
       "label": "gpt-6-astra",
       "name": "gpt-6-astra",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.546802594995366,
         "hle_source_effort": "max",
         "hle_source_name": "GPT-6 Astra (max)",
@@ -1374,6 +1460,8 @@
       "label": "mistral-large-2512",
       "name": "mistral-large-2512",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1394,6 +1482,8 @@
       "label": null,
       "name": "gemma-3-27b-it",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.044,
         "hle_source_effort": null,
         "hle_source_name": "Gemma 3 27B Instruct",
@@ -1414,6 +1504,8 @@
       "label": "llama-4-maverick",
       "name": "llama-4-maverick",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.0491195551436515,
         "hle_source_effort": null,
         "hle_source_name": "Llama 4 Maverick",
@@ -1434,6 +1526,8 @@
       "label": null,
       "name": "qwen3-coder",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1454,6 +1548,8 @@
       "label": null,
       "name": "qwen3.7-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1474,6 +1570,8 @@
       "label": null,
       "name": "qwen3-vl-235b-a22b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.0662650602409639,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 VL 235B A22B Instruct",
@@ -1494,6 +1592,8 @@
       "label": null,
       "name": "qwen-plus",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1514,6 +1614,8 @@
       "label": null,
       "name": "gpt-5.3-chat",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1534,6 +1636,8 @@
       "label": null,
       "name": "deepseek-v4-pro",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.410101946246525,
         "hle_source_effort": "max",
         "hle_source_name": "DeepSeek V4 Pro 0813 (Reasoning, Max Effort)",
@@ -1554,6 +1658,8 @@
       "label": null,
       "name": "llama-4-scout",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.0378,
         "hle_source_effort": null,
         "hle_source_name": "Llama 4 Scout",
@@ -1574,6 +1680,8 @@
       "label": null,
       "name": "grok-4.5",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1589,11 +1697,35 @@
       "y": 0.708147541423977
     },
     {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-4o-mini-2024-07-18",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "3f88d93861e3e20746627f7ff664bd93fd39a89d112687ce4c83c7dba73c896d",
+        "readout": "rated categorical response",
+        "release_created": "2024-07-18",
+        "release_source": "catalog",
+        "run_id": "20260917T135444Z_3f88d93861e3",
+        "samples": 12
+      },
+      "x": -0.6260950984945237,
+      "y": 0.5722794251348428
+    },
+    {
       "color": "#7e22ce",
       "family": "qwen",
       "label": null,
       "name": "qwen3-vl-30b-a3b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.0630213160333642,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 VL 30B A3B Instruct",
@@ -1614,6 +1746,8 @@
       "label": null,
       "name": "qwen3.5-397b-a17b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.289620018535681,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.5 397B A17B (Reasoning)",
@@ -1634,6 +1768,8 @@
       "label": null,
       "name": "deepseek-chat-v3.1",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1654,6 +1790,8 @@
       "label": null,
       "name": "qwen3.5-plus-02-15",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1674,6 +1812,8 @@
       "label": null,
       "name": "glm-5.3",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.422613531047266,
         "hle_source_effort": "max",
         "hle_source_name": "GLM-5.3 (max)",
@@ -1694,6 +1834,8 @@
       "label": null,
       "name": "deepseek-v3.2",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1714,6 +1856,8 @@
       "label": null,
       "name": "kimi-k2.6",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1734,6 +1878,8 @@
       "label": null,
       "name": "glm-5",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1754,6 +1900,8 @@
       "label": null,
       "name": "qwen3.7-plus",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.356348470806302,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.7 Plus",
@@ -1774,6 +1922,8 @@
       "label": null,
       "name": "qwen3-30b-a3b-instruct-2507",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1794,6 +1944,8 @@
       "label": null,
       "name": "gpt-5.5",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.457831325301205,
         "hle_source_effort": "xhigh",
         "hle_source_name": "GPT-5.5 (xhigh)",
@@ -1814,6 +1966,8 @@
       "label": null,
       "name": "qwen3.6-35b-a3b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.222428174235403,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.6 35B A3B (Reasoning)",
@@ -1834,6 +1988,8 @@
       "label": null,
       "name": "qwen3.6-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1854,6 +2010,8 @@
       "label": "gemini-3.8-flash",
       "name": "gemini-3.8-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1874,6 +2032,8 @@
       "label": null,
       "name": "deepseek-chat-v3-0324",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1894,6 +2054,8 @@
       "label": null,
       "name": "qwen3.6-plus",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.278498609823911,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.6 Plus",
@@ -1914,6 +2076,8 @@
       "label": null,
       "name": "qwen3-235b-a22b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.1098,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 235B A22B (Reasoning)",
@@ -1934,6 +2098,8 @@
       "label": null,
       "name": "gpt-5.4-nano",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1954,6 +2120,8 @@
       "label": null,
       "name": "gemini-3.5-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1974,6 +2142,8 @@
       "label": null,
       "name": "qwen-2.5-72b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -1994,6 +2164,8 @@
       "label": null,
       "name": "deepseek-v4-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.385542168674699,
         "hle_source_effort": "max",
         "hle_source_name": "DeepSeek V4 Flash 0731 (Reasoning, Max Effort)",
@@ -2014,6 +2186,8 @@
       "label": null,
       "name": "qwen-plus-2025-07-28",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2034,6 +2208,8 @@
       "label": null,
       "name": "gemini-3-flash-preview",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2054,6 +2230,8 @@
       "label": null,
       "name": "qwen3.7-max",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.405004633920297,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.7 Max",
@@ -2074,6 +2252,8 @@
       "label": null,
       "name": "qwen3-235b-a22b-2507",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2094,6 +2274,8 @@
       "label": null,
       "name": "qwen3.5-9b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.149212233549583,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.5 9B (Reasoning)",
@@ -2114,6 +2296,8 @@
       "label": null,
       "name": "muse-glimmer-30b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2134,6 +2318,8 @@
       "label": null,
       "name": "gemini-2.5-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2154,6 +2340,8 @@
       "label": null,
       "name": "qwen2.5-vl-72b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2174,6 +2362,8 @@
       "label": null,
       "name": "qwen3-vl-32b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.0681186283595922,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 VL 32B Instruct",
@@ -2194,6 +2384,8 @@
       "label": null,
       "name": "gemini-2.5-flash-lite",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2214,6 +2406,8 @@
       "label": null,
       "name": "gpt-5.6-sol",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.494902687673772,
         "hle_source_effort": "max",
         "hle_source_name": "GPT-5.6 Sol (max)",
@@ -2234,6 +2428,8 @@
       "label": null,
       "name": "qwen3-max-thinking",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.279888785912882,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 Max Thinking",
@@ -2254,6 +2450,8 @@
       "label": null,
       "name": "qwen3-coder-plus",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2274,6 +2472,8 @@
       "label": "inkling",
       "name": "inkling",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.318813716404078,
         "hle_source_effort": "xhigh",
         "hle_source_name": "Inkling (xhigh)",
@@ -2294,6 +2494,8 @@
       "label": null,
       "name": "qwen3-vl-8b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.0268767377201112,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 VL 8B Instruct",
@@ -2314,6 +2516,8 @@
       "label": null,
       "name": "qwen-2.5-7b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2334,6 +2538,8 @@
       "label": "kimi-k3",
       "name": "kimi-k3",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.468952734012975,
         "hle_source_effort": "max",
         "hle_source_name": "Kimi K3 (max)",
@@ -2349,11 +2555,35 @@
       "y": 0.6710244268262847
     },
     {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-4o-2024-08-06",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "1a12b248142ab869265f8502e074a7ef4d5e096a8a0c2dee2eb0e632473f1bcb",
+        "readout": "rated categorical response",
+        "release_created": "2024-08-06",
+        "release_source": "catalog",
+        "run_id": "20260917T134801Z_1a12b248142a",
+        "samples": 12
+      },
+      "x": -0.5912804058064387,
+      "y": 0.5802580057057466
+    },
+    {
       "color": "#7e22ce",
       "family": "qwen",
       "label": null,
       "name": "qwen3.5-27b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.239110287303058,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3.5 27B (Reasoning)",
@@ -2374,6 +2604,8 @@
       "label": null,
       "name": "qwen3.8-2.4t-a95b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2394,6 +2626,8 @@
       "label": null,
       "name": "qwen3-32b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.0741,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 32B (Reasoning)",
@@ -2414,6 +2648,8 @@
       "label": null,
       "name": "qwen3-14b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2434,6 +2670,8 @@
       "label": "glm-5.3-flash",
       "name": "glm-5.3-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2454,6 +2692,8 @@
       "label": null,
       "name": "glm-4.7-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2474,6 +2714,8 @@
       "label": null,
       "name": "gemini-3.6-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2492,8 +2734,54 @@
       "color": "#2563eb",
       "family": "gpt",
       "label": null,
+      "name": "gpt-4.1",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "0a72ded0be88127e9009e1c659d63042c0d8d7622ec501f7f6a3a836a4a41527",
+        "readout": "rated categorical response",
+        "release_created": "2025-04-14",
+        "release_source": "catalog",
+        "run_id": "20260917T133258Z_0a72ded0be88",
+        "samples": 12
+      },
+      "x": -0.6299053865373309,
+      "y": 0.6879566393703299
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-4o",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "9933b4a3be52fec8f416cf1d8bd3cefa1718efa1f0177f307292404d3e9db105",
+        "readout": "rated categorical response",
+        "release_created": "2024-05-13",
+        "release_source": "catalog",
+        "run_id": "20260917T135801Z_9933b4a3be52",
+        "samples": 12
+      },
+      "x": -0.6060268571393299,
+      "y": 0.5841620141118888
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
       "name": "gpt-5.1",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2514,6 +2802,8 @@
       "label": null,
       "name": "qwen3-coder-next",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.101482854494903,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 Coder Next",
@@ -2532,8 +2822,32 @@
       "color": "#2563eb",
       "family": "gpt",
       "label": null,
+      "name": "gpt-4.1-mini",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "612c6281a597db4f761707c0c0876d694d715daf35b4969395eeb63fdf9f5fa0",
+        "readout": "rated categorical response",
+        "release_created": "2025-04-14",
+        "release_source": "catalog",
+        "run_id": "20260917T133650Z_612c6281a597",
+        "samples": 12
+      },
+      "x": -0.5663403168156219,
+      "y": 0.45394876566876174
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
       "name": "gpt-5",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": null,
         "hle_source_effort": null,
         "hle_source_name": null,
@@ -2554,6 +2868,8 @@
       "label": null,
       "name": "qwen3-next-80b-a3b-instruct",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.0764596848934198,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 Next 80B A3B Instruct",
@@ -2569,11 +2885,79 @@
       "y": 0.7022990677752582
     },
     {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-4o-2024-11-20",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "eb1402c60a7305f5c9b800e5682ce648f3acc25970eaf798d0c3485b4bb16d48",
+        "readout": "rated categorical response",
+        "release_created": "2024-11-20",
+        "release_source": "catalog",
+        "run_id": "20260917T134443Z_eb1402c60a73",
+        "samples": 12
+      },
+      "x": -0.6174577809885475,
+      "y": 0.6028457218832352
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-4.1-nano",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "b6966daf09695284896ac4f0dda90cadb5e6fce5a1a77b576b290089050d0c9e",
+        "readout": "rated categorical response",
+        "release_created": "2025-04-14",
+        "release_source": "catalog",
+        "run_id": "20260917T134036Z_b6966daf0969",
+        "samples": 12
+      },
+      "x": -0.48177082177082176,
+      "y": 0.4976680628265054
+    },
+    {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-3.5-turbo-0613",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "b25b19e78ceb3fe7814ac5883239382f1c6e757fe89329495241a25ab521e178",
+        "readout": "rated categorical response",
+        "release_created": "2024-01-25",
+        "release_source": "catalog",
+        "run_id": "20260917T140156Z_b25b19e78ceb",
+        "samples": 12
+      },
+      "x": -0.6091300100287029,
+      "y": 0.438086083059628
+    },
+    {
       "color": "#c026d3",
       "family": "claude",
       "label": null,
       "name": "claude-opus-4.7",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.423076923076923,
         "hle_source_effort": "max",
         "hle_source_name": "Claude Opus 4.7 (Adaptive Reasoning, Max Effort)",
@@ -2589,11 +2973,35 @@
       "y": 0.6
     },
     {
+      "color": "#2563eb",
+      "family": "gpt",
+      "label": null,
+      "name": "gpt-3.5-turbo-16k",
+      "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
+        "hle_score": null,
+        "hle_source_effort": null,
+        "hle_source_name": null,
+        "items": 12,
+        "protocol_id": "340478ea86f503c256128623875d94e71ae4a6f5af06fda18042a3187f03f9ea",
+        "readout": "rated categorical response",
+        "release_created": "2023-08-28",
+        "release_source": "catalog",
+        "run_id": "20260917T140450Z_340478ea86f5",
+        "samples": 12
+      },
+      "x": -0.6100462990851458,
+      "y": 0.4246338825577172
+    },
+    {
       "color": "#7e22ce",
       "family": "qwen",
       "label": null,
       "name": "qwen3-8b",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.0389,
         "hle_source_effort": null,
         "hle_source_name": "Qwen3 8B (Reasoning)",
@@ -2614,6 +3022,8 @@
       "label": null,
       "name": "claude-opus-4.8",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.486561631139944,
         "hle_source_effort": "max",
         "hle_source_name": "Claude Opus 4.8 (Adaptive Reasoning, Max Effort)",
@@ -2634,6 +3044,8 @@
       "label": null,
       "name": "gemini-3.7-flash",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.478683966635774,
         "hle_source_effort": "high",
         "hle_source_name": "Gemini 3.7 Flash (high)",
@@ -2654,6 +3066,8 @@
       "label": "fable-5.1",
       "name": "claude-fable-5.1",
       "provenance": {
+        "coordinate_provenance": "canonical score-all-options",
+        "eval_version": "wvs-score-all-options-v1",
         "hle_score": 0.591288229842447,
         "hle_source_effort": "max",
         "hle_source_name": "Claude Fable 5.1 (Adaptive Reasoning, Max Effort, Default Fallback)",
@@ -2674,6 +3088,8 @@
       "label": null,
       "name": "claude-opus-4.6",
       "provenance": {
+        "coordinate_provenance": "historical rounded coordinate",
+        "eval_version": null,
         "hle_score": 0.399443929564411,
         "hle_source_effort": "max",
         "hle_source_name": "Claude Opus 4.6 (Adaptive Reasoning, Max Effort)",

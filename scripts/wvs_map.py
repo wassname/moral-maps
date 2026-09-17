@@ -553,15 +553,15 @@ def main() -> None:
                     saved_catalog[panel["model"]]["created"], tz=timezone.utc).date().isoformat()}
             if panel is None:
                 legacy_date = legacy_release_dates.get(name)
-                provenance = {"readout": "recovered rounded historical coordinate", "items": None,
-                              "samples": None, "run_id": None, "protocol_id": None,
+                provenance = {"coordinate_provenance": "historical rounded coordinate", "readout": "recovered rounded historical coordinate",
+                              "eval_version": None, "items": None, "samples": None, "run_id": None, "protocol_id": None,
                               "release_created": legacy_date,
                               "release_source": (f"saved OpenRouter catalog 2026-09-17: {LEGACY_CATALOG_IDS[name]}"
                                                  if legacy_date else "historical coordinate")}
             else:
-                provenance = {"readout": "rated categorical response", "items": panel["n_items"],
-                              "samples": panel["n_samples"], "run_id": panel["run_id"],
-                              "protocol_id": panel["protocol_id"],
+                provenance = {"coordinate_provenance": "canonical score-all-options", "readout": "rated categorical response",
+                              "eval_version": panel["eval_version"], "items": panel["n_items"], "samples": panel["n_samples"],
+                              "run_id": panel["run_id"], "protocol_id": panel["protocol_id"],
                               "release_created": catalog["created"] if catalog else None,
                               "release_source": "catalog" if catalog else "request ledger"}
             capability = capability_by_model.get(name)
@@ -612,8 +612,9 @@ def main() -> None:
         "WVS Inglehart-Welzel", countries, P,
         ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
         models=plot_models, model_labels=model_labels, emphasize=emph,
-        title="Frontier LLMs on the\nWorld Values Survey",
-        note=f"{len(plot_models)} models, rated sampling\ngithub.com/wassname/moral-maps")
+        title="Moral Maps: Where Do Frontier\nModels' Cultural Values Lie?",
+        note="World Values Survey | source: github.com/wassname/moral-maps",
+        title_y=0.115, note_y=0.04)
     fig.savefig(args.out, dpi=200, bbox_inches="tight")
     fig.savefig(Path(args.out).with_suffix(".svg"), bbox_inches="tight")
     logger.info(f"wrote {args.out}")

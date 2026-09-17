@@ -1,14 +1,15 @@
 {
-  "cache_completed_entries_after_merge": 86,
-  "ci_summaries_refreshed": 86,
-  "existing_entries_preserved_count": 86,
-  "existing_entries_sha256_after": "2fa381c2744633f337988c3fc2a753227849a733aaa906eceb507fe60b5b187f",
-  "existing_entries_sha256_before": "2fa381c2744633f337988c3fc2a753227849a733aaa906eceb507fe60b5b187f",
+  "cache_completed_entries_after_merge": 97,
+  "ci_summaries_refreshed": 0,
+  "eval_versions_stamped": 97,
+  "existing_entries_preserved_count": 97,
+  "existing_entries_sha256_after": "b4b6afcfa52ca47008d26ab7ac923fd741c0626690e02298cafb7e55f3c6dcd3",
+  "existing_entries_sha256_before": "47de431087eeea68bbf2591a8152fcb5c1fa6a084cace7fa5a6183ee635c7f3f",
   "ledger": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
-  "ledger_valid_lines": 49466,
+  "ledger_valid_lines": 54700,
   "new_complete_runs_added": 0,
   "new_models": [],
   "new_protocol_ids": [],
-  "overlap_complete_runs": 86,
+  "overlap_complete_runs": 97,
   "overlap_point_coordinates_equal": true
 }

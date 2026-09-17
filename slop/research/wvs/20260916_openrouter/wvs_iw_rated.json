@@ -1,14 +1,14 @@
 {
   "completed": {
     "00220612ec353054f53baca3eccb90ea2bea8632c2c2fdae99ef7a074bd75d05": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5467309986851505,
         0.5724812695525422,
-        0.04247123290804327,
-        0.09480053501952798
+        0.06104656289606268,
+        0.10460593729500693
       ],
       "display_key": "grok-4.3 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "x-ai/grok-4.3",
       "n_items": 12,
       "n_samples": 12,
@@ -17,14 +17,14 @@
       "run_id": "20260917T122425Z_00220612ec35"
     },
     "0043a43d1a2188f7c728ccda08eee7b062232366d8a4e912c72bdc938e37fe44": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6214472858835399,
         0.6710244268262847,
-        0.020535409516408785,
-        0.060983115136406967
+        0.03786483811416081,
+        0.06918409770409496
       ],
       "display_key": "kimi-k3 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "moonshotai/kimi-k3",
       "n_items": 12,
       "n_samples": 12,
@@ -41,6 +41,7 @@
         0.06471194730894558
       ],
       "display_key": "gemini-2.5-flash-lite (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-2.5-flash-lite",
       "n_items": 12,
       "n_samples": 12,
@@ -49,14 +50,14 @@
       "run_id": "20260917T130434Z_009e9bcb8596"
     },
     "02d386b067d55e0639d33db8b6f1e5c708c30acbada3125dcbabde47dc90edcf": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5849525883130219,
         0.59521139256589,
-        0.02321119834823242,
-        0.0670252510886532
+        0.037643038378990704,
+        0.07695278664473065
       ],
       "display_key": "qwen2.5-vl-72b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen2.5-vl-72b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -64,15 +65,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T200346Z_02d386b067d5"
     },
-    "0a798666aeed20785b4661c8c2fe4a6fc6853796bc2f3c45133863469e5b3f82": {
+    "0a72ded0be88127e9009e1c659d63042c0d8d7622ec501f7f6a3a836a4a41527": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.6299053865373309,
+        0.6879566393703299,
+        0.028990844848675826,
+        0.06904089263531353
+      ],
+      "display_key": "gpt-4.1 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-4.1",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "0a72ded0be88127e9009e1c659d63042c0d8d7622ec501f7f6a3a836a4a41527",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T133258Z_0a72ded0be88"
+    },
+    "0a798666aeed20785b4661c8c2fe4a6fc6853796bc2f3c45133863469e5b3f82": {
       "coords": [
         0.5335737179487179,
         0.5337214372928658,
-        0.022941344814671694,
-        0.09410390751379963
+        0.029444543942379133,
+        0.09738610052745941
       ],
       "display_key": "qwen3-vl-30b-a3b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-vl-30b-a3b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -81,14 +99,14 @@
       "run_id": "20260916T192223Z_0a798666aeed"
     },
     "11929820262d34605efabc00ce84137857e03ef6c53d827ea6c405555b905f26": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6151755041791274,
         0.6364257870168759,
-        0.05262633347758275,
-        0.0809846685946923
+        0.06075682882091517,
+        0.0850053325551206
       ],
       "display_key": "gpt-5.4 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5.4",
       "n_items": 12,
       "n_samples": 12,
@@ -97,14 +115,14 @@
       "run_id": "20260917T124555Z_11929820262d"
     },
     "134c21f0377c1a88f8ecfe9e9191341b0f53e0afbadb05d36ca0ba36c641f340": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5672038109538109,
         0.6522156084656084,
-        0.047966367122167806,
-        0.06566980777538725
+        0.0657887759000581,
+        0.0790074678539591
       ],
       "display_key": "gemini-3.5-flash-lite (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-3.5-flash-lite",
       "n_items": 12,
       "n_samples": 12,
@@ -113,14 +131,14 @@
       "run_id": "20260917T124448Z_134c21f0377c"
     },
     "1486c2f54e34ad1075f7b519a1dfc2b43f9f7e052d563a083fbc139fc41bd6ee": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5941946410337214,
         0.6441922202164339,
-        0.03986801497595867,
-        0.05382488437105076
+        0.06777104459972463,
+        0.07883221721567056
       ],
       "display_key": "glm-4.5-air (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "z-ai/glm-4.5-air",
       "n_items": 12,
       "n_samples": 12,
@@ -129,14 +147,14 @@
       "run_id": "20260917T125444Z_1486c2f54e34"
     },
     "182a7e88869698133f1175f18e53e7f6f2f056739559d325b211bd065235a71c": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6175297619047618,
         0.5976147806792967,
-        0.03468986624126052,
-        0.0429044958309632
+        0.035727022605345674,
+        0.07361977335041572
       ],
       "display_key": "qwen3-coder-plus (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-coder-plus",
       "n_items": 12,
       "n_samples": 12,
@@ -144,15 +162,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T193258Z_182a7e888696"
     },
-    "1a14a0f088ae0c3cc56637a32bd4c2290e4dde93dfeebb0f888a5a68c784af0d": {
+    "1a12b248142ab869265f8502e074a7ef4d5e096a8a0c2dee2eb0e632473f1bcb": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.5912804058064387,
+        0.5802580057057466,
+        0.04010151475516763,
+        0.06470588933509897
+      ],
+      "display_key": "gpt-4o-2024-08-06 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-4o-2024-08-06",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "1a12b248142ab869265f8502e074a7ef4d5e096a8a0c2dee2eb0e632473f1bcb",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T134801Z_1a12b248142a"
+    },
+    "1a14a0f088ae0c3cc56637a32bd4c2290e4dde93dfeebb0f888a5a68c784af0d": {
       "coords": [
         0.5780312225900461,
         0.608531746031746,
-        0.047255133267023915,
-        0.09642087745368229
+        0.06478224722015172,
+        0.101427539255001
       ],
       "display_key": "gemini-3.1-flash-lite-preview (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-3.1-flash-lite-preview",
       "n_items": 12,
       "n_samples": 12,
@@ -161,14 +196,14 @@
       "run_id": "20260917T125623Z_1a14a0f088ae"
     },
     "1a70f47789af20900f2799992b09e83af9490be6579098a6178d613d5ba7856c": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5274474357644292,
         0.6650744376984001,
-        0.039325438704147446,
-        0.06431091953768533
+        0.044561828476471346,
+        0.06617035838663828
       ],
       "display_key": "gpt-5.6-sol (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5.6-sol",
       "n_items": 12,
       "n_samples": 12,
@@ -177,14 +212,14 @@
       "run_id": "20260916T152843Z_1a70f47789af"
     },
     "1c31668055e399de28805046bc08075035efbad0cdb1ff7d8926841a282e07a5": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5036638266417679,
         0.6503283973522069,
-        0.04391918485419595,
-        0.041591327239427205
+        0.057017134313755345,
+        0.06039652604026301
       ],
       "display_key": "qwen3.7-max (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.7-max",
       "n_items": 12,
       "n_samples": 12,
@@ -193,14 +228,14 @@
       "run_id": "20260916T135329Z_1c31668055e3"
     },
     "1d7f4015decbcbe955adb79817b970981ca1d3165ed121b458b213ba1060f675": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6061818582651916,
         0.6004689754689754,
-        0.029517269745380506,
-        0.08002704064836072
+        0.029738189920548014,
+        0.07794129978765893
       ],
       "display_key": "qwen3-vl-8b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-vl-8b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -208,15 +243,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T192044Z_1d7f4015decb"
     },
-    "27cc1b32407e6ebca063ce550d1848751a64f4393f93b6af393a01b4f62fe162": {
+    "252fea691e8f00a7b3a658876047b1d93af94b89f127d549bac93f95644b933c": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.6137290564373897,
+        0.5741318151453763,
+        0.05391992108407547,
+        0.08074548128727346
+      ],
+      "display_key": "gpt-4o-mini (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-4o-mini",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "252fea691e8f00a7b3a658876047b1d93af94b89f127d549bac93f95644b933c",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T135119Z_252fea691e8f"
+    },
+    "27cc1b32407e6ebca063ce550d1848751a64f4393f93b6af393a01b4f62fe162": {
       "coords": [
         0.5442434494517827,
         0.6391828271087302,
-        0.025233816825009546,
-        0.04299513986767339
+        0.04443386786526795,
+        0.054686704767473275
       ],
       "display_key": "glm-5.3-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "z-ai/glm-5.3-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -225,14 +277,14 @@
       "run_id": "20260917T114916Z_27cc1b32407e"
     },
     "29b17fd9e04c4b7f93e1763b460892f9ec2f4fc4698b6dd7571fcfebc76b8500": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5429175317746331,
         0.694532627865961,
-        0.05076181516930638,
-        0.06853941563706838
+        0.06309666696112717,
+        0.07571315515523741
       ],
       "display_key": "glm-5.1 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "z-ai/glm-5.1",
       "n_items": 12,
       "n_samples": 12,
@@ -241,14 +293,14 @@
       "run_id": "20260917T120826Z_29b17fd9e04c"
     },
     "3016d2c1ab8d8f88f01723d2d695be996c7f1fdcd442a51cfbb6c7b7110a25e9": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5017202097104058,
         0.5916881018254176,
-        0.014139200341870085,
-        0.04877802971162936
+        0.04660057418362078,
+        0.07020408831610975
       ],
       "display_key": "qwen3.5-9b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.5-9b",
       "n_items": 12,
       "n_samples": 12,
@@ -257,14 +309,14 @@
       "run_id": "20260916T142212Z_3016d2c1ab8d"
     },
     "304db4b1aa6c80d734f802749c75143feddfcdb740c4131385e927148ba7d05b": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.598778659611993,
         0.6204503168788883,
-        0.031879884568457334,
-        0.08890048164637801
+        0.04059052018905529,
+        0.08949774510806
       ],
       "display_key": "qwen3-coder (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-coder",
       "n_items": 12,
       "n_samples": 12,
@@ -273,14 +325,14 @@
       "run_id": "20260916T195554Z_304db4b1aa6c"
     },
     "3194398c99baf1d5ebb273314207d4aa1bfe5d12c8b16cb192818aacd78d759f": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.4215300954189843,
         0.7190489551600663,
-        0.06886574238472291,
-        0.058216440434159446
+        0.07543950734136469,
+        0.06523372720374179
       ],
       "display_key": "grok-4.6 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "x-ai/grok-4.6",
       "n_items": 12,
       "n_samples": 12,
@@ -289,14 +341,14 @@
       "run_id": "20260917T114916Z_3194398c99ba"
     },
     "333ece6448f97447c57f24f9e9fcf0a7fb72a1b0f96696aef3c38a9c1d2d2308": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5482108382155133,
         0.5760765801607652,
-        0.05615879899255038,
-        0.06900628612372126
+        0.06725327571313976,
+        0.08275579176334262
       ],
       "display_key": "deepseek-v4-flash-0731 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "deepseek/deepseek-v4-flash-0731",
       "n_items": 12,
       "n_samples": 12,
@@ -304,15 +356,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260917T112151Z_333ece6448f9"
     },
-    "3443c17ae66d3fb529a058128b662024c4bc0601394e614bb693b388ec4c988b": {
+    "340478ea86f503c256128623875d94e71ae4a6f5af06fda18042a3187f03f9ea": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.6100462990851458,
+        0.4246338825577172,
+        0.04283858171022578,
+        0.03714494616987252
+      ],
+      "display_key": "gpt-3.5-turbo-16k (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-3.5-turbo-16k",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "340478ea86f503c256128623875d94e71ae4a6f5af06fda18042a3187f03f9ea",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T140450Z_340478ea86f5"
+    },
+    "3443c17ae66d3fb529a058128b662024c4bc0601394e614bb693b388ec4c988b": {
       "coords": [
         0.4153054353054353,
         0.6346365065494385,
-        0.06387070667136088,
-        0.06142907585948666
+        0.07206749839259896,
+        0.07710357656753936
       ],
       "display_key": "qwen3.8-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.8-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -321,14 +390,14 @@
       "run_id": "20260916T133720Z_3443c17ae66d"
     },
     "39659697ca3437f62be4fb8e129e6b3902a91b5acac3243ca914dfc917dd563b": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5030952380952382,
         0.5846967846967848,
-        0.02599338482636756,
-        0.08346488455925544
+        0.046958286642217247,
+        0.08746316369004264
       ],
       "display_key": "qwen3-coder-30b-a3b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-coder-30b-a3b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -337,14 +406,14 @@
       "run_id": "20260916T194257Z_39659697ca34"
     },
     "3c9d4fedebcab41719f4247ca94fa35430f57d0a34f3a539012e0632e35413de": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.4253104631546661,
         0.731799663031547,
-        0.08709838706511942,
-        0.05122062529170766
+        0.0936048666617984,
+        0.060012518938080954
       ],
       "display_key": "muse-spark-1.3 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "meta/muse-spark-1.3",
       "n_items": 12,
       "n_samples": 12,
@@ -352,15 +421,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T155331Z_3c9d4fedebca"
     },
-    "4230ccaa1e160c793a906aef6b786d735d9fdbf71c3333691b0eba17dcf33928": {
+    "3f88d93861e3e20746627f7ff664bd93fd39a89d112687ce4c83c7dba73c896d": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.6260950984945237,
+        0.5722794251348428,
+        0.04638829159697737,
+        0.08079941631842184
+      ],
+      "display_key": "gpt-4o-mini-2024-07-18 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-4o-mini-2024-07-18",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "3f88d93861e3e20746627f7ff664bd93fd39a89d112687ce4c83c7dba73c896d",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T135444Z_3f88d93861e3"
+    },
+    "4230ccaa1e160c793a906aef6b786d735d9fdbf71c3333691b0eba17dcf33928": {
       "coords": [
         0.5790919024614678,
         0.6085929478125246,
-        0.03990434167170201,
-        0.023380867881070636
+        0.038145029256266345,
+        0.025980758516149186
       ],
       "display_key": "claude-fable-5.1 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "anthropic/claude-fable-5.1",
       "n_items": 12,
       "n_samples": 12,
@@ -369,14 +455,14 @@
       "run_id": "20260916T153341Z_4230ccaa1e16"
     },
     "43ddc43fb5a29c7fbf21c8f32b42a909c2118feb9255959ecaeab7dadb1f3dde": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5966931216931217,
         0.5338064713064713,
-        0.011836625928696285,
-        0.10630349458372183
+        0.011307868884765215,
+        0.10204509849192553
       ],
       "display_key": "qwen3-vl-32b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-vl-32b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -385,14 +471,14 @@
       "run_id": "20260916T191809Z_43ddc43fb5a2"
     },
     "49ae9f7a09090534a15fac734c2611c445a17139cad6c5684fa0581722f3fd70": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6137896825396826,
         0.5819444444444445,
-        0.009821057676311395,
-        0.08482387932410497
+        0.015958730849444745,
+        0.0834429418953706
       ],
       "display_key": "qwen3-14b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-14b",
       "n_items": 12,
       "n_samples": 12,
@@ -401,14 +487,14 @@
       "run_id": "20260916T150121Z_49ae9f7a0909"
     },
     "4f0d6ed370f069e233ea6c4cb83000e79398c3a2aa10b355b10f99c8633c47f6": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5923129031462364,
         0.6683453376721874,
-        0.02592908625180882,
-        0.07625311311101751
+        0.042111115261344804,
+        0.08216742430172869
       ],
       "display_key": "glm-5 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "z-ai/glm-5",
       "n_items": 12,
       "n_samples": 12,
@@ -417,14 +503,14 @@
       "run_id": "20260917T123002Z_4f0d6ed370f0"
     },
     "5478eac564ec02f01e161ce017e1814954f4239b9fa1bedfe73172c5c630848f": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.4566709514410664,
         0.670101976591992,
-        0.0421869487162949,
-        0.07271432406347927
+        0.05775584971748114,
+        0.07962287120217941
       ],
       "display_key": "gpt-5.4-mini (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5.4-mini",
       "n_items": 12,
       "n_samples": 12,
@@ -433,14 +519,14 @@
       "run_id": "20260917T124216Z_5478eac564ec"
     },
     "54e721734c251e2e13cf43beab962703409108bfc5203c19e7747770ce13a801": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.593257275132275,
         0.6186534585344109,
-        0.03287309998202738,
-        0.06078538490729567
+        0.03571288070419747,
+        0.06312818330951275
       ],
       "display_key": "gemini-3.6-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-3.6-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -449,14 +535,14 @@
       "run_id": "20260917T124016Z_54e721734c25"
     },
     "568bb3fc2517dd40b1399c71e0cf52033dcce79dc7537c4943ace860fe3a1297": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6123449635867936,
         0.7514717187100795,
-        0.03722472860594401,
-        0.04262080359788279
+        0.04454897242429451,
+        0.049069808495596626
       ],
       "display_key": "gpt-5.1 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5.1",
       "n_items": 12,
       "n_samples": 12,
@@ -465,14 +551,14 @@
       "run_id": "20260917T125409Z_568bb3fc2517"
     },
     "57bed80fd5b94157effe68fe998c7c12612fea210c1371dbf230097a7e8e0717": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6363133579397021,
         0.5792251640447779,
-        0.015532918535503142,
-        0.04894510480027706
+        0.027397680484314686,
+        0.06607943334210371
       ],
       "display_key": "qwen3-coder-next (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-coder-next",
       "n_items": 12,
       "n_samples": 12,
@@ -481,14 +567,14 @@
       "run_id": "20260916T191559Z_57bed80fd5b9"
     },
     "580a5840948209ecb177dc6fdaf36e265a32ccfe223d791eb3235fea9269f27e": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6064902599972044,
         0.5413085527420844,
-        0.018354281932994144,
-        0.043773731258587176
+        0.028266888268597475,
+        0.07251640240693584
       ],
       "display_key": "qwen3-32b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-32b",
       "n_items": 12,
       "n_samples": 12,
@@ -497,14 +583,14 @@
       "run_id": "20260916T150406Z_580a58409482"
     },
     "589e10fa7924ecf8f88650d6587ff37c440f47c6c4cc4325c7009ef8d4eeb4ec": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6217724867724868,
         0.5391326046087952,
-        0.013368066261339313,
-        0.03510995792353358
+        0.015436127385306617,
+        0.05984330714155522
       ],
       "display_key": "qwen3-8b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-8b",
       "n_items": 12,
       "n_samples": 12,
@@ -513,14 +599,14 @@
       "run_id": "20260916T181355Z_589e10fa7924"
     },
     "5c920b68e50c5b4fd43542f379ac25b98e8d79107ea1722c1db12aa22fa34211": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5907043650793651,
         0.5776102655592599,
-        0.037783384172145155,
-        0.07466018958883854
+        0.04137996061944377,
+        0.07845514485495916
       ],
       "display_key": "gemini-3.5-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-3.5-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -529,14 +615,14 @@
       "run_id": "20260917T124812Z_5c920b68e50c"
     },
     "6067c0208cc500e5837d123052d6b33b3568d616e5c157f601baa8dcb7ef159b": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5189766385048643,
         0.6372836916088428,
-        0.0337635437945517,
-        0.059640726072916046
+        0.052897459249729474,
+        0.08224247455566645
       ],
       "display_key": "grok-4.20 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "x-ai/grok-4.20",
       "n_items": 12,
       "n_samples": 12,
@@ -544,15 +630,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260917T122709Z_6067c0208cc5"
     },
-    "61ab1adae3781ca3893328a845d4d517daa5fb47e07ea189da1df45388f62d42": {
+    "612c6281a597db4f761707c0c0876d694d715daf35b4969395eeb63fdf9f5fa0": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.5663403168156219,
+        0.45394876566876174,
+        0.05270303447186722,
+        0.03906537267953817
+      ],
+      "display_key": "gpt-4.1-mini (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-4.1-mini",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "612c6281a597db4f761707c0c0876d694d715daf35b4969395eeb63fdf9f5fa0",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T133650Z_612c6281a597"
+    },
+    "61ab1adae3781ca3893328a845d4d517daa5fb47e07ea189da1df45388f62d42": {
       "coords": [
         0.5993276014109347,
         0.5462479278681369,
-        0.01958469751960041,
-        0.1037406905684859
+        0.024660010076102412,
+        0.10518394004968958
       ],
       "display_key": "qwen3-vl-235b-a22b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-vl-235b-a22b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -561,14 +664,14 @@
       "run_id": "20260916T192432Z_61ab1adae378"
     },
     "66ad076e1a37493e4d3db982a0220048e520103459cefc709bc8f09f3fef6c9a": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5509667037841642,
         0.5895236753978316,
-        0.013511574117086913,
-        0.07299126669851562
+        0.02658132977411291,
+        0.08063463160776993
       ],
       "display_key": "qwen-2.5-7b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen-2.5-7b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -577,14 +680,14 @@
       "run_id": "20260916T200857Z_66ad076e1a37"
     },
     "67a70b1b03ba85be79dc122cc888a080fde239205624135a9147168e7e77293d": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5614798614630517,
         0.6880988993033613,
-        0.04645572992641227,
-        0.046994343694421285
+        0.050774441812280406,
+        0.057780026773918566
       ],
       "display_key": "inkling (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "thinkingmachines/inkling",
       "n_items": 12,
       "n_samples": 12,
@@ -593,14 +696,14 @@
       "run_id": "20260916T191343Z_67a70b1b03ba"
     },
     "6af9f017856f4c733214bf8e26992a4af3c7cb94dac8a5a4b881e8669b3917a7": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5220108722106056,
         0.6395004417804221,
-        0.03076973529726908,
-        0.084649994895056
+        0.04704769940966264,
+        0.09470717560391326
       ],
       "display_key": "gpt-5-mini (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5-mini",
       "n_items": 12,
       "n_samples": 12,
@@ -609,14 +712,14 @@
       "run_id": "20260917T130236Z_6af9f017856f"
     },
     "6d6ce30e9fbc5fdb07229b0a08e067d77511857069a4e572613d3e48b7c8b261": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5856201899951899,
         0.6494018547589976,
-        0.032344011142651626,
-        0.08396736786485802
+        0.06114886163791156,
+        0.08129405199775336
       ],
       "display_key": "qwen3.5-plus-20260420 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.5-plus-20260420",
       "n_items": 12,
       "n_samples": 12,
@@ -625,14 +728,14 @@
       "run_id": "20260916T135722Z_6d6ce30e9fbc"
     },
     "6f7a7bbc4d70e7cfceff8e25b2da2008fbf6105538825f42bfbbc47ff3459387": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5605366161616162,
         0.573015873015873,
-        0.07041699717338515,
-        0.0955132767170434
+        0.07008299148165956,
+        0.09640175208725496
       ],
       "display_key": "gemini-3.1-flash-lite (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-3.1-flash-lite",
       "n_items": 12,
       "n_samples": 12,
@@ -641,14 +744,14 @@
       "run_id": "20260917T125248Z_6f7a7bbc4d70"
     },
     "7058adf367d238c6c92e1b83ae71f6556362e9fc7a243297b6fc65e54e2c2886": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5974338624338624,
         0.6515634387658198,
-        0.0151114134522649,
-        0.07890400348024484
+        0.023795241546514957,
+        0.07922810144513995
       ],
       "display_key": "qwen3.5-27b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.5-27b",
       "n_items": 12,
       "n_samples": 12,
@@ -657,14 +760,14 @@
       "run_id": "20260916T143235Z_7058adf367d2"
     },
     "74e3649a6961000bab284e801fe811d5c8fc4cf1db15af52bb10959f5a5a37c1": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5372045855379188,
         0.6595114541543113,
-        0.03701076833492129,
-        0.08376087073198286
+        0.04180484013035134,
+        0.08450011787948054
       ],
       "display_key": "qwen3.5-plus-02-15 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.5-plus-02-15",
       "n_items": 12,
       "n_samples": 12,
@@ -673,14 +776,14 @@
       "run_id": "20260916T144205Z_74e3649a6961"
     },
     "7809cffa4ab1327c0a20b2d9ec23d0647b9382ddef65dd36c2ab5669da4f7d9f": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5595998356229528,
         0.5926290303237558,
-        0.02693093173377315,
-        0.042768178388407095
+        0.04045393842948997,
+        0.058480296424785895
       ],
       "display_key": "glm-4.7-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "z-ai/glm-4.7-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -689,14 +792,14 @@
       "run_id": "20260917T123743Z_7809cffa4ab1"
     },
     "7ee20ca2b88f69dd06b9de3018deea4cb7a418e3119e17862cd0b32146daae1a": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.538440257742794,
         0.5530118458934986,
-        0.03744969864324434,
-        0.06998170957293813
+        0.07277582530416211,
+        0.0898393391241473
       ],
       "display_key": "qwen3.5-35b-a3b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.5-35b-a3b",
       "n_items": 12,
       "n_samples": 12,
@@ -705,14 +808,14 @@
       "run_id": "20260916T142959Z_7ee20ca2b88f"
     },
     "7fe76f95937ed145b996116a31855dae4ab8c3b67e3e7ccfb84a000437e27f96": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.4526851851851852,
         0.6334977783064814,
-        0.036885948359860296,
-        0.07744723420845886
+        0.057818785990183905,
+        0.08298095716984875
       ],
       "display_key": "gpt-5-nano (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5-nano",
       "n_items": 12,
       "n_samples": 12,
@@ -721,14 +824,14 @@
       "run_id": "20260917T020418Z_7fe76f95937e"
     },
     "82875b6ee164d0d980eba738bf05f69959234567b91f9cfd01fcabca0bd70dac": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6529354469060352,
         0.5885508561103798,
-        0.0314816537313644,
-        0.04799521946452996
+        0.049299882651159914,
+        0.08073268479006059
       ],
       "display_key": "qwen3.7-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.7-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -737,14 +840,14 @@
       "run_id": "20260916T133001Z_82875b6ee164"
     },
     "840da516c1c04e69e5d80dd104803f019a4d6c6640359ad0e4bbcb71e722aa6c": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5595320767195766,
         0.6334656084656085,
-        0.0479345416110304,
-        0.06407749490095412
+        0.05158017344603731,
+        0.06609164737112991
       ],
       "display_key": "gemini-3-flash-preview (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-3-flash-preview",
       "n_items": 12,
       "n_samples": 12,
@@ -753,14 +856,14 @@
       "run_id": "20260917T125926Z_840da516c1c0"
     },
     "842298c634ec0f57848b605f67fca161631a852a68192cae1a5377b1d9f31566": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6427511094043352,
         0.5554953612269281,
-        0.03253928279038274,
-        0.07779247297520335
+        0.03535208249381765,
+        0.08497138486454137
       ],
       "display_key": "qwen3-235b-a22b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-235b-a22b",
       "n_items": 12,
       "n_samples": 12,
@@ -769,14 +872,14 @@
       "run_id": "20260916T150950Z_842298c634ec"
     },
     "8700e79d3eccf358a0de1029f7b40e2db339bb6d11403b8e69cb7a66a7b0c668": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6707823388714307,
         0.6060018656291949,
-        0.022702792353656083,
-        0.08121800045234231
+        0.03451993837104684,
+        0.09876091230627733
       ],
       "display_key": "qwen3-30b-a3b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-30b-a3b",
       "n_items": 12,
       "n_samples": 12,
@@ -785,14 +888,14 @@
       "run_id": "20260916T145439Z_8700e79d3ecc"
     },
     "88ba5af838eda5d298b312553d7c941e72a37cbf28890cdb9d8436b5f40e7cfe": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6025617283950616,
         0.6287037037037038,
-        0.030065943475536042,
-        0.09420661909505727
+        0.03396367302553316,
+        0.09406697361625513
       ],
       "display_key": "qwen-plus (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen-plus",
       "n_items": 12,
       "n_samples": 12,
@@ -801,14 +904,14 @@
       "run_id": "20260916T200626Z_88ba5af838ed"
     },
     "88ed922f271a76721ad18f0b7bb9693a48377e2507d02a4b78fa08b451972d83": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6450907949109246,
         0.5437992771640354,
-        0.014480282059694862,
-        0.10414669190782924
+        0.023312776383531648,
+        0.10024881542221994
       ],
       "display_key": "qwen3-30b-a3b-instruct-2507 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-30b-a3b-instruct-2507",
       "n_items": 12,
       "n_samples": 12,
@@ -817,14 +920,14 @@
       "run_id": "20260916T195128Z_88ed922f271a"
     },
     "8c27d32cd851de5f217cb354b15dc270cc6f4ec2d02fb15dbb20fde0790c3571": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5419602854216832,
         0.595896730624977,
-        0.044286454927165,
-        0.06410119405336592
+        0.05193570378692634,
+        0.08265065423220756
       ],
       "display_key": "deepseek-v4.1-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "deepseek/deepseek-v4.1-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -833,14 +936,14 @@
       "run_id": "20260916T151414Z_8c27d32cd851"
     },
     "921707cb0d3db143e948e9d78cd8191f4ee720eaf56b6934e2d13d9ce9e3382f": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5408168991502326,
         0.6493278669204595,
-        0.03453680502309858,
-        0.08951355314543964
+        0.03917823180041766,
+        0.08760189869507796
       ],
       "display_key": "qwen3.5-397b-a17b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.5-397b-a17b",
       "n_items": 12,
       "n_samples": 12,
@@ -849,14 +952,14 @@
       "run_id": "20260916T144546Z_921707cb0d3d"
     },
     "94428060f3776ab79ab3d146382e869d248c259c86858f4e5dbc9c5a1f4633db": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.48311026165192833,
         0.6007697469838861,
-        0.028453155979336744,
-        0.04236719989377499
+        0.05313376200674668,
+        0.06690255611782707
       ],
       "display_key": "gpt-5.4-nano (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5.4-nano",
       "n_items": 12,
       "n_samples": 12,
@@ -865,14 +968,14 @@
       "run_id": "20260917T123850Z_94428060f377"
     },
     "95bb4d3939e9937823357b5cd87adb1a6640cc5b04e0841dfec03095331a5e44": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.4569019748367575,
         0.6751145899955423,
-        0.07186088017315642,
-        0.04558197261286701
+        0.07644348564506928,
+        0.0567289888770763
       ],
       "display_key": "gpt-6-astra (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-6-astra",
       "n_items": 12,
       "n_samples": 12,
@@ -881,14 +984,14 @@
       "run_id": "20260916T154406Z_95bb4d3939e9"
     },
     "96d86b64bf7ceff8eed0daff1aa0396ee69609b5867942a7c2c9d33093f03c9d": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5196778711484593,
         0.6698994127565557,
-        0.03377693173708851,
-        0.06927660087614809
+        0.042934824935707064,
+        0.07801121120269483
       ],
       "display_key": "qwen3.6-plus (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.6-plus",
       "n_items": 12,
       "n_samples": 12,
@@ -896,15 +999,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T141839Z_96d86b64bf7c"
     },
-    "9c1d40b30945565e488b212177e40c29f730c2e96d4b07d09cbc135ba75a81f0": {
+    "9933b4a3be52fec8f416cf1d8bd3cefa1718efa1f0177f307292404d3e9db105": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.6060268571393299,
+        0.5841620141118888,
+        0.03342395986220364,
+        0.06247093532554917
+      ],
+      "display_key": "gpt-4o (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-4o",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "9933b4a3be52fec8f416cf1d8bd3cefa1718efa1f0177f307292404d3e9db105",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T135801Z_9933b4a3be52"
+    },
+    "9c1d40b30945565e488b212177e40c29f730c2e96d4b07d09cbc135ba75a81f0": {
       "coords": [
         0.6026546601546601,
         0.5957470912477916,
-        0.024251712034204544,
-        0.08684627683495146
+        0.03274570154412936,
+        0.08673540897470654
       ],
       "display_key": "qwen-2.5-72b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen-2.5-72b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -913,14 +1033,14 @@
       "run_id": "20260916T201119Z_9c1d40b30945"
     },
     "9d8a5189c078672eb884784938b183944fb161d0e716e2c44722540b17603e34": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6652380952380952,
         0.7022990677752582,
-        0.021284606679632966,
-        0.04934275921145735
+        0.026433969418704885,
+        0.06269095940430941
       ],
       "display_key": "qwen3-next-80b-a3b-instruct (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-next-80b-a3b-instruct",
       "n_items": 12,
       "n_samples": 12,
@@ -929,14 +1049,14 @@
       "run_id": "20260916T193846Z_9d8a5189c078"
     },
     "a2df2f1a32fde5dae2c1545120a4fd72cea4743bafe71a1768997dc3d125b4f4": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.610243091658148,
         0.6687657686659433,
-        0.03675410818998801,
-        0.06737179091474468
+        0.04414498817375987,
+        0.08085439770187478
       ],
       "display_key": "kimi-k2.6 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "moonshotai/kimi-k2.6",
       "n_items": 12,
       "n_samples": 12,
@@ -953,6 +1073,7 @@
         0.07471544119511193
       ],
       "display_key": "gemini-2.5-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-2.5-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -961,14 +1082,14 @@
       "run_id": "20260917T130734Z_a544b24e1874"
     },
     "a742f028f72ec35cc6586661ca261df77a51eecce778ff080062968942d822ae": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5253620889368438,
         0.6943301071633757,
-        0.03998834571383578,
-        0.06608021212309273
+        0.06029287144663362,
+        0.07390235325207269
       ],
       "display_key": "glm-5.2 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "z-ai/glm-5.2",
       "n_items": 12,
       "n_samples": 12,
@@ -977,14 +1098,14 @@
       "run_id": "20260917T115959Z_a742f028f72e"
     },
     "a9a69a3ef43e7544f73290e6fd9d3c9f37013b15a9e50be755d4d227d6cc30eb": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.524187458188895,
         0.708147541423977,
-        0.04698755670397484,
-        0.0578745248478481
+        0.05959262807078437,
+        0.06778136701328388
       ],
       "display_key": "grok-4.5 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "x-ai/grok-4.5",
       "n_items": 12,
       "n_samples": 12,
@@ -993,14 +1114,14 @@
       "run_id": "20260917T121142Z_a9a69a3ef43e"
     },
     "abf45a27f4bafad0eb264aac33b1e49e9d0404e141966954d0707930d56665e3": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.45740779531102105,
         0.6795887184190553,
-        0.07173891141983318,
-        0.06455376828361989
+        0.09233310052166174,
+        0.07166972793043255
       ],
       "display_key": "qwen3.6-27b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.6-27b",
       "n_items": 12,
       "n_samples": 12,
@@ -1009,14 +1130,14 @@
       "run_id": "20260916T141139Z_abf45a27f4ba"
     },
     "ac52652ff1f09e1f1972a8b751e1b1deca329cb555df54755aada79791bed940": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6417361111111111,
         0.5127110103300581,
-        0.03306211082399865,
-        0.06459320760155234
+        0.03807268153101321,
+        0.08042423628815949
       ],
       "display_key": "qwen-plus-2025-07-28 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen-plus-2025-07-28",
       "n_items": 12,
       "n_samples": 12,
@@ -1024,15 +1145,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T194044Z_ac52652ff1f0"
     },
-    "b35b916c22649e91ded175aede34f3937a16f42a354f7abab01a17bf2b0dfc97": {
+    "b25b19e78ceb3fe7814ac5883239382f1c6e757fe89329495241a25ab521e178": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.6091300100287029,
+        0.438086083059628,
+        0.04177939867778623,
+        0.0411635510827436
+      ],
+      "display_key": "gpt-3.5-turbo-0613 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-3.5-turbo-0613",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "b25b19e78ceb3fe7814ac5883239382f1c6e757fe89329495241a25ab521e178",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T140156Z_b25b19e78ceb"
+    },
+    "b35b916c22649e91ded175aede34f3937a16f42a354f7abab01a17bf2b0dfc97": {
       "coords": [
         0.6062280543530544,
         0.5943180448406931,
-        0.03134706527371011,
-        0.04910757543789796
+        0.04853610852408334,
+        0.0737314840555176
       ],
       "display_key": "qwen3.6-35b-a3b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.6-35b-a3b",
       "n_items": 12,
       "n_samples": 12,
@@ -1040,15 +1178,31 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260916T140418Z_b35b916c2264"
     },
+    "b5a600e549f8aaef4077c383d11a93d6b1f4395af26e0cc0f8f50d3b6f360996": {
+      "coords": [
+        0.47891715945637514,
+        0.5996774327014757,
+        0.058990630830522965,
+        0.09038008381157654
+      ],
+      "display_key": "gpt-oss-120b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-oss-120b",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "b5a600e549f8aaef4077c383d11a93d6b1f4395af26e0cc0f8f50d3b6f360996",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T130652Z_b5a600e549f8"
+    },
     "b5fdfe76425ee50c9f475587863990f2f6fd088d7f64c5c5119e7062a6a1396b": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.552530712157149,
         0.63810610515893,
-        0.0377567739081018,
-        0.08012242145033936
+        0.053278822950175,
+        0.08499253722116974
       ],
       "display_key": "gpt-5.2 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5.2",
       "n_items": 12,
       "n_samples": 12,
@@ -1056,15 +1210,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260917T125001Z_b5fdfe76425e"
     },
-    "bca0745bdc1554718d57891098f366214f05e9e896007a916d14a06efa33471a": {
+    "b6966daf09695284896ac4f0dda90cadb5e6fce5a1a77b576b290089050d0c9e": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.48177082177082176,
+        0.4976680628265054,
+        0.03020402680981063,
+        0.05335291530014508
+      ],
+      "display_key": "gpt-4.1-nano (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-4.1-nano",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "b6966daf09695284896ac4f0dda90cadb5e6fce5a1a77b576b290089050d0c9e",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T134036Z_b6966daf0969"
+    },
+    "bca0745bdc1554718d57891098f366214f05e9e896007a916d14a06efa33471a": {
       "coords": [
         0.5778139029180694,
         0.6959770802908057,
-        0.034466398666598765,
-        0.07823187669222507
+        0.03666290866643542,
+        0.07382269298741832
       ],
       "display_key": "qwen3-max-thinking (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-max-thinking",
       "n_items": 12,
       "n_samples": 12,
@@ -1073,14 +1244,14 @@
       "run_id": "20260916T145109Z_bca0745bdc15"
     },
     "be8b6978ea49ace083544a82e1837e17898ca264b959e08939da01a63424e2f9": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.56922050588427,
         0.7223026320129816,
-        0.02710061973263113,
-        0.0504019572127584
+        0.036665367096187215,
+        0.053812885345722886
       ],
       "display_key": "gpt-5 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5",
       "n_items": 12,
       "n_samples": 12,
@@ -1089,14 +1260,14 @@
       "run_id": "20260917T125811Z_be8b6978ea49"
     },
     "c2911249c065c9b0cd2f69104d1f931bf8783940bd503fd60aa99ec6c6c0a761": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5489586575370888,
         0.6356739354917721,
-        0.043048462200454045,
-        0.08272361735803685
+        0.05257011593980756,
+        0.0883451278287498
       ],
       "display_key": "gpt-5.6-terra (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5.6-terra",
       "n_items": 12,
       "n_samples": 12,
@@ -1105,14 +1276,14 @@
       "run_id": "20260917T123400Z_c2911249c065"
     },
     "c4e310179ab86b9d786c221d8bab6b6891f42d18836a8affc64249769eaffdef": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5713445083420574,
         0.5644094213660266,
-        0.022694588339844418,
-        0.07410136506739047
+        0.04068128275908349,
+        0.08447489368900887
       ],
       "display_key": "deepseek-v3.2 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "deepseek/deepseek-v3.2",
       "n_items": 12,
       "n_samples": 12,
@@ -1121,14 +1292,14 @@
       "run_id": "20260917T114916Z_c4e310179ab8"
     },
     "c64ced76e82ec32cf6be896420d813403a95a421474eefcbbcbba421f8189192": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.48767589171684006,
         0.6482142857142857,
-        0.024847625255712682,
-        0.0636935529346349
+        0.04852805951852839,
+        0.06690143204728374
       ],
       "display_key": "muse-glimmer-30b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "meta/muse-glimmer-30b",
       "n_items": 12,
       "n_samples": 12,
@@ -1137,14 +1308,14 @@
       "run_id": "20260917T111805Z_c64ced76e82e"
     },
     "c7e906b267d13cb638b0a646e9643e15bd8917152cb4ef6a2e888ba309501565": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5803524402579809,
         0.6040068811440846,
-        0.03394817417921382,
-        0.07258813270003692
+        0.04571011970861469,
+        0.08797307424268631
       ],
       "display_key": "deepseek-v3.2-exp (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "deepseek/deepseek-v3.2-exp",
       "n_items": 12,
       "n_samples": 12,
@@ -1153,14 +1324,14 @@
       "run_id": "20260917T115739Z_c7e906b267d1"
     },
     "cc5d6fdd3ce85c73322e963fe44186c44015427f93cdbcecec838da8b2dd4ab4": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5896480994850559,
         0.5981282109666797,
-        0.03137406859274463,
-        0.08079858766631393
+        0.035112198239544395,
+        0.08647066879117997
       ],
       "display_key": "deepseek-chat-v3-0324 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "deepseek/deepseek-chat-v3-0324",
       "n_items": 12,
       "n_samples": 12,
@@ -1169,14 +1340,14 @@
       "run_id": "20260917T122110Z_cc5d6fdd3ce8"
     },
     "cd5db529649a179032180cecafe4fd98aff124ee3654f7d60996de704e2b63ef": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.4988977072310405,
         0.6262540369683227,
-        0.006279760963488564,
-        0.04730514024812738
+        0.01537866158910887,
+        0.05342525613259921
       ],
       "display_key": "gemini-3.7-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-3.7-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -1185,14 +1356,14 @@
       "run_id": "20260916T172946Z_cd5db529649a"
     },
     "d21d1e81010d87b7f79bd9ceb0d5bb226485fe6393e266e169474968e6bf26f8": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5886813794915646,
         0.6339803982919925,
-        0.04261590693561221,
-        0.04660781411126606
+        0.04800287084122153,
+        0.07143925775678789
       ],
       "display_key": "deepseek-v4-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "deepseek/deepseek-v4-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -1201,14 +1372,14 @@
       "run_id": "20260917T112521Z_d21d1e81010d"
     },
     "d4580ea120a65129dc484875ee13aa8a721bb133a93a18b19f974cc876f00178": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.619008820472186,
         0.6035800722347154,
-        0.020634824655178182,
-        0.07295306220868648
+        0.0369775280569868,
+        0.08938873815444547
       ],
       "display_key": "deepseek-chat-v3.1 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "deepseek/deepseek-chat-v3.1",
       "n_items": 12,
       "n_samples": 12,
@@ -1217,14 +1388,14 @@
       "run_id": "20260917T121651Z_d4580ea120a6"
     },
     "d81f7e66b3c4c720f8dd80768d3dfc25de6edeaf6a352cfed40e961f21fcfa22": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5535321928702047,
         0.6422322099171051,
-        0.03217817886332268,
-        0.05342139005960689
+        0.05892062733798582,
+        0.06715990340387798
       ],
       "display_key": "glm-5.3 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "z-ai/glm-5.3",
       "n_items": 12,
       "n_samples": 12,
@@ -1233,14 +1404,14 @@
       "run_id": "20260916T161456Z_d81f7e66b3c4"
     },
     "da8a3ff2c0318113bd43c5d8b1813b9d0947fcd6330bfe600ec28a203e6507b8": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5974867724867725,
         0.5792094488085178,
-        0.03608202052858709,
-        0.0970663887466463
+        0.04341830148688508,
+        0.09828751212663685
       ],
       "display_key": "gpt-5.6-luna (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "openai/gpt-5.6-luna",
       "n_items": 12,
       "n_samples": 12,
@@ -1249,14 +1420,14 @@
       "run_id": "20260917T122950Z_da8a3ff2c031"
     },
     "dc09c3fe433c95591b336b279603c546152daf6534d90699323b3bcde754f5bf": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6353621031746031,
         0.5685931857310826,
-        0.035301389540358157,
-        0.055707793544840394
+        0.03688413980467388,
+        0.08024381413619414
       ],
       "display_key": "qwen3-235b-a22b-2507 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3-235b-a22b-2507",
       "n_items": 12,
       "n_samples": 12,
@@ -1265,14 +1436,14 @@
       "run_id": "20260916T195827Z_dc09c3fe433c"
     },
     "dc89e0b249b6189f2f85b9c5eebd98efb1595ea416761f9c2803ca57324275f6": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.3810994858696008,
         0.6397686012218032,
-        0.07770722831755433,
-        0.03612058315515798
+        0.08204078442843406,
+        0.039637685403670346
       ],
       "display_key": "gemini-3.8-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "google/gemini-3.8-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -1281,14 +1452,14 @@
       "run_id": "20260917T123103Z_dc89e0b249b6"
     },
     "e0a9daef251d975c5e805e159f3813dd0c55b3f0919876b828e572b0530bea88": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.48469169991228817,
         0.6190010643383659,
-        0.032452612491036585,
-        0.06512265958871256
+        0.07699729945533007,
+        0.07041604518532184
       ],
       "display_key": "qwen3.5-122b-a10b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.5-122b-a10b",
       "n_items": 12,
       "n_samples": 12,
@@ -1297,14 +1468,14 @@
       "run_id": "20260916T143453Z_e0a9daef251d"
     },
     "e3abbf27f8d036c12dd728740d2c263bb9be98f160437d5af3cb05b33dbfa761": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5255845653943481,
         0.6176120675327024,
-        0.030723613091297796,
-        0.05017065754814348
+        0.03757041296270222,
+        0.06469679141919639
       ],
       "display_key": "qwen3.8-2.4t-a95b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.8-2.4t-a95b",
       "n_items": 12,
       "n_samples": 12,
@@ -1312,15 +1483,32 @@
       "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
       "run_id": "20260917T122025Z_e3abbf27f8d0"
     },
-    "ed8190c48b2a3778bba8afff7381bb9f1578211b5e8f750d21321b62617c82c3": {
+    "eb1402c60a7305f5c9b800e5682ce648f3acc25970eaf798d0c3485b4bb16d48": {
       "ci_method": "combined item and N-response-mean bootstrap",
+      "coords": [
+        0.6174577809885475,
+        0.6028457218832352,
+        0.03261563618849975,
+        0.051118728421761774
+      ],
+      "display_key": "gpt-4o-2024-11-20 (rated)",
+      "eval_version": "wvs-score-all-options-v1",
+      "model": "openai/gpt-4o-2024-11-20",
+      "n_items": 12,
+      "n_samples": 12,
+      "protocol_id": "eb1402c60a7305f5c9b800e5682ce648f3acc25970eaf798d0c3485b4bb16d48",
+      "records_path": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl",
+      "run_id": "20260917T134443Z_eb1402c60a73"
+    },
+    "ed8190c48b2a3778bba8afff7381bb9f1578211b5e8f750d21321b62617c82c3": {
       "coords": [
         0.431934218610816,
         0.6881570439623662,
-        0.06843286443972658,
-        0.05955561989504253
+        0.08092059548185657,
+        0.07158456159738981
       ],
       "display_key": "qwen3.8-27b (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.8-27b",
       "n_items": 12,
       "n_samples": 12,
@@ -1329,14 +1517,14 @@
       "run_id": "20260916T134026Z_ed8190c48b2a"
     },
     "f095e0d2dbafdb91b51be3d0b3bd5a597730c8e3c397e0461023c87e924d92f8": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.5078196649029982,
         0.6664359119716262,
-        0.040332760807123835,
-        0.07218684667619854
+        0.04898292658545207,
+        0.07513374670738206
       ],
       "display_key": "qwen3.7-plus (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.7-plus",
       "n_items": 12,
       "n_samples": 12,
@@ -1345,14 +1533,14 @@
       "run_id": "20260916T134925Z_f095e0d2dbaf"
     },
     "fa37fc90604e5032183ec460bcc2632507566c3be3e9085f61a6ca85582b7d47": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.6514346395123706,
         0.583014517676874,
-        0.04021271468677619,
-        0.04160867116289502
+        0.044355827535678856,
+        0.07772092035914374
       ],
       "display_key": "qwen3.6-flash (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.6-flash",
       "n_items": 12,
       "n_samples": 12,
@@ -1361,14 +1549,14 @@
       "run_id": "20260916T140130Z_fa37fc90604e"
     },
     "fa9ff591d389ad2d8a4b7e3fc1410ed588508fe286430c06a941180b0590422b": {
-      "ci_method": "combined item and N-response-mean bootstrap",
       "coords": [
         0.4805424128340796,
         0.6905543787488233,
-        0.03427460911867346,
-        0.06690339494976041
+        0.08346396425450253,
+        0.07197747047181104
       ],
       "display_key": "qwen3.6-max-preview (rated)",
+      "eval_version": "wvs-score-all-options-v1",
       "model": "qwen/qwen3.6-max-preview",
       "n_items": 12,
       "n_samples": 12,

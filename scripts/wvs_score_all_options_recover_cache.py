@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 
 from moralmaps.iw_axes import X_AXIS, Y_AXIS, resolve_items
-from moralmaps.rated_cache import merge_completed, update_coords
+from moralmaps.rated_cache import merge_completed, update_coords, update_eval_versions
 from wvs_map import load_wvs_all, model_coord_ci
 
 CACHE = Path("slop/research/wvs/20260916_openrouter/wvs_iw_rated.json")
@@ -101,6 +101,8 @@ def main() -> None:
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--refresh-ci", action="store_true",
                         help="recompute only existing complete panels' coordinate CI summaries from the ledger")
+    parser.add_argument("--stamp-eval-version", action="store_true",
+                        help="add score-all-options v1 provenance to cache entries recovered from the ledger")
     args = parser.parse_args()
     if args.smoke:
         concurrency_smoke()
@@ -120,6 +122,8 @@ def main() -> None:
         merged = update_coords(CACHE, {key: entry["coords"] for key, entry in overlaps.items()})
     else:
         merged = merge_completed(CACHE, additions)
+    if args.stamp_eval_version:
+        merged = update_eval_versions(CACHE, {key: "wvs-score-all-options-v1" for key in entries})
     preserved = {key: merged["completed"][key] for key in existing}
     preserved_hash = hashlib.sha256(json.dumps({key: stable_entry(value) for key, value in preserved.items()},
                                                sort_keys=True, separators=(",", ":")).encode()).hexdigest()
@@ -131,6 +135,7 @@ def main() -> None:
         "existing_entries_sha256_after": preserved_hash,
         "new_complete_runs_added": len(additions),
         "ci_summaries_refreshed": len(overlaps) if args.refresh_ci else 0,
+        "eval_versions_stamped": len(entries) if args.stamp_eval_version else 0,
         "new_protocol_ids": sorted(additions),
         "new_models": sorted(entry["model"] for entry in additions.values()),
         "overlap_complete_runs": len(overlaps),

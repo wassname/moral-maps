@@ -37,3 +37,11 @@ def update_coords(path: Path, coords: dict[str, list[float]]) -> dict:
             completed[protocol_id]["coords"] = values
             completed[protocol_id]["ci_method"] = "combined item and N-response-mean bootstrap"
     return _write_locked(path, update)
+
+
+def update_eval_versions(path: Path, versions: dict[str, str]) -> dict:
+    """Add evaluator provenance without changing cached coordinates or run records."""
+    def update(completed: dict[str, dict]) -> None:
+        for protocol_id, version in versions.items():
+            completed[protocol_id]["eval_version"] = version
+    return _write_locked(path, update)

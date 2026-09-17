@@ -88,7 +88,10 @@ function ReleaseScatter({ data, hidden, field, title, axisMode }) {
   }, [axisMode, visible]);
   const frontierPlacement = useMemo(() => {
     const bounds = { left, right: width - right, top, bottom: height - bottom };
-    const taken = plotted.map(model => box(plotX(xValue(model)), valueY(coordinate(model)), 16, 16));
+    const taken = [
+      ...plotted.map(model => box(plotX(xValue(model)), valueY(coordinate(model)), 16, 16)),
+      ...(fit ? [box(left + 66, top + 9, 128, 18)] : []),
+    ];
     const placement = {};
     for (const model of frontier) {
       const anchor = { x: plotX(xValue(model)), y: valueY(coordinate(model)) };
@@ -213,7 +216,7 @@ function Map({ data }) {
         {data.zone_hulls.map(zone => <text key={zone.name} className="zone-label" x={labels[`zone:${zone.name}`].cx} y={labels[`zone:${zone.name}`].cy + 5} textAnchor="middle" fill={zone.color}>{zone.name}</text>)}
         {Object.entries(groups).map(([family, models]) => <g key={family} data-family={family} display={hidden.has(family) ? 'none' : 'inline'}>{models.map(model => <ModelMarker key={model.name} model={model} placement={labels} geometry={geometry} setActive={setActive} clearActive={clearActive} markerRef={model.name === focusName ? focusRef : null} logo={data.logos[model.family]} />)}</g>)}
         <g className="poles"><line x1={xMedian} y1="62" x2={xMedian} y2={geometry.bounds.top} markerEnd="url(#arrow)" /><line x1={xMedian} y1={geometry.bounds.bottom} x2={xMedian} y2="838" markerEnd="url(#arrow)" /><line x1="64" y1={yMedian} x2={geometry.bounds.left} y2={yMedian} markerEnd="url(#arrow)" /><line x1={geometry.bounds.right} y1={yMedian} x2="1184" y2={yMedian} markerEnd="url(#arrow)" /><text x={xMedian} y="40" textAnchor="middle">{data.axis.y[1]}</text><text x={xMedian} y="870" textAnchor="middle">{data.axis.y[0]}</text><text x="25" y={yMedian + 7}>{data.axis.x[0]}</text><text x="1136" y={yMedian + 7} textAnchor="end">{data.axis.x[1]}</text></g>
-        <text className="map-title" x={geometry.bounds.left + 8} y={geometry.bounds.bottom - 54}>{data.title.split('\n').map((line, index) => <tspan key={line} x={geometry.bounds.left + 8} dy={index ? 17 : 0}>{line}</tspan>)}</text>
+        <text className="map-title" x={geometry.bounds.left + 8} y={geometry.bounds.bottom - 78}>{data.title.split('\n').map((line, index) => <tspan key={line} x={geometry.bounds.left + 8} dy={index ? 17 : 0}>{line}</tspan>)}</text>
         <text className="map-note" x={geometry.bounds.left + 8} y={geometry.bounds.bottom - 34} textAnchor="start">{data.note.split('\n').map((line, index) => <tspan key={line} x={geometry.bounds.left + 8} dy={index ? 11 : 0}>{line}</tspan>)}</text>
       </svg>
       <Tooltip active={active} geometry={geometry} />

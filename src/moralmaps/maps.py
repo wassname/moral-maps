@@ -298,7 +298,8 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
                    model_labels: dict[str, str] | None = None,
                    steer: dict[str, tuple[float, float, str]] | None = None,
                    emphasize: set[str] | None = None,
-                   title: str | None = None, note: str | None = None):
+                   title: str | None = None, note: str | None = None,
+                   title_y: float = 0.075, note_y: float = 0.02):
     """The interpretable "4-value map": two NAMED axes with four pole signposts through the human
     MEDIAN crosshair, Economist-style zone hulls (the 4 most-separate zones), zone-coloured dots, and
     auto-placed labels (landmarks + corner outliers + one representative per zone + any models; see
@@ -420,10 +421,10 @@ def plot_value_map(display: str, countries: list[str], P: np.ndarray,
     # INSIDE the axes, in the empty bottom-left corner, so a crop of the PNG can't strip the attribution
     # and there's no external white band. -- Claude
     if title:
-        ax.text(0.012, 0.075, title, transform=ax.transAxes, ha="left", va="bottom",
+        ax.text(0.012, title_y, title, transform=ax.transAxes, ha="left", va="bottom",
                 fontsize=11, fontweight="bold", color="#333", zorder=11, linespacing=1.05)
     if note:
-        ax.text(0.012, 0.02, note, transform=ax.transAxes, ha="left", va="bottom",
+        ax.text(0.012, note_y, note, transform=ax.transAxes, ha="left", va="bottom",
                 fontsize=7.5, color="#8a857a", zorder=11, linespacing=1.1)
     return fig
 

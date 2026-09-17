@@ -57,15 +57,27 @@ def main() -> None:
     assert data["capability_x"]["fetched_utc"] == "2026-09-17T10:13:20Z"
     capability_matched = [model for model in data["models"] if model["provenance"]["hle_score"] is not None]
     assert len(capability_matched) == data["capability_x"]["matched_models"] == 46
+    canonical_models = [model for model in data["models"]
+                        if model["provenance"]["coordinate_provenance"] == "canonical score-all-options"]
+    historical_models = [model for model in data["models"]
+                         if model["provenance"]["coordinate_provenance"] == "historical rounded coordinate"]
+    assert len(canonical_models) == 96
+    assert len(historical_models) == 12
+    assert all(model["provenance"]["eval_version"] == "wvs-score-all-options-v1"
+               for model in canonical_models)
+    assert all(model["provenance"]["eval_version"] is None for model in historical_models)
+    assert all("reliability" not in str(model["provenance"]["protocol_id"])
+               for model in canonical_models)
     assert len(data["countries"]) == 90
     assert len(data["zone_hulls"]) == 4
     assert len(data["latest_by_family"]) == 13
     assert all(len(zone["points"]) >= 30 for zone in data["zone_hulls"])
-    dated = [model for model in data["models"] if model["provenance"]["release_created"]]
-    grok_dates = {model["name"]: model["provenance"]["release_created"] for model in data["models"] if model["name"] in {"grok-4.20", "grok-4.3"}}
-    assert grok_dates == {"grok-4.20": "2026-03-31", "grok-4.3": "2026-04-30"}
-    assert all(model["provenance"]["release_source"].startswith("saved OpenRouter catalog 2026-09-17: x-ai/")
-               for model in data["models"] if model["name"] in grok_dates)
+    dated = sorted((model for model in data["models"] if model["provenance"]["release_created"]),
+                   key=lambda model: (model["provenance"]["release_created"], model["name"]))
+    grok_dates = {model["name"]: model["provenance"]["release_created"] for model in data["models"] if model["family"] == "grok"}
+    assert grok_dates == {"grok-4.20": "2026-03-31", "grok-4.3": "2026-04-30",
+                          "grok-4.5": "2026-07-08", "grok-4.6": "2026-08-12"}
+    assert data["latest_by_family"]["grok"]["name"] == "grok-4.6"
     families = {model["family"] for model in data["models"]}
 
     with sync_playwright() as playwright:
@@ -130,9 +142,20 @@ def main() -> None:
         svg_description(page, '.release-panel[data-coordinate="x"] svg', "release-x-svg-title", "release-x-svg-desc")
         assert page.locator(".release-mark").count() == len(dated) * 2
         assert page.locator(".frontier-label").count() > 0
-        frontier_boxes = page.locator('.frontier-label text').evaluate_all("nodes => nodes.map(node => { const b = node.getBBox(); return [b.x, b.y, b.width, b.height]; })")
-        assert all(x >= 96 and y >= 42 and x + width <= 1165 and y + height <= 272 for x, y, width, height in frontier_boxes)
-        assert all(a[0] + a[2] <= b[0] or b[0] + b[2] <= a[0] or a[1] + a[3] <= b[1] or b[1] + b[3] <= a[1] for index, a in enumerate(frontier_boxes) for b in frontier_boxes[index + 1:])
+        expected_frontier = []
+        best_score = float("-inf")
+        for model in dated:
+            score = model["provenance"]["hle_score"]
+            if score is not None and score > best_score:
+                expected_frontier.append(model["name"])
+                best_score = score
+        for panel in page.locator(".release-panel").all():
+            assert panel.locator(".frontier-label line").count() == 0
+            actual_frontier = panel.locator(".frontier-label").evaluate_all("nodes => nodes.map(node => node.dataset.frontierModel)")
+            assert actual_frontier == expected_frontier, (actual_frontier, expected_frontier)
+            frontier_boxes = panel.locator('.frontier-label text').evaluate_all("nodes => nodes.map(node => { const b = node.getBBox(); return [b.x, b.y, b.width, b.height]; })")
+            assert all(x >= 96 and y >= 42 and x + width <= 1165 and y + height <= 272 for x, y, width, height in frontier_boxes)
+            assert all(a[0] + a[2] <= b[0] or b[0] + b[2] <= a[0] or a[1] + a[3] <= b[1] or b[1] + b[3] <= a[1] for index, a in enumerate(frontier_boxes) for b in frontier_boxes[index + 1:])
         for grok_name in grok_dates:
             assert page.locator(f'[data-release-model="{grok_name}"]').count() == 2
         self_expression_panel = page.locator('.release-panel[data-coordinate="x"]')
@@ -198,7 +221,7 @@ def main() -> None:
         page.screenshot(path=OUT / "wvs_react_root_playwright_keyboard_focus.png", full_page=True)
 
         release_y_marker = page.locator('.release-panel[data-coordinate="y"] [data-release-model="qwen3.8-flash"]')
-        release_y_marker.locator(".model-ring").hover()
+        release_y_marker.focus()
         page.wait_for_selector("#release-y-tooltip")
         assert page.locator("#release-y-tooltip strong").inner_text() == "qwen3.8-flash"
         assert page.locator("#release-y-tooltip span").all_text_contents() == ["Secular-Rational: 0.635", "release 2026-08-26"]
@@ -208,7 +231,7 @@ def main() -> None:
         assert page.locator("#release-y-tooltip").is_visible()
         page.screenshot(path=OUT / "wvs_react_root_playwright_release_panel_keyboard_focus.png", full_page=True)
         release_x_marker = page.locator('.release-panel[data-coordinate="x"] [data-release-model="qwen3.8-flash"]')
-        release_x_marker.locator(".model-ring").hover()
+        release_x_marker.focus()
         page.wait_for_selector("#release-x-tooltip")
         assert release_y_marker.get_attribute("aria-describedby") == "release-y-tooltip"
         assert release_x_marker.get_attribute("aria-describedby") == "release-x-tooltip"
@@ -218,7 +241,7 @@ def main() -> None:
         for grok_name, grok_date in grok_dates.items():
             grok = next(model for model in dated if model["name"] == grok_name)
             grok_marker = page.locator(f'.release-panel[data-coordinate="y"] [data-release-model="{grok_name}"]')
-            grok_marker.locator(".model-ring").hover()
+            grok_marker.focus()
             assert page.locator("#release-y-tooltip strong").inner_text() == grok_name
             assert page.locator("#release-y-tooltip span").all_text_contents() == [
                 f"Secular-Rational: {grok['y']:.3f}", f"release {grok_date}",
@@ -238,10 +261,10 @@ def main() -> None:
         page.screenshot(path=OUT / "wvs_react_playwright_release_fit_qwen_only.png", full_page=True)
 
         page.get_by_role("button", name="qwen", exact=True).click()
-        page.get_by_role("button", name="muse", exact=True).click()
+        page.get_by_role("button", name="inkling", exact=True).click()
         page.wait_for_timeout(100)
         for family in families:
-            expected = "inline" if family == "muse" else "none"
+            expected = "inline" if family == "inkling" else "none"
             assert map_svg.locator(f':scope > g[data-family="{family}"]').get_attribute("display") == expected
         for panel in page.locator(".release-panel").all():
             assert int(panel.locator("svg").get_attribute("data-fit-n")) == 0
@@ -268,12 +291,13 @@ def main() -> None:
     print(json.dumps({
         "root": "React app loaded at /",
         "compatibility": "/wvs/ and /wvs/react/ redirect to the root React app; shared data remains at /wvs/wvs_map_data.json",
-        "shared": {"models": 64, "countries": 90, "buffered_hulls": 4, "latest_labels": 13,
+        "shared": {"models": len(data["models"]), "canonical_score_all_options": len(canonical_models),
+                   "historical_rounded": len(historical_models), "countries": 90, "buffered_hulls": 4, "latest_labels": 13,
                    "numeric_model_country_median_equality": "verified against DOM data attributes"},
         "svg_accessibility": "main map and both release panels have stable title/desc aria-labelledby; descriptions update after family visibility change",
         "qwen_toggle": "clicked, map and dated-panel family groups hidden, country coordinates invariant",
         "tooltip": "map and release-panel pointer hover and focus show panel-specific model name, coordinate, and release date only",
-        "release_panels": {"panels": 2, "dated_models": len(dated), "date_order": "DOM order verified; both catalog-dated Grok models rendered in each panel",
+        "release_panels": {"panels": 2, "dated_models": len(dated), "date_order": "DOM order verified; all four catalog-dated Grok models rendered in each panel",
                            "ols": "line, n, and R squared recompute from currently visible matched models; the Self-expression panel renders negative stored x, so upward means Self-expression; fewer than two distinct x values hide the fit"},
         "capability_panels": {"matched_models": len(capability_matched), "omitted_models": len(data["models"]) - len(capability_matched),
                               "source": data["capability_x"]["source_url"], "fetched_utc": data["capability_x"]["fetched_utc"],
