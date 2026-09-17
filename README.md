@@ -4,66 +4,13 @@ What do an LLM's values look like next to ours? moralmaps puts models through hu
 
 ## Are models moral aliens?
 
-Are they like us? Start with the World Values Survey: its culture map compares societies by how traditional or secular they are, and how much they weigh survival over self-expression.
+Start with the World Values Survey: its culture map compares societies by how traditional or secular they are, and how much they weigh survival over self-expression.
 
-![World Values Survey map: 64 model coordinates cluster toward self-expression (left) and secular-rational values (top), alongside human societies.](docs/img/wvs/wvs_map_iw.png)
+![World Values Survey map: models cluster toward self-expression (left) and secular-rational values (top), alongside human societies.](docs/img/wvs/wvs_map_iw.png)
 
 The models cluster in the upper-left, around and above the Western societies. These are survey answers, not a test of how the models behave outside the survey.
 
-The map combines 17 recovered historical coordinates with 48 newly completed panels. One model name overlaps, giving 64 points. Each new panel contains 12 questions with 12 repeated ratings, with answer order shuffled. Human coordinates are approximated from [GlobalOpinionQA](https://huggingface.co/datasets/Anthropic/llm_global_opinions), using the [axis definitions](src/moralmaps/iw_axes.py).
-
-### New model results
-
-Higher scores mean more self-expression or more secular-rational answers. All rows below are complete panels. GLM 5.3 Flash and Grok 4.5 are excluded because each retained run completed only 143 of 144 responses.
-
-| model | self-expression | secular-rational | comparison |
-|---|---:|---:|---|
-| claude-fable-5.1 | 0.58 | 0.61 | requested target |
-| gpt-6-astra | 0.46 | 0.68 | requested target |
-| deepseek-v4.1-flash | 0.54 | 0.60 | requested target |
-| kimi-k3 | 0.62 | 0.67 | requested target |
-| muse-spark-1.3 | 0.43 | 0.73 | requested target |
-| inkling | 0.56 | 0.69 | requested target, no schema |
-| glm-5.3 | 0.55 | 0.64 | requested target |
-| gemini-3.7-flash | 0.50 | 0.63 | requested target |
-| gpt-5.6-sol | 0.53 | 0.67 | requested target |
-| qwen-2.5-7b-instruct / 72b-instruct | 0.55 / 0.60 | 0.59 / 0.60 | direct-instruct size pair |
-| qwen3-8b / 32b / 235b-a22b | 0.62 / 0.61 / 0.64 | 0.54 / 0.54 / 0.56 | direct-instruct size series |
-| qwen3.5-9b / 122b-a10b / 397b-a17b | 0.50 / 0.48 / 0.54 | 0.59 / 0.62 / 0.65 | direct-instruct size series |
-| qwen3.6-27b / qwen3.7-flash / qwen3.8-27b | 0.46 / 0.65 / 0.43 | 0.68 / 0.59 / 0.69 | releases, not a size series |
-
-[Full coordinates and 95% intervals](docs/img/wvs/wvs_model_ci.md) | [Model IDs and run settings](slop/research/wvs/20260916_openrouter/execution_matrix.md) | [Request ledger](slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl)
-
-The family comparisons are descriptive. Model size and release order do not establish what caused a value difference; Coder and VL variants are separate from direct-instruct models.
-
-<details>
-<summary>How far were the 17 historical models from Western societies?</summary>
-
-These distances use the mean and standard deviations of 29 Western societies. The two z columns give direction and distance on each axis; Mahalanobis distance measures the joint difference while accounting for correlation between the axes. This table covers the historical subset, not all 64 points.
-
-| model | z self-expr | z secular | Mahalanobis |
-|:------|------------:|----------:|------------:|
-| gpt-5.5 | -0.33 | +2.93 | +4.71 |
-| deepseek-v4-pro | +0.54 | +2.61 | +3.32 |
-| grok-4.3 | -0.19 | +2.61 | +4.08 |
-| gemini-2.5-pro | +0.01 | +2.29 | +3.38 |
-| qwen3.7-max | -0.66 | +2.18 | +4.01 |
-| gpt-5.4 | -0.13 | +2.07 | +3.21 |
-| gpt-5.3-chat | +0.21 | +1.96 | +2.69 |
-| gemma-4-31b-it | -0.73 | +1.86 | +3.62 |
-| deepseek-v4-flash | +0.68 | +1.64 | +1.83 |
-| llama-4-maverick | +1.14 | +1.64 | +1.65 |
-| mistral-large-2512 | +1.21 | +1.64 | +1.64 |
-| claude-opus-4.6 | +1.08 | +1.54 | +1.54 |
-| grok-4.20 | +0.81 | +1.43 | +1.47 |
-| claude-opus-4.7 | +0.81 | +1.21 | +1.22 |
-| gemma-3-27b-it | +0.88 | +1.21 | +1.21 |
-| claude-opus-4.8 | +0.94 | +1.00 | +1.04 |
-| llama-4-scout | +1.01 | +0.46 | +1.09 |
-
-[Distances from all regions](docs/img/wvs/wvs_model_outlier_sd.md) | [Calculation](scripts/wvs_outlier_table.py)
-
-</details>
+See [all model results and their uncertainty](docs/img/wvs/wvs_model_ci.md) in one table.
 
 ## Can we steer these values?
 
@@ -105,7 +52,7 @@ The intended value moves, but so do other answers. This is why we need to measur
 
 ## Measurement
 
-The maps use human-comparable survey scores. For local models, we read answer-token probabilities; for APIs without logprobs, we use repeated ratings. We check probability mass on valid answers so broken answer formatting is not mistaken for a value change.
+The maps use human-comparable survey scores. For local models, we read answer-token probabilities; for APIs without logprobs, we use repeated ratings. We check probability mass on valid answers so broken answer formatting is not mistaken for a value change. Human positions on the World Values Survey map are approximated from [GlobalOpinionQA](https://huggingface.co/datasets/Anthropic/llm_global_opinions), using the [axis definitions](src/moralmaps/iw_axes.py).
 
 For steering comparisons, we also want a score that considers both intended changes and side effects. The existing [metric](src/moralmaps/metrics.py) is `sel_gated = (on - 0.1 * off) * coh²`: intended logprob movement minus a smaller penalty for other movement, multiplied by a valid-answer mass check. `si_flips` checks whether the model's chosen answers changed. Logprob movement can be visible even when chosen answers stay the same.
 

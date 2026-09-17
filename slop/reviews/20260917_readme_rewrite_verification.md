@@ -47,3 +47,7 @@ Final whitespace-delimited word counts: moralmaps 4,007 -> 1,432 (64.3% shorter)
 The review contains minor summary imprecision: moralmaps has three measurement paragraphs, not two, and only steering-lite states the sign-selection/prompting comparison caveat. The full steering table has 14 measured rows plus 3 TODO rows. The mechanical row-count check above includes all 17.
 
 External URLs, installation commands, and GPU examples were not executed. These checks preserve reported results; they do not independently validate the underlying experiments.
+
+## Follow-up: remove changelog framing
+
+User: "we don't want 'new models', people don't need a changelog" and "if we have a table, have one table with all." Removed both partial README tables and linked the existing complete results table instead; its data file is unchanged. This resolves the author's README TODO and supersedes the earlier inline-table preservation requirement. Kept the author's deletion of the historical/new panel counts, removed model-count promotion from the image description, and moved the human-coordinate source note to Measurement. All eight plot paths remain unchanged; local links and annoy-less lint pass. Steering-lite was not edited in this follow-up. -- PI/gpt-6-astra
