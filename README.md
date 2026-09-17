@@ -54,9 +54,13 @@ The intended value moves, but so do other answers. This is why we need to measur
 
 ## Measurement
 
-The maps use human-comparable survey scores. For local models, we read answer-token probabilities; for APIs without logprobs, we use repeated ratings. Human positions on the World Values Survey map are approximated from [GlobalOpinionQA](https://huggingface.co/datasets/Anthropic/llm_global_opinions), using the [axis definitions](src/moralmaps/iw_axes.py).
+The maps use human-comparable survey scores. For local models, we read answer-token probabilities; for APIs without logprobs, we use repeated ratings. We check probability mass on valid answers so broken answer formatting is not mistaken for a value change.
 
-For steering, we want to change the target concept in either direction without changing unrelated answers. We measure *steering selectivity*: intended logprob movement minus one tenth of unintended movement, comparing the two steering directions. This can detect small changes even when the chosen answer stays the same. See the [results and measurement details](https://github.com/wassname/steering-lite#results), or the [scoring function](src/moralmaps/metrics.py#L80).
+For steering comparisons, we also want a score that considers both intended changes and side effects. The existing [metric](src/moralmaps/metrics.py) is `sel_gated = (on - 0.1 * off) * coh²`: intended logprob movement minus a smaller penalty for other movement, multiplied by a valid-answer mass check. `si_flips` checks whether the model's chosen answers changed. Logprob movement can be visible even when chosen answers stay the same.
+
+When we steer a concept, we want the relevant answers to change without changing unrelated answers. So we reward movement in the intended direction and subtract a smaller penalty for side effects. We use logprobs because they show small changes even when the model still chooses the same answer.
+
+A possible replacement is [steering F-beta](https://github.com/wassname/steering-lite#a-simpler-score), which treats desired changes as true positives and unwanted changes as false positives. It is still a proposal; the plots and existing results have not been rescored.
 
 ## Install and use
 
