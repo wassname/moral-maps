@@ -1010,3 +1010,19 @@ This is not the first mandatory-reasoning panel. The same ledger records Astra r
 My read: task 1622 was almost certainly a wrapper/config regression despite the Astra precedent, not evidence of a new model-class problem. Nano is only the cheapest protocol diagnostic, with a manifest completion-only ceiling of USD 0.0590, not a priority result. Task 1623 now uses catalog-supported `reasoning.effort=low` plus strict structured output; it is still running, so its result and cost are not evidence yet.
 
 The retry audit will determine whether the priority panels can start.
+
+## 2026-09-17 -- Nano low-reasoning diagnostic completed
+
+This entry records the completed cheapest protocol diagnostic and its offline replay.
+
+Task 1623 ran `openai/gpt-5-nano` with `reasoning.effort=low`, strict structured JSON, 12 WVS items, and 12 planned samples per item. The durable ledger run `20260917T020418Z_7fe76f95937e` has 144 initial `request_completed`, two `request_completed` rescue phases, 144 `answer_parsed`, 12 item results, and zero `request_failed`. Its finish event records `valid_samples: 144`, `failed_samples: 0`, and `rescued_samples: 2`. The complete Pueue log records:
+
+> `cached gpt-5-nano (rated): (0.45, 0.63) +-(0.11, 0.16) 95% CI`
+>
+> `slop/research/wvs/20260917_priority_phase/task_1623_clean.log:26`
+
+The ledger's 146 accepted phases sum to 28,157 prompt tokens, 78,117 completion tokens, 106,274 total tokens, and USD 0.03265465 in provider-reported `usage.cost`; that includes both rescues. The initial final messages for `Homosexuality` sample 4 and `Religion` sample 1 were empty, then their separately logged rescue replies parsed successfully. Each binary WVS item had six canonical and six reversed initial option orders. Task 1625 reran the exact wrapper and logged `cache hit gpt-5-nano (rated): protocol=7fe76f95937e`; the request ledger has no event later than the original run finish, so the replay added no network request record. Sources: `slop/audits/20260917_wvs_gpt5_nano_task_1623_complete_panel.md`, the cited full logs, and the append-only request ledger.
+
+My read: this is very probably a valid exact-protocol mechanics diagnostic and resolves the task 1622 wrapper/config regression. The two rescues are explicit and billed rather than hidden, but their upstream empty-message cause remains unknown. An independent raw-answer review found 11 of 12 Homosexuality pole replies rate every mutually exclusive option identically, producing an expected score 5.57 near the 5.5 midpoint. The parse-completeness result therefore does not validate the self-expression coordinate for priority sequencing.
+
+Priority dispatch is paused pending an explicit content-quality metric and its cheapest diagnostic.
