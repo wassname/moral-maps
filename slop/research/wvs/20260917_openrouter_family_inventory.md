@@ -57,8 +57,8 @@ Live catalog observation:
 |---|---:|---:|---:|---|---|
 | `x-ai/grok-4.6` | 2026-08-12 | 2 | 6 | yes | exists, missing comparable candidate |
 | `x-ai/grok-4.5` | 2026-07-08 | 2 | 6 | yes | exists, missing comparable candidate; saved WVS attempts incomplete |
-| `x-ai/grok-4.3` | 2026-04-30 | 2 | 6 | yes | exists and plotted |
-| `x-ai/grok-4.20` | 2026-03-30 | 2 | 6 | yes | exists and plotted |
+| `x-ai/grok-4.3` | 2026-04-30 | 1.25 | 2.5 | yes | exists and plotted |
+| `x-ai/grok-4.20` | 2026-03-31 | 1.25 | 2.5 | yes | exists and plotted |
 | `x-ai/grok-4.4` | -- | -- | -- | -- | absent from this 2026-09-17 catalog snapshot |
 
 This is a direct absence check in the saved catalog, not proof that no provider will ever host 4.4.

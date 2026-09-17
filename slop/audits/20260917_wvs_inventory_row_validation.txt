@@ -1,0 +1,1 @@
+validated 135 inventory date/price/structured rows against 444 saved catalog records: 0 mismatches
