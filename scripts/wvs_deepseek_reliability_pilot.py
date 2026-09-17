@@ -16,7 +16,7 @@ import numpy as np
 from moralmaps.iw_axes import X_AXIS, Y_AXIS, resolve_items
 from moralmaps.read_api import rated_protocol_identity, read_items_rated
 from wvs_map import _sample_only_coord_se, load_wvs_all, model_coord_ci
-from wvs_score_all_options_refresh import OSS_PROVIDER, release, reserve
+from wvs_score_all_options_refresh import OSS_PROVIDER, reserve, settle_external_reservation
 
 EVAL_VERSION = "wvs-score-all-options-v1"
 MODELS = (
@@ -188,6 +188,14 @@ def pilot_spend() -> Decimal:
     return cost
 
 
+def start_pilot_state() -> None:
+    def update(state: dict) -> None:
+        state.pop("finished_utc", None)
+        state.update({"reserved_usd": str(PILOT_CAP_USD), "started_utc": datetime.now(UTC).isoformat(),
+                      "spent_usd": str(pilot_spend())})
+    pilot_state(update)
+
+
 def v1_coords(model: str) -> list[float]:
     cache = json.loads(CACHE.read_text())["completed"]
     entries = [entry for entry in cache.values() if entry["model"] == model and entry.get("n_samples") == 12]
@@ -218,8 +226,7 @@ def run() -> None:
     items, resolved = rated_items()
     if not reserve({"id": PILOT_RESERVATION_ID, "lane": "deepseek", "reserve_usd": str(PILOT_CAP_USD)}):
         raise RuntimeError("global USD 80 cap would be exceeded by the USD 1 pilot reservation")
-    pilot_state(lambda state: state.update({"reserved_usd": str(PILOT_CAP_USD), "started_utc": datetime.now(UTC).isoformat(),
-                                             "spent_usd": str(pilot_spend())}))
+    start_pilot_state()
     results = {"eval_version": EVAL_VERSION, "models": [], "not_published": True}
     try:
         for row in data["models"]:
@@ -249,7 +256,7 @@ def run() -> None:
             results["models"].append(model_result)
             atomic_json(RESULTS, results)
     finally:
-        release(PILOT_RESERVATION_ID)
+        settle_external_reservation(PILOT_RESERVATION_ID, pilot_spend())
         pilot_state(lambda state: state.update({"reserved_usd": "0", "finished_utc": datetime.now(UTC).isoformat()}))
 
 

@@ -139,10 +139,15 @@ def rated_cost() -> Decimal:
     return total
 
 
+def observed_cost(state: dict) -> Decimal:
+    external = sum(Decimal(value) for value in state.get("external_observed_usd", {}).values())
+    return PRIOR_OBSERVED_USD + max(Decimal(), rated_cost() - DENSE_BASELINE_USD) + external
+
+
 def reserve(row: dict) -> bool:
     with budget_state() as state:
         held = sum(Decimal(value["reserve_usd"]) for value in state["reservations"].values())
-        observed = PRIOR_OBSERVED_USD + max(Decimal(), rated_cost() - DENSE_BASELINE_USD)
+        observed = observed_cost(state)
         required = Decimal(row["reserve_usd"])
         if observed + held + required >= GLOBAL_STOP_USD:
             print(f"stop: observed={observed} held={held} required={required} cap={GLOBAL_STOP_USD}")
@@ -154,6 +159,14 @@ def reserve(row: dict) -> bool:
 def release(model_id: str) -> None:
     with budget_state() as state:
         state["reservations"].pop(model_id, None)
+        state["rated_ledger_cost_usd"] = str(rated_cost())
+        state["reconciled_utc"] = datetime.now(UTC).isoformat()
+
+
+def settle_external_reservation(model_id: str, cost: Decimal) -> None:
+    with budget_state() as state:
+        state["reservations"].pop(model_id, None)
+        state.setdefault("external_observed_usd", {})[model_id] = str(cost)
         state["rated_ledger_cost_usd"] = str(rated_cost())
         state["reconciled_utc"] = datetime.now(UTC).isoformat()
 
