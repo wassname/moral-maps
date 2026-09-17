@@ -60,7 +60,7 @@ For steering comparisons, we also want a score that considers both intended chan
 
 When we steer a concept, we want the relevant answers to change without changing unrelated answers. So we reward movement in the intended direction and subtract a smaller penalty for side effects. We use logprobs because they show small changes even when the model still chooses the same answer.
 
-A possible replacement is [steering F-beta](https://github.com/wassname/steering-lite#a-simpler-score), which treats desired changes as true positives and unwanted changes as false positives. It is still a proposal; the plots and existing results have not been rescored.
+A possible replacement is steering F-beta, which treats desired changes as true positives and unwanted changes as false positives. It is still a proposal; the plots and existing results have not been rescored.
 
 ## Install and use
 
