@@ -1,0 +1,25 @@
+item_id,n_options,comparison,group_sizes,same_partition_as_other_comparison,observed_tv,null_mean_tv,null_p95_tv,null_p99_tv,randomization_p,holm_adjusted_p_24,maxT_adjusted_p_24
+Abortion,10,canonical_vs_reversed,10/10,True,0.39999999999999997,0.326671,0.6000000000000001,0.7000000000000002,0.3382366176338237,1.0,0.3597564024359756
+Abortion,10,schedule_half,10/10,True,0.39999999999999997,0.326671,0.6000000000000001,0.7000000000000002,0.3382366176338237,1.0,0.3597564024359756
+Attending peaceful demonstrations,3,canonical_vs_reversed,11/9,False,0.09090909090909093,0.09997939393939395,0.11111111111111113,0.11111111111111113,1.0,1.0,1.0
+Attending peaceful demonstrations,3,schedule_half,10/10,False,0.09999999999999999,0.1,0.09999999999999999,0.09999999999999999,1.0,1.0,1.0
+"Determination, perseverance",2,canonical_vs_reversed,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+"Determination, perseverance",2,schedule_half,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+God,2,canonical_vs_reversed,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+God,2,schedule_half,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Homosexuality,10,canonical_vs_reversed,10/10,True,0.30000000000000004,0.16778600000000005,0.30000000000000004,0.5,0.3059869401305987,1.0,0.5415245847541524
+Homosexuality,10,schedule_half,10/10,True,0.30000000000000004,0.16778600000000005,0.30000000000000004,0.5,0.3059869401305987,1.0,0.5415245847541524
+Imagination,2,canonical_vs_reversed,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Imagination,2,schedule_half,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Independence,2,canonical_vs_reversed,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Independence,2,schedule_half,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Joining in boycotts,3,canonical_vs_reversed,11/9,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Joining in boycotts,3,schedule_half,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Obedience,2,canonical_vs_reversed,10/10,False,0.09999999999999999,0.1,0.09999999999999999,0.09999999999999999,1.0,1.0,1.0
+Obedience,2,schedule_half,10/10,False,0.09999999999999999,0.1,0.09999999999999999,0.09999999999999999,1.0,1.0,1.0
+Religion,4,canonical_vs_reversed,12/8,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Religion,4,schedule_half,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Signing a petition,3,canonical_vs_reversed,11/9,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+Signing a petition,3,schedule_half,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+dealing with people?,2,canonical_vs_reversed,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
+dealing with people?,2,schedule_half,10/10,False,0.0,0.0,0.0,0.0,1.0,1.0,1.0
