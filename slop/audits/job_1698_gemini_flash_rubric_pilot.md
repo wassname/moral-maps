@@ -6,7 +6,7 @@ Pueue task 1698 ran `scripts/wvs_api/08_gemini_flash_rubric_pilot.sh` in `/works
 
 > why: estimate Gemini Flash WVS sensitivity to reasoning and reversed rubric under one fixed protocol; resolve: audit all 20 cells for completion, route, rescue, cost, and paired shifts before interpretation
 
-The complete cleaned Pueue log was read as `[pq] task 1698: last 444 of 444 clean lines`. The raw Pueue log was also saved and read, 524 lines. The executing branch began at `d64b788e56400ac52755d03fe81ef4ae06250101`; the durable result does not record a Git revision, so the exact runtime revision is likely but not provable from the artifact alone.
+The complete cleaned Pueue log was read as `[pq] task 1698: last 444 of 444 clean lines`. The complete raw Pueue log was also read, 524 lines. Both are durable artifacts: `slop/research/wvs/20260918_gemini_flash_rubric_pilot/pueue_task_1698_clean.log` (SHA-256 `c01d71149ed030188d77500079425db989f997baaf85d7c51185e43e62976e26`) and `pueue_task_1698_raw.log` (SHA-256 `95807828805d0431bc18bf31052bc6a4abdc1e4f75c38653704e55e097f6e648`). The executing branch began at `d64b788e56400ac52755d03fe81ef4ae06250101`; the durable result does not record a Git revision, so the exact runtime revision is likely but not provable from the artifact alone.
 
 The primary raw data are the 20 JSONL files under `slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/`; each preserves requests, full provider responses, parsed answers, per-item distributions, and a `run_finished` event. I programmatically checked all raw event records, then recomputed coordinates from every stored `item_result.p_samples` using `wvs_map.model_coord_ci` and the saved 12 WVS items. The runner is `scripts/wvs_gemini_flash_rubric_pilot.py`; the request and transform implementation is `src/moralmaps/read_api.py:302-499`.
 
@@ -143,6 +143,21 @@ These high-minus-minimum directions do not repeat across releases. The high shif
 
 Binary items use three identity-order and three reversed-order draws. Descriptively, using sample positions 3-5 minus 0-2, with all items retained in each coordinate, produced contrasts from -0.0902 to +0.0632 on Self-expression and -0.1028 to +0.0218 on Secular-Rational across cells. This is too variable, and is entangled with which seed positions fall in each half, to call a positional-bias correction. It is evidence that the binary order control is not negligible at N=6.
 
+### Descriptive release-date fit
+
+The manifest stores release timestamps, in model identity order: 3 Flash Preview, 2025-12-17; 3.5 Flash, 2026-05-19; 3.6 Flash, 2026-07-21; 3.7 Flash, 2026-08-13; and 3.8 Flash, 2026-09-02. I fit unweighted ordinary least squares separately to each cell and coordinate, using those five timestamps expressed as decimal UTC years. RMSE is root mean squared residual on the coordinate scale. The 2D RMSE is `sqrt(mean(residual_x^2 + residual_y^2))` across the five releases.
+
+| cell | Self-expression slope/year | Self-expression R2 | Self-expression RMSE | Secular-Rational slope/year | Secular-Rational R2 | Secular-Rational RMSE | 2D residual RMSE |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| normal minimum | -0.2369 | 0.5210 | 0.0583 | +0.0020 | 0.0004 | 0.0262 | 0.0639 |
+| normal high | +0.0326 | 0.0258 | 0.0515 | -0.0821 | 0.9360 | 0.0055 | 0.0518 |
+| reversed minimum | -0.1458 | 0.2394 | 0.0667 | -0.0083 | 0.0043 | 0.0327 | 0.0743 |
+| reversed high | +0.1353 | 0.3674 | 0.0456 | -0.0345 | 0.5088 | 0.0087 | 0.0464 |
+
+High cells have lower 2D residual RMSE in this five-point descriptive fit: 0.0639 to 0.0518 for normal and 0.0743 to 0.0464 for reversed. This is not one stable better family trend. The fitted axis changes: normal minimum has Self-expression R2 0.5210 and Secular-Rational R2 0.0004, whereas normal high has Self-expression R2 0.0258 and Secular-Rational R2 0.9360. Reversed minimum and high similarly differ in both slopes and concentration of fit.
+
+The model release order, model identity, and fixed wall-clock execution order are confounded. Cells ran serially in the same order for every model, `normal_minimum`, `normal_high`, `reversed_minimum`, then `reversed_high`, during one 108-minute interval; these are not independent release-date observations. N is five releases. The all-equal rates also changed from 127/360 (35.3%) to 138/360 (38.3%) between normal minimum and high, and from 171/360 (47.5%) to 150/360 (41.7%) between reversed minimum and high. Therefore the smaller residual cannot be attributed to reasoning depth rather than release identity, wall-clock order, or response style.
+
 ### Rescues and complete-response inspection
 
 All four rescues were Gemini 3.8 high-effort responses. Their initial responses were a valid provider `stop` but lacked a parse-valid JSON rating object, so the runner sent an assistant-turn tail plus the forcing prompt. The rescue use is visible in `src/moralmaps/read_api.py:390-421`. For the three reversed-high Homosexuality rescues, recorded reasoning-token counts were 1,966, 1,912, and 512; all three rescue messages stopped and yielded parse-valid JSON. This is better than dropping samples, but these repaired second turns are not exchangeable with ordinary one-turn samples.
@@ -221,6 +236,6 @@ Epistemic context: this is an independent artifact and code review, not a new me
 7. Bugs requiring code changes: none demonstrated. The observed limitations are measurement design, not a demonstrated parser, route, transform, or ledger fault.
 8. Misconceptions requiring reinterpretation: high means substantially more exposed reasoning tokens but not necessarily a causal moral-coordinate treatment; low is not equivalent to no reasoning; inverse rubric arithmetic does not guarantee rubric invariance; provider name does not identify quantization.
 9. What would change the verdict: a counterbalanced run retaining direction and magnitude within paired uncertainty would raise confidence in a reasoning effect. A randomized flat-vector diagnostic explaining the differences would instead make response style the leading account.
-10. Recommended sequence: preserve and commit this branch-contained evidence, append observed costs to the journal, and do not change the published map. Before another paid run, compare a small counterbalanced two-release follow-up with a flat-vector diagnostic. Do not combine a larger N, a token-limit change, a new wording, different provider, and counterbalancing in one experiment, because it would destroy attribution.
+10. Recommended sequence: preserve and commit this branch-contained evidence, including both full Pueue logs, append observed costs and the descriptive release-date fit to the journal, and do not change the published map. Before another paid run, compare a small counterbalanced two-release follow-up with a flat-vector diagnostic. Do not combine a larger N, a token-limit change, a new wording, different provider, and counterbalancing in one experiment, because it would destroy attribution.
 
 -- PI[gpt-5.6-terra]
