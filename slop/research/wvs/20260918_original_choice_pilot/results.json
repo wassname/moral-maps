@@ -1,0 +1,793 @@
+{
+  "budget": {
+    "conservative_spent_usd": "0.30971775",
+    "failed_phases_charged_at_bound": 0,
+    "provider_reported_spent_usd": "0.30971775"
+  },
+  "eval_version": "wvs-original-choice-pilot-v1",
+  "merge_into_primary": false,
+  "models": [
+    {
+      "cannot_answer_samples": 76,
+      "failed_samples": 0,
+      "model": "google/gemini-3-flash-preview",
+      "per_question": {
+        "Abortion": {
+          "cannot_answer": 24,
+          "coverage": 0.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.0,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 0
+        },
+        "Attending peaceful demonstrations": {
+          "cannot_answer": 13,
+          "coverage": 0.4583333333333333,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.2916666666666667,
+            "Might do": 0.16666666666666666,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 11
+        },
+        "ChildQualities": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "important_rates": {
+            "Determination, perseverance": 0.875,
+            "Feeling of responsibility": 0.8333333333333334,
+            "Good manners": 0.25,
+            "Hard work": 0.4166666666666667,
+            "Imagination": 0.5833333333333334,
+            "Independence": 1.0,
+            "Not being selfish (unselfishness)": 0.041666666666666664,
+            "Obedience": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 1.0
+          },
+          "is_list": true,
+          "n": 24,
+          "substantive": 24
+        },
+        "God": {
+          "cannot_answer": 19,
+          "coverage": 0.20833333333333334,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No": 0.08333333333333333,
+            "No answer": 0.0,
+            "Yes": 0.125
+          },
+          "substantive": 5
+        },
+        "Homosexuality": {
+          "cannot_answer": 1,
+          "coverage": 0.9583333333333334,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.9583333333333334,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 23
+        },
+        "Joining in boycotts": {
+          "cannot_answer": 14,
+          "coverage": 0.4166666666666667,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.25,
+            "Might do": 0.16666666666666666,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 10
+        },
+        "Religion": {
+          "cannot_answer": 3,
+          "coverage": 0.875,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No answer": 0.0,
+            "Not at all important": 0.5416666666666666,
+            "Not very important": 0.0,
+            "Rather important": 0.0,
+            "Very important": 0.3333333333333333
+          },
+          "substantive": 21
+        },
+        "Signing a petition": {
+          "cannot_answer": 2,
+          "coverage": 0.9166666666666666,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.875,
+            "Might do": 0.041666666666666664,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 22
+        },
+        "dealing with people?": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Most people can be trusted": 0.7916666666666666,
+            "Need to be very careful": 0.20833333333333334,
+            "No answer": 0.0
+          },
+          "substantive": 24
+        }
+      },
+      "protocol_id": "575b0c6497e6d148bfb4989ba46e710cbe0132c5568ebd6e60973abb1475a0e3",
+      "records": "slop/research/wvs/20260918_original_choice_pilot/records/google__gemini-3-flash-preview/original_choice.jsonl",
+      "rescued_samples": 0,
+      "run_id": "20260918T233134Z_575b0c6497e6",
+      "valid_samples": 216
+    },
+    {
+      "cannot_answer_samples": 16,
+      "failed_samples": 0,
+      "model": "google/gemini-3.5-flash",
+      "per_question": {
+        "Abortion": {
+          "cannot_answer": 9,
+          "coverage": 0.625,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.041666666666666664,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.25,
+            "Don't know": 0.0,
+            "Never justifiable": 0.3333333333333333,
+            "No answer": 0.0
+          },
+          "substantive": 15
+        },
+        "Attending peaceful demonstrations": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.8333333333333334,
+            "Might do": 0.16666666666666666,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 24
+        },
+        "ChildQualities": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "important_rates": {
+            "Determination, perseverance": 1.0,
+            "Feeling of responsibility": 1.0,
+            "Good manners": 0.8333333333333334,
+            "Hard work": 0.0,
+            "Imagination": 0.041666666666666664,
+            "Independence": 1.0,
+            "Not being selfish (unselfishness)": 0.125,
+            "Obedience": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 1.0
+          },
+          "is_list": true,
+          "n": 24,
+          "substantive": 24
+        },
+        "God": {
+          "cannot_answer": 7,
+          "coverage": 0.7083333333333334,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No": 0.25,
+            "No answer": 0.0,
+            "Yes": 0.4583333333333333
+          },
+          "substantive": 17
+        },
+        "Homosexuality": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 1.0,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 24
+        },
+        "Joining in boycotts": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.9583333333333334,
+            "Might do": 0.041666666666666664,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 24
+        },
+        "Religion": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No answer": 0.0,
+            "Not at all important": 0.2916666666666667,
+            "Not very important": 0.0,
+            "Rather important": 0.20833333333333334,
+            "Very important": 0.5
+          },
+          "substantive": 24
+        },
+        "Signing a petition": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.9583333333333334,
+            "Might do": 0.041666666666666664,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 24
+        },
+        "dealing with people?": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Most people can be trusted": 0.6666666666666666,
+            "Need to be very careful": 0.3333333333333333,
+            "No answer": 0.0
+          },
+          "substantive": 24
+        }
+      },
+      "protocol_id": "87a37074de5b2b0c25054bf0858df8c6f7e10fea7fbbff128bea0ea25f50f8e0",
+      "records": "slop/research/wvs/20260918_original_choice_pilot/records/google__gemini-3.5-flash/original_choice.jsonl",
+      "rescued_samples": 0,
+      "run_id": "20260918T233643Z_87a37074de5b",
+      "valid_samples": 216
+    },
+    {
+      "cannot_answer_samples": 60,
+      "failed_samples": 0,
+      "model": "google/gemini-3.6-flash",
+      "per_question": {
+        "Abortion": {
+          "cannot_answer": 24,
+          "coverage": 0.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.0,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 0
+        },
+        "Attending peaceful demonstrations": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.08333333333333333,
+            "Might do": 0.9166666666666666,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 24
+        },
+        "ChildQualities": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "important_rates": {
+            "Determination, perseverance": 0.9583333333333334,
+            "Feeling of responsibility": 1.0,
+            "Good manners": 0.625,
+            "Hard work": 0.08333333333333333,
+            "Imagination": 0.3333333333333333,
+            "Independence": 1.0,
+            "Not being selfish (unselfishness)": 0.0,
+            "Obedience": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 1.0
+          },
+          "is_list": true,
+          "n": 24,
+          "substantive": 24
+        },
+        "God": {
+          "cannot_answer": 23,
+          "coverage": 0.041666666666666664,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No": 0.041666666666666664,
+            "No answer": 0.0,
+            "Yes": 0.0
+          },
+          "substantive": 1
+        },
+        "Homosexuality": {
+          "cannot_answer": 8,
+          "coverage": 0.6666666666666666,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.6666666666666666,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 16
+        },
+        "Joining in boycotts": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.375,
+            "Might do": 0.625,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 24
+        },
+        "Religion": {
+          "cannot_answer": 5,
+          "coverage": 0.7916666666666666,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No answer": 0.0,
+            "Not at all important": 0.375,
+            "Not very important": 0.0,
+            "Rather important": 0.16666666666666666,
+            "Very important": 0.25
+          },
+          "substantive": 19
+        },
+        "Signing a petition": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 1.0,
+            "Might do": 0.0,
+            "No answer": 0.0,
+            "Would never do": 0.0
+          },
+          "substantive": 24
+        },
+        "dealing with people?": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Most people can be trusted": 0.125,
+            "Need to be very careful": 0.875,
+            "No answer": 0.0
+          },
+          "substantive": 24
+        }
+      },
+      "protocol_id": "02e9b5529e55661b3f8c9a8837ac319abcce6cc81b86f480c4f729ff13ef43ab",
+      "records": "slop/research/wvs/20260918_original_choice_pilot/records/google__gemini-3.6-flash/original_choice.jsonl",
+      "rescued_samples": 0,
+      "run_id": "20260918T234203Z_02e9b5529e55",
+      "valid_samples": 216
+    },
+    {
+      "cannot_answer_samples": 118,
+      "failed_samples": 0,
+      "model": "google/gemini-3.7-flash",
+      "per_question": {
+        "Abortion": {
+          "cannot_answer": 24,
+          "coverage": 0.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.0,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 0
+        },
+        "Attending peaceful demonstrations": {
+          "cannot_answer": 14,
+          "coverage": 0.4166666666666667,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.0,
+            "Might do": 0.041666666666666664,
+            "No answer": 0.0,
+            "Would never do": 0.375
+          },
+          "substantive": 10
+        },
+        "ChildQualities": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "important_rates": {
+            "Determination, perseverance": 1.0,
+            "Feeling of responsibility": 1.0,
+            "Good manners": 0.4166666666666667,
+            "Hard work": 0.0,
+            "Imagination": 0.5,
+            "Independence": 1.0,
+            "Not being selfish (unselfishness)": 0.08333333333333333,
+            "Obedience": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 1.0
+          },
+          "is_list": true,
+          "n": 24,
+          "substantive": 24
+        },
+        "God": {
+          "cannot_answer": 24,
+          "coverage": 0.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No": 0.0,
+            "No answer": 0.0,
+            "Yes": 0.0
+          },
+          "substantive": 0
+        },
+        "Homosexuality": {
+          "cannot_answer": 18,
+          "coverage": 0.25,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.25,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 6
+        },
+        "Joining in boycotts": {
+          "cannot_answer": 12,
+          "coverage": 0.5,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.0,
+            "Might do": 0.16666666666666666,
+            "No answer": 0.0,
+            "Would never do": 0.3333333333333333
+          },
+          "substantive": 12
+        },
+        "Religion": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No answer": 0.0,
+            "Not at all important": 1.0,
+            "Not very important": 0.0,
+            "Rather important": 0.0,
+            "Very important": 0.0
+          },
+          "substantive": 24
+        },
+        "Signing a petition": {
+          "cannot_answer": 6,
+          "coverage": 0.75,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.08333333333333333,
+            "Might do": 0.0,
+            "No answer": 0.0,
+            "Would never do": 0.6666666666666666
+          },
+          "substantive": 18
+        },
+        "dealing with people?": {
+          "cannot_answer": 20,
+          "coverage": 0.16666666666666666,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Most people can be trusted": 0.16666666666666666,
+            "Need to be very careful": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 4
+        }
+      },
+      "protocol_id": "6f7274ed858a89fb312d5e147eeb7b2cf3c077697eec1c295788a7ebca9c77e4",
+      "records": "slop/research/wvs/20260918_original_choice_pilot/records/google__gemini-3.7-flash/original_choice.jsonl",
+      "rescued_samples": 0,
+      "run_id": "20260918T234805Z_6f7274ed858a",
+      "valid_samples": 216
+    },
+    {
+      "cannot_answer_samples": 87,
+      "failed_samples": 0,
+      "model": "google/gemini-3.8-flash",
+      "per_question": {
+        "Abortion": {
+          "cannot_answer": 24,
+          "coverage": 0.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.0,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 0
+        },
+        "Attending peaceful demonstrations": {
+          "cannot_answer": 2,
+          "coverage": 0.9166666666666666,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.0,
+            "Might do": 0.4166666666666667,
+            "No answer": 0.0,
+            "Would never do": 0.5
+          },
+          "substantive": 22
+        },
+        "ChildQualities": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "important_rates": {
+            "Determination, perseverance": 0.9583333333333334,
+            "Feeling of responsibility": 1.0,
+            "Good manners": 0.2916666666666667,
+            "Hard work": 0.0,
+            "Imagination": 0.5833333333333334,
+            "Independence": 1.0,
+            "Not being selfish (unselfishness)": 0.16666666666666666,
+            "Obedience": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 1.0
+          },
+          "is_list": true,
+          "n": 24,
+          "substantive": 24
+        },
+        "God": {
+          "cannot_answer": 24,
+          "coverage": 0.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No": 0.0,
+            "No answer": 0.0,
+            "Yes": 0.0
+          },
+          "substantive": 0
+        },
+        "Homosexuality": {
+          "cannot_answer": 12,
+          "coverage": 0.5,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.5,
+            "Don't know": 0.0,
+            "Never justifiable": 0.0,
+            "No answer": 0.0
+          },
+          "substantive": 12
+        },
+        "Joining in boycotts": {
+          "cannot_answer": 5,
+          "coverage": 0.7916666666666666,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.0,
+            "Might do": 0.5416666666666666,
+            "No answer": 0.0,
+            "Would never do": 0.25
+          },
+          "substantive": 19
+        },
+        "Religion": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "No answer": 0.0,
+            "Not at all important": 1.0,
+            "Not very important": 0.0,
+            "Rather important": 0.0,
+            "Very important": 0.0
+          },
+          "substantive": 24
+        },
+        "Signing a petition": {
+          "cannot_answer": 0,
+          "coverage": 1.0,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Have done": 0.2916666666666667,
+            "Might do": 0.0,
+            "No answer": 0.0,
+            "Would never do": 0.7083333333333334
+          },
+          "substantive": 24
+        },
+        "dealing with people?": {
+          "cannot_answer": 20,
+          "coverage": 0.16666666666666666,
+          "is_list": false,
+          "n": 24,
+          "option_frequencies": {
+            "Don't know": 0.0,
+            "Most people can be trusted": 0.041666666666666664,
+            "Need to be very careful": 0.125,
+            "No answer": 0.0
+          },
+          "substantive": 4
+        }
+      },
+      "protocol_id": "b36e76786beafdbe94697bfb4297c69dc06786b52473da03e21168e16ecf525d",
+      "records": "slop/research/wvs/20260918_original_choice_pilot/records/google__gemini-3.8-flash/original_choice.jsonl",
+      "rescued_samples": 0,
+      "run_id": "20260918T232000Z_b36e76786bea",
+      "valid_samples": 216
+    }
+  ],
+  "not_published": true,
+  "schema": 1
+}

@@ -1,0 +1,193 @@
+{
+  "cannot_answer_rate_per_model": {
+    "google/gemini-3-flash-preview": 0.35185185185185186,
+    "google/gemini-3.5-flash": 0.07407407407407408,
+    "google/gemini-3.6-flash": 0.2777777777777778,
+    "google/gemini-3.7-flash": 0.5462962962962963,
+    "google/gemini-3.8-flash": 0.4027777777777778
+  },
+  "cannot_answer_rate_per_question_per_model": {
+    "google/gemini-3-flash-preview": {
+      "Abortion": 1.0,
+      "Attending peaceful demonstrations": 0.5416666666666666,
+      "ChildQualities": 0.0,
+      "God": 0.7916666666666666,
+      "Homosexuality": 0.041666666666666664,
+      "Joining in boycotts": 0.5833333333333334,
+      "Religion": 0.125,
+      "Signing a petition": 0.08333333333333333,
+      "dealing with people?": 0.0
+    },
+    "google/gemini-3.5-flash": {
+      "Abortion": 0.375,
+      "Attending peaceful demonstrations": 0.0,
+      "ChildQualities": 0.0,
+      "God": 0.2916666666666667,
+      "Homosexuality": 0.0,
+      "Joining in boycotts": 0.0,
+      "Religion": 0.0,
+      "Signing a petition": 0.0,
+      "dealing with people?": 0.0
+    },
+    "google/gemini-3.6-flash": {
+      "Abortion": 1.0,
+      "Attending peaceful demonstrations": 0.0,
+      "ChildQualities": 0.0,
+      "God": 0.9583333333333334,
+      "Homosexuality": 0.3333333333333333,
+      "Joining in boycotts": 0.0,
+      "Religion": 0.20833333333333334,
+      "Signing a petition": 0.0,
+      "dealing with people?": 0.0
+    },
+    "google/gemini-3.7-flash": {
+      "Abortion": 1.0,
+      "Attending peaceful demonstrations": 0.5833333333333334,
+      "ChildQualities": 0.0,
+      "God": 1.0,
+      "Homosexuality": 0.75,
+      "Joining in boycotts": 0.5,
+      "Religion": 0.0,
+      "Signing a petition": 0.25,
+      "dealing with people?": 0.8333333333333334
+    },
+    "google/gemini-3.8-flash": {
+      "Abortion": 1.0,
+      "Attending peaceful demonstrations": 0.08333333333333333,
+      "ChildQualities": 0.0,
+      "God": 1.0,
+      "Homosexuality": 0.5,
+      "Joining in boycotts": 0.20833333333333334,
+      "Religion": 0.0,
+      "Signing a petition": 0.0,
+      "dealing with people?": 0.8333333333333334
+    }
+  },
+  "coverage_per_question_per_model": {
+    "google/gemini-3-flash-preview": {
+      "Abortion": 0.0,
+      "Attending peaceful demonstrations": 0.4583333333333333,
+      "ChildQualities": 1.0,
+      "God": 0.20833333333333334,
+      "Homosexuality": 0.9583333333333334,
+      "Joining in boycotts": 0.4166666666666667,
+      "Religion": 0.875,
+      "Signing a petition": 0.9166666666666666,
+      "dealing with people?": 1.0
+    },
+    "google/gemini-3.5-flash": {
+      "Abortion": 0.625,
+      "Attending peaceful demonstrations": 1.0,
+      "ChildQualities": 1.0,
+      "God": 0.7083333333333334,
+      "Homosexuality": 1.0,
+      "Joining in boycotts": 1.0,
+      "Religion": 1.0,
+      "Signing a petition": 1.0,
+      "dealing with people?": 1.0
+    },
+    "google/gemini-3.6-flash": {
+      "Abortion": 0.0,
+      "Attending peaceful demonstrations": 1.0,
+      "ChildQualities": 1.0,
+      "God": 0.041666666666666664,
+      "Homosexuality": 0.6666666666666666,
+      "Joining in boycotts": 1.0,
+      "Religion": 0.7916666666666666,
+      "Signing a petition": 1.0,
+      "dealing with people?": 1.0
+    },
+    "google/gemini-3.7-flash": {
+      "Abortion": 0.0,
+      "Attending peaceful demonstrations": 0.4166666666666667,
+      "ChildQualities": 1.0,
+      "God": 0.0,
+      "Homosexuality": 0.25,
+      "Joining in boycotts": 0.5,
+      "Religion": 1.0,
+      "Signing a petition": 0.75,
+      "dealing with people?": 0.16666666666666666
+    },
+    "google/gemini-3.8-flash": {
+      "Abortion": 0.0,
+      "Attending peaceful demonstrations": 0.9166666666666666,
+      "ChildQualities": 1.0,
+      "God": 0.0,
+      "Homosexuality": 0.5,
+      "Joining in boycotts": 0.7916666666666666,
+      "Religion": 1.0,
+      "Signing a petition": 1.0,
+      "dealing with people?": 0.16666666666666666
+    }
+  },
+  "fits": {
+    "bootstrap": {
+      "coord_xy_se": [
+        0.022466332449912703,
+        0.025109781760228336,
+        0.02365212838379098,
+        0.01951449924804607,
+        0.027229023207987296,
+        0.0583488072877232,
+        0.044384870332239555,
+        0.020584217254974606,
+        0.034020655426662806,
+        0.020872494859663287
+      ],
+      "draws_requested": 1000,
+      "draws_used": 1000,
+      "rmse_2d_se": 0.012214577464163304,
+      "slope_x_se": 0.049561400923480305,
+      "slope_y_se": 0.048557016601809846
+    },
+    "point": {
+      "coords_xy_per_model": {
+        "google/gemini-3-flash-preview": [
+          0.9125,
+          0.6805555555555555
+        ],
+        "google/gemini-3.5-flash": [
+          0.9083333333333334,
+          0.5601851851851852
+        ],
+        "google/gemini-3.6-flash": [
+          0.6041666666666666,
+          0.6273148148148149
+        ],
+        "google/gemini-3.7-flash": [
+          0.5541666666666667,
+          0.9
+        ],
+        "google/gemini-3.8-flash": [
+          0.4875,
+          0.9083333333333334
+        ]
+      },
+      "items_excluded_zero_coverage": {
+        "google/gemini-3-flash-preview": {
+          "Survival <-> Self-expression": 0,
+          "Traditional <-> Secular-Rational": 1
+        },
+        "google/gemini-3.5-flash": {
+          "Survival <-> Self-expression": 0,
+          "Traditional <-> Secular-Rational": 0
+        },
+        "google/gemini-3.6-flash": {
+          "Survival <-> Self-expression": 0,
+          "Traditional <-> Secular-Rational": 1
+        },
+        "google/gemini-3.7-flash": {
+          "Survival <-> Self-expression": 0,
+          "Traditional <-> Secular-Rational": 2
+        },
+        "google/gemini-3.8-flash": {
+          "Survival <-> Self-expression": 0,
+          "Traditional <-> Secular-Rational": 2
+        }
+      },
+      "rmse_2d": 0.1540562511562277,
+      "slope_x_per_year": -0.6061984096087086,
+      "slope_y_per_year": 0.2834030539477191
+    }
+  }
+}

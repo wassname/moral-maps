@@ -1,10 +1,11 @@
 {
-  "completed_phases": 217,
+  "completed_phases": 1081,
   "completed_phases_without_provider_cost": 0,
-  "conservative_spent_usd": "0.07505325",
+  "conservative_spent_usd": "0.30971775",
   "failed_phases_charged_at_bound": 0,
+  "finished_utc": "2026-09-18T23:56:25.663526+00:00",
   "hard_cap_usd": "5",
-  "provider_reported_spent_usd": "0.07505325",
+  "provider_reported_spent_usd": "0.30971775",
   "reserved_usd": "0E-8",
   "schema": 1
 }

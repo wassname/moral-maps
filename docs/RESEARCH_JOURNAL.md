@@ -1142,6 +1142,15 @@ My read: it is probable that at least some flat vectors are deliberate abstentio
 
 The cause of the remaining flat vectors remains open.
 
+## 2026-09-18 -- wvs-original-choice-pilot-v1 audit: original format does not reduce abstention or scatter
+
+Pueue task 1706 completed all five Gemini Flash releases on the preregistered original-response-format pilot: 9 original questions (8 single-choice with "Don't know"/"No answer" offered; one verbatim choose-up-to-five child-quality list) x 24 paired samples each. 1,080 panel phases plus the paid smoke; zero retries, rescues, or failures; every route an exact Google AI Studio dated release with advertised quantization `unknown`. Total stage spend USD 0.30971775 against the USD 5 stop, reconciled exactly to the three global ledger entries with zero held reservations. One disclosed deviation: a mocked test patched the wrong symbol and executed the gemini-3.8-flash panel early (216 phases, USD 0.07433250, settled as `pilot/original-choice-unplanned-3.8-panel`); the data is valid preregistered-protocol output and was kept. Full audit: `slop/audits/job_1706_original_choice_pilot.md`.
+
+Evidence: `cannot_answer` rates are 76/216 (35.2%) Preview, 16/216 (7.4%) 3.5, 60/216 (27.8%) 3.6, 118/216 (54.6%) 3.7, 87/216 (40.3%) 3.8. Abortion drew `cannot_answer` from 100% of samples in four of five releases; God from 100% in 3.7 and 3.8. Conditional coordinates with paired-bootstrap SE (B=1000): Preview (0.9125, 0.6806), 3.5 (0.9083, 0.5602), 3.6 (0.6042, 0.6273), 3.7 (0.5542, 0.9000), 3.8 (0.4875, 0.9083); SEs 0.020-0.058. Release-date OLS: x slope -0.6062/year (SE 0.0496), y slope +0.2834/year (SE 0.0486), 2D residual RMSE 0.1541 (SE 0.0122).
+
+Interpretation, separated: against the preregistered questions, the single-choice original format does not reduce abstention (rates overlap the dense 35-48% flat range and are more heterogeneous) and increases release-date scatter (RMSE 0.1541 versus 0.0518-0.0639 dense, about 2.4-3.0x). Doubt migrates into the explicit non-substantive options instead of disappearing; the preregistered P1 (nonzero, heterogeneous explicit refusal) is supported, P2 (original differs from dense min) is supported on most releases, and P3 (no directional prediction) observed a worse direction for scatter. Limitations carry over: release order, model identity, and fixed wall-clock order are exactly confounded; n=5; 3.7/3.8 y rests on 5 of 7 Y items due to zero God/Abortion coverage. Per the preregistration, no protocol is selected on trend. -- PI[gpt-5.6-terra]
+
+Source: `slop/research/wvs/20260918_original_choice_pilot/` (`results.json`, `analysis.json`, raw `records/`, `request_attempts.jsonl`, `budget.json`, `pueue_task_1706_clean.log`) and the global ledger `slop/research/wvs/20260917_score_all_options/budget.json`. Nothing published; the map is unchanged.
 ## 2026-09-18 -- Preregistration: wvs-original-choice-pilot-v1
 
 Written and committed before any paid call of this pilot. Branch `research/gemini-flash-rubric-v1`; published map untouched.

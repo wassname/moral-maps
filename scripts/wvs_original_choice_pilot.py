@@ -662,7 +662,8 @@ def paid_smoke(items: list[dict]) -> None:
     plan = plan_requests(items)
     pid = protocol_id(model, plan)
     req = plan[q * N_SAMPLES]
-    if not reserve({"id": reservation_id(SMOKE_RESERVATION), "lane": "google", "reserve_usd": "0.05"}):
+    smoke_rid = reservation_id(SMOKE_RESERVATION)
+    if not reserve({"id": smoke_rid, "lane": "google", "reserve_usd": "0.05"}):
         raise RuntimeError("global repository cap rejected original-choice smoke reservation")
     before = Decimal(update_state(lambda state: state)["conservative_spent_usd"])
     smoke_records = OUT / "paid_smoke.jsonl"
@@ -674,7 +675,7 @@ def paid_smoke(items: list[dict]) -> None:
             raise RuntimeError(f"unexpected smoke outcome: {outcome}")
     finally:
         after = Decimal(update_state(lambda state: state)["conservative_spent_usd"])
-        settle_external_reservation(reservation_id(SMOKE_RESERVATION), after - before)
+        settle_external_reservation(smoke_rid, after - before)
     completed = [event for event in load_events(smoke_records) if event["event"] == "request_completed"]
     routes = []
     for event in completed:
