@@ -26,7 +26,7 @@ DENSE_BASELINE_USD = Decimal("3.5908606723")
 OSS_PROVIDER = {
     "allow_fallbacks": True,
     "require_parameters": True,
-    "quantizations": ["fp8", "int8", "bf16", "fp16"],
+    "quantizations": ["fp8", "bf16", "fp16"],
 }
 LANES = ("openai", "google", "xai", "muse", "kimi", "glm", "deepseek", "qwen")
 SPECIALIZED = ("batch", "free", "-pro", "-fast", "vision", "-vl", "-5v", "-4.6v", "-4.5v", "-code", "-codex", "coder", "audio", "clip", "image", "guard", "safeguard", "multi-agent", "embedding", "rerank")
