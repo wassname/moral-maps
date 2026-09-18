@@ -1,9 +1,13 @@
-"""Does the WVS answer-slot readout hold on this model family, and at what think budget?
+"""Can this model's WVS coordinate resolve a steering effect at all?
 
-Qwen3-0.6B answers the IW battery with pmass 0.999. Qwen3.5-0.8B read 0.783 at think=1 in the
-steering smoke, which would make every steered coordinate mushy. Before renting a big GPU, find out
-whether that is the think budget (the model is mid-thought when we force the answer slot) or the
-chat template (the prefill does not land where we think it does).
+Two questions, both asked before renting a big GPU.
+
+1. Is the answer slot readable? Qwen3-0.6B answers the IW battery with pmass 0.999, Qwen3.5-0.8B
+   reads 0.61-0.84, and the leak goes to the option WORD, not gibberish. The think-budget sweep
+   separates "the model is mid-thought when we force the slot" from "the format prior is weak".
+2. Is the coordinate stable? The battery is 12 items, 5 on X. One item flipping moves X by up to
+   0.2, which would swamp any steering effect. The resample pass reports the bootstrap CI over
+   items and think traces, so we can compare it against the move we hope to see.
 
   uv run --extra steer python scripts/probe_wvs_think_budget.py --model Qwen/Qwen3.5-0.8B
 """
@@ -19,13 +23,16 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from moralmaps.iw_axes import resolve_items
 from moralmaps.read import read_items, resolve_answer_ids
-from moralmaps.wvs import build_instruments, load_wvs_all, model_axis_scores, read_model
+from moralmaps.wvs import build_instruments, load_wvs_all, model_axis_scores, read_coords, read_model
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="Qwen/Qwen3.5-0.8B")
     ap.add_argument("--think-budgets", default="1,16,64,256")
+    ap.add_argument("--ci-think", type=int, default=64, help="think budget for the resample pass")
+    ap.add_argument("--ci-samples", type=int, default=8, help="think traces averaged per item")
+    ap.add_argument("--ci-temperature", type=float, default=1.0)
     ap.add_argument("--batch-size", type=int, default=12)
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--device-map", default=None, help="'auto' shards a large model over the GPUs")
@@ -64,6 +71,19 @@ def main() -> None:
     print("\nSHOULD: pmass climbs toward ~1.0 as the think budget grows, and the coordinate settles.\n"
           "ELSE, if pmass stays low at every budget, the prefill or chat template is wrong for this\n"
           "family and no steered coordinate from it is comparable to the published map.")
+
+    c = read_coords(model, tok, instrs, meta, resolved, np.random.default_rng(0),
+                    think=args.ci_think, batch_size=args.batch_size,
+                    n_samples=args.ci_samples, temperature=args.ci_temperature)
+    print(f"\nresample pass: think={args.ci_think} n_samples={args.ci_samples} "
+          f"T={args.ci_temperature}\n"
+          f"  x = {c['x']:.4f} +- {1.96 * c['x_se']:.4f} (95%)\n"
+          f"  y = {c['y']:.4f} +- {1.96 * c['y_se']:.4f} (95%)\n"
+          f"  pmass mean {c['mean_pmass']:.3f} min {c['min_pmass']:.3f}\n"
+          f"SHOULD: the 95% interval is small next to the move we want to detect. The published\n"
+          f"Qwen3-4B Authority steer moved MFQ-2 factors by a few tenths of a scale point; on this\n"
+          f"0-1 axis a usable effect is ~0.05 or more, so a CI wider than that means the 12-item\n"
+          f"battery cannot resolve the steer and the plot would be noise.")
 
 
 if __name__ == "__main__":

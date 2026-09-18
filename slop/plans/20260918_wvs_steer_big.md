@@ -72,14 +72,35 @@ This mattered most for credulity, which nearly paraphrases the X-axis trust item
 
 ## Goals
 
-1. [ ] goal: one source of truth for the WVS battery readout, importable outside `scripts/`
+0. [/] goal: the target model's answer slot is readable, before renting anything big
+   - subtle failure mode: the coordinate looks plausible while most of the answer-token mass sits
+     off the digits, so every steered move is measured through mush
+   - discriminator: mean pmass_allowed >= 0.95 on the unsteered battery. Qwen3-0.6B reads 1.000,
+     Qwen3.5-0.8B reads 0.61-0.84 and its coordinate swings 0.15 in X with the think budget
+   - verify: `just wvs-steer-readable` (Modal, ~$0.75 per model)
+   - evidence:
+     - > logs_think_probe.log, Qwen3.5-0.8B top-5 at the answer slot:
+       > `'0':0.454 '1':0.214 'No':0.130 'You':0.018 'Answer':0.016`
+       > the leak is the option WORD, not gibberish: a format-prior weakness, not a broken prefill
+     - > Qwen3.5 chat template closes an empty think block by default, so the reader's own `<think>`
+       > made `</think> ... <think>`. Fixed with enable_thinking=True; worth only +0.02 to +0.09 pmass,
+       > so the template was not the main cause. Qwen3-0.6B unchanged at 1.000 (no regression).
+   - tasks:
+     1. [x] probe think budget 1/16/64/256 on the new family
+     2. [x] fix the double-think template artifact
+     3. [/] probe Qwen3.5-27B and Qwen3-32B on Modal, pick on the measured number
+
+1. [x] goal: one source of truth for the WVS battery readout, importable outside `scripts/`
    - subtle failure mode: the steer script gets its own copy of the item resolution, the two
      drift, and the steered points are not comparable to the published base points
    - discriminator: `scripts/wvs_map.py --local-model Qwen/Qwen3.5-4B` before and after the
      refactor produces identical (x, y) to 6 decimals
    - verify: `just smoke` plus the before/after coordinate diff
+   - evidence:
+     - > before (git HEAD script) and after (src/moralmaps/wvs.py), Qwen/Qwen3-0.6B:
+       > `COORD Qwen/Qwen3-0.6B x=0.495998 y=0.416814` both times
    - tasks:
-     1. [ ] move `load_wvs_all`, `build_instruments`, `read_model`, `model_axis_scores` from
+     1. [x] move `load_wvs_all`, `build_instruments`, `read_model`, `model_axis_scores` from
         `scripts/wvs_map.py` into `src/moralmaps/wvs.py`, leave the script importing them
 
 2. [ ] goal: honesty and credulity persona pairs that steer the intended axis, not style
@@ -89,19 +110,20 @@ This mattered most for credulity, which nearly paraphrases the X-axis trust item
      factual-recall probe is unchanged while the on-axis probe moves
    - verify: the `persona-steering` skill checklist, then read 10 generations per pole
    - tasks:
-     1. [ ] write pos/neg persona sets for honesty and for credulity
-     2. [ ] decide: separate vectors, or the sum `v_honesty + v_credulity` (steering-lite supports
-        `v1 + v2`). Proposal: run both separately plus the sum, 3 axes total.
+     1. [x] one mirrored pair, in `scripts/wvs_steer_sweep.py::HONESTY_PAIR`
+     2. [ ] read 10 generations per pole and check the axis is honesty, not bluntness
+     3. [~] credulity dropped by wassname
 
 3. [ ] goal: a Modal runner that reproduces the local smoke result exactly
    - subtle failure mode: the Modal path silently uses a different dtype, device map or think
      budget than local, so the big-model numbers are not comparable to the 4B showcase
    - discriminator: `modal run ...::smoke` on the tiny random model returns the same coordinates as
      the local CPU smoke to 6 decimals
-   - verify: `just modal-smoke`
+   - verify: `just wvs-steer-modal-smoke`
    - tasks:
-     1. [ ] port `vjp-steering/scripts/run_modal.py`, one container per (axis, method, seed)
-     2. [ ] `device_map="auto"` for the multi-GPU path, weights cached on a Volume
+     1. [x] port `vjp-steering/scripts/run_modal.py`, one container per (method, seed)
+     2. [x] `device_map="auto"` for the multi-GPU path, weights cached on a Volume
+     3. [ ] compare the Modal tiny-model coordinate against the same run locally
 
 4. [ ] goal: the map figure, base plus a steered trajectory per method, with the confound holdout
    - subtle failure mode: the trajectory looks impressive because the model is degrading, and the
@@ -111,7 +133,8 @@ This mattered most for credulity, which nearly paraphrases the X-axis trust item
    - verify: fresh-eyes subagent reads the PNG and says which way each method moved and why
    - tasks:
      1. [ ] dose sweep at iso-KL calibrated coefficients, bootstrap CI over items and samples
-     2. [ ] arrows on the existing IW map, one colour per method
+     2. [x] paths on the existing IW map, one colour per method, off the zone palette
+     3. [x] leave-one-out column: move length again without the most influential item
 
 ## Open questions for wassname
 

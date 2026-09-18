@@ -104,8 +104,9 @@ def main() -> None:
             far = max(side, key=lambda d: abs(d["mult"]))
             worst, loo_len = loo_worst(far, r["doses"][0], resolved)
             rows.append([r["method"], r["seed"], f"{r['calibrated_C']:+.3f}", f"{far['mult']:+.1f}",
-                         f"{far['x'] - base['x']:+.4f}", f"{far['y'] - base['y']:+.4f}",
-                         f"{np.hypot(far['x'] - base['x'], far['y'] - base['y']):.4f}",
+                         f"{far['dx']:+.4f}+-{1.96 * far['dx_se']:.3f}",
+                         f"{far['dy']:+.4f}+-{1.96 * far['dy_se']:.3f}",
+                         f"{np.hypot(far['dx'], far['dy']):.4f}",
                          f"{loo_len:.4f}", worst or "-", f"{far['mean_pmass']:.3f}"])
 
     # the reach of random directions at the same iso-KL dose: anything inside this has shown nothing.
@@ -125,8 +126,11 @@ def main() -> None:
 
     rows.sort(key=lambda r: -float(r[6]))
     print(tabulate(rows, tablefmt="pipe", headers=[
-        "method", "seed", "C", "dose", "dx", "dy", "|move|", "|move| less worst item",
-        "worst item", "pmass"]))
+        "method", "seed", "C", "dose", "dx (95%)", "dy (95%)", "|move|",
+        "|move| less worst item", "worst item", "pmass"]))
+    print("\ndx/dy intervals are PAIRED against base on the same items. The absolute coordinate is\n"
+          "much less certain (+-0.07 on X for a 12-item battery); that uncertainty is shared by base\n"
+          "and dose, so it limits where the model sits among societies, not how far the steer moved it.")
     logger.info(f"wrote {args.out} ({dropped} doses dropped below pmass {args.min_pmass})")
 
 

@@ -19,7 +19,7 @@ import re
 import numpy as np
 
 from .instrument import Instrument, InstrItem
-from .iw_axes import SKIP, X_AXIS, Y_AXIS, positiveness
+from .iw_axes import SKIP, X_AXIS, Y_AXIS, positiveness   # noqa: F401  positiveness re-exported
 from .zones import zone_of
 
 # option labels are single digits 0..n-1 -- single-token (unlike '10' on the justifiable scale) and
@@ -114,6 +114,88 @@ def read_model(rows: list[dict], meta: dict[str, dict]) -> dict[str, np.ndarray]
     """rows from read_items -> {suffix: p over that item's options}. NaN p (read collapse) fails loud
     later via positiveness rather than being imputed."""
     return {r["id"]: np.asarray(r["p"], float)[: meta[r["id"]]["n"]] for r in rows}
+
+
+def read_coords(model, tok, instrs, meta, resolved, rng, *, think: int, batch_size: int,
+                n_samples: int, temperature: float) -> dict:
+    """One live-model WVS readout -> coordinate, bootstrap CI, per-item positions, coherence.
+
+    n_samples > 1 (with temperature > 0) averages the answer distribution over independent think
+    traces. The battery is 12 items, so a single trace that flips one item moves an axis by up to
+    1/5, which is why the CI here is not decoration.
+    """
+    from .read import read_items, resolve_answer_ids   # torch import stays out of the module import
+
+    rows = []
+    for instr in instrs:
+        rows += read_items(model, tok, instr, instr.items,
+                           resolve_answer_ids(tok, instr.answer_space),
+                           max_think_tokens=think, batch_size=batch_size,
+                           n_samples=n_samples, temperature=temperature)
+    psamples, pmass = {}, {}
+    for r in rows:
+        n = meta[r["id"]]["n"]
+        p = np.exp(np.asarray(r["sample_lp"], float))[:, :n]
+        psamples[r["id"]] = p / p.sum(1, keepdims=True)   # NaN at collapse, on purpose
+        pmass[r["id"]] = float(np.mean(r["sample_pmass_allowed"]))
+    x, y, x_se, y_se = model_coord_ci(psamples, resolved, rng)
+    per_item = {}
+    for axis in (X_AXIS, Y_AXIS):
+        for it in resolved[axis]:
+            s = it["suffix"]
+            per_item[s] = {"axis": axis, "pmass": pmass[s],
+                           "pos": positiveness(psamples[s].mean(0), it["pole_idx"], it["n"])}
+    return {"x": x, "y": y, "x_se": x_se, "y_se": y_se,
+            "mean_pmass": float(np.mean(list(pmass.values()))),
+            "min_pmass": float(np.min(list(pmass.values()))),
+            "per_item": per_item,
+            # the primitive: per (item, sample) renormalized answer distribution. Every readout
+            # above is a pure function of it, and the paired base-vs-dose CI needs it, so it is
+            # saved rather than recomputed.
+            "psamples": {k: v.tolist() for k, v in psamples.items()}}
+
+
+def coord_delta_ci(psamples_a: dict, psamples_b: dict, resolved: dict, rng: np.random.Generator,
+                   B: int = 2000) -> tuple[float, float, float, float]:
+    """(dx, dy, dx_se, dy_se) for b minus a, resampling the SAME items in both.
+
+    The absolute coordinate carries the item-set variance of a 12-item battery (+-0.07 on X for a
+    model that reads at pmass 0.999). A steer is a within-item comparison, so the paired bootstrap
+    that reuses each replicate's item draw for both readouts removes that shared term and leaves
+    the variance that actually limits the steering claim.
+    """
+    a = {k: np.asarray(v, float) for k, v in psamples_a.items()}
+    b = {k: np.asarray(v, float) for k, v in psamples_b.items()}
+
+    def coords(ps: dict, draw: dict) -> tuple[float, float]:
+        xy = []
+        for axis in (X_AXIS, Y_AXIS):
+            vals = []
+            for j, srows in draw[axis]:
+                it = resolved[axis][j]
+                vals.append(positiveness(ps[it["suffix"]][srows].mean(0), it["pole_idx"], it["n"]))
+            xy.append(float(np.mean(vals)))
+        return xy[0], xy[1]
+
+    point = {axis: [(j, np.arange(len(a[resolved[axis][j]["suffix"]])))
+                    for j in range(len(resolved[axis]))] for axis in (X_AXIS, Y_AXIS)}
+    ax_, ay_ = coords(a, point)
+    bx_, by_ = coords(b, point)
+    dxs, dys = [], []
+    for _ in range(B):
+        # one item draw and one trace draw per replicate, reused for BOTH readouts: that is what
+        # makes it paired
+        draw = {}
+        for axis in (X_AXIS, Y_AXIS):
+            items = resolved[axis]
+            picks = rng.integers(0, len(items), len(items))
+            draw[axis] = [(int(j), rng.integers(0, len(a[items[j]["suffix"]]),
+                                                len(a[items[j]["suffix"]]))) for j in picks]
+        rx, ry = coords(a, draw)
+        sx, sy = coords(b, draw)
+        dxs.append(sx - rx)
+        dys.append(sy - ry)
+    return bx_ - ax_, by_ - ay_, float(np.std(dxs)), float(np.std(dys))
 
 
 def _sample_only_coord_se(psamples: dict[str, np.ndarray], resolved: dict[str, list[dict]],
