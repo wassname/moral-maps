@@ -145,16 +145,22 @@ not the final result.
      2. [x] `device_map="auto"` for the multi-GPU path, weights cached on a Volume
      3. [ ] compare the Modal tiny-model coordinate against the same run locally
 
-4. [ ] goal: the map figure, base plus a steered trajectory per method, with the confound holdout
+4. [x] goal: the map figure, base plus a steered trajectory per method, with the confound holdout
    - subtle failure mode: the trajectory looks impressive because the model is degrading, and the
      dot drifts toward the map centre as answers go uniform
    - discriminator: every plotted dose passes the pmass gate, and the degradation direction (toward
      the uniform-answer coordinate) is drawn on the figure so a drift toward it is visible
    - verify: fresh-eyes subagent reads the PNG and says which way each method moved and why
+   - evidence:
+     - > `logs_wvs_steer_plot_14b.log`: no method exceeded the held-out honesty random p95
+       > (mean-diff 2.813, PCA 0.188, VJP 2.031 versus random p95 3.653, n=20).
+     - > Fresh-eyes review: "Some map movements beat random reach ... but this demonstrates
+       > unusual WVS displacement, not an honesty-specific effect."
    - tasks:
-     1. [ ] dose sweep at iso-KL calibrated coefficients, bootstrap CI over items and samples
+     1. [x] dose sweep at iso-KL calibrated coefficients, bootstrap CI over items and samples
      2. [x] paths on the existing IW map, one colour per method, off the zone palette
      3. [x] leave-one-out column: move length again without the most influential item
+     4. [x] figure subtitle states that no method exceeded held-out random controls
 
 ## Open questions for wassname
 

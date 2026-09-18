@@ -121,18 +121,22 @@ def main() -> None:
     assert all(r["model"] == model for r in runs), "mixing models in one figure"
     groups = {m: sorted([r for r in runs if r["method"] == m], key=lambda r: r["seed"])
               for m in sorted({r["method"] for r in runs})}
+    random_runs = groups.get("random", [])
+    random_effects = [r["manipulation_check"]["scored"]["effect_logodds"]
+                      for r in random_runs]
+    random_effect_p95 = float(np.quantile(random_effects, 0.95)) if random_effects else np.nan
     primary = next((rs for m, rs in groups.items() if m != "random"), runs[:1])
     base = pool_dose(primary, 0.0)
     fig = maps.plot_value_map(
         "WVS Inglehart-Welzel", countries, P,
         ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
         models={f"{model.split('/')[-1]} (base)": (base["x"], base["y"])}, emphasize=emph,
-        title=f"Honesty steering on the culture map\n{model.split('/')[-1]}",
-        note="World Values Survey | filled: pmass >= 0.90 | hollow: failed coherence gate",
+        title=f"Candidate honesty-steering paths\n{model.split('/')[-1]}",
+        note=(f"Held-out honesty: no method exceeded random p95 = {random_effect_p95:.3f} "
+              f"(n = {len(random_effects)}) | filled: pmass >= 0.90"),
         title_y=0.115, note_y=0.04)
     ax = fig.axes[0]
 
-    random_runs = groups.get("random", [])
     null_move: dict[float, list[float]] = {}
     for r in random_runs:
         b = r["doses"][0]
@@ -146,50 +150,58 @@ def main() -> None:
         color = METHOD_COLORS[method]
         mults = sorted({d["mult"] for r in method_runs for d in r["doses"]})
         if method == "random":
-            for i, r in enumerate(method_runs):
-                draw_path(ax, r["doses"], color, sgx, sgy, args.min_pmass,
-                          random=True, label="random controls" if i == 0 else None)
+            for r in method_runs:
                 null_pts += [(d["x"] * sgx, d["y"] * sgy) for d in r["doses"]
                              if d["mult"] and d["mean_pmass"] >= args.min_pmass]
                 failed += sum(d["mean_pmass"] < args.min_pmass for d in r["doses"])
+            if null_pts:
+                px, py = np.asarray(null_pts).T
+                ax.scatter(px, py, s=8, color=color, alpha=0.25, zorder=2,
+                           label="coherent random controls")
             continue
 
         pooled = [pool_dose(method_runs, m) for m in mults]
         draw_path(ax, pooled, color, sgx, sgy, args.min_pmass, label=method)
         failed += sum(d["mean_pmass"] < args.min_pmass for d in pooled)
         pooled_base = next(d for d in pooled if d["mult"] == 0)
-        for sign in (+1, -1):
-            side = [d for d in pooled if np.sign(d["mult"]) == sign
-                    and d["mean_pmass"] >= args.min_pmass]
-            if not side:
-                continue
-            far = max(side, key=lambda d: abs(d["mult"]))
+        coherent = [d for d in pooled if d["mult"] and d["mean_pmass"] >= args.min_pmass]
+        for d in coherent:
             dx, dy, dx_se, dy_se = coord_delta_ci(
-                pooled_base["psamples"], far["psamples"], resolved,
-                np.random.default_rng(20_000 + sign))
-            worst, loo_len = loo_worst(far, pooled_base, resolved)
+                pooled_base["psamples"], d["psamples"], resolved,
+                np.random.default_rng(20_000 + int(10 * d["mult"])))
+            worst, loo_len = loo_worst(d, pooled_base, resolved)
             move = float(np.hypot(dx, dy))
-            null = null_move.get(far["mult"], [])
+            null = null_move.get(d["mult"], [])
             null_p95 = float(np.quantile(null, 0.95)) if null else np.nan
-            rows.append([method, len(method_runs), f"{far['mult']:+.1f}",
+            rows.append([method, len(method_runs), f"{d['mult']:+.1f}",
                          f"{dx:+.4f}+-{1.96 * dx_se:.3f}",
                          f"{dy:+.4f}+-{1.96 * dy_se:.3f}",
                          f"{move:.4f}", f"{loo_len:.4f}",
                          f"{null_p95:.4f}" if null else "-", len(null),
                          "yes" if null and move > null_p95 else "no",
-                         worst or "-", f"{far['mean_pmass']:.3f}"])
-            ax.annotate(f"{far['mult']:+g}C", (far["x"] * sgx, far["y"] * sgy),
-                        xytext=(3, 3), textcoords="offset points", fontsize=6, color=color)
+                         worst or "-", f"{d['mean_pmass']:.3f}"])
+        for sign in (+1, -1):
+            side = [d for d in coherent if np.sign(d["mult"]) == sign]
+            if side:
+                far = max(side, key=lambda d: abs(d["mult"]))
+                ax.annotate(f"{far['mult']:+g}C", (far["x"] * sgx, far["y"] * sgy),
+                            xytext=(3, 3), textcoords="offset points", fontsize=6, color=color)
 
     if len(null_pts) >= 3:
         from scipy.spatial import ConvexHull
         pts = np.array(null_pts)
         hull = pts[ConvexHull(pts).vertices]
-        ax.fill(hull[:, 0], hull[:, 1], color="#777777", alpha=0.10, zorder=1,
-                label="random reach (all doses)")
+        ax.fill(hull[:, 0], hull[:, 1], color="#777777", alpha=0.07, zorder=1,
+                label="random reach (all coherent doses)")
     else:
         logger.warning(f"only {len(null_pts)} coherent random points, null region not drawn")
-    ax.legend(loc="upper right", fontsize=7, framealpha=0.9)
+    coherent_xy = [(d["x"] * sgx, d["y"] * sgy) for r in runs for d in r["doses"]
+                   if d["mean_pmass"] >= args.min_pmass]
+    plot_x = list(P[:, 0] * sgx) + [x for x, _ in coherent_xy]
+    plot_y = list(P[:, 1] * sgy) + [y for _, y in coherent_xy]
+    ax.set_xlim(min(plot_x) - 0.05, max(plot_x) + 0.05)
+    ax.set_ylim(min(plot_y) - 0.05, max(plot_y) + 0.05)
+    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), fontsize=7, framealpha=0.9)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.out, dpi=200, bbox_inches="tight")
     fig.savefig(args.out.with_suffix(".svg"), bbox_inches="tight")
@@ -200,9 +212,6 @@ def main() -> None:
         "|move| less worst item", "random p95", "random n", "beats random?",
         "worst item", "pmass"]))
 
-    random_effects = [r["manipulation_check"]["scored"]["effect_logodds"]
-                      for r in random_runs]
-    random_effect_p95 = float(np.quantile(random_effects, 0.95)) if random_effects else np.nan
     check_rows = []
     for method, method_runs in groups.items():
         if method == "random":

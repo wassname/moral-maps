@@ -1,0 +1,28 @@
+2026-09-18 21:36:38.810 | INFO     | __main__:main:229 - wrote docs/img/wvs/wvs_steer_honesty_qwen3_14b.png (62 method-dose paths/points failed pmass 0.9)
+| method    |   read seeds |   dose | dx (95%)       | dy (95%)       |   |move| |   |move| less worst item | random p95   |   random n | beats random?   | worst item                        |   pmass |
+|:----------|-------------:|-------:|:---------------|:---------------|---------:|-------------------------:|:-------------|-----------:|:----------------|:----------------------------------|--------:|
+| vjp_delta |            3 |   -1   | -0.3372+-0.425 | -0.4747+-0.477 |   0.5823 |                   0.5059 | 0.2574       |         10 | yes             | dealing with people?              |   0.953 |
+| vjp_delta |            3 |   -2   | -0.3316+-0.442 | -0.4725+-0.502 |   0.5772 |                   0.5003 | -            |          0 | no              | dealing with people?              |   0.992 |
+| vjp_delta |            3 |    2   | +0.1800+-0.229 | -0.1973+-0.240 |   0.2671 |                   0.1931 | -            |          0 | no              | God                               |   0.994 |
+| vjp_delta |            3 |    1   | -0.2533+-0.196 | -0.0367+-0.088 |   0.2559 |                   0.1612 | 0.3238       |         15 | no              | dealing with people?              |   1     |
+| mean_diff |            3 |    2   | +0.1039+-0.327 | -0.2173+-0.236 |   0.2409 |                   0.1489 | -            |          0 | no              | Religion                          |   0.966 |
+| pca       |            3 |    2   | +0.0042+-0.321 | -0.2387+-0.199 |   0.2387 |                   0.1557 | -            |          0 | no              | God                               |   0.93  |
+| pca       |            3 |    1   | -0.2224+-0.146 | -0.0164+-0.096 |   0.223  |                   0.177  | 0.3238       |         15 | no              | Attending peaceful demonstrations |   0.995 |
+| pca       |            3 |   -1   | +0.0814+-0.067 | -0.1996+-0.225 |   0.2156 |                   0.123  | 0.2574       |         10 | no              | God                               |   0.966 |
+| mean_diff |            3 |   -0.5 | -0.1873+-0.144 | -0.0148+-0.040 |   0.1878 |                   0.1344 | 0.1320       |         17 | yes             | Attending peaceful demonstrations |   0.991 |
+| vjp_delta |            3 |    0.5 | -0.1293+-0.088 | -0.0580+-0.087 |   0.1417 |                   0.1175 | 0.1239       |         19 | yes             | Attending peaceful demonstrations |   1     |
+| mean_diff |            3 |    1   | +0.0841+-0.204 | -0.1060+-0.143 |   0.1353 |                   0.0915 | 0.3238       |         15 | no              | God                               |   0.984 |
+| mean_diff |            3 |   -1   | -0.1312+-0.121 | -0.0264+-0.089 |   0.1338 |                   0.0843 | 0.2574       |         10 | no              | Attending peaceful demonstrations |   0.975 |
+| pca       |            3 |    0.5 | -0.1287+-0.101 | +0.0055+-0.041 |   0.1288 |                   0.0936 | 0.1239       |         19 | yes             | Attending peaceful demonstrations |   0.998 |
+| pca       |            3 |   -0.5 | +0.0741+-0.065 | -0.0599+-0.081 |   0.0952 |                   0.0773 | 0.1320       |         17 | no              | God                               |   0.964 |
+| mean_diff |            3 |    0.5 | +0.0697+-0.070 | -0.0284+-0.059 |   0.0752 |                   0.0476 | 0.1239       |         19 | no              | Signing a petition                |   0.985 |
+
+Held-out honesty manipulation (true-vs-welcome log-odds):
+| method    |   effect |   random p95 |   random n | honesty-specific?   |
+|:----------|---------:|-------------:|-----------:|:--------------------|
+| mean_diff |    2.813 |        3.653 |         20 | no                  |
+| pca       |    0.188 |        3.653 |         20 | no                  |
+| vjp_delta |    2.031 |        3.653 |         20 | no                  |
+
+dx/dy intervals pool independent read seeds and pair base versus dose on the same
+items and sampled think streams. Hollow points remain visible but fail pmass >= 0.90.
