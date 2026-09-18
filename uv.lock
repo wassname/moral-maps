@@ -11,8 +11,8 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-07-03T02:38:05.43429745Z"
-exclude-newer-span = "P6D"
+exclude-newer = "2026-09-10T10:55:26.444190706Z"
+exclude-newer-span = "P8D"
 
 [[package]]
 name = "annotated-doc"

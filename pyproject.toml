@@ -20,6 +20,13 @@ maps = [
     "matplotlib>=3.8",
     "shapely>=2.0",       # union of per-country discs into one merged zone region
 ]                          # label placement is in-repo (moralmaps.labelplace); no textalloc/adjustText dep
+# scripts/wvs_steer_sweep.py only: activation steering plus the GlobalOpinionQA loader. The library
+# never imports these. `pip install moral-maps[steer]`.
+steer = [
+    "steering-lite @ git+https://github.com/wassname/steering-lite.git@c1e05c9",
+    "datasets>=4.0,<5",
+    "accelerate>=1.6",
+]
 # moralmaps.read_api (sampling readout for logprob-less API models) only. Install with
 # `pip install moral-maps[api]`. The local logprob reader (read.py) needs none of this.
 api = [
@@ -32,6 +39,7 @@ api = [
 [dependency-groups]
 dev = [
     "scipy>=1.17.1",
+    "modal>=1.5.4",       # launcher for scripts/run_modal_wvs.py, not needed inside the image
 ]
 
 [build-system]
