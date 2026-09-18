@@ -162,7 +162,7 @@ function ReleaseScatters({ data, hidden, axisMode, setAxisMode }) {
         <option value="release-date">Release date</option>
         <option value="capability">{data.capability_x.label}</option>
       </select></label>
-      <span><a href={data.capability_x.source_url}>Artificial Analysis HLE score</a>, saved {data.capability_x.fetched_utc.slice(0, 10)}. {axisMode === 'capability' ? `${data.capability_x.matched_models} matched, ${data.models.length - data.capability_x.matched_models} omitted.` : 'Release-date labels mark running HLE score highs among shown mapped models.'}</span>
+      {axisMode === 'capability' && <span><a href={data.capability_x.source_url}>Artificial Analysis HLE score</a>, saved {data.capability_x.fetched_utc.slice(0, 10)}. {data.capability_x.matched_models} matched, {data.models.length - data.capability_x.matched_models} omitted.</span>}
     </div>
     <ReleaseScatter data={data} hidden={hidden} field="y" axisMode={axisMode} title={`${xLabel} vs Secular-Rational`} />
     <ReleaseScatter data={data} hidden={hidden} field="x" axisMode={axisMode} title={`${xLabel} vs Self-expression`} />
@@ -221,7 +221,7 @@ function Map({ data }) {
       </svg>
       <Tooltip active={active} geometry={geometry} />
     </div>
-    <p className="map-explanation">Since 1981, the World Values Survey has asked people in about ninety countries the same questions. Its axes run from Traditional to Secular-Rational and from Self-expression to Survival.</p>
+    <p className="map-explanation">We start with the <a href="https://www.worldvaluessurvey.org/">World Values Survey</a>, a standard culture map. Since 1981 it has asked people in about ninety countries the same questions. Its axes run from Traditional to Secular-Rational and from Self-expression to Survival.</p>
     <blockquote className="economist-quote">
       <p>“The models’ answers, in English, on topics ranging from political petitions to God, suggest values that are different from those of most people. In fact, the models are often more extreme than the average respondent in every country included in the polling.”</p>
       <footer><a href="https://www.economist.com/briefing/2026/06/25/ai-models-values-are-very-different-from-most-peoples">The Economist, “AI models’ values are very different from most people’s”, 2026-06-25</a></footer>
@@ -235,8 +235,8 @@ function App() {
   const [data, setData] = useState(null);
   useEffect(() => { fetch('wvs/wvs_map_data.json').then(response => response.json()).then(setData); }, []);
   return <main>
-    <h1>Moral Maps: Where Do Frontier Models' Cultural Values Lie?</h1>
-    <p className="lede">We start with the <a href="https://www.worldvaluessurvey.org/">World Values Survey</a>, a map of human values across about ninety countries.</p>
+    <h1>Where do models sit in human cultural values?</h1>
+    <p className="lede">Are they moving? Are Chinese models different?</p>
     {data && <Map data={data} />}
   </main>;
 }

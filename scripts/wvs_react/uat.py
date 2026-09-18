@@ -96,8 +96,8 @@ def main() -> None:
         assert page.title() == "Moral Maps: Where Do Frontier Models' Cultural Values Lie?"
         assert page.locator("html").get_attribute("lang") == "en"
         assert page.locator('meta[name="viewport"]').count() == 1
-        assert page.locator("h1").inner_text() == "Moral Maps: Where Do Frontier Models' Cultural Values Lie?"
-        assert page.locator(".lede").inner_text() == "We start with the World Values Survey, a map of human values across about ninety countries."
+        assert page.locator("h1").inner_text() == "Where do models sit in human cultural values?"
+        assert page.locator(".lede").inner_text() == "Are they moving? Are Chinese models different?"
         visible_copy = page.locator("main").inner_text()
         for absent in ("React/SVG rendering", "Historical coordinates", "Dated releases only"):
             assert absent not in visible_copy
