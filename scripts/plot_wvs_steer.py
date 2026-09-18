@@ -128,7 +128,7 @@ def main() -> None:
         ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
         models={f"{model.split('/')[-1]} (base)": (base["x"], base["y"])}, emphasize=emph,
         title=f"Honesty steering on the culture map\n{model.split('/')[-1]}",
-        note="Filled: pmass >= 0.90 | hollow: failed coherence gate",
+        note="World Values Survey | filled: pmass >= 0.90 | hollow: failed coherence gate",
         title_y=0.115, note_y=0.04)
     ax = fig.axes[0]
 

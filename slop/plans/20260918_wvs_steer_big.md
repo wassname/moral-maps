@@ -89,7 +89,7 @@ not the final result.
 
 ## Goals
 
-0. [/] goal: the target model's answer slot is readable, before renting anything big
+0. [x] goal: the target model's answer slot is readable, before renting anything big
    - subtle failure mode: the coordinate looks plausible while most of the answer-token mass sits
      off the digits, so every steered move is measured through mush
    - discriminator: mean pmass_allowed >= 0.95 on the unsteered battery. Qwen3-0.6B reads 1.000,
@@ -102,10 +102,13 @@ not the final result.
      - > Qwen3.5 chat template closes an empty think block by default, so the reader's own `<think>`
        > made `</think> ... <think>`. Fixed with enable_thinking=True; worth only +0.02 to +0.09 pmass,
        > so the template was not the main cause. Qwen3-0.6B unchanged at 1.000 (no regression).
+     - > `logs_modal_qwen3_readable.log`, 64-token, 8-sample resample: Qwen3-4B mean/min
+       > pmass 0.979/0.880; Qwen3-8B 0.567/0.009; Qwen3-14B 0.987/0.948. Qwen3-14B is the
+       > largest candidate that passes the preregistered mean >= 0.95 gate.
    - tasks:
      1. [x] probe think budget 1/16/64/256 on the new family
      2. [x] fix the double-think template artifact
-     3. [/] probe Qwen3.5-27B and Qwen3-32B on Modal, pick on the measured number
+     3. [x] probe candidate large models on Modal and select Qwen3-14B from measured pmass
 
 1. [x] goal: one source of truth for the WVS battery readout, importable outside `scripts/`
    - subtle failure mode: the steer script gets its own copy of the item resolution, the two
