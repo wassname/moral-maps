@@ -70,6 +70,23 @@ leave-one-out is one item reacting to the persona wording, not a cultural shift.
 This mattered most for credulity, which nearly paraphrases the X-axis trust item
 (`"Most people can be trusted"`). Credulity is now out of scope, but the check is cheap and stays.
 
+## Corrected-run decision rule (recorded before the next full sweep)
+
+The first 27B sweep found two evaluation bugs: sampled think traces were not seeded before a
+"paired" bootstrap, and VJP's behavioral sign was opposite its configured sign. Its baseline
+pmass was also 0.75, below the preregistered 0.95 readability gate. Those outputs are diagnostic,
+not the final result.
+
+1. Use the largest probed model with base mean pmass >= 0.95. A plotted dose must keep mean pmass
+   >= 0.90; do not replace this with a post-hoc relative threshold.
+2. Orient every vector, including random, on four held-out true-vs-welcome questions. A method is
+   honesty-specific only if its log-odds effect exceeds the 95th percentile over random directions.
+3. A culture-map effect must beat the matched-dose random displacement and retain its direction
+   after the single most influential WVS item is removed. Opposite doses should point to opposite
+   half-planes locally; a non-monotonic or same-direction trajectory is evidence against an axis.
+4. If no implementation passes these checks, conclude only that these implementations are
+   inconclusive. Do not conclude that honesty has no cultural effect.
+
 ## Goals
 
 0. [/] goal: the target model's answer slot is readable, before renting anything big

@@ -77,7 +77,9 @@ def main(model: str = MODEL, methods: str = ",".join(METHODS), seeds: str = ",".
             res = json.loads(handle.get())
             base = res["doses"][0]
             far = max(res["doses"], key=lambda d: abs(d["mult"]))
+            check = res["manipulation_check"]["scored"]
             print(f"{method}\ts{seed}\tC={res['calibrated_C']:+.3f}\t"
+                  f"honesty={check['effect_logodds']:+.3f}\t"
                   f"dx={far['x'] - base['x']:+.4f}\tdy={far['y'] - base['y']:+.4f}\t"
                   f"pmass={far['mean_pmass']:.3f}")
         except Exception as error:
