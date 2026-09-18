@@ -12,6 +12,10 @@ See <https://wassname.github.io/moral-maps/> for an interactive plot.
 
 The models cluster in the upper-left, around and above the Western societies. These are survey answers, not a test of how the models behave outside the survey.
 
+> “The models’ answers, in English, on topics ranging from political petitions to God, suggest values that are different from those of most people. In fact, the models are often more extreme than the average respondent in every country included in the polling.”
+>
+> [The Economist, “AI models’ values are very different from most people’s”, 2026-06-25](https://www.economist.com/briefing/2026/06/25/ai-models-values-are-very-different-from-most-peoples)
+
 See [all model results and their uncertainty](docs/img/wvs/wvs_model_ci.md) in one table.
 
 ## Can we steer these values?

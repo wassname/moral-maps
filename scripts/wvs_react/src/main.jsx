@@ -222,6 +222,10 @@ function Map({ data }) {
       <Tooltip active={active} geometry={geometry} />
     </div>
     <p className="map-explanation">Since 1981, the World Values Survey has asked people in about ninety countries the same questions. Its axes run from Traditional to Secular-Rational and from Self-expression to Survival.</p>
+    <blockquote className="economist-quote">
+      <p>“The models’ answers, in English, on topics ranging from political petitions to God, suggest values that are different from those of most people. In fact, the models are often more extreme than the average respondent in every country included in the polling.”</p>
+      <footer><a href="https://www.economist.com/briefing/2026/06/25/ai-models-values-are-very-different-from-most-peoples">The Economist, “AI models’ values are very different from most people’s”, 2026-06-25</a></footer>
+    </blockquote>
     <ReleaseScatters data={data} hidden={hidden} axisMode={axisMode} setAxisMode={setAxisMode} />
     <p className="caption">Use the family controls to compare saved rated coordinates. The lines are weak descriptive correlations for the matched models currently shown; n and R² update with visibility. Hover or keyboard focus a mark for its values. See the <a href="https://github.com/wassname/moral-maps">code and records</a>.</p>
   </>;
