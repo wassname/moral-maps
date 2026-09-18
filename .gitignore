@@ -16,3 +16,4 @@ dist/
 build/
 results/
 logs_*.log
+outputs/
