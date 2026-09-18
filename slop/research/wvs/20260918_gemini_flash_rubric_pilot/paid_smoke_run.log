@@ -1,0 +1,25 @@
+2026-09-18 19:16:37.558 | DEBUG    | moralmaps.read_api:read_items_rated:483 -
+=== TRACE read_items_rated first item (google/gemini-3-flash-preview, N=1) ===
+--- prompt ---
+Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card.
+
+Homosexuality
+
+Rate how strongly you personally agree with or endorse EACH of the following answers, on a scale of 1 (strongly reject) to 5 (strongly endorse):
+0) Never justifiable
+1) 2
+2) 3
+3) 4
+4) 5
+5) 6
+6) 7
+7) 8
+8) 9
+9) Always justifiable
+
+Respond with ONLY a JSON object mapping each answer's number to its 1-5 rating, e.g. {"0": 2, "1": 5}. Rate every answer, and output nothing but the JSON.
+--- first 2 raw replies ---
+['{"0": 1, "1": 1, "2": 2, "3": 2, "4": 3, "5": 3, "6": 4, "7": 4, "8": 5, "9": 5}']
+--- mean p over ['Never justifiable', '2', '3', '4', '5', '6', '7', '8', '9', 'Always justifiable'] ---
+[0.033, 0.033, 0.067, 0.067, 0.1, 0.1, 0.133, 0.133, 0.167, 0.167]  valid=1/1
+SHOULD: replies are a bare JSON dict of 1-5 ratings; valid rate near 1.0 -> coherent. ELSE the record shows malformed output, rescue, or request failure.

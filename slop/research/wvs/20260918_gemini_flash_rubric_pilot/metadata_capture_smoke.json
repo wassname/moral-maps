@@ -1,0 +1,33 @@
+{
+  "durable_response_field": {
+    "endpoints": {
+      "available": [
+        {
+          "model": "fake-release",
+          "provider": "Google AI Studio",
+          "selected": true
+        }
+      ]
+    },
+    "requested": "fake"
+  },
+  "failed_retry_conservative_charge_usd": "0.0071680",
+  "request_header": "X-OpenRouter-Metadata: enabled",
+  "rescue_seed": "seed 23 present in both initial and rescue payloads",
+  "rescue_seed_records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/rescue_seed_capture_smoke.jsonl",
+  "resume": "one completed request reused without another call",
+  "retry": "one retryable timeout preserved, charged conservatively, then completed",
+  "reverse_transform": {
+    "raw": [
+      1.0,
+      5.0
+    ],
+    "transformed": [
+      5.0,
+      1.0
+    ]
+  },
+  "route_mismatch": "failed inline after charging actual cost and saving the full response",
+  "route_mismatch_record": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/route_mismatch_capture_smoke.json",
+  "status": "passed"
+}

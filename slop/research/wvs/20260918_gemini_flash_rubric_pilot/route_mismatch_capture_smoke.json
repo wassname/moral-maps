@@ -1,0 +1,40 @@
+{
+  "attempt": 1,
+  "error": "route mismatch: expected={'requested_model': 'google/gemini-3-flash-preview', 'response_model': 'google/gemini-3-flash-preview', 'selected_provider': 'Google AI Studio', 'selected_release_slug': 'google/gemini-3-flash-preview-20251217'} observed={'requested_model': 'google/gemini-3-flash-preview', 'response_model': 'google/gemini-3-flash-preview', 'selected_provider': 'Wrong', 'selected_release_slug': 'google/gemini-3-flash-preview-20251217'}",
+  "error_type": "RuntimeError",
+  "event": "request_attempt_route_invalid",
+  "model": "google/gemini-3-flash-preview",
+  "payload_sha256": "f4b28104e77352f5ef58b2614b41912916ac19ee68be9383da60e3bfb87357d0",
+  "provider_reported_cost_usd": 0.001,
+  "recorded_at_utc": "2026-09-18T11:46:26.526838+00:00",
+  "reserved_bound_usd": "0.0071680",
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "message": {
+          "content": "{\"0\": 1, \"1\": 5}"
+        }
+      }
+    ],
+    "id": "fake",
+    "model": "google/gemini-3-flash-preview",
+    "openrouter_metadata": {
+      "endpoints": {
+        "available": [
+          {
+            "model": "google/gemini-3-flash-preview-20251217",
+            "provider": "Wrong",
+            "selected": true
+          }
+        ]
+      },
+      "requested": "google/gemini-3-flash-preview"
+    },
+    "provider": "Google AI Studio",
+    "usage": {
+      "cost": 0.001
+    }
+  },
+  "response_id": "fake"
+}

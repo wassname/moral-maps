@@ -1026,3 +1026,68 @@ The ledger's 146 accepted phases sum to 28,157 prompt tokens, 78,117 completion 
 My read: this is very probably a valid exact-protocol mechanics diagnostic and resolves the task 1622 wrapper/config regression. The two rescues are explicit and billed rather than hidden, but their upstream empty-message cause remains unknown. An independent raw-answer review found 11 of 12 Homosexuality pole replies rate every mutually exclusive option identically, producing an expected score 5.57 near the 5.5 midpoint. The parse-completeness result therefore does not validate the self-expression coordinate for priority sequencing.
 
 Priority dispatch is paused pending an explicit content-quality metric and its cheapest diagnostic.
+
+## 2026-09-18 -- Gemini Flash reasoning and rating-rubric pilot design
+
+This entry preregisters a provider-locked pilot to separate reasoning-depth effects from sensitivity to the rating rubric.
+
+The saved model catalog and the endpoint snapshot at `slop/research/wvs/20260918_gemini_flash_rubric_pilot/endpoint_catalog.json` identify five compatible full Gemini Flash releases: `google/gemini-3-flash-preview`, `google/gemini-3.5-flash`, `google/gemini-3.6-flash`, `google/gemini-3.7-flash`, and `google/gemini-3.8-flash`. Gemini 3 Flash has only a preview entry in the saved catalog, so it is retained as that release. Batch aliases, Flash Lite, and image variants are excluded. Gemini 2.5 Flash is excluded because its Google AI Studio endpoint advertises `reasoning` but not `reasoning_effort`, so the required minimum-versus-high comparison is not established. The five selected standard Google AI Studio endpoints advertise both `reasoning_effort` and structured output. Their advertised quantization is `unknown`.
+
+Each model has four cells: normal human rubric at minimum and high reasoning, and reversed rating rubric at minimum and high reasoning. Minimum is `minimal` for Gemini 3, 3.5, and 3.6 Flash, and `low` for Gemini 3.7 and 3.8 Flash. Each cell uses the same twelve WVS items and options, six samples per item, paired deterministic seeds, and three canonical plus three reversed option orders for binary items. The reversed rubric says that one is strong endorsement and five is strong rejection; analysis applies `6 - rating`, but retains the raw reversed cell separately and does not merge it into the primary human-comparable result. There is no z-scaling.
+
+The provider policy is `only=["google-ai-studio"]`, `allow_fallbacks=false`, and `require_parameters=true`. A complete pilot is seventy-two requests per cell, two hundred eighty-eight per model, and fourteen hundred forty paid panel requests, plus one paid smoke request. The runtime reserves 2048 input tokens and 1024 output tokens for each initial request at the saved standard-endpoint prices. This bounds the panel at USD 9.363456 and the smoke at USD 0.004096, leaving USD 0.632448 below the USD 10 hard stop. Each request permits at most three attempts; a failed attempt is retained and charged at its conservative bound. A later run reuses each parse-valid saved request and only calls missing samples. Rescues and retries can therefore stop the pilot before completion rather than crossing the cap.
+
+The quantization audit covers all ninety-seven exact model IDs in the canonical v1 cache and all 15,772 matching completed request phases in the saved ledger. No response contains an explicit exact quantization. Of these phases, 5,196 have a saved provider that joins to a currently listed endpoint with a known quantization, but that join is ambiguous because the endpoint snapshot was fetched after the requests and is not historical route evidence. The remaining 10,576 have unknown quantization under the current join. Source: `slop/research/wvs/20260918_gemini_flash_rubric_pilot/quantization_audit.json` and its dated endpoint snapshot. My read: quantization-stratified variance is not identifiable from the saved results; provider and current endpoint metadata must not be relabelled as the historical quantization.
+
+Predictions recorded before requests:
+
+- If reasoning depth is a material source of coordinate variation, the paired high-minus-minimum shift should repeat in direction across releases within each rubric.
+- If rating-scale wording is a material source, the reverse-transformed reversed-rubric cell should differ from the normal-rubric cell under the same reasoning setting.
+- If a release trend is robust, its direction should be similar in all four cells. A trend that changes sign across rubric or reasoning cells is evidence of measurement sensitivity rather than a stable family trajectory.
+- Under a rubric-invariant readout, normal and reverse-transformed cells should agree within their paired sampling uncertainty.
+
+My read: the crossed design is likely more informative than increasing repeats under one prompt, because it tests two named measurement choices while holding provider, items, options, and seed schedules fixed. A remaining alternative is genuine model variation within the Flash series; the four-cell agreement pattern is what separates that from prompt sensitivity. -- PI[gpt-5.6-terra]
+
+The paid run begins only after metadata capture is durable and a one-request smoke record shows the actual route and response fields.
+
+## 2026-09-18 -- Gemini Flash high-reasoning paid smoke
+
+This entry records the provider-locked smoke before the crossed Gemini Flash pilot.
+
+| phase | finish | prompt tokens | completion tokens | reasoning tokens | cost, USD | parse result |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| initial | length | 166 | 1,009 | 979 | 0.0031100 | truncated JSON |
+| rescue | stop | 525 | 662 | 602 | 0.0022485 | valid JSON |
+| total | | 691 | 1,671 | 1,581 | 0.0053585 | one valid sample |
+
+The raw records are `slop/research/wvs/20260918_gemini_flash_rubric_pilot/paid_smoke.jsonl`; the checked summary is `paid_smoke.json` in the same directory. Both phases report requested and response model `google/gemini-3-flash-preview`, selected provider `Google AI Studio`, and selected release slug `google/gemini-3-flash-preview-20251217`. The saved standard endpoint advertises quantization as `unknown`. Local conservative spend and provider-reported spend both equal USD 0.0053585, with no failed phase, no held reservation, and the same amount settled to the repository-wide budget ledger.
+
+My read: high reasoning can exhaust the initial completion budget before returning the rating object, because this initial phase spent 979 of 1,009 completion tokens on reasoning and stopped for length. The rescue path recovered this sample, but one sample does not estimate how often rescue will be needed. Repeated rescues would make the preregistered initial-request cost bound optimistic for completion, while the USD 10 runtime stop would still end the pilot early rather than overspend. -- PI[gpt-5.6-terra]
+
+The full pilot remains unqueued until this smoke is reviewed.
+
+## 2026-09-18 -- Gemini Flash protocol amendment after the high-reasoning smoke
+
+This entry records the protocol change made before any panel run.
+
+The first high-reasoning smoke stopped for length after using 979 reasoning tokens inside 1,009 completion tokens, then required a rescue. Source: `slop/research/wvs/20260918_gemini_flash_rubric_pilot/paid_smoke.jsonl:3-5`. The initial USD 9.363456 panel estimate assumed 1,024 output tokens for every cell and did not bound rescue phases. It is therefore not a completion-safe estimate for the observed high-reasoning path.
+
+The amended protocol holds `max_tokens=2048` fixed in all four cells, so output budget is not a second treatment that differs with reasoning condition. N remains six per item and cell across the same five releases. Each cell's 2,048-token setting is part of its manifest row and protocol identity. The request reservation holds input at 2,048 tokens for both initial and rescue phases; the observed initial and rescue prompts used 166 and 525 prompt tokens, so increasing the input reserve with the output limit had no measured basis. The regenerated manifest bounds the 1,440 initial panel requests at USD 16.220160. One revised smoke is bounded at USD 0.007168, leaving USD 3.772672 below the owner-authorized USD 20 stage stop before observed spend. Sources: `slop/research/wvs/20260918_gemini_flash_rubric_pilot/manifest.json` and the standard-endpoint prices in `endpoint_catalog.json`.
+
+The rescue now receives the same paired seed as its initial request. Every paid response is route-validated before the caller can accept it. A route mismatch is charged using returned usage, saved with the full response as `request_attempt_route_invalid`, and fails the sample rather than retrying another route. The offline smoke verifies seed propagation, route-mismatch settlement and persistence, bounded transient retry, request reuse, and the reversed-rating transform. Source: `slop/research/wvs/20260918_gemini_flash_rubric_pilot/metadata_capture_smoke.json` and its JSONL records.
+
+My read: fixing the token budget across cells removes a clear condition-specific confound while preserving reasoning effort and rubric direction as the two intended treatments. The larger initial-request bound is an estimate, while the runtime stage stop remains the spending limit. A new provider-locked high-reasoning smoke must return parse-valid JSON without rescue before the full pilot can be considered for dispatch. -- PI[gpt-5.6-terra]
+
+The amended full pilot remains unqueued pending the revised paid smoke and review.
+
+## 2026-09-18 -- Revised Gemini Flash high-reasoning smoke
+
+This entry records the paid smoke of the amended fixed-output-budget protocol.
+
+The `normal_high` cell used `google/gemini-3-flash-preview`, high reasoning, `max_tokens=2048`, and the same first-item seed as its full-panel manifest. The initial request returned a complete ten-key rating object with `finish_reason=stop`; no rescue was dispatched. It used 166 prompt tokens and 1,535 completion tokens, of which 1,494 were reasoning tokens, for 1,701 total tokens and USD 0.004688. The selected route was Google AI Studio release `google/gemini-3-flash-preview-20251217`; the standard endpoint's advertised quantization field was present as `unknown`. Source: `slop/research/wvs/20260918_gemini_flash_rubric_pilot/paid_smoke_2048.jsonl` and checked summary `paid_smoke_2048.json`.
+
+The local pilot ledger now includes both smoke protocols and reports USD 0.0100465 as provider-reported and conservative spend, zero held reservation, and zero failed phases. The revised smoke's distinct repository-wide settlement is USD 0.004688 with no matching held reservation. Replaying the smoke command reused the completed protocol and added no request-attempt record.
+
+My read: this sample supports the operational requirement that the fixed 2,048-token output budget can return high-reasoning ratings without a rescue. It does not estimate truncation frequency across items or releases. The fixed budget removes the known condition-specific budget difference, while route validation, seeded rescue, the USD 20 stage stop, and the append-only records bound the remaining operational risks. -- PI[gpt-5.6-terra]
+
+The full pilot remains unqueued until the revised smoke is inspected.

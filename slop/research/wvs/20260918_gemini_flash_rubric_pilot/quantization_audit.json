@@ -1,0 +1,1317 @@
+{
+  "canonical_cache": "slop/research/wvs/20260916_openrouter/wvs_iw_rated.json",
+  "canonical_models": 97,
+  "classification_counts": {
+    "ambiguous": 5196,
+    "exact": 0,
+    "unknown": 10576
+  },
+  "completed_request_phases": 15772,
+  "conclusion": "No quantization-stratified variance is identifiable. Exact requires an explicit saved response quantization; current endpoint joins are ambiguous rather than historical route evidence.",
+  "endpoint_catalog": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/endpoint_catalog.json",
+  "endpoint_snapshot_is_historical_route_evidence": false,
+  "endpoint_snapshot_scope": "all exact model IDs in the canonical v1 cache",
+  "rows": [
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "anthropic/claude-fable-5.1",
+      "saved_provider_counts": {
+        "Anthropic": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8"
+      ],
+      "model": "deepseek/deepseek-chat-v3-0324",
+      "saved_provider_counts": {
+        "GMICloud": 4,
+        "SiliconFlow": 140
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "deepseek/deepseek-chat-v3.1",
+      "saved_provider_counts": {
+        "CoreWeave": 83,
+        "Novita": 61
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 182
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "deepseek/deepseek-v3.2",
+      "saved_provider_counts": {
+        "SiliconFlow": 1,
+        "StreamLake": 181
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8"
+      ],
+      "model": "deepseek/deepseek-v3.2-exp",
+      "saved_provider_counts": {
+        "AtlasCloud": 10,
+        "SiliconFlow": 134
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "deepseek/deepseek-v4-flash",
+      "saved_provider_counts": {
+        "DeepInfra": 5,
+        "StreamLake": 139
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "deepseek/deepseek-v4-flash-0731",
+      "saved_provider_counts": {
+        "DeepInfra": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 140,
+        "unknown_no_current_provider_join": 4
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "deepseek/deepseek-v4.1-flash",
+      "saved_provider_counts": {
+        "Modal": 1,
+        "Reka": 4,
+        "Together": 139
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-2.5-flash",
+      "saved_provider_counts": {
+        "Google": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-2.5-flash-lite",
+      "saved_provider_counts": {
+        "Google": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-3-flash-preview",
+      "saved_provider_counts": {
+        "Google": 141,
+        "Google AI Studio": 3
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-3.1-flash-lite",
+      "saved_provider_counts": {
+        "Google": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-3.1-flash-lite-preview",
+      "saved_provider_counts": {
+        "Google AI Studio": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-3.5-flash",
+      "saved_provider_counts": {
+        "Google": 143,
+        "Google AI Studio": 1
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-3.5-flash-lite",
+      "saved_provider_counts": {
+        "Google": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-3.6-flash",
+      "saved_provider_counts": {
+        "Google": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-3.7-flash",
+      "saved_provider_counts": {
+        "Google": 136,
+        "Google AI Studio": 8
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 215
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "google/gemini-3.8-flash",
+      "saved_provider_counts": {
+        "Google": 205,
+        "Google AI Studio": 10
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "unknown"
+      ],
+      "model": "meta/muse-glimmer-30b",
+      "saved_provider_counts": {
+        "DeepInfra": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 155
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "meta/muse-spark-1.3",
+      "saved_provider_counts": {
+        "Meta": 155
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp4",
+        "fp8",
+        "int4",
+        "unknown"
+      ],
+      "model": "moonshotai/kimi-k2.6",
+      "saved_provider_counts": {
+        "Crusoe": 12,
+        "SiliconFlow": 5,
+        "StreamLake": 127
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp4",
+        "fp8",
+        "mxfp4",
+        "unknown"
+      ],
+      "model": "moonshotai/kimi-k3",
+      "saved_provider_counts": {
+        "InferenceNet": 134,
+        "Morph": 10
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-3.5-turbo-0613",
+      "saved_provider_counts": {
+        "Azure": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-3.5-turbo-16k",
+      "saved_provider_counts": {
+        "Azure": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-4.1",
+      "saved_provider_counts": {
+        "Azure": 1,
+        "OpenAI": 143
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-4.1-mini",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-4.1-nano",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-4o",
+      "saved_provider_counts": {
+        "Azure": 1,
+        "OpenAI": 143
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-4o-2024-08-06",
+      "saved_provider_counts": {
+        "Azure": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-4o-2024-11-20",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-4o-mini",
+      "saved_provider_counts": {
+        "Azure": 1,
+        "OpenAI": 143
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-4o-mini-2024-07-18",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5-mini",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 146
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5-nano",
+      "saved_provider_counts": {
+        "OpenAI": 146
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5.1",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5.2",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5.4",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5.4-mini",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5.4-nano",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 304
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5.6-luna",
+      "saved_provider_counts": {
+        "OpenAI": 304
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5.6-sol",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-5.6-terra",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "openai/gpt-6-astra",
+      "saved_provider_counts": {
+        "OpenAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp16",
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "openai/gpt-oss-120b",
+      "saved_provider_counts": {
+        "AkashML": 78,
+        "DeepInfra": 13,
+        "DekaLLM": 1,
+        "Mancer 2": 52
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp8"
+      ],
+      "model": "qwen/qwen-2.5-72b-instruct",
+      "saved_provider_counts": {
+        "DeepInfra": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen-2.5-7b-instruct",
+      "saved_provider_counts": {
+        "Phala": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen-plus",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen-plus-2025-07-28",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8"
+      ],
+      "model": "qwen/qwen2.5-vl-72b-instruct",
+      "saved_provider_counts": {
+        "Parasail": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "int4",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-14b",
+      "saved_provider_counts": {
+        "DeepInfra": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3-235b-a22b",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-235b-a22b-2507",
+      "saved_provider_counts": {
+        "GMICloud": 142,
+        "Parasail": 2
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-30b-a3b",
+      "saved_provider_counts": {
+        "DeepInfra": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 60,
+        "unknown_current_quantization": 84
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-30b-a3b-instruct-2507",
+      "saved_provider_counts": {
+        "DekaLLM": 2,
+        "Nebius": 51,
+        "SiliconFlow": 9,
+        "StreamLake": 82
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8"
+      ],
+      "model": "qwen/qwen3-32b",
+      "saved_provider_counts": {
+        "DeepInfra": 137,
+        "SiliconFlow": 7
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 287
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3-8b",
+      "saved_provider_counts": {
+        "Alibaba": 287
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 71,
+        "unknown_current_quantization": 73
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-coder",
+      "saved_provider_counts": {
+        "DeepInfra": 71,
+        "Google": 73
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-coder-30b-a3b-instruct",
+      "saved_provider_counts": {
+        "SiliconFlow": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-coder-next",
+      "saved_provider_counts": {
+        "Parasail": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3-coder-plus",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3-max-thinking",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-next-80b-a3b-instruct",
+      "saved_provider_counts": {
+        "Parasail": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-vl-235b-a22b-instruct",
+      "saved_provider_counts": {
+        "Novita": 70,
+        "Parasail": 74
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 5,
+        "unknown_current_quantization": 139
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-vl-30b-a3b-instruct",
+      "saved_provider_counts": {
+        "Alibaba": 139,
+        "SiliconFlow": 5
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3-vl-32b-instruct",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "unknown"
+      ],
+      "model": "qwen/qwen3-vl-8b-instruct",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 150
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.5-122b-a10b",
+      "saved_provider_counts": {
+        "AtlasCloud": 148,
+        "SiliconFlow": 2
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.5-27b",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.5-35b-a3b",
+      "saved_provider_counts": {
+        "Darkbloom": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.5-397b-a17b",
+      "saved_provider_counts": {
+        "Phala": 143,
+        "Venice": 1
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.5-9b",
+      "saved_provider_counts": {
+        "Darkbloom": 1,
+        "DeepInfra": 128,
+        "Venice": 15
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.5-plus-02-15",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 145
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.5-plus-20260420",
+      "saved_provider_counts": {
+        "Alibaba": 145
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.6-27b",
+      "saved_provider_counts": {
+        "Chutes": 142,
+        "SiliconFlow": 2
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.6-35b-a3b",
+      "saved_provider_counts": {
+        "Darkbloom": 2,
+        "Parasail": 142
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 208
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.6-flash",
+      "saved_provider_counts": {
+        "Alibaba": 208
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 145
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.6-max-preview",
+      "saved_provider_counts": {
+        "Alibaba": 145
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.6-plus",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 640
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.7-flash",
+      "saved_provider_counts": {
+        "Alibaba": 640
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.7-max",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.7-plus",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 203
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.8-2.4t-a95b",
+      "saved_provider_counts": {
+        "SiliconFlow": 203
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 95,
+        "unknown_current_quantization": 49
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "qwen/qwen3.8-27b",
+      "saved_provider_counts": {
+        "DekaLLM": 49,
+        "Reka": 95
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "qwen/qwen3.8-flash",
+      "saved_provider_counts": {
+        "Alibaba": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "unknown"
+      ],
+      "model": "thinkingmachines/inkling",
+      "saved_provider_counts": {
+        "Together": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "x-ai/grok-4.20",
+      "saved_provider_counts": {
+        "xAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 144
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "x-ai/grok-4.3",
+      "saved_provider_counts": {
+        "xAI": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 427
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "x-ai/grok-4.5",
+      "saved_provider_counts": {
+        "xAI": 427
+      }
+    },
+    {
+      "classification_counts": {
+        "unknown_current_quantization": 278
+      },
+      "current_endpoint_quantizations": [
+        "unknown"
+      ],
+      "model": "x-ai/grok-4.6",
+      "saved_provider_counts": {
+        "xAI": 278
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 146
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp8"
+      ],
+      "model": "z-ai/glm-4.5-air",
+      "saved_provider_counts": {
+        "Novita": 146
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "bf16",
+        "fp8",
+        "unknown"
+      ],
+      "model": "z-ai/glm-4.7-flash",
+      "saved_provider_counts": {
+        "Venice": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp8",
+        "unknown"
+      ],
+      "model": "z-ai/glm-5",
+      "saved_provider_counts": {
+        "StreamLake": 144
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 153
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "z-ai/glm-5.1",
+      "saved_provider_counts": {
+        "AtlasCloud": 153
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 144
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "unknown"
+      ],
+      "model": "z-ai/glm-5.2",
+      "saved_provider_counts": {
+        "Ambient": 71,
+        "Phala": 15,
+        "StreamLake": 58
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 136,
+        "unknown_current_quantization": 10
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "nvfp4",
+        "unknown"
+      ],
+      "model": "z-ai/glm-5.3",
+      "saved_provider_counts": {
+        "DeepInfra": 132,
+        "Io Net": 4,
+        "Wafer": 10
+      }
+    },
+    {
+      "classification_counts": {
+        "ambiguous_current_snapshot_join": 251,
+        "unknown_current_quantization": 215
+      },
+      "current_endpoint_quantizations": [
+        "fp4",
+        "fp8",
+        "nvfp4",
+        "unknown"
+      ],
+      "model": "z-ai/glm-5.3-flash",
+      "saved_provider_counts": {
+        "Cloudflare": 2,
+        "Crusoe": 1,
+        "DeepInfra": 79,
+        "DigitalOcean": 2,
+        "Friendli": 2,
+        "Near AI": 106,
+        "NextBit": 2,
+        "Parasail": 3,
+        "Phala": 18,
+        "Reka": 25,
+        "Sail Research": 17,
+        "Venice": 4,
+        "Wafer": 205
+      }
+    }
+  ],
+  "schema": 2,
+  "source_ledger": "slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl"
+}

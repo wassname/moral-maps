@@ -33,9 +33,15 @@ from datetime import UTC, datetime
 from math import inf
 from pathlib import Path
 
+import httpx
 import numpy as np
 from loguru import logger
-from openrouter_wrapper.retry import openrouter_request   # stamina backoff on 429/provider/upstream errors
+from openrouter_wrapper.retry import (
+    MalformedResponseError,
+    ProviderError,
+    UpstreamError,
+    openrouter_request,
+)
 
 from .instrument import Instrument, InstrItem
 from .read import build_user_content
@@ -117,12 +123,20 @@ def read_items_sampled(model: str, instr: Instrument, items: list[InstrItem], *,
 
 
 # --- rated readout (dense, positional-bias-controlled) ------------------------------------------
-_RATE_PROMPT = (
-    "{question}\n\n"
-    "Rate how strongly you personally agree with or endorse EACH of the following answers, on a "
-    "scale of 1 (strongly reject) to 5 (strongly endorse):\n{legend}\n\n"
-    'Respond with ONLY a JSON object mapping each answer\'s number to its 1-5 rating, e.g. '
-    '{{"0": 2, "1": 5}}. Rate every answer, and output nothing but the JSON.')
+_RATE_PROMPTS = {
+    "normal": (
+        "{question}\n\n"
+        "Rate how strongly you personally agree with or endorse EACH of the following answers, on a "
+        "scale of 1 (strongly reject) to 5 (strongly endorse):\n{legend}\n\n"
+        'Respond with ONLY a JSON object mapping each answer\'s number to its 1-5 rating, e.g. '
+        '{{"0": 2, "1": 5}}. Rate every answer, and output nothing but the JSON.'),
+    "reversed": (
+        "{question}\n\n"
+        "Rate how strongly you personally agree with or endorse EACH of the following answers, on a "
+        "scale of 1 (strongly endorse) to 5 (strongly reject):\n{legend}\n\n"
+        'Respond with ONLY a JSON object mapping each answer\'s number to its 1-5 rating, e.g. '
+        '{{"0": 2, "1": 5}}. Rate every answer, and output nothing but the JSON.'),
+}
 
 
 def _parse_ratings(text: str, n: int) -> dict[int, float] | None:
@@ -162,7 +176,8 @@ def _force_msg(n: int) -> str:
 
 async def _force_answer(model: str, prompt: str, phase1_msg: dict, temperature: float,
                         max_tokens: int, req_timeout: float, reasoning: dict | None,
-                        response_format: dict | None, n: int, provider: dict | None) -> dict:
+                        response_format: dict | None, n: int, provider: dict | None,
+                        seed: int | None, request_fn) -> dict:
     """Phase-2 rescue (wassname's bounded-thinking pattern, gist 72eed3a1): a reasoning model that
     spent its whole budget thinking and truncated the JSON mid-object gets a follow-up in the SAME
     conversation -- feed its (truncated) reasoning back as the assistant turn, then demand a compact
@@ -174,20 +189,56 @@ async def _force_answer(model: str, prompt: str, phase1_msg: dict, temperature: 
             {"role": "assistant", "content": tail},
             {"role": "user", "content": _force_msg(n)}]
     payload = {"model": model, "messages": msgs, "temperature": temperature, "max_tokens": max(max_tokens, 2048)}
+    if seed is not None:
+        payload["seed"] = seed
     if reasoning is not None:
         payload["reasoning"] = reasoning
     if response_format is not None:
         payload["response_format"] = response_format
     if provider is not None:
         payload["provider"] = provider
-    return await asyncio.wait_for(openrouter_request(payload), timeout=req_timeout)
+    return await asyncio.wait_for(request_fn(payload), timeout=req_timeout)
 
 
-def _rate_plan(items: list[dict], n_samples: int, per_call: int = 1) -> list[dict]:
+async def openrouter_request_with_metadata_once(payload: dict, timeout: float = 60.0,
+                                                api_key: str | None = None,
+                                                transport: httpx.AsyncBaseTransport | None = None) -> dict:
+    """Request OpenRouter routing metadata once. -- PI[gpt-5.6-terra]"""
+    api_key = api_key or os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        raise ValueError("OPENROUTER_API_KEY must be set in environment or provided")
+    model = payload.get("model")
+    async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
+        response = await client.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
+                     "X-OpenRouter-Metadata": "enabled"},
+            json=payload,
+        )
+    response.raise_for_status()
+    try:
+        data = response.json()
+    except json.JSONDecodeError as error:
+        raise MalformedResponseError(f"Malformed response for {model}", data=response.text) from error
+    if "error" in data:
+        error = data["error"].get("message", str(data["error"]))
+        raise ProviderError(error, data=data)
+    if not data.get("choices"):
+        raise MalformedResponseError(f"{model} response missing nonempty choices", data=data)
+    choice = data["choices"][0]
+    if choice.get("finish_reason") == "error":
+        error = choice["error"]["message"]
+        raise UpstreamError(error, data=data)
+    return data
+
+
+def _rate_plan(items: list[dict], n_samples: int, per_call: int = 1,
+               rating_rubric: str = "normal") -> list[dict]:
     """Flatten (item, presented-order, count) into a list of <=per_call requests. A binary item splits
     its draws between the two orders (positional-bias control); an ordinal item keeps natural order
     (shuffling "Never..Always" is nonsense). per_call=1: OpenRouter providers do NOT reliably honour
     n>1 (they return a single completion), so one request per sample -- fine, they fire concurrently."""
+    prompt_template = _RATE_PROMPTS[rating_rubric]
     plan = []
     for i, it in enumerate(items):
         opts, n = it["options"], it["n"]
@@ -196,7 +247,7 @@ def _rate_plan(items: list[dict], n_samples: int, per_call: int = 1) -> list[dic
         sample = 0
         for perm, tot in groups:
             legend = "\n".join(f"{j}) {opts[perm[j]]}" for j in range(n))
-            prompt = _RATE_PROMPT.format(question=it["question"], legend=legend)
+            prompt = prompt_template.format(question=it["question"], legend=legend)
             while tot > 0:
                 k = min(tot, per_call); tot -= k
                 plan.append({"i": i, "perm": perm, "prompt": prompt, "cnt": k,
@@ -209,9 +260,10 @@ def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, te
                             max_tokens: int, concurrency: int, req_timeout: float,
                             reasoning: dict | None, structured_output: bool,
                             provider: dict | None = None, eval_version: str | None = None,
-                            seed_schedule: list[int] | None = None) -> str:
+                            seed_schedule: list[int] | None = None,
+                            rating_rubric: str = "normal", request_metadata: bool = False) -> str:
     """Hash the exact model, rendered prompts, and request settings that define a cacheable panel."""
-    plan = _rate_plan(items, n_samples)
+    plan = _rate_plan(items, n_samples, rating_rubric=rating_rubric)
     protocol = {
         "schema": 2,
         "model": model,
@@ -222,7 +274,7 @@ def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, te
         "reasoning": reasoning,
         "structured_output": structured_output,
         "provider": provider,
-        "rate_prompt": _RATE_PROMPT,
+        "rate_prompt": _RATE_PROMPTS[rating_rubric],
         "rescue_prompt": _force_msg(10),
         "requests": [{key: req[key] for key in ("i", "perm", "prompt", "cnt", "sample", "presented_options")}
                      for req in plan],
@@ -231,6 +283,10 @@ def rated_protocol_identity(model: str, items: list[dict], *, n_samples: int, te
         protocol["eval_version"] = eval_version
     if seed_schedule is not None:
         protocol["seed_schedule"] = seed_schedule
+    if rating_rubric != "normal":
+        protocol["rating_rubric"] = rating_rubric
+    if request_metadata:
+        protocol["request_metadata"] = True
     encoded = json.dumps(protocol, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
     return hashlib.sha256(encoded).hexdigest()
 
@@ -248,7 +304,9 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                      reasoning: dict | None = None, structured_output: bool = False, records_path: str | Path,
                      verbose_first: bool = False, provider: dict | None = None,
                      probe_first: bool = False, eval_version: str = "wvs-score-all-options-v1",
-                     identity_eval_version: str | None = None, seed_schedule: list[int] | None = None) -> list[dict]:
+                     identity_eval_version: str | None = None, seed_schedule: list[int] | None = None,
+                     rating_rubric: str = "normal", request_metadata: bool = False,
+                     reuse_valid_records: bool = False, request_fn=openrouter_request) -> list[dict]:
     """Run one score-all-options panel and write an fsynced JSONL event for every paid request phase.
 
     The record is the source of truth. It preserves dispatches, responses, rescues, provider usage,
@@ -256,14 +314,15 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
     reduced view for coordinates only. An incomplete item stays incomplete and the caller must not plot it.
     """
     assert temperature > 0, "sampling readout needs temperature > 0"
-    plan = _rate_plan(items, n_samples)
+    plan = _rate_plan(items, n_samples, rating_rubric=rating_rubric)
     if seed_schedule is not None and len(seed_schedule) != len(plan):
         raise ValueError(f"seed schedule has {len(seed_schedule)} entries, expected {len(plan)}")
     protocol_id = rated_protocol_identity(model, items, n_samples=n_samples, temperature=temperature,
                                           max_tokens=max_tokens, concurrency=concurrency,
                                           req_timeout=req_timeout, reasoning=reasoning,
                                           structured_output=structured_output, provider=provider,
-                                          eval_version=identity_eval_version, seed_schedule=seed_schedule)
+                                          eval_version=identity_eval_version, seed_schedule=seed_schedule,
+                                          rating_rubric=rating_rubric, request_metadata=request_metadata)
     run_id = f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}_{protocol_id[:12]}"
     rpath = Path(records_path)
     rpath.parent.mkdir(parents=True, exist_ok=True)
@@ -271,7 +330,17 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                 "max_tokens": max_tokens, "concurrency": concurrency, "req_timeout": req_timeout,
                 "reasoning": reasoning, "structured_output": structured_output, "provider": provider,
                 "probe_first": probe_first, "eval_version": eval_version,
-                "identity_eval_version": identity_eval_version, "seed_schedule": seed_schedule}
+                "identity_eval_version": identity_eval_version, "seed_schedule": seed_schedule,
+                "rating_rubric": rating_rubric, "request_metadata": request_metadata,
+                "reuse_valid_records": reuse_valid_records}
+    prior_answers = {}
+    if reuse_valid_records and rpath.exists():
+        for line in rpath.read_text().splitlines():
+            record = json.loads(line)
+            if (record.get("event") == "answer_parsed" and record.get("parsed") is True
+                    and record.get("protocol_id") == protocol_id):
+                key = (record["item_id"], record["sample"], tuple(record["presented_order"]))
+                prior_answers[key] = record
     _append_record(rpath, {"event": "run_started", "run_id": run_id, "protocol_id": protocol_id,
                            "settings": settings, "items": items, "planned_requests": len(plan)})
 
@@ -287,6 +356,13 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                             "presented_options": req["presented_options"], "presented_order": req["perm"],
                             "sample": req["sample"], "prompt": req["prompt"], "settings": settings,
                             "eval_version": eval_version, "seed": seed}
+            prior_key = (item["id"], req["sample"], tuple(req["perm"]))
+            if prior_key in prior_answers:
+                prior = prior_answers[prior_key]
+                _append_record(rpath, {"event": "request_reused", **request_meta,
+                                       "source_run_id": prior["run_id"]})
+                return {"text": prior["text"], "rescued": prior.get("rescued", False),
+                        "error": None, "reused": True}
             payload = {"model": model, "messages": [{"role": "user", "content": req["prompt"]}],
                        "temperature": temperature, "n": req["cnt"], "max_tokens": max_tokens}
             if seed is not None:
@@ -303,7 +379,7 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                 try:
                     _append_record(rpath, {"event": "request_started", "phase": phase,
                                            **request_meta, "payload": payload})
-                    data = await asyncio.wait_for(openrouter_request(payload), timeout=req_timeout)
+                    data = await asyncio.wait_for(request_fn(payload), timeout=req_timeout)
                     _append_record(rpath, {"event": "request_completed", "phase": phase,
                                            **request_meta, "response": data, "provider": data.get("provider"),
                                            "usage": data.get("usage")})
@@ -322,6 +398,8 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                                                or "(thinking truncated)"},
                                               {"role": "user", "content": _force_msg(item["n"])},
                                           ]}
+                        if seed is not None:
+                            rescue_payload["seed"] = seed
                         if response_format is not None:
                             rescue_payload["response_format"] = response_format
                         if reasoning is not None:
@@ -332,7 +410,8 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
                                                **request_meta, "payload": rescue_payload,
                                                "initial_response_message": message})
                         rescue = await _force_answer(model, req["prompt"], message, temperature,
-                                                     max_tokens, req_timeout, reasoning, response_format, item["n"], provider)
+                                                     max_tokens, req_timeout, reasoning, response_format,
+                                                     item["n"], provider, seed, request_fn)
                         _append_record(rpath, {"event": "request_completed", "phase": phase,
                                                **request_meta, "response": rescue, "provider": rescue.get("provider"),
                                                "usage": rescue.get("usage")})
@@ -359,9 +438,10 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
         return [first] + await asyncio.gather(*(call(seq, req) for seq, req in enumerate(plan[1:], start=1)))
 
     results = asyncio.run(run_all())
-    agg = {i: {"p_samples": [], "texts": [], "failed": 0, "rescued": 0, "prompt": ""}
+    agg = {i: {"p_samples": [], "rating_samples_raw": [], "rating_samples_transformed": [],
+               "texts": [], "failed": 0, "rescued": 0, "prompt": ""}
            for i in range(len(items))}
-    for req, result in zip(plan, results):
+    for seq, (req, result) in enumerate(zip(plan, results)):
         i, n, perm = req["i"], items[req["i"]]["n"], req["perm"]
         agg[i]["prompt"] = req["prompt"]
         agg[i]["rescued"] += int(result["rescued"])
@@ -373,21 +453,29 @@ def read_items_rated(model: str, items: list[dict], *, n_samples: int = 12, temp
         text = result["text"]
         agg[i]["texts"].append(text)
         rated = _parse_ratings(text, n)
-        _append_record(rpath, {"event": "answer_parsed", "run_id": run_id, "protocol_id": protocol_id,
+        _append_record(rpath, {"event": "answer_parsed", "request_id": f"{run_id}_{seq:03d}",
+                               "run_id": run_id, "protocol_id": protocol_id,
                                "model": model, "item_id": items[i]["id"], "sample": req["sample"],
-                               "presented_order": perm, "text": text, "parsed": rated is not None})
+                               "presented_order": perm, "text": text, "rescued": result["rescued"],
+                               "parsed": rated is not None})
         if rated is None:
             continue
-        r_canon = np.zeros(n)
+        r_raw = np.zeros(n)
         for j in range(n):
-            r_canon[perm[j]] = rated[j]
-        agg[i]["p_samples"].append(r_canon / r_canon.sum())
+            r_raw[perm[j]] = rated[j]
+        r_transformed = 6 - r_raw if rating_rubric == "reversed" else r_raw.copy()
+        agg[i]["rating_samples_raw"].append(r_raw)
+        agg[i]["rating_samples_transformed"].append(r_transformed)
+        agg[i]["p_samples"].append(r_transformed / r_transformed.sum())
 
     out = []
     for i, item in enumerate(items):
         ps = agg[i]["p_samples"]
         p = np.mean(ps, axis=0) if ps else np.full(item["n"], np.nan)
         row = {"id": item["id"], "p": p, "p_samples": [x.tolist() for x in ps],
+               "rating_samples_raw": [x.tolist() for x in agg[i]["rating_samples_raw"]],
+               "rating_samples_transformed": [x.tolist() for x in agg[i]["rating_samples_transformed"]],
+               "rating_rubric": rating_rubric,
                "pmass_allowed": len(ps) / n_samples, "n_samples": n_samples,
                "valid_samples": len(ps), "failed_samples": agg[i]["failed"],
                "rescued_samples": agg[i]["rescued"], "prompt": agg[i]["prompt"],
