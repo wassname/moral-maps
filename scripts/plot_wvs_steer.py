@@ -5,8 +5,9 @@ so the question "where does honesty steering move this model, culturally" has a 
 
 Three things the figure has to keep honest:
   - the random control's reach is drawn as a grey null region. A method inside it has shown nothing.
-  - doses whose answer mass collapsed are dropped, and counted in the caption. A path that wanders
-    because the model stopped answering is not a cultural move.
+  - doses below the preregistered answer-mass gate stay visible as faint hollow points, but are
+    excluded from the result table. A path that wanders because the model stopped answering is not
+    a cultural move.
   - the leave-one-out column in the table says how much of the move survives dropping the single
     most influential item, so a one-item lexical effect cannot pass as a shift of the whole profile.
 
@@ -27,7 +28,7 @@ matplotlib.use("Agg")
 
 from moralmaps import maps
 from moralmaps.iw_axes import X_AXIS, Y_AXIS, positiveness, resolve_items
-from moralmaps.wvs import human_axis_scores, load_wvs_all
+from moralmaps.wvs import coord_delta_ci, human_axis_scores, load_wvs_all
 from moralmaps.zones import zones_for
 
 # Deliberately none of the zone-hull colours (West blue, East Asia red, Latin America orange,
@@ -57,6 +58,50 @@ def loo_worst(dose: dict, base: dict, resolved: dict) -> tuple[str, float]:
     return worst, float(best_len)
 
 
+def pool_dose(runs: list[dict], mult: float) -> dict:
+    """Pool independent read seeds for one method and dose."""
+    doses = [next(d for d in r["doses"] if d["mult"] == mult) for r in runs]
+    suffixes = doses[0]["per_item"]
+    return {
+        "mult": mult,
+        "x": float(np.mean([d["x"] for d in doses])),
+        "y": float(np.mean([d["y"] for d in doses])),
+        "mean_pmass": float(np.mean([d["mean_pmass"] for d in doses])),
+        "min_pmass": float(np.min([d["min_pmass"] for d in doses])),
+        "per_item": {
+            s: {"axis": doses[0]["per_item"][s]["axis"],
+                "pmass": float(np.mean([d["per_item"][s]["pmass"] for d in doses])),
+                "pos": float(np.mean([d["per_item"][s]["pos"] for d in doses]))}
+            for s in suffixes
+        },
+        "psamples": {
+            s: np.concatenate([np.asarray(d["psamples"][s]) for d in doses]).tolist()
+            for s in doses[0]["psamples"]
+        },
+    }
+
+
+def draw_path(ax, doses: list[dict], color: str, sgx: float, sgy: float,
+              min_pmass: float, *, random: bool = False, label: str | None = None) -> None:
+    """Draw failed-coherence segments faint and hollow rather than hiding them."""
+    doses = sorted(doses, key=lambda d: d["mult"])
+    ok = [d["mean_pmass"] >= min_pmass for d in doses]
+    for a, b, pass_a, pass_b in zip(doses, doses[1:], ok, ok[1:]):
+        ax.plot([a["x"] * sgx, b["x"] * sgx], [a["y"] * sgy, b["y"] * sgy],
+                "--" if random else "-", color=color, lw=1.2 if random else 2.0,
+                alpha=0.65 if pass_a and pass_b else 0.18, zorder=4)
+    passed = [d for d, keep in zip(doses, ok) if keep]
+    failed = [d for d, keep in zip(doses, ok) if not keep]
+    if label:
+        ax.plot([], [], "--" if random else "-", color=color, lw=1.5, label=label)
+    if passed:
+        ax.scatter([d["x"] * sgx for d in passed], [d["y"] * sgy for d in passed],
+                   s=14, color=color, alpha=0.85, zorder=5)
+    if failed:
+        ax.scatter([d["x"] * sgx for d in failed], [d["y"] * sgy for d in failed],
+                   s=14, facecolors="none", edgecolors=color, alpha=0.25, zorder=3)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", type=Path, default=Path("outputs"))
@@ -74,64 +119,74 @@ def main() -> None:
 
     model = runs[0]["model"]
     assert all(r["model"] == model for r in runs), "mixing models in one figure"
-    base = runs[0]["doses"][0]
+    groups = {m: sorted([r for r in runs if r["method"] == m], key=lambda r: r["seed"])
+              for m in sorted({r["method"] for r in runs})}
+    primary = next((rs for m, rs in groups.items() if m != "random"), runs[:1])
+    base = pool_dose(primary, 0.0)
     fig = maps.plot_value_map(
         "WVS Inglehart-Welzel", countries, P,
         ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
         models={f"{model.split('/')[-1]} (base)": (base["x"], base["y"])}, emphasize=emph,
         title=f"Honesty steering on the culture map\n{model.split('/')[-1]}",
-        note="World Values Survey | source: github.com/wassname/moral-maps",
+        note="Filled: pmass >= 0.90 | hollow: failed coherence gate",
         title_y=0.115, note_y=0.04)
     ax = fig.axes[0]
 
-    dropped, rows, null_pts = 0, [], []
-    for r in runs:
-        kept = [d for d in r["doses"] if d["mean_pmass"] >= args.min_pmass]
-        dropped += len(r["doses"]) - len(kept)
-        kept.sort(key=lambda d: d["mult"])
-        xs = [d["x"] * sgx for d in kept]
-        ys = [d["y"] * sgy for d in kept]
-        color = METHOD_COLORS[r["method"]]
-        if r["method"] == "random":
-            null_pts += list(zip(xs, ys))
-        ax.plot(xs, ys, "--o" if r["method"] == "random" else "-o", color=color, lw=2.0, ms=3.5,
-                alpha=0.85, zorder=5, label=f"{r['method']} s{r['seed']}")
-        # both directions: the honest score is the weaker one, so never let +C hide a dead -C
+    failed, rows, null_pts = 0, [], []
+    for method, method_runs in groups.items():
+        color = METHOD_COLORS[method]
+        mults = sorted({d["mult"] for r in method_runs for d in r["doses"]})
+        if method == "random":
+            for i, r in enumerate(method_runs):
+                draw_path(ax, r["doses"], color, sgx, sgy, args.min_pmass,
+                          random=True, label="random controls" if i == 0 else None)
+                null_pts += [(d["x"] * sgx, d["y"] * sgy) for d in r["doses"]
+                             if d["mult"] and d["mean_pmass"] >= args.min_pmass]
+                failed += sum(d["mean_pmass"] < args.min_pmass for d in r["doses"])
+            continue
+
+        pooled = [pool_dose(method_runs, m) for m in mults]
+        draw_path(ax, pooled, color, sgx, sgy, args.min_pmass, label=method)
+        failed += sum(d["mean_pmass"] < args.min_pmass for d in pooled)
+        pooled_base = next(d for d in pooled if d["mult"] == 0)
         for sign in (+1, -1):
-            side = [d for d in kept if np.sign(d["mult"]) == sign]
+            side = [d for d in pooled if np.sign(d["mult"]) == sign
+                    and d["mean_pmass"] >= args.min_pmass]
             if not side:
                 continue
             far = max(side, key=lambda d: abs(d["mult"]))
-            worst, loo_len = loo_worst(far, r["doses"][0], resolved)
-            rows.append([r["method"], r["seed"], f"{r['calibrated_C']:+.3f}", f"{far['mult']:+.1f}",
-                         f"{far['dx']:+.4f}+-{1.96 * far['dx_se']:.3f}",
-                         f"{far['dy']:+.4f}+-{1.96 * far['dy_se']:.3f}",
-                         f"{np.hypot(far['dx'], far['dy']):.4f}",
-                         f"{loo_len:.4f}", worst or "-", f"{far['mean_pmass']:.3f}"])
+            dx, dy, dx_se, dy_se = coord_delta_ci(
+                pooled_base["psamples"], far["psamples"], resolved,
+                np.random.default_rng(20_000 + sign))
+            worst, loo_len = loo_worst(far, pooled_base, resolved)
+            rows.append([method, len(method_runs), f"{far['mult']:+.1f}",
+                         f"{dx:+.4f}+-{1.96 * dx_se:.3f}",
+                         f"{dy:+.4f}+-{1.96 * dy_se:.3f}",
+                         f"{np.hypot(dx, dy):.4f}", f"{loo_len:.4f}",
+                         worst or "-", f"{far['mean_pmass']:.3f}"])
+            ax.annotate(f"{far['mult']:+g}C", (far["x"] * sgx, far["y"] * sgy),
+                        xytext=(3, 3), textcoords="offset points", fontsize=6, color=color)
 
-    # the reach of random directions at the same iso-KL dose: anything inside this has shown nothing.
-    # Needs a real cloud, one random seed gives a degenerate box that would overstate the null.
     if len(null_pts) >= 3:
         from scipy.spatial import ConvexHull
         pts = np.array(null_pts)
         hull = pts[ConvexHull(pts).vertices]
-        ax.fill(hull[:, 0], hull[:, 1], color="#777777", alpha=0.15, zorder=1,
-                label="random null region")
+        ax.fill(hull[:, 0], hull[:, 1], color="#777777", alpha=0.10, zorder=1,
+                label="random reach (all doses)")
     else:
-        logger.warning(f"only {len(null_pts)} random points, null region not drawn")
+        logger.warning(f"only {len(null_pts)} coherent random points, null region not drawn")
     ax.legend(loc="upper right", fontsize=7, framealpha=0.9)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.out, dpi=200, bbox_inches="tight")
     fig.savefig(args.out.with_suffix(".svg"), bbox_inches="tight")
 
-    rows.sort(key=lambda r: -float(r[6]))
+    rows.sort(key=lambda r: -float(r[5]))
     print(tabulate(rows, tablefmt="pipe", headers=[
-        "method", "seed", "C", "dose", "dx (95%)", "dy (95%)", "|move|",
+        "method", "read seeds", "dose", "dx (95%)", "dy (95%)", "|move|",
         "|move| less worst item", "worst item", "pmass"]))
-    print("\ndx/dy intervals are PAIRED against base on the same items. The absolute coordinate is\n"
-          "much less certain (+-0.07 on X for a 12-item battery); that uncertainty is shared by base\n"
-          "and dose, so it limits where the model sits among societies, not how far the steer moved it.")
-    logger.info(f"wrote {args.out} ({dropped} doses dropped below pmass {args.min_pmass})")
+    print("\ndx/dy intervals pool independent read seeds and pair base versus dose on the same\n"
+          "items and sampled think streams. Hollow points remain visible but fail pmass >= 0.90.")
+    logger.info(f"wrote {args.out} ({failed} method-dose paths/points failed pmass {args.min_pmass})")
 
 
 if __name__ == "__main__":
