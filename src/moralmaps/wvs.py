@@ -132,10 +132,11 @@ def read_coords(model, tok, instrs, meta, resolved, rng, *, think: int, batch_si
                            resolve_answer_ids(tok, instr.answer_space),
                            max_think_tokens=think, batch_size=batch_size,
                            n_samples=n_samples, temperature=temperature)
-    psamples, pmass = {}, {}
+    lp_gather, psamples, pmass = {}, {}, {}
     for r in rows:
         n = meta[r["id"]]["n"]
-        p = np.exp(np.asarray(r["sample_lp"], float))[:, :n]
+        lp_gather[r["id"]] = np.asarray(r["sample_lp"], float)[:, :n]
+        p = np.exp(lp_gather[r["id"]])
         psamples[r["id"]] = p / p.sum(1, keepdims=True)   # NaN at collapse, on purpose
         pmass[r["id"]] = float(np.mean(r["sample_pmass_allowed"]))
     x, y, x_se, y_se = model_coord_ci(psamples, resolved, rng)
@@ -149,20 +150,16 @@ def read_coords(model, tok, instrs, meta, resolved, rng, *, think: int, batch_si
             "mean_pmass": float(np.mean(list(pmass.values()))),
             "min_pmass": float(np.min(list(pmass.values()))),
             "per_item": per_item,
-            # the primitive: per (item, sample) renormalized answer distribution. Every readout
-            # above is a pure function of it, and the paired base-vs-dose CI needs it, so it is
-            # saved rather than recomputed.
+            # Full-vocabulary logprobs gathered at the allowed answer tokens, before renormalization.
+            "lp_gather": {k: v.tolist() for k, v in lp_gather.items()},
             "psamples": {k: v.tolist() for k, v in psamples.items()}}
 
 
 def coord_delta_ci(psamples_a: dict, psamples_b: dict, resolved: dict, rng: np.random.Generator,
                    B: int = 2000) -> tuple[float, float, float, float]:
-    """(dx, dy, dx_se, dy_se) for b minus a, resampling the SAME items in both.
+    """(dx, dy, dx_se, dy_se) for b minus a, each replicate resampling the SAME items in both.
 
-    The absolute coordinate carries the item-set variance of a 12-item battery (+-0.07 on X for a
-    model that reads at pmass 0.999). A steer is a within-item comparison, so the paired bootstrap
-    that reuses each replicate's item draw for both readouts removes that shared term and leaves
-    the variance that actually limits the steering claim.
+    Pairing removes the item-set variance the two readouts share (+-0.07 on X for this battery).
     """
     a = {k: np.asarray(v, float) for k, v in psamples_a.items()}
     b = {k: np.asarray(v, float) for k, v in psamples_b.items()}

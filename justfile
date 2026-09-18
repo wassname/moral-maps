@@ -23,9 +23,9 @@ wvs-steer-modal-smoke:
     uv run --extra steer --group dev modal run scripts/run_modal_wvs.py::smoke
 
 # the real fan-out, one container per (method, seed). H200 for 27B dense, B200:2 for 122B-A10B
-wvs-steer-modal model="Qwen/Qwen3.5-27B" gpu="H200" seeds="0":
+wvs-steer-modal model="Qwen/Qwen3.5-27B" gpu="H200" seeds="0" methods="mean_diff,pca,vjp_delta,random":
     WVS_GPU={{gpu}} uv run --extra steer --group dev modal run --detach scripts/run_modal_wvs.py::main \
-        --model {{model}} --seeds {{seeds}}
+        --model {{model}} --seeds {{seeds}} --methods {{methods}}
 
 wvs-steer-pull:
     uv run --group dev modal volume get --force moralmaps-wvs-steer outputs .
