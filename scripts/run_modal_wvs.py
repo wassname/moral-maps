@@ -52,7 +52,7 @@ def run(argv: list[str]) -> str:
         subprocess.run([sys.executable, "scripts/wvs_steer_sweep.py", *argv], cwd="/repo", check=True)
     finally:
         cache.commit()
-    method = argv[argv.index("--methods") + 1]
+    method = argv[argv.index("--methods") + 1]   # keep --methods as two tokens for this lookup
     seed = argv[argv.index("--seed") + 1] if "--seed" in argv else "0"
     result = Path(f"/cache/outputs/wvs_steer_{method}_s{seed}.json")
     return result.read_text() if result.exists() else ""
@@ -66,7 +66,8 @@ def main(model: str = MODEL, methods: str = ",".join(METHODS), seeds: str = ",".
     handles = {
         job: run.spawn([
             "--model", model, "--methods", job[0], "--seed", job[1],
-            "--device-map", device_map, "--c-grid", c_grid,
+            "--device-map", device_map,
+            f"--c-grid={c_grid}",   # one token: a bare -2,... is read as a flag
             "--extract-batch-size", str(extract_batch_size),
         ])
         for job in jobs
