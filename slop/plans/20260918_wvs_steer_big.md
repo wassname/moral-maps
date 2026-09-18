@@ -1,5 +1,8 @@
 # Plan: steer a large open model on the WVS culture map (honesty + credulity)
 
+Status: superseded by `slop/plans/20260918_wvs_honesty_rerun.md`. This pilot used the wrong
+honesty axis and invalid cross-method dose matching; retain it only as a record of the first run.
+
 worktree `/workspace/2026/lite/moralmaps-wvs-steer-big`, branch `wvs-steer-big`
 written by Claude (claude-opus-4.8 in pi), 2026-09-18. NOT yet approved by wassname.
 
