@@ -1,0 +1,458 @@
+{
+  "budget": {
+    "completed_phases_without_provider_cost": 0,
+    "conservative_spent_usd": "3.20884450",
+    "failed_phases_charged_at_bound": 2,
+    "provider_reported_spent_usd": "3.19041250"
+  },
+  "eval_version": "wvs-gemini-flash-rubric-v1",
+  "models": [
+    {
+      "cells": [
+        {
+          "coords": [
+            0.6170217569786536,
+            0.6282596371882087,
+            0.030916052435892204,
+            0.059459137658558966
+          ],
+          "failed_samples": 0,
+          "name": "normal_minimum",
+          "protocol_id": "e0d26259ddccd08fdba6baedd51acbb873dd0810e916a394be61b18ad5ae422a",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3-flash-preview/normal_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.006697980846262447,
+            0.006408095311956655
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T115057Z_e0d26259ddcc",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.4495943562610229,
+            0.6768678852012185,
+            0.04756892270330131,
+            0.05738876981811542
+          ],
+          "failed_samples": 0,
+          "name": "normal_high",
+          "protocol_id": "80307718e12e6ef071350f0a8e04e61de144eb35c61b624b8b2e3bc1d1945cc9",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3-flash-preview/normal_high.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.024924200772604772,
+            0.008795236239895162
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T115418Z_80307718e12e",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.5808329066393582,
+            0.6101190476190477,
+            0.03096906626299251,
+            0.07022393081440403
+          ],
+          "failed_samples": 0,
+          "name": "reversed_minimum",
+          "protocol_id": "152844599eae3e1c4c8c40130bc7f68f50d996da0818a9a331d31b4f1107b672",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3-flash-preview/reversed_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.008128710395104814,
+            0.011775497950313097
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T120204Z_152844599eae",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.4154850088183421,
+            0.6693121693121693,
+            0.04738934314518543,
+            0.05971456301557607
+          ],
+          "failed_samples": 0,
+          "name": "reversed_high",
+          "protocol_id": "9c2cef1728b21904289627949f2cb216807570a0a99198ae8b20a03cfea0397d",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3-flash-preview/reversed_high.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.023989459613616492,
+            0.004012159229731958
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T120407Z_9c2cef1728b2",
+          "status": "complete",
+          "valid_samples": 72
+        }
+      ],
+      "id": "google/gemini-3-flash-preview"
+    },
+    {
+      "cells": [
+        {
+          "coords": [
+            0.6138227513227512,
+            0.5614856043427471,
+            0.03441266343036969,
+            0.07172945080314014
+          ],
+          "failed_samples": 0,
+          "name": "normal_minimum",
+          "protocol_id": "5c0f17c2ba7fdb7b5616a5d1907ad6b657a4180dc5d783c653f57d94debef777",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.5-flash/normal_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.011708176669385874,
+            0.012116098270348886
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T121225Z_5c0f17c2ba7f",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.5504629629629629,
+            0.6388230376325614,
+            0.050309785412487845,
+            0.048298274833658575
+          ],
+          "failed_samples": 0,
+          "name": "normal_high",
+          "protocol_id": "998703570404688e41278cc8e9eb50aac4b38185f2a18b061f1e710564a40147",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.5-flash/normal_high.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.019765637200383403,
+            0.007465814792614488
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T121419Z_998703570404",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.6142328042328042,
+            0.5530990173847317,
+            0.037461551391359406,
+            0.04997111174982642
+          ],
+          "failed_samples": 0,
+          "name": "reversed_minimum",
+          "protocol_id": "582f12aa78a9fad7c8f921ba27019ce6ba8b08b7100d4d5892a1c12f7c088c91",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.5-flash/reversed_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.0070499649844534005,
+            0.016481648558854735
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T121936Z_582f12aa78a9",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.4958377425044091,
+            0.652336860670194,
+            0.04116918843232739,
+            0.05458693198800789
+          ],
+          "failed_samples": 0,
+          "name": "reversed_high",
+          "protocol_id": "f3e2146f8613fc787a2c949051be2bf4f91972157ec5a2a852a65e94ef902815",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.5-flash/reversed_high.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.029346753485940718,
+            0.01088690354539383
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T122131Z_f3e2146f8613",
+          "status": "complete",
+          "valid_samples": 72
+        }
+      ],
+      "id": "google/gemini-3.5-flash"
+    },
+    {
+      "cells": [
+        {
+          "coords": [
+            0.589126984126984,
+            0.6023062387348102,
+            0.03328500472410627,
+            0.061580682898375746
+          ],
+          "failed_samples": 0,
+          "name": "normal_minimum",
+          "protocol_id": "ee6923acc4e8a4b72b72a8f35899b4f3ff440f134ee8b88676ca83d02f742763",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.6-flash/normal_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.007212121421639044,
+            0.005490813255119021
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T122635Z_ee6923acc4e8",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.5522269705603039,
+            0.6389432877528117,
+            0.04415110776651727,
+            0.053154248160676765
+          ],
+          "failed_samples": 0,
+          "name": "normal_high",
+          "protocol_id": "908521e54c5896fb9daf6126670a9c0e9ce52efe095d6115df45868a4f973c34",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.6-flash/normal_high.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.01318319798916267,
+            0.0051959747487279285
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T122853Z_908521e54c58",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.6243915343915344,
+            0.547017797017797,
+            0.040726457857654524,
+            0.055499554003393715
+          ],
+          "failed_samples": 0,
+          "name": "reversed_minimum",
+          "protocol_id": "6adfdd902f37a63a0980730c43ad977c2cff9248469b7b6602f0d5c80254c285",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.6-flash/reversed_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.006235284119621675,
+            0.01630234196308404
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T123746Z_6adfdd902f37",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.5807098765432098,
+            0.6649316292173436,
+            0.027522573835912764,
+            0.04855439632653008
+          ],
+          "failed_samples": 0,
+          "name": "reversed_high",
+          "protocol_id": "384c0dbfbdb1bbf7caf981c2815e73407507a0e14ef7da8410fecc9288e56089",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.6-flash/reversed_high.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.010569929585689107,
+            0.012168098838558461
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T124019Z_384c0dbfbdb1",
+          "status": "complete",
+          "valid_samples": 72
+        }
+      ],
+      "id": "google/gemini-3.6-flash"
+    },
+    {
+      "cells": [
+        {
+          "coords": [
+            0.4679434257738855,
+            0.630345404154928,
+            0.05507504864362349,
+            0.04758666411632342
+          ],
+          "failed_samples": 0,
+          "name": "normal_minimum",
+          "protocol_id": "4abfb1e17b33a1ff2dd7057006d366930997829637c0faee188bf56a16a292f0",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.7-flash/normal_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.019896865367771178,
+            0.007599103300015066
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T124949Z_4abfb1e17b33",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.5077370426508357,
+            0.6192537621109049,
+            0.036381370448515596,
+            0.04049780365427846
+          ],
+          "failed_samples": 0,
+          "name": "normal_high",
+          "protocol_id": "8a18fcef54ac12b7cabfbc4e66bec22f207633f4f395e0419cb060ad55524c8e",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.7-flash/normal_high.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.01115544193363562,
+            0.008425685112357834
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T125351Z_8a18fcef54ac",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.5034722222222221,
+            0.6308578987150415,
+            0.011633608688756637,
+            0.04640361381560755
+          ],
+          "failed_samples": 0,
+          "name": "reversed_minimum",
+          "protocol_id": "818ffecb3ac5e9519591d194d80c8233292fc5e8cf4fb670ec7b2d871c54fa35",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.7-flash/reversed_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.007228212793297191,
+            0.01081520721802253
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T130220Z_818ffecb3ac5",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.5295447530864197,
+            0.6359599395313681,
+            0.029780377412998712,
+            0.04709405881190778
+          ],
+          "failed_samples": 0,
+          "name": "reversed_high",
+          "protocol_id": "93085f421a57a6625d7d40be7db3251d0347c9ad10d2bc0c754357075cd258de",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.7-flash/reversed_high.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.01863429459252714,
+            0.00902749049776414
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T130637Z_93085f421a57",
+          "status": "complete",
+          "valid_samples": 72
+        }
+      ],
+      "id": "google/gemini-3.7-flash"
+    },
+    {
+      "cells": [
+        {
+          "coords": [
+            0.41143769385148693,
+            0.6264115073638884,
+            0.07088653589748746,
+            0.042073711415980715
+          ],
+          "failed_samples": 0,
+          "name": "normal_minimum",
+          "protocol_id": "96474f9ed9017e6ae81c6e7214dab7e122d263ebc5c54abb6a74acaa120b4254",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.8-flash/normal_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.018251259711482164,
+            0.005662970295505212
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T131254Z_96474f9ed901",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.42397571564238234,
+            0.6153943058704964,
+            0.0640551968027769,
+            0.03603091765350772
+          ],
+          "failed_samples": 0,
+          "name": "normal_high",
+          "protocol_id": "39c670a238050ddeed2e6c1568285af45f1667562f07479ae3a64ea429f5d2a3",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.8-flash/normal_high.jsonl",
+          "rescued_samples": 1,
+          "response_mean_se": [
+            0.0047698134246152305,
+            0.007792820004328513
+          ],
+          "routing_metadata_records": 73,
+          "run_id": "20260918T131632Z_39c670a23805",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.4214814814814815,
+            0.6002241805813234,
+            0.05882556774630966,
+            0.042602258023954356
+          ],
+          "failed_samples": 0,
+          "name": "reversed_minimum",
+          "protocol_id": "d35083caa6744676f4b483550d62f650a6121b8a02c55ede8ddd34c58f6fcff2",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.8-flash/reversed_minimum.jsonl",
+          "rescued_samples": 0,
+          "response_mean_se": [
+            0.016412583635499887,
+            0.009475113221256293
+          ],
+          "routing_metadata_records": 72,
+          "run_id": "20260918T132541Z_d35083caa674",
+          "status": "complete",
+          "valid_samples": 72
+        },
+        {
+          "coords": [
+            0.4552910052910054,
+            0.6445578231292516,
+            0.051907009344091655,
+            0.04633979911000953
+          ],
+          "failed_samples": 0,
+          "name": "reversed_high",
+          "protocol_id": "2bf10e1d6fd2a0dc7aef8538423b966f3293ad2b881234f8c71e87b696849208",
+          "records": "slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.8-flash/reversed_high.jsonl",
+          "rescued_samples": 3,
+          "response_mean_se": [
+            0.01326594258906009,
+            0.009808599386351544
+          ],
+          "routing_metadata_records": 75,
+          "run_id": "20260918T132854Z_2bf10e1d6fd2",
+          "status": "complete",
+          "valid_samples": 72
+        }
+      ],
+      "id": "google/gemini-3.8-flash"
+    }
+  ],
+  "not_published": true,
+  "schema": 1
+}

@@ -1,0 +1,13 @@
+{
+  "external_observed_usd": {
+    "pilot/deepseek-wvs-v1-reliability": "0.364683724004",
+    "pilot/gemini-flash-rubric-smoke-2048/20260918T114112.952954Z": "0.0046880",
+    "pilot/gemini-flash-rubric-smoke/20260918T111625.452461Z": "0.0053585",
+    "pilot/gemini-flash-rubric/20260918T115056.470656Z": "3.19879800"
+  },
+  "prior_observed_usd": "5.34309727235",
+  "rated_ledger_cost_usd": "7.388069120252",
+  "reconciled_utc": "2026-09-18T13:38:36.534345+00:00",
+  "reservations": {},
+  "schema": 1
+}

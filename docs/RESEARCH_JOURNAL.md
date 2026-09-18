@@ -1091,3 +1091,35 @@ The local pilot ledger now includes both smoke protocols and reports USD 0.01004
 My read: this sample supports the operational requirement that the fixed 2,048-token output budget can return high-reasoning ratings without a rescue. It does not estimate truncation frequency across items or releases. The fixed budget removes the known condition-specific budget difference, while route validation, seeded rescue, the USD 20 stage stop, and the append-only records bound the remaining operational risks. -- PI[gpt-5.6-terra]
 
 The full pilot remains unqueued until the revised smoke is inspected.
+
+## 2026-09-18 -- Gemini Flash rubric pilot observed usage and audit
+
+This entry records the completed provider-locked pilot without changing the public map.
+
+Pueue task 1698 ran `scripts/wvs_api/08_gemini_flash_rubric_pilot.sh` on the dedicated research branch. The full raw records contain five Gemini Flash releases, four cells each, twelve WVS items per cell, and six ratings per item. The runner expected 1,440 initial calls. Each of the twenty `run_finished` records instead reports 72 valid and zero failed samples, so all 1,440 final answer vectors parsed. Four Gemini 3.8 high-reasoning samples required a rescue phase, and two client `ReadTimeout` attempts retried successfully. Source: `slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/`, `request_attempts.jsonl`, and Pueue log 1698.
+
+| accounting quantity | observed USD | how known |
+| --- | ---: | --- |
+| panel provider-reported response cost, including rescues | 3.18036600 | sum of 1,444 full-panel `request_completed.usage.cost` values |
+| prior paid smokes | 0.01004650 | saved smoke records |
+| total provider-reported local spend | 3.19041250 | `budget.json.provider_reported_spent_usd` |
+| two missing-response timeout bounds | 0.01843200 | 2 x saved USD 0.009216 request bounds |
+| total conservative pilot spend | 3.20884450 | `budget.json.conservative_spent_usd` and global settlement |
+
+The durable final ledger states:
+
+> "completed_phases": 1447,
+> "completed_phases_without_provider_cost": 0,
+> "conservative_spent_usd": "3.20884450",
+> "failed_phases_charged_at_bound": 2,
+> "hard_cap_usd": "20",
+> "provider_reported_spent_usd": "3.19041250",
+> "reserved_usd": "0E-8"
+
+The global ledger settles the two smokes and full pilot to exactly USD 3.20884450 and has no held reservation. The full panel settlement is USD 3.19879800, which equals the USD 3.18036600 response cost plus the USD 0.01843200 conservative timeout charge. Source: `slop/research/wvs/20260917_score_all_options/budget.json` and `slop/research/wvs/20260918_gemini_flash_rubric_pilot/budget.json`.
+
+The audited response data contains 586 all-equal raw rating vectors out of 1,440, or 40.7 percent. High-minus-minimum coordinate shifts changed sign across releases, and the reverse-transformed rubric shift also varied by release. The detailed cell coordinates, paired uncertainty, binary-order contrast, exact routes, unavailable quantization field, and limitations are in `slop/audits/job_1698_gemini_flash_rubric_pilot.md`.
+
+My read: this is probably good operational evidence that the budget, durable records, provider lock, route validation, and transform performed as designed. It is not causal evidence that reasoning depth changes values, because the four cells ran in fixed order and the current measurement also has uneven flat-rating and rescue rates. -- PI[gpt-5.6-terra]
+
+The audited pilot remains separate from the published map pending owner review.
