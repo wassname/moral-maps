@@ -33,7 +33,7 @@ the model must fit with an autograd graph, not just a KV cache.
 
 | model | total/active | bf16 GB | fits | $/hr | verdict |
 | --- | --- | --- | --- | --- | --- |
-| Qwen3.5-27B (dense) | 27B | 54 | 1xH200 | 4.54 | cheap rung, measure timings here |
+| Qwen3.5-27B (dense) | 27B | 54 | 1xH200 | 4.54 | cheap, run first to measure seconds per readout |
 | **Qwen3.5-122B-A10B** | 122B/10B | 244 | 2xB200 (360) | **12.50** | **primary** |
 | GLM-5.3-Flash | 320B/18B | 640 | 4xB200 (720) | 25.00 | stretch, tight for activations |
 | GLM-5.3 | 753B/40B | 1506 | nothing at bf16; fp8 ~753 on 8xH200 | 36-50 | backward through fp8 MoE is unproven, skip |
@@ -41,8 +41,8 @@ the model must fit with an autograd graph, not just a KV cache.
 
 Rough budget for the primary: extraction 3 methods x 2 axes x 3 seeds, plus a dose sweep of
 ~5 doses x 2 directions x 3 methods x 2 axes read on a 12-item battery. Order of magnitude
-**$50-150** including debugging. This is a guess with wide error bars, the 27B rung exists to
-replace it with measured seconds-per-readout before the big spend.
+**$50-150** including debugging. This is a guess with wide error bars. Run the 27B first and
+replace the guess with measured seconds per readout before the big spend.
 
 Cost leaks to avoid: an idle container holding 2xB200 while we poke at a bug ($12.50/hr), and
 re-downloading 244 GB per cold start (keep weights on a Volume).
