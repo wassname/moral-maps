@@ -1,0 +1,30 @@
+{
+  "budget": {
+    "completed_phases": 217,
+    "completed_phases_without_provider_cost": 0,
+    "conservative_spent_usd": "0.07505325",
+    "failed_phases_charged_at_bound": 0,
+    "hard_cap_usd": "5",
+    "provider_reported_spent_usd": "0.07505325",
+    "reserved_usd": "0E-8",
+    "schema": 1
+  },
+  "item": "Homosexuality",
+  "model": "google/gemini-3.7-flash",
+  "outcome": {
+    "outcome": "cannot_answer",
+    "selected": "No answer"
+  },
+  "records": "slop/research/wvs/20260918_original_choice_pilot/paid_smoke.jsonl",
+  "routes": [
+    {
+      "advertised_quantization": "unknown",
+      "endpoint_tag": "google-ai-studio",
+      "requested_model": "google/gemini-3.7-flash",
+      "response_model": "google/gemini-3.7-flash",
+      "selected_provider": "Google AI Studio",
+      "selected_release_slug": "google/gemini-3.7-flash-20260813"
+    }
+  ],
+  "status": "passed"
+}

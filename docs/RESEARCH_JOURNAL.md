@@ -1141,3 +1141,46 @@ The same response returns a ten-key all-3 JSON object. The instrument prompt exp
 My read: it is probable that at least some flat vectors are deliberate abstention or neutrality rather than sampling noise or parser failure, because this response states that mechanism before emitting an all-neutral vector. It is not proven for every flat vector, and the opposite rubric-by-effort changes rule out a simple monotone reasoning account. -- PI[gpt-5.6-terra]
 
 The cause of the remaining flat vectors remains open.
+
+## 2026-09-18 -- Preregistration: wvs-original-choice-pilot-v1
+
+Written and committed before any paid call of this pilot. Branch `research/gemini-flash-rubric-v1`; published map untouched.
+
+### Source reconstruction (verified from the saved dataset, no fabrication)
+
+Dataset `Anthropic/llm_global_opinions`, WVS rows, read offline from the local HF cache. Ordinary panel items are stored one row per item with verbatim question text and verbatim option lists that include the original non-substantive codes. The 12 rubric-pilot items resolve to 8 ordinary questions (Religion; God; Abortion; Homosexuality; interpersonal trust; Signing a petition; Attending peaceful demonstrations; Joining in boycotts) plus 4 child qualities. The child qualities share exactly one distinct stem, verbatim: "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important? Please choose up to five." with exactly 10 per-quality rows (Feeling of responsibility; Tolerance and respect for other people; Obedience; Good manners; Not being selfish (unselfishness); Independence; Thrift saving money and things; Hard work; Imagination; Determination, perseverance). The original choose-up-to-five list is therefore exactly reconstructible: verbatim stem plus the 10 quality names in saved source row order. The source stores only per-quality marginal human distributions, not the joint human selection distribution; model-side sampling needs only the instrument, so reconstruction proceeds. Stems are kept verbatim, including "using this card" phrasing.
+
+### Instrument mapping (exact)
+
+- Ordinary question: verbatim question text, all source options offered verbatim except the post-hoc missing code "Other missing; Multiple answers Mail (EVS)", which is a data-collection code, not a card option; offered lists are substantive options plus "Don't know" and "No answer" (asserted present in every row). Response schema: `{"selected": <exact option string>}`.
+- Child qualities: one list question per model, verbatim stem plus numbered qualities in saved source row order; schema `{"selected": [<0 to 5 distinct quality strings>]}`.
+- `cannot_answer` (reported separately, never treated as neutral, never dropped): ordinary selection in {"Don't know", "No answer"}; list selection of length 0. The original instrument has no "none" option for the list, so zero selections is recorded as non-substantive.
+- Invalid (rescued once, then a failed sample): malformed JSON, unknown option, duplicates, or more than 5 selections.
+
+### Design
+
+Five Gemini Flash releases, pinned provider `google-ai-studio`, `allow_fallbacks=false`, `require_parameters=true`, exact dated release slugs validated per response; each release's minimum reasoning (Preview/3.5/3.6 `minimal`, 3.7/3.8 `low`); temperature 1.0; `max_tokens` 1024; structured output; per-response OpenRouter metadata with the advertised quantization field saved verbatim (currently `unknown`). N=24 paired deterministic seeds shared across all five releases; presented option order is the canonical source order cyclically rotated by sample index modulo the offered-list length, identical across releases, so samples pair exactly. 9 original questions x 24 = 216 requests per model, 1,080 panel requests plus 1 paid smoke = 1,081 planned paid calls.
+
+### Budget
+
+Distinct namespace: `wvs-original-choice-pilot-v1`, artifacts under `slop/research/wvs/20260918_original_choice_pilot/`, local ledger `budget.json` there, global lane `google` reservation `pilot/original-choice` against the locked USD 80 repository cap. Per-request reserve bound: 1,024 input + 1,024 output tokens at each endpoint's listed prices (worst-case panel bound about USD 6.09 is a reserve ceiling, not expected spend; the dense pilot averaged about USD 0.0022 per request). Hard stage stop USD 5.0 conservative spend; if reached, the runner raises and no further requests are reserved.
+
+### Analysis plan (fixed before unblinding)
+
+1. Per model per question: selected-option frequencies over substantive answers, `cannot_answer` count and rate, coverage (substantive fraction of 24).
+2. Conditional WVS coordinates: per-item p over substantive options only; child quality q mapped to the source binary row as [P(Important), 1-P]; coordinates via the existing `model_coord_ci` item-and-response bootstrap; paired bootstrap over the 24 shared sample indices (B=1000) for cross-release differences, slopes, and 2D residual RMSE.
+3. Release-date OLS slope/R2/2D RMSE as in the rubric audit, compared descriptively against the completed dense `normal_minimum` and `normal_high` cells. No protocol is selected or promoted on trend alone.
+
+### Preregistered predictions
+
+- P1: `cannot_answer` rates are nonzero and heterogeneous across releases; doubt that showed as flat vectors under dense scoring can surface as explicit "Don't know"/"No answer".
+- P2: original-choice coordinates differ from dense `normal_minimum` coordinates on at least some releases; direction not predicted.
+- P3: no directional prediction on release-date 2D RMSE versus the dense range 0.0464-0.0639.
+
+### Smoke gate (1 paid request)
+
+`google/gemini-3.7-flash`, Homosexuality (flat-prone: 40.7 percent flat vectors in the dense pilot; its reversed-high reasoning explicitly stated the AI lacks personal beliefs). Gates: parse-valid selected option; validated google-ai-studio route; `usage.cost` present; the answer lands in substantive or `cannot_answer`, never silently neutral.
+
+### Execution
+
+Exactly one resumable Pueue task on the `api` group after the smoke passes, with one `pqf` follower; full log and raw records audited before interpretation.
