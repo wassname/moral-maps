@@ -83,6 +83,30 @@ def main(model: str = MODEL, methods: str = ",".join(METHODS), seeds: str = ",".
             print(f"{method}\ts{seed}\tFAILED\t{error}")
 
 
+@app.function(gpu=os.environ.get("WVS_GPU", "H200"), volumes={"/cache": cache}, timeout=60 * 60)
+def probe(model: str, device_map: str) -> str:
+    """Read the battery unsteered at several think budgets: is this model's answer slot readable?"""
+    from huggingface_hub import snapshot_download
+
+    snapshot_download(model)
+    argv = ["--model", model] + (["--device-map", device_map] if device_map else [])
+    out = subprocess.run([sys.executable, "scripts/probe_wvs_think_budget.py", *argv],
+                         cwd="/repo", check=True, capture_output=True, text=True)
+    return out.stdout
+
+
+@app.local_entrypoint()
+def readable(models: str = "Qwen/Qwen3.5-27B,Qwen/Qwen3-32B", device_map: str = ""):
+    """Which candidate large model reads cleanly enough to be worth a sweep? ~10 min per model."""
+    handles = {m: probe.spawn(m, device_map) for m in models.split(",")}
+    for m, handle in handles.items():
+        print(f"\n===== {m} =====")
+        try:
+            print(handle.get())
+        except Exception as error:
+            print(f"FAILED\t{error}")
+
+
 @app.local_entrypoint()
 def smoke():
     """Same image, mounts and Volume as the real fan-out, on the tiny random model."""

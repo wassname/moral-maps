@@ -7,6 +7,15 @@ written by Claude (claude-opus-4.8 in pi), 2026-09-18. NOT yet approved by wassn
 > moral map how the cultural preference change when steered for honesty + credulity. I want to
 > try a few steering methods." -- wassname
 
+Decisions after the first pass (wassname, 2026-09-18):
+- honesty only, one axis, credulity dropped
+- WVS only, no MFQ-2. "that's the plot"
+- "$100 is fine if it works"
+
+Branch note: this worktree branched from 789829e, which the Gemini-pilot session later amended to
+4955468. Rebase or cherry-pick the steering commits onto 4955468 before any merge, do not carry the
+stale preregistration commit. (told to me over intercom by moralmap_add_astra)
+
 ## What exists already (observation, read from the code today)
 
 - `scripts/wvs_map.py --local-model X` already reads the 12-item Inglehart-Welzel battery with the
@@ -51,13 +60,15 @@ Why not the biggest: Kimi K3 does not fit one Modal container at any precision, 
 fits as fp8 where the `vjp_delta` backward is a research project of its own. Qwen3.5-122B-A10B also
 gives a clean scaling story next to the published Qwen3-4B showcase, same family.
 
-## Preregistered confound (raise before running)
+## Preregistered confound
 
-X-axis item 2 is interpersonal trust, `"Most people can be trusted"`. A **credulity** steer is
-close to a paraphrase of that item, so an X shift may be lexical leakage, not a cultural move.
-Discriminator: recompute X with that item held out. If the credulity effect on X survives the
-holdout, it is a cultural move; if X collapses to base, it is item leakage and must be reported
-as such. Honesty has no equivalent overlap in the battery.
+The battery is 12 items, so one item can carry a whole apparent move. `scripts/wvs_steer_sweep.py`
+saves each item's position at every dose, and `scripts/plot_wvs_steer.py` reports the move length
+again with the single most influential item removed. A move that mostly disappears under that
+leave-one-out is one item reacting to the persona wording, not a cultural shift.
+
+This mattered most for credulity, which nearly paraphrases the X-axis trust item
+(`"Most people can be trusted"`). Credulity is now out of scope, but the check is cheap and stays.
 
 ## Goals
 

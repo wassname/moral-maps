@@ -27,9 +27,14 @@ _ASSISTANT_SENTINEL: str = "ZZUNIQ_ASSISTANT_SENTINEL_ZZ"
 
 
 def _generation_prompt_with_open_think(tok, messages: list[dict[str, str]]) -> str:
-    """Return exactly one open reasoning marker. (Claude, 2026-07-19)"""
+    """Return exactly one open reasoning marker. (Claude, 2026-07-19)
+
+    enable_thinking=True matters for templates that default to non-thinking: Qwen3.5 otherwise emits
+    a CLOSED empty `<think></think>`, we then append our own `<think>`, and the model reads a
+    `</think> ... <think>` sequence it never saw in training. Templates without the variable ignore
+    it (Qwen3 is unchanged)."""
     prompt = tok.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True)
+        messages, tokenize=False, add_generation_prompt=True, enable_thinking=True)
     if prompt.rstrip().endswith("<think>"):
         return prompt
     return prompt + "<think>\n"

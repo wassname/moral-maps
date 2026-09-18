@@ -28,3 +28,7 @@ wvs-steer-modal model="Qwen/Qwen3.5-27B" gpu="H200":
 
 wvs-steer-pull:
     uv run --group dev modal volume get --force moralmaps-wvs-steer outputs .
+
+# which candidate large model reads the answer slot cleanly enough to be worth a sweep
+wvs-steer-readable models="Qwen/Qwen3.5-27B,Qwen/Qwen3-32B":
+    uv run --extra steer --group dev modal run scripts/run_modal_wvs.py::readable --models {{models}}

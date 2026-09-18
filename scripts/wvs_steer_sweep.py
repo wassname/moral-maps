@@ -141,7 +141,9 @@ def main() -> None:
     else:
         model = AutoModelForCausalLM.from_pretrained(args.model, dtype=dtype).to(args.device).eval()
 
-    n_blocks = model.config.num_hidden_layers
+    # Qwen3.5 ships as a VL wrapper (Qwen3_5ForConditionalGeneration), so the block count lives in
+    # config.text_config, not at the top level.
+    n_blocks = model.config.get_text_config().num_hidden_layers
     if args.layers == "mid":
         layers = tuple(range(max(2, int(n_blocks * 0.2)), min(n_blocks - 2, int(n_blocks * 0.8))))
     else:
