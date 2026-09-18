@@ -1026,3 +1026,26 @@ The ledger's 146 accepted phases sum to 28,157 prompt tokens, 78,117 completion 
 My read: this is very probably a valid exact-protocol mechanics diagnostic and resolves the task 1622 wrapper/config regression. The two rescues are explicit and billed rather than hidden, but their upstream empty-message cause remains unknown. An independent raw-answer review found 11 of 12 Homosexuality pole replies rate every mutually exclusive option identically, producing an expected score 5.57 near the 5.5 midpoint. The parse-completeness result therefore does not validate the self-expression coordinate for priority sequencing.
 
 Priority dispatch is paused pending an explicit content-quality metric and its cheapest diagnostic.
+
+## 2026-09-18 -- Gemini Flash reasoning and rating-rubric pilot design
+
+This entry preregisters a provider-locked pilot to separate reasoning-depth effects from sensitivity to the rating rubric.
+
+The saved model catalog and the endpoint snapshot at `slop/research/wvs/20260918_gemini_flash_rubric_pilot/endpoint_catalog.json` identify five compatible full Gemini Flash releases: `google/gemini-3-flash-preview`, `google/gemini-3.5-flash`, `google/gemini-3.6-flash`, `google/gemini-3.7-flash`, and `google/gemini-3.8-flash`. Gemini 3 Flash has only a preview entry in the saved catalog, so it is retained as that release. Batch aliases, Flash Lite, and image variants are excluded. Gemini 2.5 Flash is excluded because its Google AI Studio endpoint advertises `reasoning` but not `reasoning_effort`, so the required minimum-versus-high comparison is not established. The five selected standard Google AI Studio endpoints advertise both `reasoning_effort` and structured output. Their advertised quantization is `unknown`.
+
+Each model has four cells: normal human rubric at minimum and high reasoning, and reversed rating rubric at minimum and high reasoning. Minimum is `minimal` for Gemini 3, 3.5, and 3.6 Flash, and `low` for Gemini 3.7 and 3.8 Flash. Each cell uses the same twelve WVS items and options, six samples per item, paired deterministic seeds, and three canonical plus three reversed option orders for binary items. The reversed rubric says that one is strong endorsement and five is strong rejection; analysis applies `6 - rating`, but retains the raw reversed cell separately and does not merge it into the primary human-comparable result. There is no z-scaling.
+
+The provider policy is `only=["google-ai-studio"]`, `allow_fallbacks=false`, and `require_parameters=true`. A complete pilot is seventy-two requests per cell, two hundred eighty-eight per model, and fourteen hundred forty paid panel requests, plus one paid smoke request. At the standard endpoint prices saved in the endpoint snapshot, a conservative bound that charges both input and completion as 1024 tokens for every panel request is USD 8.110080; the highest-price one-request smoke bound is USD 0.010752. The hard pilot stop is USD 10 within the existing reliability and repository caps.
+
+The existing selected-model ledger has seven hundred ninety-one completed request phases: six hundred thirty-three say provider `Google`, fourteen say `Google AI Studio`, and one hundred forty-four have no provider value. None contains a quantization field. The dated endpoint snapshot lists three Google AI Studio service tiers per selected model, but every tier reports quantization as `unknown`. Therefore zero existing responses have recoverable exact quantization, and quantization-stratified variance is not identifiable from saved evidence. Provider and endpoint-tier metadata remain worth recording, but they are not a quantization label.
+
+Predictions recorded before requests:
+
+- If reasoning depth is a material source of coordinate variation, the paired high-minus-minimum shift should repeat in direction across releases within each rubric.
+- If rating-scale wording is a material source, the reverse-transformed reversed-rubric cell should differ from the normal-rubric cell under the same reasoning setting.
+- If a release trend is robust, its direction should be similar in all four cells. A trend that changes sign across rubric or reasoning cells is evidence of measurement sensitivity rather than a stable family trajectory.
+- Under a rubric-invariant readout, normal and reverse-transformed cells should agree within their paired sampling uncertainty.
+
+My read: the crossed design is likely more informative than increasing repeats under one prompt, because it tests two named measurement choices while holding provider, items, options, and seed schedules fixed. A remaining alternative is genuine model variation within the Flash series; the four-cell agreement pattern is what separates that from prompt sensitivity. -- PI[gpt-5.6-terra]
+
+The paid run begins only after metadata capture is durable and a one-request smoke record shows the actual route and response fields.
