@@ -1125,3 +1125,19 @@ For the direct release-date question, an unweighted five-release OLS fit has low
 My read: this is probably good operational evidence that the budget, durable records, provider lock, route validation, and transform performed as designed. It is not causal evidence that reasoning depth changes values, because the four cells ran in fixed order and the current measurement also has uneven flat-rating and rescue rates. -- PI[gpt-5.6-terra]
 
 The audited pilot remains separate from the published map pending owner review.
+
+## 2026-09-18 -- Flat ratings and stated lack of personal beliefs
+
+This note records one possible meaning of the pilot's flat rating vectors.
+
+The raw data contains 586 all-equal rating vectors out of 1,440. By rubric and effort, the counts are normal minimum 127/360 (35.3%), normal high 138/360 (38.3%), reversed minimum 171/360 (47.5%), and reversed high 150/360 (41.7%). The normal high-minus-minimum change is +3.0 percentage points, while the reversed high-minus-minimum change is -5.8 percentage points. Thus more reasoning did not monotonically increase flat ratings across the two rubric directions. Source: `slop/research/wvs/20260918_gemini_flash_rubric_pilot/results.json` and the raw `item_result` records.
+
+In `slop/research/wvs/20260918_gemini_flash_rubric_pilot/records/google__gemini-3.7-flash/reversed_high.jsonl:5`, request `20260918T130637Z_93085f421a57_001` is the Homosexuality initial response. Its visible reasoning says:
+
+> A neutral stance seems appropriate, given the AI lacks personal beliefs, and forced-choice JSON survey format often leads to neutral value choices.
+
+The same response returns a ten-key all-3 JSON object. The instrument prompt explicitly asks the model to "personally agree with or endorse EACH" answer, so refusal to possess personal beliefs conflicts with the intended construct even though the object parses and is a valid score-all-options response.
+
+My read: it is probable that at least some flat vectors are deliberate abstention or neutrality rather than sampling noise or parser failure, because this response states that mechanism before emitting an all-neutral vector. It is not proven for every flat vector, and the opposite rubric-by-effort changes rule out a simple monotone reasoning account. -- PI[gpt-5.6-terra]
+
+The cause of the remaining flat vectors remains open.
