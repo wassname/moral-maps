@@ -132,6 +132,15 @@ def main() -> None:
         title_y=0.115, note_y=0.04)
     ax = fig.axes[0]
 
+    random_runs = groups.get("random", [])
+    null_move: dict[float, list[float]] = {}
+    for r in random_runs:
+        b = r["doses"][0]
+        for d in r["doses"][1:]:
+            if d["mean_pmass"] >= args.min_pmass:
+                null_move.setdefault(d["mult"], []).append(
+                    float(np.hypot(d["x"] - b["x"], d["y"] - b["y"])))
+
     failed, rows, null_pts = 0, [], []
     for method, method_runs in groups.items():
         color = METHOD_COLORS[method]
@@ -159,10 +168,15 @@ def main() -> None:
                 pooled_base["psamples"], far["psamples"], resolved,
                 np.random.default_rng(20_000 + sign))
             worst, loo_len = loo_worst(far, pooled_base, resolved)
+            move = float(np.hypot(dx, dy))
+            null = null_move.get(far["mult"], [])
+            null_p95 = float(np.quantile(null, 0.95)) if null else np.nan
             rows.append([method, len(method_runs), f"{far['mult']:+.1f}",
                          f"{dx:+.4f}+-{1.96 * dx_se:.3f}",
                          f"{dy:+.4f}+-{1.96 * dy_se:.3f}",
-                         f"{np.hypot(dx, dy):.4f}", f"{loo_len:.4f}",
+                         f"{move:.4f}", f"{loo_len:.4f}",
+                         f"{null_p95:.4f}" if null else "-", len(null),
+                         "yes" if null and move > null_p95 else "no",
                          worst or "-", f"{far['mean_pmass']:.3f}"])
             ax.annotate(f"{far['mult']:+g}C", (far["x"] * sgx, far["y"] * sgy),
                         xytext=(3, 3), textcoords="offset points", fontsize=6, color=color)
@@ -183,7 +197,24 @@ def main() -> None:
     rows.sort(key=lambda r: -float(r[5]))
     print(tabulate(rows, tablefmt="pipe", headers=[
         "method", "read seeds", "dose", "dx (95%)", "dy (95%)", "|move|",
-        "|move| less worst item", "worst item", "pmass"]))
+        "|move| less worst item", "random p95", "random n", "beats random?",
+        "worst item", "pmass"]))
+
+    random_effects = [r["manipulation_check"]["scored"]["effect_logodds"]
+                      for r in random_runs]
+    random_effect_p95 = float(np.quantile(random_effects, 0.95)) if random_effects else np.nan
+    check_rows = []
+    for method, method_runs in groups.items():
+        if method == "random":
+            continue
+        effects = [r["manipulation_check"]["scored"]["effect_logodds"] for r in method_runs]
+        effect = float(np.mean(effects))
+        check_rows.append([method, f"{effect:+.3f}",
+                           f"{random_effect_p95:+.3f}" if random_effects else "-",
+                           len(random_effects), "yes" if random_effects and effect > random_effect_p95 else "no"])
+    print("\nHeld-out honesty manipulation (true-vs-welcome log-odds):")
+    print(tabulate(check_rows, tablefmt="pipe", headers=[
+        "method", "effect", "random p95", "random n", "honesty-specific?"]))
     print("\ndx/dy intervals pool independent read seeds and pair base versus dose on the same\n"
           "items and sampled think streams. Hollow points remain visible but fail pmass >= 0.90.")
     logger.info(f"wrote {args.out} ({failed} method-dose paths/points failed pmass {args.min_pmass})")

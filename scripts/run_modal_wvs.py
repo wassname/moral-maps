@@ -60,9 +60,11 @@ def run(argv: list[str]) -> str:
 
 @app.local_entrypoint()
 def main(model: str = MODEL, methods: str = ",".join(METHODS), seeds: str = ",".join(map(str, SEEDS)),
-         device_map: str = "auto", c_grid: str = "-2,-1,-0.5,0.5,1,2", extract_batch_size: int = 8):
+         random_seeds: str = "", device_map: str = "auto",
+         c_grid: str = "-2,-1,-0.5,0.5,1,2", extract_batch_size: int = 8):
     # one container per (method, seed): a dead lane must not hide the others
     jobs = [(m, s) for s in seeds.split(",") for m in methods.split(",")]
+    jobs += [("random", s) for s in random_seeds.split(",") if s and ("random", s) not in jobs]
     handles = {
         job: run.spawn([
             "--model", model, "--methods", job[0], "--seed", job[1],
