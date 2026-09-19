@@ -22,8 +22,9 @@ Spend authority: single-smoke approval seq 150; the 512-call panel was not queue
 
 - One response, no rescue (the reply parsed first try; rescue triggers only on
   unparseable/truncated JSON).
-- 9/9 substantive, 0 refusals (v1 smoke on the same model refused 9/9 when refusal was
-  advertised; the escape hatch, not the model, was the difference).
+- 9/9 substantive, 0 refusals. Bounded comparison: the same model gave 9/9 refusal under v1
+  versus 9/9 substantive under v2. This is consistent with the advertised refusal token
+  causing the v1 result, but n=1 and the added reason fields do not isolate causality.
 - Every reason has 6-7 words, status `valid`. Child selected 5 qualities
   (Feeling of responsibility; Tolerance and respect for other people; Independence;
   Imagination; Determination, perseverance). Observation, not inference: reason

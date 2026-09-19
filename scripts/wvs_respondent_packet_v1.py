@@ -313,15 +313,30 @@ def paired_seeds(count: int) -> list[int]:
     return seeds
 
 
+def migrate_ledger(state: dict) -> dict:
+    """Schema 1 -> 2: this stage ledger accumulates costs across eval versions (v1 smoke plus
+    v2 smoke/panel), so a single eval_version label is false. Replace it with the
+    eval_versions list. Every numeric/counter field passes through untouched."""
+    if state.get("schema", 1) < 2:
+        versions = sorted({state.pop("eval_version", EVAL_VERSION), EVAL_VERSION})
+        state["schema"] = 2
+        state["eval_versions"] = versions
+    versions = state.setdefault("eval_versions", [EVAL_VERSION])
+    if EVAL_VERSION not in versions:
+        state["eval_versions"] = sorted(versions + [EVAL_VERSION])
+    return state
+
+
 def update_state(update) -> dict:
     OUT.mkdir(parents=True, exist_ok=True)
     with LOCK.open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         state = json.loads(STATE.read_text()) if STATE.exists() else {
-            "schema": 1, "eval_version": EVAL_VERSION, "hard_cap_usd": str(STAGE_CAP_USD),
+            "schema": 2, "eval_versions": [EVAL_VERSION], "hard_cap_usd": str(STAGE_CAP_USD),
             "provider_reported_spent_usd": "0", "conservative_spent_usd": "0",
             "reserved_usd": "0", "completed_phases": 0,
             "completed_phases_without_provider_cost": 0, "failed_phases_charged_at_bound": 0}
+        migrate_ledger(state)
         state["hard_cap_usd"] = str(STAGE_CAP_USD)
         update(state)
         atomic_json(STATE, state)
@@ -868,8 +883,24 @@ def offline_regression(battery: list[dict]) -> None:
         assert smoke_stub.call_count == 1 and run_stub.call_count == 0
         assert os.environ.get(PAID_OPTIN_ENV) == "1"
         os.environ.pop(PAID_OPTIN_ENV, None)
+    # fixture: ledger migration labels both eval versions and preserves every numeric field
+    v1_ledger = {"schema": 1, "eval_version": "wvs-respondent-packet-v1",
+                 "hard_cap_usd": "5", "provider_reported_spent_usd": "0.00054048",
+                 "conservative_spent_usd": "0.00938784", "reserved_usd": "0E-8",
+                 "completed_phases": 1, "completed_phases_without_provider_cost": 0,
+                 "failed_phases_charged_at_bound": 3}
+    migrated = migrate_ledger(dict(v1_ledger))
+    assert migrated["schema"] == 2
+    assert migrated["eval_versions"] == ["wvs-respondent-packet-v1",
+                                          "wvs-respondent-packet-v2"]
+    assert "eval_version" not in migrated, "single-version label must be gone after migration"
+    for key, value in v1_ledger.items():
+        if key in ("schema", "eval_version"):
+            continue
+        assert migrated[key] == value, f"migration changed numeric field {key}"
+    assert migrate_ledger(migrated) == migrated, "migration must be idempotent"
     print("offline regression passed: opt-in guard, mis-patch defense, CLI refusal check, "
-          "and dotenv paid-path gating all hold")
+          "dotenv paid-path gating, and ledger migration all hold")
 
 
 def paid_smoke(battery: list[dict]) -> None:
