@@ -1,0 +1,18 @@
+# Saved Qwen3-14B WVS replot
+
+Command:
+
+```sh
+UV_OFFLINE=1 uv run --offline python -u scripts/plot_wvs_steer.py --runs outputs --out docs/img/wvs/wvs_steer_honesty_qwen3_14b.png
+```
+
+Observed output:
+
+```text
+2026-09-19 14:17:53 | wrote docs/img/wvs/wvs_steer_honesty_qwen3_14b.png, docs/img/wvs/wvs_steer_honesty_qwen3_14b.svg, docs/img/wvs/wvs_steer_honesty_qwen3_14b.md
+2026-09-19 14:17:53 | wrote docs/img/wvs/wvs_steer_honesty_qwen3_14b_vjp.png
+```
+
+The plot reads saved `outputs/wvs_steer_*.json` artifacts only. Filled points use pooled `pmass(dose) / pmass(vanilla) >= 0.96`. The VJP negative `-0.5C` point is the first failure. Later negative observations remain disconnected.
+
+-- PI[gpt-5.6-terra]

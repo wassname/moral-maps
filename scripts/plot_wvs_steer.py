@@ -1,17 +1,13 @@
-"""Draw the honesty steer as a path across the WVS culture map, one path per method.
+"""Render saved Qwen3-14B WVS steering artifacts without model inference.
 
-Reads the JSONs from scripts/wvs_steer_sweep.py and puts them on the same map as the base model,
-so the question "where does honesty steering move this model, culturally" has a picture.
+The source of truth is the saved ``lp_gather`` values in ``outputs/wvs_steer_*.json``.
+A point is connected only while its pooled answer mass remains at least 96% of that
+method's pooled vanilla answer mass. Later recovered points are observations, not a
+continuous dose trajectory.
 
-Three things the figure has to keep honest:
-  - the random control's reach is drawn as a grey null region. A method inside it has shown nothing.
-  - doses below the preregistered answer-mass gate stay visible as faint hollow points, but are
-    excluded from the result table. A path that wanders because the model stopped answering is not
-    a cultural move.
-  - the leave-one-out column in the table says how much of the move survives dropping the single
-    most influential item, so a one-item lexical effect cannot pass as a shift of the whole profile.
-
-  uv run python scripts/plot_wvs_steer.py --runs outputs --out docs/img/wvs/wvs_steer_honesty.png
+uv run python scripts/plot_wvs_steer.py \
+  --runs outputs \
+  --out docs/img/wvs/wvs_steer_honesty_qwen3_14b.png
 """
 from __future__ import annotations
 
@@ -19,214 +15,402 @@ import argparse
 import json
 from pathlib import Path
 
+import matplotlib
 import numpy as np
 from loguru import logger
+from matplotlib.patches import FancyArrowPatch
 from tabulate import tabulate
 
-import matplotlib
 matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 from moralmaps import maps
-from moralmaps.iw_axes import X_AXIS, Y_AXIS, positiveness, resolve_items
+from moralmaps.iw_axes import X_AXIS, Y_AXIS, resolve_items
 from moralmaps.wvs import coord_delta_ci, human_axis_scores, load_wvs_all
 from moralmaps.zones import zones_for
 
-# Deliberately none of the zone-hull colours (West blue, East Asia red, Latin America orange,
-# African-Islamic brown) or the model-star purple, so a path is never mistaken for a human region.
-METHOD_COLORS = {"vjp_delta": "#111111", "mean_diff": "#00838f", "pca": "#1e8449", "random": "#777777"}
+COLORS = {"vjp_delta": "#111111", "mean_diff": "#00838f", "pca": "#1e8449", "random": "#777777"}
+MAIN_METHODS = ("vjp_delta", "mean_diff", "pca")
+PMASS_RATIO_FLOOR = 0.96
 
 
 def axis_means(per_item: dict, resolved: dict, drop: str | None = None) -> tuple[float, float]:
-    """(X, Y) from saved per-item positions, optionally dropping one item (leave-one-out)."""
-    xy = []
+    """Return WVS coordinates from saved per-item positions."""
+    values = []
     for axis in (X_AXIS, Y_AXIS):
-        vals = [per_item[it["suffix"]]["pos"] for it in resolved[axis] if it["suffix"] != drop]
-        xy.append(float(np.mean(vals)))
-    return xy[0], xy[1]
+        values.append(float(np.mean([
+            per_item[item["suffix"]]["pos"]
+            for item in resolved[axis]
+            if item["suffix"] != drop
+        ])))
+    return tuple(values)
 
 
 def loo_worst(dose: dict, base: dict, resolved: dict) -> tuple[str, float]:
-    """The item whose removal shrinks the move most, and the move length without it."""
-    full = np.hypot(dose["x"] - base["x"], dose["y"] - base["y"])
-    worst, best_len = None, full
+    """Return the item whose removal reduces the saved movement most."""
+    full_move = np.hypot(dose["x"] - base["x"], dose["y"] - base["y"])
+    worst, smallest_move = None, full_move
     for suffix in dose["per_item"]:
-        dx_, dy_ = axis_means(dose["per_item"], resolved, drop=suffix)
-        bx_, by_ = axis_means(base["per_item"], resolved, drop=suffix)
-        length = np.hypot(dx_ - bx_, dy_ - by_)
-        if length < best_len:
-            worst, best_len = suffix, length
-    return worst, float(best_len)
+        dx, dy = axis_means(dose["per_item"], resolved, drop=suffix)
+        bx, by = axis_means(base["per_item"], resolved, drop=suffix)
+        move = np.hypot(dx - bx, dy - by)
+        if move < smallest_move:
+            worst, smallest_move = suffix, move
+    return worst, float(smallest_move)
+
+
+def entropy_and_pmax(lp_gather: dict[str, list[list[float]]]) -> tuple[float, float]:
+    """Compute allowed-answer entropy and maximum probability from full-vocabulary logprobs."""
+    entropies, maxima = [], []
+    for samples in lp_gather.values():
+        for logprobs in samples:
+            logprobs = np.asarray(logprobs)
+            probs = np.exp(logprobs - np.logaddexp.reduce(logprobs))
+            entropies.append(float(-np.sum(probs * np.log(probs)) / np.log(len(probs))))
+            maxima.append(float(probs.max()))
+    return float(np.mean(entropies)), float(np.mean(maxima))
 
 
 def pool_dose(runs: list[dict], mult: float) -> dict:
-    """Pool independent read seeds for one method and dose."""
-    doses = [next(d for d in r["doses"] if d["mult"] == mult) for r in runs]
+    """Pool read seeds while retaining every sample needed for diagnostics."""
+    doses = [next(dose for dose in run["doses"] if dose["mult"] == mult) for run in runs]
     suffixes = doses[0]["per_item"]
+    lp_gather = {
+        suffix: [sample for dose in doses for sample in dose["lp_gather"][suffix]]
+        for suffix in doses[0]["lp_gather"]
+    }
+    entropy, pmax = entropy_and_pmax(lp_gather)
     return {
         "mult": mult,
-        "x": float(np.mean([d["x"] for d in doses])),
-        "y": float(np.mean([d["y"] for d in doses])),
-        "mean_pmass": float(np.mean([d["mean_pmass"] for d in doses])),
-        "min_pmass": float(np.min([d["min_pmass"] for d in doses])),
+        "x": float(np.mean([dose["x"] for dose in doses])),
+        "y": float(np.mean([dose["y"] for dose in doses])),
+        "mean_pmass": float(np.mean([dose["mean_pmass"] for dose in doses])),
+        "min_pmass": float(np.min([dose["min_pmass"] for dose in doses])),
+        "entropy": entropy,
+        "pmax": pmax,
         "per_item": {
-            s: {"axis": doses[0]["per_item"][s]["axis"],
-                "pmass": float(np.mean([d["per_item"][s]["pmass"] for d in doses])),
-                "pos": float(np.mean([d["per_item"][s]["pos"] for d in doses]))}
-            for s in suffixes
+            suffix: {
+                "axis": doses[0]["per_item"][suffix]["axis"],
+                "pmass": float(np.mean([dose["per_item"][suffix]["pmass"] for dose in doses])),
+                "pos": float(np.mean([dose["per_item"][suffix]["pos"] for dose in doses])),
+            }
+            for suffix in suffixes
         },
         "psamples": {
-            s: np.concatenate([np.asarray(d["psamples"][s]) for d in doses]).tolist()
-            for s in doses[0]["psamples"]
+            suffix: np.concatenate([np.asarray(dose["psamples"][suffix]) for dose in doses]).tolist()
+            for suffix in doses[0]["psamples"]
         },
     }
 
 
-def draw_path(ax, doses: list[dict], color: str, sgx: float, sgy: float,
-              min_pmass: float, *, random: bool = False, label: str | None = None) -> None:
-    """Draw failed-coherence segments faint and hollow rather than hiding them."""
-    doses = sorted(doses, key=lambda d: d["mult"])
-    ok = [d["mean_pmass"] >= min_pmass for d in doses]
-    for a, b, pass_a, pass_b in zip(doses, doses[1:], ok, ok[1:]):
-        ax.plot([a["x"] * sgx, b["x"] * sgx], [a["y"] * sgy, b["y"] * sgy],
-                "--" if random else "-", color=color, lw=1.2 if random else 2.0,
-                alpha=0.65 if pass_a and pass_b else 0.18, zorder=4)
-    passed = [d for d, keep in zip(doses, ok) if keep]
-    failed = [d for d, keep in zip(doses, ok) if not keep]
+def pooled_by_method(groups: dict[str, list[dict]]) -> dict[str, list[dict]]:
+    """Add relative answer mass, using each method's own pooled vanilla mass."""
+    pooled = {}
+    for method, runs in groups.items():
+        doses = [pool_dose(runs, mult) for mult in sorted({d["mult"] for run in runs for d in run["doses"]})]
+        base = next(dose for dose in doses if dose["mult"] == 0.0)
+        for dose in doses:
+            dose["pmass_ratio"] = dose["mean_pmass"] / base["mean_pmass"]
+        pooled[method] = doses
+    return pooled
+
+
+def side_path(doses: list[dict], sign: int) -> list[dict]:
+    """Traverse vanilla outward, not numeric left-to-right."""
+    base = next(dose for dose in doses if dose["mult"] == 0.0)
+    side = sorted((dose for dose in doses if np.sign(dose["mult"]) == sign), key=lambda dose: abs(dose["mult"]))
+    return [base, *side]
+
+
+def path_state(path: list[dict]) -> list[str]:
+    """Classify a plotted dose without reconnecting after the first failure."""
+    states = ["vanilla"]
+    crossed_failure = False
+    for dose in path[1:]:
+        valid = dose["pmass_ratio"] >= PMASS_RATIO_FLOOR
+        if not crossed_failure and valid:
+            states.append("connected")
+        elif not crossed_failure:
+            states.append("first_failure")
+            crossed_failure = True
+        else:
+            states.append("recovered_disconnected" if valid else "invalid_disconnected")
+    return states
+
+
+def paired_coordinate_ci(base: dict, dose: dict, resolved: dict) -> tuple[float, float, float, float]:
+    """Return saved-sample paired coordinate movement and 95% interval inputs."""
+    return coord_delta_ci(
+        base["psamples"], dose["psamples"], resolved,
+        np.random.default_rng(20_000 + int(100 * dose["mult"])),
+    )
+
+
+def add_path(ax, path: list[dict], sign: int, color: str, scale_x: float, scale_y: float, *, label: str | None,
+             dose_labels: bool, resolved: dict | None = None, show_uncertainty: bool = False,
+             label_offset: tuple[float, float] = (3, 3)) -> None:
+    """Draw a path limited by the answer-mass condition, with signed-coefficient arrows."""
+    states = path_state(path)
     if label:
-        ax.plot([], [], "--" if random else "-", color=color, lw=1.5, label=label)
-    if passed:
-        ax.scatter([d["x"] * sgx for d in passed], [d["y"] * sgy for d in passed],
-                   s=14, color=color, alpha=0.85, zorder=5)
-    if failed:
-        ax.scatter([d["x"] * sgx for d in failed], [d["y"] * sgy for d in failed],
-                   s=14, facecolors="none", edgecolors=color, alpha=0.25, zorder=3)
+        ax.plot([], [], color=color, lw=2, ls="-" if sign > 0 else "--", label=label)
+    for previous, current, state in zip(path, path[1:], states[1:]):
+        if state == "first_failure":
+            ax.plot(
+                [previous["x"] * scale_x, current["x"] * scale_x],
+                [previous["y"] * scale_y, current["y"] * scale_y],
+                "--", color=color, lw=1.2, alpha=0.35, zorder=3,
+            )
+            start, end = (previous, current) if sign > 0 else (current, previous)
+            ax.add_patch(FancyArrowPatch(
+                (start["x"] * scale_x, start["y"] * scale_y),
+                (end["x"] * scale_x, end["y"] * scale_y),
+                arrowstyle="-|>", mutation_scale=10, linewidth=1.1, linestyle="--", color=color, alpha=0.45, zorder=4,
+            ))
+            continue
+        if state != "connected":
+            continue
+        start, end = (previous, current) if sign > 0 else (current, previous)
+        arrow = FancyArrowPatch(
+            (start["x"] * scale_x, start["y"] * scale_y),
+            (end["x"] * scale_x, end["y"] * scale_y),
+            arrowstyle="-|>", mutation_scale=11, linewidth=2, color=color, alpha=0.82, zorder=5,
+        )
+        ax.add_patch(arrow)
+    for dose, state in zip(path, states):
+        x, y = dose["x"] * scale_x, dose["y"] * scale_y
+        if state in {"vanilla", "connected"}:
+            ax.scatter(x, y, s=26 if state == "vanilla" else 20, color=color, zorder=6)
+        elif state == "first_failure":
+            ax.scatter(x, y, s=34, facecolors="none", edgecolors=color, linewidths=1.4, alpha=0.48, zorder=5)
+        else:
+            ax.scatter(x, y, s=28, marker="s", facecolors="none", edgecolors=color, linewidths=1.2, alpha=0.45, zorder=4)
+        if show_uncertainty and dose["mult"] != 0.0:
+            _, _, dx_se, dy_se = paired_coordinate_ci(path[0], dose, resolved)
+            ax.errorbar(
+                x, y, xerr=1.96 * dx_se * abs(scale_x), yerr=1.96 * dy_se * abs(scale_y),
+                fmt="none", ecolor=color, elinewidth=0.8, capsize=1.8, alpha=0.38, zorder=2,
+            )
+        if dose_labels:
+            text = "vanilla" if dose["mult"] == 0.0 else f"{dose['mult']:+g}C"
+            ax.annotate(text, (x, y), xytext=label_offset, textcoords="offset points", fontsize=6.3, color=color)
+
+
+
+def matched_random(groups: dict[str, list[dict]]) -> dict[float, tuple[float, int]]:
+    """Apply the answer-mass condition to each random seed before calculating the null."""
+    values: dict[float, list[float]] = {}
+    for run in groups.get("random", []):
+        base = next(dose for dose in run["doses"] if dose["mult"] == 0.0)
+        for dose in run["doses"]:
+            if dose["mult"] == 0.0 or dose["mean_pmass"] / base["mean_pmass"] < PMASS_RATIO_FLOOR:
+                continue
+            values.setdefault(dose["mult"], []).append(float(np.hypot(dose["x"] - base["x"], dose["y"] - base["y"])))
+    return {mult: (float(np.quantile(moves, 0.95)), len(moves)) for mult, moves in values.items()}
+
+
+def dose_row(method: str, dose: dict, base: dict, resolved: dict, null: dict[float, tuple[float, int]],
+             order: int, state: str) -> list[str]:
+    """Compute a complete, saved-artifact-only table row."""
+    dx, dy, dx_se, dy_se = coord_delta_ci(
+        base["psamples"], dose["psamples"], resolved, np.random.default_rng(20_000 + int(100 * dose["mult"]))
+    )
+    worst, loo_move = loo_worst(dose, base, resolved)
+    move = float(np.hypot(dx, dy))
+    random_p95, random_n = null.get(dose["mult"], (np.nan, 0))
+    comparison = "-" if random_n == 0 or state != "connected" else ("yes" if move > random_p95 else "no")
+    return [
+        method, str(order), f"{dose['mult']:+g}C", state.replace("_", " "),
+        f"{dose['pmass_ratio']:.3f}", f"{dose['entropy']:.3f}", f"{dose['pmax']:.3f}",
+        f"{dx:+.3f} +/- {1.96 * dx_se:.3f}", f"{dy:+.3f} +/- {1.96 * dy_se:.3f}",
+        f"{move:.3f}", f"{loo_move:.3f}", f"{random_p95:.3f}" if random_n else "-",
+        str(random_n) if random_n else "-", comparison, worst or "-",
+    ]
+
+
+def render_table(pooled: dict[str, list[dict]], groups: dict[str, list[dict]], resolved: dict) -> str:
+    """Write all shown observations, including failed and disconnected ones."""
+    null = matched_random(groups)
+    headers = [
+        "method", "order", "dose", "path state", "pmass/base", "entropy", "max p",
+        "dx (95%)", "dy (95%)", "move", "LOO move", "random p95", "random n", "beats matched random?", "worst item",
+    ]
+    sections = [
+        "# Qwen3-14B saved WVS steering replot",
+        "",
+        "Filled path points satisfy pooled `pmass(dose) / pmass(vanilla) >= 0.96`. The first failure is hollow and reached by a faint dashed segment. Later observations can recover answer mass, but remain disconnected from that signed path.",
+        "",
+        "`entropy` is normalized entropy over allowed answer tokens. `max p` is the mean maximum allowed-answer probability. Coordinate intervals pair vanilla and dose samples. Random p95 uses only random directions whose own answer mass passes the same relative rule; `-` means no matched random control passed.",
+    ]
+    for method in MAIN_METHODS:
+        if method not in pooled:
+            continue
+        rows = []
+        base = next(dose for dose in pooled[method] if dose["mult"] == 0.0)
+        for sign, title in ((1, "intended honest-persona direction (+)"), (-1, "intended dishonest-persona direction (-)")):
+            path = side_path(pooled[method], sign)
+            signed_order = {id(dose): order for order, dose in enumerate(path if sign > 0 else reversed(path))}
+            for dose, state in zip(path[1:], path_state(path)[1:]):
+                rows.append(dose_row(method, dose, base, resolved, null, signed_order[id(dose)], state))
+            sections.extend(["", f"## {method}: {title}", "", tabulate(rows[-(len(path) - 1):], headers=headers, tablefmt="pipe", disable_numparse=True)])
+    random_rows = []
+    for mult, (p95, n) in sorted(null.items()):
+        random_rows.append([f"{mult:+g}C", f"{p95:.3f}", n])
+    sections.extend(["", "## Dose-matched random controls", "", tabulate(random_rows, headers=["dose", "movement p95", "coherent n"], tablefmt="pipe")])
+    return "\n".join(sections) + "\n"
+
+
+def map_axes(runs: list[dict], pooled: dict[str, list[dict]], *, title: str, note: str):
+    """Create the culture map and include all saved plotted observations in its limits."""
+    resolved = resolve_items(load_wvs_all())
+    countries, positions = human_axis_scores(resolved)
+    zones, emphasize = zones_for(countries)
+    scale_x, scale_y = maps.orient_geographic(positions, countries, zones)
+    base = next(dose for dose in pooled["vjp_delta"] if dose["mult"] == 0.0)
+    figure = maps.plot_value_map(
+        "WVS Inglehart-Welzel", countries, positions,
+        ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
+        models={"Qwen3-14B vanilla": (base["x"], base["y"])}, emphasize=emphasize,
+        title=title, note=note, title_y=0.115, note_y=0.04,
+    )
+    ax = figure.axes[0]
+    all_x = [*list(positions[:, 0] * scale_x)]
+    all_y = [*list(positions[:, 1] * scale_y)]
+    for doses in pooled.values():
+        all_x.extend(dose["x"] * scale_x for dose in doses)
+        all_y.extend(dose["y"] * scale_y for dose in doses)
+    pad_x = max(0.15, 0.15 * (max(all_x) - min(all_x)))
+    pad_y = max(0.15, 0.15 * (max(all_y) - min(all_y)))
+    ax.set_xlim(min(all_x) - pad_x, max(all_x) + pad_x)
+    ax.set_ylim(min(all_y) - pad_y, max(all_y) + pad_y)
+    return figure, ax, resolved, scale_x, scale_y
+
+
+def save_figure(figure, out: Path) -> None:
+    """Write stable PNG/SVG outputs, removing renderer-only trailing spaces from SVG."""
+    figure.savefig(out, dpi=200)
+    svg = out.with_suffix(".svg")
+    figure.savefig(svg)
+    svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
+
+
+def render_main(runs: list[dict], pooled: dict[str, list[dict]], out: Path) -> None:
+    """Render all saved real methods with separately traversed signed paths."""
+    figure, ax, resolved, scale_x, scale_y = map_axes(
+        runs, pooled, title="Saved WVS steering paths, Qwen3-14B",
+        note="",
+    )
+    offsets = {"vjp_delta": (3, 4), "mean_diff": (3, -8), "pca": (3, 10)}
+    for method in MAIN_METHODS:
+        if method not in pooled:
+            continue
+        for sign, name in ((1, "intended honest-persona direction"), (-1, "intended dishonest-persona direction")):
+            label = f"{method}: {name} ({'+' if sign == 1 else '-'})"
+            add_path(ax, side_path(pooled[method], sign), sign, COLORS[method], scale_x, scale_y,
+                     label=label, dose_labels=method == "vjp_delta", resolved=resolved,
+                     show_uncertainty=method == "vjp_delta", label_offset=offsets[method])
+    ax.set_position([0.06, 0.10, 0.64, 0.82])
+    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), fontsize=7, framealpha=0.9)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    save_figure(figure, out)
+    plt.close(figure)
+
+
+def metric_path(ax, path: list[dict], sign: int, value: str, color: str, *, label: str | None) -> None:
+    """Plot diagnostics with the same answer-mass condition and signed-coefficient arrows."""
+    states = path_state(path)
+    for previous, current, state in zip(path, path[1:], states[1:]):
+        if state == "first_failure":
+            ax.plot([previous["mult"], current["mult"]], [previous[value], current[value]], "--", color=color, alpha=0.35)
+            start, end = (previous, current) if sign > 0 else (current, previous)
+            ax.add_patch(FancyArrowPatch(
+                (start["mult"], start[value]), (end["mult"], end[value]),
+                arrowstyle="-|>", mutation_scale=8, linewidth=1.0, linestyle="--", color=color, alpha=0.45,
+            ))
+        elif state == "connected":
+            start, end = (previous, current) if sign > 0 else (current, previous)
+            ax.add_patch(FancyArrowPatch(
+                (start["mult"], start[value]), (end["mult"], end[value]),
+                arrowstyle="-|>", mutation_scale=10, linewidth=1.7, color=color,
+            ))
+    for dose, state in zip(path, states):
+        if state in {"vanilla", "connected"}:
+            ax.scatter(dose["mult"], dose[value], color=color, s=28, zorder=3)
+        elif state == "first_failure":
+            ax.scatter(dose["mult"], dose[value], facecolors="none", edgecolors=color, s=38, alpha=0.55, zorder=3)
+        else:
+            ax.scatter(dose["mult"], dose[value], marker="s", facecolors="none", edgecolors=color, s=31, alpha=0.55, zorder=3)
+    ax.plot([], [], color=color, label=label)
+
+
+def render_vjp(runs: list[dict], pooled: dict[str, list[dict]], out: Path) -> None:
+    """Render a readable VJP-only map plus answer-mass and saturation diagnostics."""
+    figure, ax, resolved, scale_x, scale_y = map_axes(
+        runs, pooled, title="VJP delta, saved Qwen3-14B WVS observations", note="",
+    )
+    figure.set_size_inches(16, 8)
+    ax.set_position([0.04, 0.12, 0.56, 0.79])
+    positive = side_path(pooled["vjp_delta"], 1)
+    negative = side_path(pooled["vjp_delta"], -1)
+    positive_color, negative_color = "#147d64", "#a13a3a"
+    add_path(ax, positive, 1, positive_color, scale_x, scale_y, label="intended honest-persona direction (+)",
+             dose_labels=True, resolved=resolved, show_uncertainty=True)
+    add_path(ax, negative, -1, negative_color, scale_x, scale_y, label="intended dishonest-persona direction (-)",
+             dose_labels=True, resolved=resolved, show_uncertainty=True, label_offset=(4, -9))
+    ax.text(0.02, 0.95, "Faint crossbars: paired 95% coordinate intervals", transform=ax.transAxes, fontsize=6.5)
+    ax.annotate("first negative failure: -0.5C", xy=(negative[1]["x"] * scale_x, negative[1]["y"] * scale_y),
+                xytext=(18, -20), textcoords="offset points", fontsize=7, arrowprops={"arrowstyle": "-", "color": "#555555"})
+    ax.annotate("later recovery observations\n(disconnected)", xy=(negative[-1]["x"] * scale_x, negative[-1]["y"] * scale_y),
+                xytext=(8, 18), textcoords="offset points", fontsize=7, arrowprops={"arrowstyle": "-", "color": "#555555"})
+    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), fontsize=7)
+
+    pmass_ax = figure.add_axes([0.68, 0.58, 0.28, 0.28])
+    metric_path(pmass_ax, positive, 1, "pmass_ratio", positive_color, label="intended honest (+)")
+    metric_path(pmass_ax, negative, -1, "pmass_ratio", negative_color, label="intended dishonest (-)")
+    pmass_ax.axhline(PMASS_RATIO_FLOOR, color="#aa3333", ls="--", lw=1, label="0.96 threshold")
+    pmass_ax.set(title="Relative answer mass", xlabel="signed dose (C)", ylabel="pmass / vanilla", ylim=(0.55, 1.05))
+    pmass_ax.legend(fontsize=6, loc="lower right")
+    pmass_ax.annotate("-0.5C fails", xy=(-0.5, negative[1]["pmass_ratio"]), xytext=(-1.9, 0.66), fontsize=6.5,
+                      arrowprops={"arrowstyle": "->", "color": "#555555"})
+
+    saturation_ax = figure.add_axes([0.68, 0.16, 0.28, 0.28])
+    metric_path(saturation_ax, positive, 1, "entropy", "#4c78a8", label="entropy")
+    metric_path(saturation_ax, negative, -1, "entropy", "#4c78a8", label=None)
+    max_ax = saturation_ax.twinx()
+    metric_path(max_ax, positive, 1, "pmax", "#e45756", label="max p")
+    metric_path(max_ax, negative, -1, "pmax", "#e45756", label=None)
+    saturation_ax.set(title="Allowed-answer saturation", xlabel="signed dose (C)", ylabel="normalized entropy", ylim=(-0.02, 1.05))
+    max_ax.set(ylabel="mean maximum answer probability", ylim=(-0.02, 1.05))
+    saturation_ax.annotate("-2C: low entropy, high max p", xy=(-2, negative[-1]["entropy"]), xytext=(-1.9, 0.42), fontsize=6.5,
+                           arrowprops={"arrowstyle": "->", "color": "#555555"})
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    save_figure(figure, out)
+    plt.close(figure)
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--runs", type=Path, default=Path("outputs"))
-    ap.add_argument("--out", type=Path, default=Path("docs/img/wvs/wvs_steer_honesty.png"))
-    ap.add_argument("--min-pmass", type=float, default=0.9,
-                    help="drop any dose whose mean answer-token mass fell below this")
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--runs", type=Path, default=Path("outputs"))
+    parser.add_argument("--out", type=Path, default=Path("docs/img/wvs/wvs_steer_honesty_qwen3_14b.png"))
+    parser.add_argument("--table", type=Path, default=None)
+    args = parser.parse_args()
 
-    runs = [json.loads(p.read_text()) for p in sorted(args.runs.glob("wvs_steer_*.json"))]
-    assert runs, f"no wvs_steer_*.json under {args.runs}"
+    runs = [json.loads(path.read_text()) for path in sorted(args.runs.glob("wvs_steer_*.json"))]
+    assert runs, f"no wvs_steer_*.json below {args.runs}"
+    assert {run["model"] for run in runs} == {"Qwen/Qwen3-14B"}, "saved replot must not mix models"
+    groups = {method: sorted([run for run in runs if run["method"] == method], key=lambda run: run["seed"])
+              for method in sorted({run["method"] for run in runs})}
+    assert all(method in groups for method in MAIN_METHODS), f"missing expected methods: {set(MAIN_METHODS) - set(groups)}"
+    assert "random" in groups, "missing random control artifacts"
+    pooled = pooled_by_method(groups)
+    table_path = args.table or args.out.with_suffix(".md")
     resolved = resolve_items(load_wvs_all())
-    countries, P = human_axis_scores(resolved)
-    zones_all, emph = zones_for(countries)
-    sgx, sgy = maps.orient_geographic(P, countries, zones_all)   # plot_value_map's own flip
-
-    model = runs[0]["model"]
-    assert all(r["model"] == model for r in runs), "mixing models in one figure"
-    groups = {m: sorted([r for r in runs if r["method"] == m], key=lambda r: r["seed"])
-              for m in sorted({r["method"] for r in runs})}
-    random_runs = groups.get("random", [])
-    random_effects = [r["manipulation_check"]["scored"]["effect_logodds"]
-                      for r in random_runs]
-    random_effect_p95 = float(np.quantile(random_effects, 0.95)) if random_effects else np.nan
-    primary = next((rs for m, rs in groups.items() if m != "random"), runs[:1])
-    base = pool_dose(primary, 0.0)
-    fig = maps.plot_value_map(
-        "WVS Inglehart-Welzel", countries, P,
-        ("Survival", "Self-expression", "Traditional", "Secular-Rational"),
-        models={f"{model.split('/')[-1]} (base)": (base["x"], base["y"])}, emphasize=emph,
-        title=f"Candidate honesty-steering paths\n{model.split('/')[-1]}",
-        note=(f"Held-out honesty: no method exceeded random p95 = {random_effect_p95:.3f} "
-              f"(n = {len(random_effects)}) | filled: pmass >= 0.90"),
-        title_y=0.115, note_y=0.04)
-    ax = fig.axes[0]
-
-    null_move: dict[float, list[float]] = {}
-    for r in random_runs:
-        b = r["doses"][0]
-        for d in r["doses"][1:]:
-            if d["mean_pmass"] >= args.min_pmass:
-                null_move.setdefault(d["mult"], []).append(
-                    float(np.hypot(d["x"] - b["x"], d["y"] - b["y"])))
-
-    failed, rows, null_pts = 0, [], []
-    for method, method_runs in groups.items():
-        color = METHOD_COLORS[method]
-        mults = sorted({d["mult"] for r in method_runs for d in r["doses"]})
-        if method == "random":
-            for r in method_runs:
-                null_pts += [(d["x"] * sgx, d["y"] * sgy) for d in r["doses"]
-                             if d["mult"] and d["mean_pmass"] >= args.min_pmass]
-                failed += sum(d["mean_pmass"] < args.min_pmass for d in r["doses"])
-            if null_pts:
-                px, py = np.asarray(null_pts).T
-                ax.scatter(px, py, s=8, color=color, alpha=0.25, zorder=2,
-                           label="coherent random controls")
-            continue
-
-        pooled = [pool_dose(method_runs, m) for m in mults]
-        draw_path(ax, pooled, color, sgx, sgy, args.min_pmass, label=method)
-        failed += sum(d["mean_pmass"] < args.min_pmass for d in pooled)
-        pooled_base = next(d for d in pooled if d["mult"] == 0)
-        coherent = [d for d in pooled if d["mult"] and d["mean_pmass"] >= args.min_pmass]
-        for d in coherent:
-            dx, dy, dx_se, dy_se = coord_delta_ci(
-                pooled_base["psamples"], d["psamples"], resolved,
-                np.random.default_rng(20_000 + int(10 * d["mult"])))
-            worst, loo_len = loo_worst(d, pooled_base, resolved)
-            move = float(np.hypot(dx, dy))
-            null = null_move.get(d["mult"], [])
-            null_p95 = float(np.quantile(null, 0.95)) if null else np.nan
-            rows.append([method, len(method_runs), f"{d['mult']:+.1f}",
-                         f"{dx:+.4f}+-{1.96 * dx_se:.3f}",
-                         f"{dy:+.4f}+-{1.96 * dy_se:.3f}",
-                         f"{move:.4f}", f"{loo_len:.4f}",
-                         f"{null_p95:.4f}" if null else "-", len(null),
-                         "yes" if null and move > null_p95 else "no",
-                         worst or "-", f"{d['mean_pmass']:.3f}"])
-        for sign in (+1, -1):
-            side = [d for d in coherent if np.sign(d["mult"]) == sign]
-            if side:
-                far = max(side, key=lambda d: abs(d["mult"]))
-                ax.annotate(f"{far['mult']:+g}C", (far["x"] * sgx, far["y"] * sgy),
-                            xytext=(3, 3), textcoords="offset points", fontsize=6, color=color)
-
-    if len(null_pts) >= 3:
-        from scipy.spatial import ConvexHull
-        pts = np.array(null_pts)
-        hull = pts[ConvexHull(pts).vertices]
-        ax.fill(hull[:, 0], hull[:, 1], color="#777777", alpha=0.07, zorder=1,
-                label="random reach (all coherent doses)")
-    else:
-        logger.warning(f"only {len(null_pts)} coherent random points, null region not drawn")
-    coherent_xy = [(d["x"] * sgx, d["y"] * sgy) for r in runs for d in r["doses"]
-                   if d["mean_pmass"] >= args.min_pmass]
-    plot_x = list(P[:, 0] * sgx) + [x for x, _ in coherent_xy]
-    plot_y = list(P[:, 1] * sgy) + [y for _, y in coherent_xy]
-    ax.set_xlim(min(plot_x) - 0.05, max(plot_x) + 0.05)
-    ax.set_ylim(min(plot_y) - 0.05, max(plot_y) + 0.05)
-    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), fontsize=7, framealpha=0.9)
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(args.out, dpi=200, bbox_inches="tight")
-    fig.savefig(args.out.with_suffix(".svg"), bbox_inches="tight")
-
-    rows.sort(key=lambda r: -float(r[5]))
-    print(tabulate(rows, tablefmt="pipe", headers=[
-        "method", "read seeds", "dose", "dx (95%)", "dy (95%)", "|move|",
-        "|move| less worst item", "random p95", "random n", "beats random?",
-        "worst item", "pmass"]))
-
-    check_rows = []
-    for method, method_runs in groups.items():
-        if method == "random":
-            continue
-        effects = [r["manipulation_check"]["scored"]["effect_logodds"] for r in method_runs]
-        effect = float(np.mean(effects))
-        check_rows.append([method, f"{effect:+.3f}",
-                           f"{random_effect_p95:+.3f}" if random_effects else "-",
-                           len(random_effects), "yes" if random_effects and effect > random_effect_p95 else "no"])
-    print("\nHeld-out honesty manipulation (true-vs-welcome log-odds):")
-    print(tabulate(check_rows, tablefmt="pipe", headers=[
-        "method", "effect", "random p95", "random n", "honesty-specific?"]))
-    print("\ndx/dy intervals pool independent read seeds and pair base versus dose on the same\n"
-          "items and sampled think streams. Hollow points remain visible but fail pmass >= 0.90.")
-    logger.info(f"wrote {args.out} ({failed} method-dose paths/points failed pmass {args.min_pmass})")
+    table_path.parent.mkdir(parents=True, exist_ok=True)
+    table_path.write_text(render_table(pooled, groups, resolved))
+    render_main(runs, pooled, args.out)
+    render_vjp(runs, pooled, args.out.with_name(args.out.stem + "_vjp.png"))
+    logger.info(f"wrote {args.out}, {args.out.with_suffix('.svg')}, {table_path}")
+    logger.info(f"wrote {args.out.with_name(args.out.stem + '_vjp.png')}")
 
 
 if __name__ == "__main__":
