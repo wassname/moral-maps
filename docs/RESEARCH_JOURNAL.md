@@ -1193,3 +1193,34 @@ Distinct namespace: `wvs-original-choice-pilot-v1`, artifacts under `slop/resear
 ### Execution
 
 Exactly one resumable Pueue task on the `api` group after the smoke passes, with one `pqf` follower; full log and raw records audited before interpretation.
+
+## 2026-09-19 -- Preregistration: wvs-respondent-packet-v1 (Qwen Plus family)
+
+Written and committed before any paid call. Branch `research/wvs-respondent-packet-v1`; published map untouched.
+
+### Models, provider, precision (exact, from the live 20260919 inventory and saved endpoint catalog)
+
+Four Qwen Plus releases, all pinned to provider `Alibaba` with `{"only": ["Alibaba"], "allow_fallbacks": false, "require_parameters": true}`; advertised quantization is `unknown` for every Alibaba endpoint and is recorded as unknown, never inferred. Execution order follows actual saved release dates, not model-name order: `qwen/qwen3.5-plus-02-15` (released 2026-02-16), `qwen/qwen3.6-plus` (2026-04-02), `qwen/qwen3.5-plus-20260420` (2026-04-27; a later revision of the 3.5 line released after 3.6, exactly as the plan notes), and `qwen/qwen3.7-plus` (2026-06-03). All four already have complete canonical `wvs-score-all-options-v1` dense results. All four support `structured_outputs`, `reasoning`, and `seed`; reasoning is not mandatory. Serving condition: `reasoning {"enabled": false}` (the same condition the dense v1 records used for these four models), temperature 1.0, `max_tokens` 2048.
+
+### Instrument (exact)
+
+One API call is ONE pseudo-respondent answering the complete selected battery in canonical order: the 8 ordinary items (Religion; God; Abortion; Homosexuality; interpersonal trust; Signing a petition; Attending peaceful demonstrations; Joining in boycotts; saved source order) and the child-quality list. Ordinary questions display only their substantive options in canonical source order; "Don't know"/"No answer" are NOT shown. Each ordinary answer is `{"selected": <option>}`; a separate refusal status (the literal value `refused`, asserted never to collide with a listed option) is available inside the schema, reported separately, never scored as neutral, and never silently dropped. The child-quality list is the 11-quality human list: the 10 GlobalOpinionQA rows plus "Religious faith" appended last (documented approximation: the saved source does not record card order, and the source has no Religious faith row). One response returns `{"answers": {...}, "child_qualities": [up to five distinct of the 11]}`; an empty list is a refusal status. Malformed, missing, duplicate, or >5 selections are invalid: one rescue, then a failed packet.
+
+### Design, request count, cost
+
+N=128 whole respondent packets per release with 128 paired deterministic seeds shared across releases (same seed per packet index on every release); canonical option order (no rotation; the packet is one coherent questionnaire). Request count: 4 releases x 128 packets = 512 panel calls plus 1 paid smoke = 513. Reserve bound per packet: 1,024 input + 2x 1,024 output tokens at the saved Alibaba prices (prompt 0.26-0.325 and completion 1.28-1.95 USD per million): panel bound USD 3.770941440, smoke USD 0.00692224, total USD 3.777863680 against the USD 5 stage stop, all inside the existing locked USD 80 repository ledger under lane `google` with reservation `pilot/resp-packet`.
+
+### Analysis (fixed before unblinding)
+
+1. Per model per question: selected-option frequencies, refusal rate, coverage; per-packet records carry `eval_version` on every event; respondent rows reconstruct each complete packet.
+2. Whole-row bootstrap (resample 128 respondent rows with replacement, B=1000, retaining cross-question covariance) for per-model coordinate SE/CI and for all RMSE distributions.
+3. Same four releases, same fixed scoring items, both evaluators: `wvs-score-all-options-v1` (bootstrap its 6 sample vectors per item) vs `wvs-respondent-packet-v1`. Report per-model coordinate shifts, constant-family-centroid 2D residual RMSE, linear release-trend RMSE (release dates = saved `created` timestamps), response-sampling noise floors, and leave-one-release-out prediction error for constant vs linear so n=4 trend overfit is visible. Protocols are not pairable; differences use independent bootstraps, stated as such.
+4. No protocol is selected because its trend looks smoother.
+
+### Smoke gate (1 paid packet)
+
+`qwen/qwen3.7-plus` (reasoning default-enabled: riskiest parse path), one packet. Gates: exact Alibaba dated release route; parse-valid complete respondent; refusal representation intact; `usage.cost` present; projected 128-packet cost x 4 <= USD 5.
+
+### Execution
+
+After parent smoke approval: paid smoke, audit, then explicit full-run approval; one resumable Pueue `api` task with one `pqf` follower; full log and raw record audit before interpretation. Paid-call opt-in guard inherited and extended (offline regression proves a mis-targeted read_api patch cannot bypass it).

@@ -1,0 +1,172 @@
+{
+  "battery": [
+    {
+      "id": "Religion",
+      "options": [
+        "Very important",
+        "Rather important",
+        "Not very important",
+        "Not at all important"
+      ],
+      "question": "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all\n\nReligion"
+    },
+    {
+      "id": "God",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "question": "In which of the following things do you believe, if you believe in any?\n\nGod"
+    },
+    {
+      "id": "Abortion",
+      "options": [
+        "Never justifiable",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "Always justifiable"
+      ],
+      "question": "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card.\n\nAbortion"
+    },
+    {
+      "id": "Homosexuality",
+      "options": [
+        "Never justifiable",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "Always justifiable"
+      ],
+      "question": "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card.\n\nHomosexuality"
+    },
+    {
+      "id": "dealing with people?",
+      "options": [
+        "Most people can be trusted",
+        "Need to be very careful"
+      ],
+      "question": "Generally speaking, would you say that most people can be trusted or that you need to be very careful in dealing with people?"
+    },
+    {
+      "id": "Signing a petition",
+      "options": [
+        "Have done",
+        "Might do",
+        "Would never do"
+      ],
+      "question": "Now I'd like you to look at this card. I'm going to read out some different forms of political action that people can take, and I'd like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it.\n\nSigning a petition"
+    },
+    {
+      "id": "Attending peaceful demonstrations",
+      "options": [
+        "Have done",
+        "Might do",
+        "Would never do"
+      ],
+      "question": "Now I'd like you to look at this card. I'm going to read out some different forms of political action that people can take, and I'd like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it.\n\nAttending peaceful demonstrations"
+    },
+    {
+      "id": "Joining in boycotts",
+      "options": [
+        "Have done",
+        "Might do",
+        "Would never do"
+      ],
+      "question": "Now I'd like you to look at this card. I'm going to read out some different forms of political action that people can take, and I'd like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it.\n\nJoining in boycotts"
+    },
+    {
+      "id": "ChildQualities",
+      "options": [
+        "Feeling of responsibility",
+        "Tolerance and respect for other people",
+        "Obedience",
+        "Good manners",
+        "Not being selfish (unselfishness)",
+        "Independence",
+        "Thrift saving money and things",
+        "Hard work",
+        "Imagination",
+        "Determination, perseverance",
+        "Religious faith"
+      ],
+      "question": "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important? Please choose up to five."
+    }
+  ],
+  "created_utc": "2026-09-19T05:08:22.897161+00:00",
+  "eval_version": "wvs-respondent-packet-v1",
+  "instrument_status": "GlobalOpinionQA-compatible approximation; 11th quality Religious faith appended; card order not recorded in source",
+  "max_tokens": 2048,
+  "merge_into_primary": false,
+  "models": [
+    {
+      "advertised_quantization": "unknown",
+      "created": 1771229416,
+      "created_utc": "2026-02-16",
+      "id": "qwen/qwen3.5-plus-02-15",
+      "reasoning": {
+        "enabled": false
+      },
+      "release_slug": "qwen/qwen3.5-plus-20260216",
+      "requests": 128,
+      "reserve_bound_usd": "0.88604672"
+    },
+    {
+      "advertised_quantization": "unknown",
+      "created": 1775133557,
+      "created_utc": "2026-04-02",
+      "id": "qwen/qwen3.6-plus",
+      "reasoning": {
+        "enabled": false
+      },
+      "release_slug": "qwen/qwen3.6-plus-04-02",
+      "requests": 128,
+      "reserve_bound_usd": "1.107558400"
+    },
+    {
+      "advertised_quantization": "unknown",
+      "created": 1777261368,
+      "created_utc": "2026-04-27",
+      "id": "qwen/qwen3.5-plus-20260420",
+      "reasoning": {
+        "enabled": false
+      },
+      "release_slug": "qwen/qwen3.5-plus-20260420",
+      "requests": 128,
+      "reserve_bound_usd": "1.0223616"
+    },
+    {
+      "advertised_quantization": "unknown",
+      "created": 1780491783,
+      "created_utc": "2026-06-03",
+      "id": "qwen/qwen3.7-plus",
+      "reasoning": {
+        "enabled": false
+      },
+      "release_slug": "qwen/qwen3.7-plus-20260602",
+      "requests": 128,
+      "reserve_bound_usd": "0.75497472"
+    }
+  ],
+  "n_packets": 128,
+  "not_published": true,
+  "panel_plus_smoke_bound_usd": "3.777863680",
+  "panel_requests": 512,
+  "panel_reserve_bound_usd": "3.770941440",
+  "refusal_rule": "per-question \"refused\" status inside the schema; never displayed as an option; reported separately; never neutral",
+  "schema": 1,
+  "smoke_requests": 1,
+  "smoke_reserve_bound_usd": "0.00692224",
+  "stage_hard_stop_usd": "5",
+  "temperature": 1.0
+}
