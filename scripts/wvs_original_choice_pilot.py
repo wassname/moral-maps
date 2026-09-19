@@ -48,6 +48,21 @@ N_SAMPLES = 24
 MAX_TOKENS = 1024
 REQUEST_TIMEOUT = 400
 STAGE_CAP_USD = Decimal("5")
+PAID_OPTIN_ENV = "WVS_PAID_CALLS_AUTHORIZED"
+
+
+class PaidCallsNotAuthorized(RuntimeError):
+    """Raised when a paid request is attempted without the explicit opt-in.
+
+    Root cause of the 2026-09-19 unplanned gemini-3.8 panel: the test monkeypatched
+    `moralmaps.read_api.openrouter_request_with_metadata_once`, but this module had already bound
+    its own name via `from ... import` at import time, so the patch never took effect and the real
+    API was called. The opt-in guard is a second, independent line of defense: even a mis-patched
+    or unpatched request path refuses to execute unless the run was explicitly authorized."""
+
+
+def paid_calls_authorized() -> bool:
+    return os.environ.get(PAID_OPTIN_ENV) == "1"
 OUT = Path("slop/research/wvs/20260918_original_choice_pilot")
 MANIFEST = OUT / "manifest.json"
 RESULTS = OUT / "results.json"
@@ -275,6 +290,10 @@ def append_attempt(record: dict) -> None:
 
 
 async def budgeted_request(model: str, payload: dict) -> dict:
+    if not paid_calls_authorized():
+        raise PaidCallsNotAuthorized(
+            f"paid calls require --i-authorize-paid-calls (which sets {PAID_OPTIN_ENV}=1); "
+            "offline tests must never reach the API")
     payload_hash = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
     for attempt in range(1, MAX_ATTEMPTS + 1):
         bound = reserve_request(model)
@@ -625,6 +644,57 @@ def write_manifest(items: list[dict]) -> dict:
     return payload
 
 
+def offline_regression(items: list[dict]) -> None:
+    """Proves the paid path cannot execute without the opt-in, even with the real request function
+    in place and a transport that would succeed. Regression for the 2026-09-19 accident."""
+    import moralmaps.read_api as ra
+    os.environ.pop(PAID_OPTIN_ENV, None)
+    assert not paid_calls_authorized()
+    calls = {"n": 0}
+
+    def would_reach_api(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        return httpx.Response(200, json={"choices": [], "usage": {}})
+
+    payload = {"model": MODELS[0], "messages": [{"role": "user", "content": "test"}]}
+    original = ra.openrouter_request_with_metadata_once
+    old_api_key = os.environ.pop("OPENROUTER_API_KEY", None)
+    os.environ["OPENROUTER_API_KEY"] = "test-key"
+    try:
+        ran = False
+        try:
+            asyncio.run(budgeted_request(MODELS[0], payload))
+        except PaidCallsNotAuthorized:
+            ran = True
+        assert ran, "budgeted_request executed without the opt-in"
+        assert calls["n"] == 0, "a paid HTTP call leaked without the opt-in"
+        # even the raw request function, when invoked through the real transport path, is only
+        # reachable via budgeted_request inside this module; a mis-targeted read_api patch cannot
+        # bypass the guard:
+        async def patched(payload, timeout=60.0, **kwargs):
+            return await original(payload, timeout=timeout, transport=httpx.MockTransport(would_reach_api))
+        ra.openrouter_request_with_metadata_once = patched
+        ran = False
+        try:
+            asyncio.run(budgeted_request(MODELS[0], payload))
+        except PaidCallsNotAuthorized:
+            ran = True
+        assert ran and calls["n"] == 0, "opt-in guard bypassed by a read_api-level patch"
+    finally:
+        ra.openrouter_request_with_metadata_once = original
+        if old_api_key is not None:
+            os.environ["OPENROUTER_API_KEY"] = old_api_key
+        else:
+            os.environ.pop("OPENROUTER_API_KEY", None)
+    # CLI guard: --run without the flag must fail fast
+    import subprocess
+    proc = subprocess.run(["uv", "run", "--offline", "--with", "datasets>=4.0,<5", "python",
+                           "scripts/wvs_original_choice_pilot.py", "--run"],
+                          capture_output=True, text=True, timeout=300)
+    assert proc.returncode != 0 and "--i-authorize-paid-calls" in (proc.stderr + proc.stdout)
+    print("offline regression passed: no paid call without opt-in, mis-patch cannot bypass, CLI guard holds")
+
+
 def offline_smoke(items: list[dict]) -> None:
     ordinary = next(i for i in items if not i["is_list"])
     order = presented(items, 0, 1)
@@ -737,6 +807,131 @@ def load_wvs_recs() -> list[dict]:
     return load_wvs_all()
 
 
+DENSE_RESULTS = Path("slop/research/wvs/20260918_gemini_flash_rubric_pilot/results.json")
+
+
+def dense_psamples(cell_name: str) -> dict[str, dict[str, np.ndarray]]:
+    """model -> item suffix -> per-sample p over the canonical substantive options, from the dense
+    rubric pilot (canonical score-all-options, normal rubric)."""
+    data = json.loads(DENSE_RESULTS.read_text())
+    out = {}
+    for row in data["models"]:
+        cell = next(c for c in row["cells"] if c["name"] == cell_name)
+        events = [json.loads(line) for line in Path(cell["records"]).read_text().splitlines()]
+        finished = [e for e in events if e["event"] == "run_finished"][-1]
+        out[row["id"]] = {e["id"]: np.asarray(e["p_samples"]) for e in events
+                          if e["event"] == "item_result" and e["run_id"] == finished["run_id"]}
+    return out
+
+
+def release_years() -> np.ndarray:
+    catalog = {r["id"]: r for r in json.loads(MODEL_CATALOG.read_text())["data"]}
+    def decimal_year(ts: int) -> float:
+        d = datetime.fromtimestamp(ts, tz=timezone.utc)
+        jan = datetime(d.year, 1, 1, tzinfo=timezone.utc)
+        nxt = datetime(d.year + 1, 1, 1, tzinfo=timezone.utc)
+        return d.year + (d - jan).total_seconds() / (nxt - jan).total_seconds()
+    return np.array([decimal_year(catalog[m]["created"]) for m in MODELS])
+
+
+def coords_on_items(per_item: dict[str, dict[str, np.ndarray]], resolved: dict,
+                    item_ids: set[str]) -> dict:
+    """Coordinates, release OLS slopes, and 2D residual RMSE restricted to a fixed item set."""
+    x = release_years()
+    ys = []
+    for m in MODELS:
+        xy = []
+        for axis in (X_AXIS, Y_AXIS):
+            vals = [positiveness(np.mean(per_item[m][it["suffix"]], axis=0)[None, :],
+                                 it["pole_idx"], it["n"])
+                    for it in resolved[axis] if it["suffix"] in item_ids]
+            xy.append(float(np.mean(vals)))
+        ys.append(xy)
+    ys = np.array(ys)
+    slopes, preds = [], []
+    for k in range(2):
+        slope, intercept = np.polyfit(x, ys[:, k], 1)
+        slopes.append(float(slope))
+        preds.append(slope * x + intercept)
+    rmse2 = float(np.sqrt(np.mean(np.sum((ys - np.column_stack(preds)) ** 2, axis=1))))
+    return {"coords_xy_per_model": {m: [float(v) for v in ys[k]] for k, m in enumerate(MODELS)},
+            "slope_x_per_year": slopes[0], "slope_y_per_year": slopes[1], "rmse_2d": rmse2}
+
+
+def sensitivity(items: list[dict], child_rows: list[dict], resolved: dict,
+               summaries: dict[str, dict]) -> dict:
+    """Release fits on fixed common item sets (coverage rule applied to ALL five original-choice
+    releases simultaneously), with dense normal_minimum/high recomputed on exactly the same items.
+    This fixes the estimand the all-items comparison changed."""
+    plan = plan_requests(items)
+    orig = {m: sample_psamples(m, items, Path(summaries[m]["records"]), summaries[m]["protocol_id"],
+                               plan, child_rows) for m in MODELS}
+    dense_min = dense_psamples("normal_minimum")
+    dense_high = dense_psamples("normal_high")
+    all_suffixes = sorted(orig[MODELS[0]])
+    rules = {"nonzero": 0.0, "cov25": 0.25, "cov50": 0.50, "cov75": 0.75}
+    out = {}
+    for rule, threshold in rules.items():
+        keep = [s for s in all_suffixes
+                if all(sum(v.sum() > 0 for v in orig[m][s]) / len(orig[m][s]) > threshold
+                       for m in MODELS)]
+        keep = set(keep)
+        counts = {axis: sorted(it["suffix"] for it in resolved[axis] if it["suffix"] in keep)
+                  for axis in (X_AXIS, Y_AXIS)}
+        out[rule] = {"min_per_model_coverage": threshold,
+                     "items": counts,
+                     "n_items": {axis: len(counts[axis]) for axis in (X_AXIS, Y_AXIS)},
+                     "original_choice": coords_on_items(orig, resolved, keep),
+                     "dense_normal_minimum": coords_on_items(dense_min, resolved, keep),
+                     "dense_normal_high": coords_on_items(dense_high, resolved, keep)}
+    return out
+
+
+def position_contrast(items: list[dict]) -> dict:
+    """Balance evidence and option-position/refusal contrast from the records: rotations cover each
+    position equally; cannot_answer rate by the position of the nearest non-substantive option, and
+    substantive selection rate by normalized position bucket (first/middle/last third)."""
+    out = {}
+    for model in MODELS:
+        rpath = OUT / "records" / model.replace("/", "__") / "original_choice.jsonl"
+        answers = [e for e in load_events(rpath) if e["event"] == "answer_parsed"]
+        rows = []
+        for q, item in enumerate(items):
+            if item["is_list"]:
+                continue
+            k = len(item["offered"])
+            base = item["offered"]
+            for e in answers:
+                if e["item_id"] != item["id"]:
+                    continue
+                s = e["sample"]
+                pos_of = {opt: (opt_pos - s) % k for opt_pos, opt in enumerate(base)}
+                dk_rank = min(pos_of[o] for o in NONSUBSTANTIVE) / k
+                if e["outcome"] == "substantive":
+                    sel_rank = pos_of[e["selected"]] / k
+                    rows.append((dk_rank, sel_rank, False))
+                else:
+                    rows.append((dk_rank, None, True))
+        def bucket(rank):
+            return "first_third" if rank < 1 / 3 else ("middle" if rank < 2 / 3 else "last_third")
+        cannot_by_dk_position = {b: [0, 0] for b in ("first_third", "middle", "last_third")}
+        sel_by_position = {b: [0, 0] for b in ("first_third", "middle", "last_third")}
+        for dk_rank, sel_rank, cannot in rows:
+            cannot_by_dk_position[bucket(dk_rank)][1] += 1
+            cannot_by_dk_position[bucket(dk_rank)][0] += int(cannot)
+            if sel_rank is not None:
+                sel_by_position[bucket(sel_rank)][1] += 1
+        out[model] = {
+            "cannot_answer_rate_by_dk_position_third": {
+                b: (round(v[0] / v[1], 4) if v[1] else None) for b, v in cannot_by_dk_position.items()},
+            "n_by_dk_position_third": {b: v[1] for b, v in cannot_by_dk_position.items()},
+            "substantive_selection_share_by_position_third": {
+                b: round(v[1] / sum(x[1] for x in sel_by_position.values()), 4)
+                for b, v in sel_by_position.items()},
+        }
+    return out
+
+
 def analyze() -> None:
     """Post-run analysis: coordinates, coverage, refusal rates, paired bootstrap, release trend."""
     items, child_rows = build_items()
@@ -751,27 +946,52 @@ def analyze() -> None:
     coverage = {m: {item_id: stats["coverage"]
                     for item_id, stats in summaries[m]["per_question"].items()} for m in MODELS}
     atomic_json(OUT / "analysis.json", {
-        "fits": fits,
+        "schema": 2,
+        "status_labels": {
+            "gemini-3-flash-preview": "preregistered", "google/gemini-3.5-flash": "preregistered",
+            "google/gemini-3.6-flash": "preregistered", "google/gemini-3.7-flash": "smoke-then-preregistered-panel",
+            "google/gemini-3.8-flash": "EXPLORATORY, ran before the preregistration commit 5ad68ad"},
+        "note": ("the all-items five-release fit below is therefore NOT a preregistered prediction "
+                 "test; preregistered claims are per-release P1/P2 only"),
+        "fits_all_items_exploratory": fits,
+        "sensitivity_fixed_item_sets": sensitivity(items, child_rows, resolved, summaries),
+        "position_contrast": position_contrast(items),
         "cannot_answer_rate_per_model": {m: sum(cannot[m].values()) / len(cannot[m]) for m in MODELS},
         "cannot_answer_rate_per_question_per_model": cannot,
         "coverage_per_question_per_model": coverage,
     })
-    print(json.dumps(fits["point"], indent=2))
+    print(json.dumps({"all_items": fits["point"],
+                      "sensitivity": {k: {"n_items": v["n_items"],
+                                          "orig_rmse": v["original_choice"]["rmse_2d"],
+                                          "dense_min_rmse": v["dense_normal_minimum"]["rmse_2d"],
+                                          "dense_high_rmse": v["dense_normal_high"]["rmse_2d"]}
+                                      for k, v in sensitivity(items, child_rows, resolved, summaries).items()}},
+                     indent=2))
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--offline-smoke", action="store_true")
-    parser.add_argument("--write-manifest", action="store_true")
-    parser.add_argument("--paid-smoke", action="store_true")
-    parser.add_argument("--run", action="store_true")
-    parser.add_argument("--analyze", action="store_true")
+    actions = parser.add_mutually_exclusive_group(required=True)
+    actions.add_argument("--offline-smoke", action="store_true")
+    actions.add_argument("--offline-regression", action="store_true")
+    actions.add_argument("--write-manifest", action="store_true")
+    actions.add_argument("--paid-smoke", action="store_true")
+    actions.add_argument("--run", action="store_true")
+    actions.add_argument("--analyze", action="store_true")
+    parser.add_argument("--i-authorize-paid-calls", action="store_true",
+                        help="required for --paid-smoke/--run; sets the paid-call opt-in")
     args = parser.parse_args()
     items, child_rows = build_items()
     if args.offline_smoke:
         offline_smoke(items)
+    if args.offline_regression:
+        offline_regression(items)
     if args.write_manifest:
         write_manifest(items)
+    if args.paid_smoke or args.run:
+        if not args.i_authorize_paid_calls:
+            raise SystemExit("--paid-smoke/--run cost money and require --i-authorize-paid-calls")
+        os.environ[PAID_OPTIN_ENV] = "1"
     if args.paid_smoke:
         paid_smoke(items)
     if args.run:

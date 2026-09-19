@@ -120,7 +120,7 @@
       "dealing with people?": 0.16666666666666666
     }
   },
-  "fits": {
+  "fits_all_items_exploratory": {
     "bootstrap": {
       "coord_xy_se": [
         0.022466332449912703,
@@ -189,5 +189,507 @@
       "slope_x_per_year": -0.6061984096087086,
       "slope_y_per_year": 0.2834030539477191
     }
+  },
+  "note": "the all-items five-release fit below is therefore NOT a preregistered prediction test; preregistered claims are per-release P1/P2 only",
+  "position_contrast": {
+    "google/gemini-3-flash-preview": {
+      "cannot_answer_rate_by_dk_position_third": {
+        "first_third": 0.4091,
+        "last_third": 0.375,
+        "middle": 0.3788
+      },
+      "n_by_dk_position_third": {
+        "first_third": 110,
+        "last_third": 16,
+        "middle": 66
+      },
+      "substantive_selection_share_by_position_third": {
+        "first_third": 0.3534,
+        "last_third": 0.3017,
+        "middle": 0.3448
+      }
+    },
+    "google/gemini-3.5-flash": {
+      "cannot_answer_rate_by_dk_position_third": {
+        "first_third": 0.0727,
+        "last_third": 0.0625,
+        "middle": 0.1061
+      },
+      "n_by_dk_position_third": {
+        "first_third": 110,
+        "last_third": 16,
+        "middle": 66
+      },
+      "substantive_selection_share_by_position_third": {
+        "first_third": 0.3352,
+        "last_third": 0.3068,
+        "middle": 0.358
+      }
+    },
+    "google/gemini-3.6-flash": {
+      "cannot_answer_rate_by_dk_position_third": {
+        "first_third": 0.3,
+        "last_third": 0.5,
+        "middle": 0.2879
+      },
+      "n_by_dk_position_third": {
+        "first_third": 110,
+        "last_third": 16,
+        "middle": 66
+      },
+      "substantive_selection_share_by_position_third": {
+        "first_third": 0.3409,
+        "last_third": 0.3182,
+        "middle": 0.3409
+      }
+    },
+    "google/gemini-3.7-flash": {
+      "cannot_answer_rate_by_dk_position_third": {
+        "first_third": 0.5909,
+        "last_third": 0.75,
+        "middle": 0.6212
+      },
+      "n_by_dk_position_third": {
+        "first_third": 110,
+        "last_third": 16,
+        "middle": 66
+      },
+      "substantive_selection_share_by_position_third": {
+        "first_third": 0.4459,
+        "last_third": 0.2432,
+        "middle": 0.3108
+      }
+    },
+    "google/gemini-3.8-flash": {
+      "cannot_answer_rate_by_dk_position_third": {
+        "first_third": 0.4727,
+        "last_third": 0.5625,
+        "middle": 0.3939
+      },
+      "n_by_dk_position_third": {
+        "first_third": 110,
+        "last_third": 16,
+        "middle": 66
+      },
+      "substantive_selection_share_by_position_third": {
+        "first_third": 0.3238,
+        "last_third": 0.3143,
+        "middle": 0.3619
+      }
+    }
+  },
+  "schema": 2,
+  "sensitivity_fixed_item_sets": {
+    "cov25": {
+      "dense_normal_high": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.40776014109347436,
+            0.7365039281705948
+          ],
+          "google/gemini-3.5-flash": [
+            0.5841049382716049,
+            0.694352252685586
+          ],
+          "google/gemini-3.6-flash": [
+            0.5435185185185184,
+            0.6945206028539362
+          ],
+          "google/gemini-3.7-flash": [
+            0.461089065255732,
+            0.6669552669552671
+          ],
+          "google/gemini-3.8-flash": [
+            0.3234126984126985,
+            0.661552028218695
+          ]
+        },
+        "rmse_2d": 0.09374605926987896,
+        "slope_x_per_year": -0.012891078161264849,
+        "slope_y_per_year": -0.0989300777864456
+      },
+      "dense_normal_minimum": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.6434413580246913,
+            0.6795634920634921
+          ],
+          "google/gemini-3.5-flash": [
+            0.6374559082892416,
+            0.624968734968735
+          ],
+          "google/gemini-3.6-flash": [
+            0.6287037037037037,
+            0.6437301587301588
+          ],
+          "google/gemini-3.7-flash": [
+            0.38795194003527333,
+            0.6824835658168993
+          ],
+          "google/gemini-3.8-flash": [
+            0.2944003527336861,
+            0.6769761103094437
+          ]
+        },
+        "rmse_2d": 0.11062522669412543,
+        "slope_x_per_year": -0.3918383833725489,
+        "slope_y_per_year": -0.0036253479507921704
+      },
+      "items": {
+        "Survival <-> Self-expression": [
+          "Attending peaceful demonstrations",
+          "Joining in boycotts",
+          "Signing a petition"
+        ],
+        "Traditional <-> Secular-Rational": [
+          "Determination, perseverance",
+          "Imagination",
+          "Independence",
+          "Obedience",
+          "Religion"
+        ]
+      },
+      "min_per_model_coverage": 0.25,
+      "n_items": {
+        "Survival <-> Self-expression": 3,
+        "Traditional <-> Secular-Rational": 5
+      },
+      "original_choice": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.9375,
+            0.8
+          ],
+          "google/gemini-3.5-flash": [
+            0.9583333333333334,
+            0.6805555555555556
+          ],
+          "google/gemini-3.6-flash": [
+            0.7430555555555557,
+            0.7444444444444445
+          ],
+          "google/gemini-3.7-flash": [
+            0.5069444444444445,
+            0.9
+          ],
+          "google/gemini-3.8-flash": [
+            0.3541666666666667,
+            0.9083333333333334
+          ]
+        },
+        "rmse_2d": 0.16910500932360994,
+        "slope_x_per_year": -0.7221633278414168,
+        "slope_y_per_year": 0.13230329671184193
+      }
+    },
+    "cov50": {
+      "dense_normal_high": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.5380952380952381,
+            0.7365039281705948
+          ],
+          "google/gemini-3.5-flash": [
+            0.7374338624338626,
+            0.694352252685586
+          ],
+          "google/gemini-3.6-flash": [
+            0.7,
+            0.6945206028539362
+          ],
+          "google/gemini-3.7-flash": [
+            0.5082671957671958,
+            0.6669552669552671
+          ],
+          "google/gemini-3.8-flash": [
+            0.22023809523809534,
+            0.661552028218695
+          ]
+        },
+        "rmse_2d": 0.1745457540939421,
+        "slope_x_per_year": -0.2189997556490904,
+        "slope_y_per_year": -0.0989300777864456
+      },
+      "dense_normal_minimum": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.711111111111111,
+            0.6795634920634921
+          ],
+          "google/gemini-3.5-flash": [
+            0.7164351851851852,
+            0.624968734968735
+          ],
+          "google/gemini-3.6-flash": [
+            0.7185185185185186,
+            0.6437301587301588
+          ],
+          "google/gemini-3.7-flash": [
+            0.4495701058201058,
+            0.6824835658168993
+          ],
+          "google/gemini-3.8-flash": [
+            0.33558201058201065,
+            0.6769761103094437
+          ]
+        },
+        "rmse_2d": 0.12592759141229765,
+        "slope_x_per_year": -0.40806802305431017,
+        "slope_y_per_year": -0.0036253479507921704
+      },
+      "items": {
+        "Survival <-> Self-expression": [
+          "Signing a petition"
+        ],
+        "Traditional <-> Secular-Rational": [
+          "Determination, perseverance",
+          "Imagination",
+          "Independence",
+          "Obedience",
+          "Religion"
+        ]
+      },
+      "min_per_model_coverage": 0.5,
+      "n_items": {
+        "Survival <-> Self-expression": 1,
+        "Traditional <-> Secular-Rational": 5
+      },
+      "original_choice": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.9791666666666666,
+            0.8
+          ],
+          "google/gemini-3.5-flash": [
+            0.9791666666666666,
+            0.6805555555555556
+          ],
+          "google/gemini-3.6-flash": [
+            1.0,
+            0.7444444444444445
+          ],
+          "google/gemini-3.7-flash": [
+            0.33333333333333337,
+            0.9
+          ],
+          "google/gemini-3.8-flash": [
+            0.29166666666666663,
+            0.9083333333333334
+          ]
+        },
+        "rmse_2d": 0.2643484950720592,
+        "slope_x_per_year": -0.8339691792184623,
+        "slope_y_per_year": 0.13230329671184193
+      }
+    },
+    "cov75": {
+      "dense_normal_high": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            NaN,
+            0.7365039281705948
+          ],
+          "google/gemini-3.5-flash": [
+            NaN,
+            0.694352252685586
+          ],
+          "google/gemini-3.6-flash": [
+            NaN,
+            0.6945206028539362
+          ],
+          "google/gemini-3.7-flash": [
+            NaN,
+            0.6669552669552671
+          ],
+          "google/gemini-3.8-flash": [
+            NaN,
+            0.661552028218695
+          ]
+        },
+        "rmse_2d": NaN,
+        "slope_x_per_year": NaN,
+        "slope_y_per_year": -0.0989300777864456
+      },
+      "dense_normal_minimum": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            NaN,
+            0.6795634920634921
+          ],
+          "google/gemini-3.5-flash": [
+            NaN,
+            0.624968734968735
+          ],
+          "google/gemini-3.6-flash": [
+            NaN,
+            0.6437301587301588
+          ],
+          "google/gemini-3.7-flash": [
+            NaN,
+            0.6824835658168993
+          ],
+          "google/gemini-3.8-flash": [
+            NaN,
+            0.6769761103094437
+          ]
+        },
+        "rmse_2d": NaN,
+        "slope_x_per_year": NaN,
+        "slope_y_per_year": -0.0036253479507921704
+      },
+      "items": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": [
+          "Determination, perseverance",
+          "Imagination",
+          "Independence",
+          "Obedience",
+          "Religion"
+        ]
+      },
+      "min_per_model_coverage": 0.75,
+      "n_items": {
+        "Survival <-> Self-expression": 0,
+        "Traditional <-> Secular-Rational": 5
+      },
+      "original_choice": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            NaN,
+            0.8
+          ],
+          "google/gemini-3.5-flash": [
+            NaN,
+            0.6805555555555556
+          ],
+          "google/gemini-3.6-flash": [
+            NaN,
+            0.7444444444444445
+          ],
+          "google/gemini-3.7-flash": [
+            NaN,
+            0.9
+          ],
+          "google/gemini-3.8-flash": [
+            NaN,
+            0.9083333333333334
+          ]
+        },
+        "rmse_2d": NaN,
+        "slope_x_per_year": NaN,
+        "slope_y_per_year": 0.13230329671184193
+      }
+    },
+    "nonzero": {
+      "dense_normal_high": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.4495943562610229,
+            0.7365039281705948
+          ],
+          "google/gemini-3.5-flash": [
+            0.5504629629629629,
+            0.694352252685586
+          ],
+          "google/gemini-3.6-flash": [
+            0.5522269705603039,
+            0.6945206028539362
+          ],
+          "google/gemini-3.7-flash": [
+            0.5077370426508357,
+            0.6669552669552671
+          ],
+          "google/gemini-3.8-flash": [
+            0.42397571564238234,
+            0.661552028218695
+          ]
+        },
+        "rmse_2d": 0.05208403121789642,
+        "slope_x_per_year": 0.03264101067017449,
+        "slope_y_per_year": -0.0989300777864456
+      },
+      "dense_normal_minimum": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.6170217569786536,
+            0.6795634920634921
+          ],
+          "google/gemini-3.5-flash": [
+            0.6138227513227512,
+            0.624968734968735
+          ],
+          "google/gemini-3.6-flash": [
+            0.589126984126984,
+            0.6437301587301588
+          ],
+          "google/gemini-3.7-flash": [
+            0.4679434257738855,
+            0.6824835658168993
+          ],
+          "google/gemini-3.8-flash": [
+            0.41143769385148693,
+            0.6769761103094437
+          ]
+        },
+        "rmse_2d": 0.06271183170463177,
+        "slope_x_per_year": -0.2368815371407787,
+        "slope_y_per_year": -0.0036253479507921704
+      },
+      "items": {
+        "Survival <-> Self-expression": [
+          "Attending peaceful demonstrations",
+          "Homosexuality",
+          "Joining in boycotts",
+          "Signing a petition",
+          "dealing with people?"
+        ],
+        "Traditional <-> Secular-Rational": [
+          "Determination, perseverance",
+          "Imagination",
+          "Independence",
+          "Obedience",
+          "Religion"
+        ]
+      },
+      "min_per_model_coverage": 0.0,
+      "n_items": {
+        "Survival <-> Self-expression": 5,
+        "Traditional <-> Secular-Rational": 5
+      },
+      "original_choice": {
+        "coords_xy_per_model": {
+          "google/gemini-3-flash-preview": [
+            0.9125,
+            0.8
+          ],
+          "google/gemini-3.5-flash": [
+            0.9083333333333334,
+            0.6805555555555556
+          ],
+          "google/gemini-3.6-flash": [
+            0.6041666666666666,
+            0.7444444444444445
+          ],
+          "google/gemini-3.7-flash": [
+            0.5541666666666667,
+            0.9
+          ],
+          "google/gemini-3.8-flash": [
+            0.4875,
+            0.9083333333333334
+          ]
+        },
+        "rmse_2d": 0.12317306101251788,
+        "slope_x_per_year": -0.6061984096087086,
+        "slope_y_per_year": 0.13230329671184193
+      }
+    }
+  },
+  "status_labels": {
+    "gemini-3-flash-preview": "preregistered",
+    "google/gemini-3.5-flash": "preregistered",
+    "google/gemini-3.6-flash": "preregistered",
+    "google/gemini-3.7-flash": "smoke-then-preregistered-panel",
+    "google/gemini-3.8-flash": "EXPLORATORY, ran before the preregistration commit 5ad68ad"
   }
 }
