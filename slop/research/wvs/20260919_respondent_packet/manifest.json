@@ -103,7 +103,8 @@
       "question": "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important? Please choose up to five."
     }
   ],
-  "created_utc": "2026-09-19T05:08:22.897161+00:00",
+  "created_utc": "2026-09-19T05:23:13.067458+00:00",
+  "endpoint_provenance": "endpoints and pricing from the authenticated 2026-09-18 snapshot; the unauthenticated live models GET returns endpoints=null, so the paid smoke is the current live route test",
   "eval_version": "wvs-respondent-packet-v1",
   "instrument_status": "GlobalOpinionQA-compatible approximation; 11th quality Religious faith appended; card order not recorded in source",
   "max_tokens": 2048,
@@ -119,7 +120,7 @@
       },
       "release_slug": "qwen/qwen3.5-plus-20260216",
       "requests": 128,
-      "reserve_bound_usd": "0.88604672"
+      "reserve_bound_usd": "0.44302336"
     },
     {
       "advertised_quantization": "unknown",
@@ -131,7 +132,7 @@
       },
       "release_slug": "qwen/qwen3.6-plus-04-02",
       "requests": 128,
-      "reserve_bound_usd": "1.107558400"
+      "reserve_bound_usd": "0.553779200"
     },
     {
       "advertised_quantization": "unknown",
@@ -143,7 +144,7 @@
       },
       "release_slug": "qwen/qwen3.5-plus-20260420",
       "requests": 128,
-      "reserve_bound_usd": "1.0223616"
+      "reserve_bound_usd": "0.5111808"
     },
     {
       "advertised_quantization": "unknown",
@@ -155,18 +156,20 @@
       },
       "release_slug": "qwen/qwen3.7-plus-20260602",
       "requests": 128,
-      "reserve_bound_usd": "0.75497472"
+      "reserve_bound_usd": "0.37748736"
     }
   ],
   "n_packets": 128,
   "not_published": true,
-  "panel_plus_smoke_bound_usd": "3.777863680",
+  "panel_plus_smoke_bound_usd": "1.888419840",
   "panel_requests": 512,
-  "panel_reserve_bound_usd": "3.770941440",
-  "refusal_rule": "per-question \"refused\" status inside the schema; never displayed as an option; reported separately; never neutral",
-  "schema": 1,
+  "panel_reserve_bound_usd": "1.885470720",
+  "refusal_rule": "ordinary: per-question \"refused\" status inside the schema, never displayed as an option; child: separate refused flag plus a 0..5 selected list, zero selections with refused=false is a valid substantive none; all refusals reported separately, never neutral",
+  "reserve_bound_formula": "1024 input tokens + 2048 output tokens per packet at the saved Alibaba per-token prices",
+  "schema": 2,
+  "smoke_model": "qwen/qwen3.7-plus",
   "smoke_requests": 1,
-  "smoke_reserve_bound_usd": "0.00692224",
+  "smoke_reserve_bound_usd": "0.00294912",
   "stage_hard_stop_usd": "5",
   "temperature": 1.0
 }

@@ -28,6 +28,7 @@ import httpx
 import numpy as np
 
 import moralmaps.iw_axes as iw
+from moralmaps.iw_axes import X_AXIS, Y_AXIS, positiveness, resolve_items
 from moralmaps.read_api import openrouter_request_with_metadata_once
 from openrouter_wrapper.retry import is_retryable_error
 
@@ -169,13 +170,18 @@ def packet_schema(battery: list[dict]) -> dict:
                                                       "enum": q["options"] + [REFUSED]}},
                           "required": ["selected"], "additionalProperties": False}
                 for q in battery if q["id"] != "ChildQualities"}
+    # child: refused flag is separate from the 0..5 selected list; zero selections with refused=false
+    # is a valid substantive "none of these" answer (the human stem says "Which, if any").
     return {"type": "json_schema", "json_schema": {"name": "wvs_respondent_packet", "strict": True,
             "schema": {"type": "object", "properties": {
                 "answers": {"type": "object", "properties": ordinary,
                             "required": list(ordinary), "additionalProperties": False},
-                "child_qualities": {"type": "array",
-                                    "items": {"type": "string", "enum": child["options"]},
-                                    "minItems": 0, "maxItems": 5, "uniqueItems": True}},
+                "child_qualities": {"type": "object", "properties": {
+                    "refused": {"type": "boolean"},
+                    "selected": {"type": "array",
+                                 "items": {"type": "string", "enum": child["options"]},
+                                 "minItems": 0, "maxItems": 5, "uniqueItems": True}},
+                    "required": ["refused", "selected"], "additionalProperties": False}},
                 "required": ["answers", "child_qualities"], "additionalProperties": False}}}
 
 
@@ -188,8 +194,11 @@ def parse_packet(battery: list[dict], text: str) -> dict | None:
         raw = json.loads(objs[-1])
     except json.JSONDecodeError:
         return None
-    answers, qualities = raw.get("answers"), raw.get("child_qualities")
-    if not isinstance(answers, dict) or not isinstance(qualities, list):
+    answers, child = raw.get("answers"), raw.get("child_qualities")
+    if not isinstance(answers, dict) or not isinstance(child, dict):
+        return None
+    qualities, child_refused = child.get("selected"), child.get("refused")
+    if not isinstance(qualities, list) or not isinstance(child_refused, bool):
         return None
     row = {}
     for q in battery:
@@ -197,7 +206,9 @@ def parse_packet(battery: list[dict], text: str) -> dict | None:
             if (len(qualities) > 5 or len(set(qualities)) != len(qualities)
                     or not set(qualities) <= set(q["options"])):
                 return None
-            row["ChildQualities"] = {"outcome": "refused" if len(qualities) == 0 else "substantive",
+            if child_refused and qualities:
+                return None  # a refusal selects nothing
+            row["ChildQualities"] = {"outcome": "refused" if child_refused else "substantive",
                                      "selected": qualities}
             continue
         answer = answers.get(q["id"])
@@ -246,11 +257,17 @@ def update_state(update) -> dict:
     return state
 
 
+INPUT_RESERVE_TOKENS = 1024
+OUTPUT_RESERVE_TOKENS = 2048
+
+
 def request_bound(model: str) -> Decimal:
+    """Per-packet reserve bound: 1,024 input + 2,048 output tokens at the saved Alibaba prices.
+    Matches the manifest and the preregistration prose exactly."""
     endpoint = standard_endpoint(model)
-    price = (Decimal(endpoint["pricing"]["prompt"])
-             + Decimal(endpoint["pricing"]["completion"]) * 2)
-    return Decimal(MAX_TOKENS) * price
+    bound = (Decimal(INPUT_RESERVE_TOKENS) * Decimal(endpoint["pricing"]["prompt"])
+             + Decimal(OUTPUT_RESERVE_TOKENS) * Decimal(endpoint["pricing"]["completion"]))
+    return bound
 
 
 def reserve_request(model: str) -> Decimal:
@@ -465,11 +482,16 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
         substantive = [o for o in outcomes if o["outcome"] == "substantive"]
         if q["id"] == "ChildQualities":
             counts = {opt: 0 for opt in q["options"]}
+            zero_selection = 0
             for o in substantive:
                 for sel in o["selected"]:
                     counts[sel] += 1
+                if not o["selected"]:
+                    zero_selection += 1
             per_question[q["id"]] = {"n": len(outcomes), "substantive": len(substantive),
                                      "refused": len(refused),
+                                     "zero_selection_substantive": zero_selection,
+                                     "zero_selection_or_refusal": zero_selection + len(refused),
                                      "coverage": len(substantive) / len(outcomes),
                                      "selection_rates": {opt: counts[opt] / len(outcomes)
                                                          for opt in counts}}
@@ -482,9 +504,12 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
                                      "coverage": len(substantive) / len(outcomes),
                                      "option_frequencies": {opt: counts[opt] / len(outcomes)
                                                             for opt in counts}}
+    zero_or_refused = sum(q.get("zero_selection_or_refusal", q["refused"]) for q in per_question.values())
     return {"model": model, "eval_version": EVAL_VERSION, "protocol_id": pid, "records": str(rpath),
             "valid_packets": len(rows),
             "refusal_rate_overall": sum(q["refused"] for q in per_question.values())
+            / sum(q["n"] for q in per_question.values()),
+            "zero_selection_or_refusal_rate_overall": zero_or_refused
             / sum(q["n"] for q in per_question.values()),
             "per_question": per_question}
 
@@ -492,6 +517,7 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
 def write_manifest(battery: list[dict]) -> dict:
     catalog = {r["id"]: r for r in json.loads(MODEL_CATALOG.read_text())["data"]}
     rows, total = [], Decimal(0)
+    smoke_model = MODELS[3]
     for model in MODELS:
         endpoint = standard_endpoint(model)
         created = catalog[model]["created"]
@@ -503,20 +529,32 @@ def write_manifest(battery: list[dict]) -> dict:
                      "reasoning": {"enabled": False},
                      "advertised_quantization": endpoint.get("quantization"),
                      "requests": N_PACKETS, "reserve_bound_usd": str(bound)})
-    smoke = Decimal(request_bound(MODELS[0]))
-    payload = {"schema": 1, "eval_version": EVAL_VERSION,
+    smoke_bound = request_bound(smoke_model)
+    payload = {"schema": 2, "eval_version": EVAL_VERSION,
                "created_utc": datetime.now(UTC).isoformat(), "models": rows,
                "battery": [{"id": q["id"], "question": q["question"], "options": q["options"]}
                            for q in battery],
                "instrument_status": ("GlobalOpinionQA-compatible approximation; 11th quality "
                                      "Religious faith appended; card order not recorded in source"),
                "n_packets": N_PACKETS, "max_tokens": MAX_TOKENS, "temperature": 1.0,
+               "reserve_bound_formula": (f"{INPUT_RESERVE_TOKENS} input tokens + "
+                                         f"{OUTPUT_RESERVE_TOKENS} output tokens per packet at the "
+                                         "saved Alibaba per-token prices"),
                "panel_requests": N_PACKETS * len(MODELS), "smoke_requests": 1,
-               "panel_reserve_bound_usd": str(total), "smoke_reserve_bound_usd": str(smoke),
-               "panel_plus_smoke_bound_usd": str(total + smoke),
+               "smoke_model": smoke_model,
+               "smoke_reserve_bound_usd": str(smoke_bound),
+               "panel_reserve_bound_usd": str(total),
+               "panel_plus_smoke_bound_usd": str(total + smoke_bound),
+               "endpoint_provenance": ("endpoints and pricing from the authenticated 2026-09-18 "
+                                       "snapshot; the unauthenticated live models GET returns "
+                                       "endpoints=null, so the paid smoke is the current live "
+                                       "route test"),
                "stage_hard_stop_usd": str(STAGE_CAP_USD),
-               "refusal_rule": ("per-question \"refused\" status inside the schema; never displayed "
-                                "as an option; reported separately; never neutral"),
+               "refusal_rule": ("ordinary: per-question \"refused\" status inside the schema, "
+                                "never displayed as an option; child: separate refused flag plus "
+                                "a 0..5 selected list, zero selections with refused=false is a "
+                                "valid substantive none; all refusals reported separately, never "
+                                "neutral"),
                "not_published": True, "merge_into_primary": False}
     atomic_json(MANIFEST, payload)
     return payload
@@ -525,23 +563,38 @@ def write_manifest(battery: list[dict]) -> dict:
 def offline_smoke(battery: list[dict]) -> None:
     valid = {"answers": {q["id"]: {"selected": q["options"][0]} for q in battery
                          if q["id"] != "ChildQualities"},
-             "child_qualities": ["Independence", RELIGIOUS_FAITH]}
+             "child_qualities": {"refused": False, "selected": ["Independence", RELIGIOUS_FAITH]}}
     row = parse_packet(battery, json.dumps(valid))
     assert row is not None and row["ChildQualities"]["selected"] == ["Independence", RELIGIOUS_FAITH]
+    assert row["ChildQualities"]["outcome"] == "substantive"
     assert all(row[q["id"]]["outcome"] == "substantive" for q in battery if q["id"] != "ChildQualities")
+    # zero selections with refused=false: valid substantive "none", NOT refusal
+    none = {"answers": {q["id"]: {"selected": q["options"][0]} for q in battery
+                        if q["id"] != "ChildQualities"},
+            "child_qualities": {"refused": False, "selected": []}}
+    row = parse_packet(battery, json.dumps(none))
+    assert row is not None and row["ChildQualities"] == {"outcome": "substantive", "selected": []}
+    # refused=true with empty selection: refusal
     refused = {"answers": {q["id"]: {"selected": REFUSED} for q in battery
-                           if q["id"] != "ChildQualities"}, "child_qualities": []}
+                           if q["id"] != "ChildQualities"},
+               "child_qualities": {"refused": True, "selected": []}}
     row = parse_packet(battery, json.dumps(refused))
     assert row is not None and all(v["outcome"] == "refused" for v in row.values())
-    bad = {"answers": {"nonexistent": {"selected": "x"}}, "child_qualities": []}
+    bad = {"answers": {"nonexistent": {"selected": "x"}},
+           "child_qualities": {"refused": False, "selected": []}}
     assert parse_packet(battery, json.dumps(bad)) is None
     assert parse_packet(battery, "garbage") is None
     over = {"answers": valid["answers"],
-            "child_qualities": next(q for q in battery if q["id"] == "ChildQualities")["options"][:6]}
+            "child_qualities": {"refused": False,
+                                "selected": next(q for q in battery
+                                                 if q["id"] == "ChildQualities")["options"][:6]}}
     assert parse_packet(battery, json.dumps(over)) is None
     dup = {"answers": valid["answers"],
-           "child_qualities": [RELIGIOUS_FAITH, RELIGIOUS_FAITH]}
+           "child_qualities": {"refused": False, "selected": [RELIGIOUS_FAITH, RELIGIOUS_FAITH]}}
     assert parse_packet(battery, json.dumps(dup)) is None
+    inconsistent = {"answers": valid["answers"],
+                    "child_qualities": {"refused": True, "selected": [RELIGIOUS_FAITH]}}
+    assert parse_packet(battery, json.dumps(inconsistent)) is None
     # refusal sentinel must not collide with a listed option
     for q in battery:
         assert REFUSED not in q["options"], q["id"]
@@ -607,7 +660,7 @@ def paid_smoke(battery: list[dict]) -> None:
         raise SystemExit("paid smoke requires --i-authorize-paid-calls")
     from wvs_score_all_options_refresh import reserve, settle_external_reservation
     smoke_rid = f"pilot/resp-packet-smoke/{datetime.now(UTC).strftime('%Y%m%dT%H%M%S.%fZ')}"
-    if not reserve({"id": smoke_rid, "lane": "google", "reserve_usd": "0.05"}):
+    if not reserve({"id": smoke_rid, "lane": "alibaba", "reserve_usd": "0.05"}):
         raise RuntimeError("global repository cap rejected respondent-packet smoke reservation")
     before = Decimal(update_state(lambda s: s)["conservative_spent_usd"])
     smoke_records = OUT / "paid_smoke.jsonl"
@@ -648,6 +701,7 @@ def main() -> None:
     actions.add_argument("--paid-smoke", action="store_true")
     actions.add_argument("--run", action="store_true")
     actions.add_argument("--analyze", action="store_true")
+    actions.add_argument("--synthetic-analysis-test", action="store_true")
     parser.add_argument("--i-authorize-paid-calls", action="store_true",
                         help="required for --paid-smoke/--run; sets the paid-call opt-in")
     args = parser.parse_args()
@@ -667,7 +721,9 @@ def main() -> None:
     if args.run:
         run(battery)
     if args.analyze:
-        analyze()
+        analyze_real()
+    if args.synthetic_analysis_test:
+        synthetic_analysis_test(battery, child_rows)
 
 
 def run(battery: list[dict]) -> None:
@@ -687,8 +743,279 @@ def run(battery: list[dict]) -> None:
     print("panel complete")
 
 
+def release_years() -> np.ndarray:
+    catalog = {r["id"]: r for r in json.loads(MODEL_CATALOG.read_text())["data"]}
+    def decimal_year(ts: int) -> float:
+        d = datetime.fromtimestamp(ts, tz=timezone.utc)
+        jan = datetime(d.year, 1, 1, tzinfo=timezone.utc)
+        nxt = datetime(d.year + 1, 1, 1, tzinfo=timezone.utc)
+        return d.year + (d - jan).total_seconds() / (nxt - jan).total_seconds()
+    return np.array([decimal_year(catalog[m]["created"]) for m in MODELS])
+
+
+class NoSubstantive(Exception):
+    """A bootstrap draw left an item with zero substantive rows."""
+
+
 def analyze() -> None:
-    raise SystemExit("analysis is implemented after the full run; see the preregistration")
+    raise SystemExit("replaced; see analyze_real")
+
+
+DENSE_LEDGER = Path("slop/research/wvs/20260916_openrouter/wvs_iw_requests.jsonl")
+
+
+def dense_qwen_psamples() -> dict[str, dict[str, list[np.ndarray]]]:
+    """model -> item suffix -> per-rating-sample p vectors, from the canonical dense-v1 ledger."""
+    run_ids = {e["model"]: e["run_id"] for e in
+               json.loads(DENSE_CACHE.read_text())["completed"].values()
+               if e.get("model") in MODELS}
+    if len(run_ids) != len(MODELS):
+        raise RuntimeError(f"dense cache lacks runs for: {set(MODELS) - set(run_ids)}")
+    out = {m: {} for m in MODELS}
+    for line in DENSE_LEDGER.read_text().splitlines():
+        r = json.loads(line)
+        if (r.get("event") == "item_result" and r.get("run_id") in run_ids.values()
+                and r.get("model") in MODELS):
+            out[r["model"]][r["id"]] = [np.asarray(v) for v in r["p_samples"]]
+    for m in MODELS:
+        if len(out[m]) != 12:
+            raise RuntimeError(f"dense item set incomplete for {m}: {len(out[m])}")
+    return out
+
+
+def packet_item_lists(rows: dict[int, dict], battery: list[dict],
+                      child_rows: list[dict]) -> dict[str, list[np.ndarray]]:
+    """One vector per packet per scored item; refused packets contribute a zero vector (excluded
+    from the mean by the positivity of the mean, and coverage counts them)."""
+    from wvs_original_choice_pilot import child_binary_rows
+    binaries = child_binary_rows(child_rows)
+    out = {}
+    for q in battery:
+        if q["id"] == "ChildQualities":
+            for quality in PANEL_QUALITIES:
+                opts = binaries[quality]
+                vecs = []
+                for k in sorted(rows):
+                    entry = rows[k]["ChildQualities"]
+                    mentioned = entry["outcome"] == "substantive" and quality in entry["selected"]
+                    vecs.append(np.array([1.0 if o == "Important" else 0.0 for o in opts])
+                                if mentioned else
+                                np.array([0.0 if o == "Important" else 1.0 for o in opts]))
+                out[quality] = vecs
+            continue
+        vecs = []
+        for k in sorted(rows):
+            entry = rows[k][q["id"]]
+            vec = np.zeros(len(q["options"]))
+            if entry["outcome"] == "substantive":
+                vec[q["options"].index(entry["selected"])] = 1.0
+            vecs.append(vec)
+        out[q["id"]] = vecs
+    return out
+
+
+def coords_draws(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: dict,
+                 B: int = 1000, seed: int = 17, row_linked: bool = True) -> np.ndarray:
+    """(B, n_models, 2) coordinate draws.
+
+    row_linked=True (packet protocol): resample whole respondent rows, one index draw shared across
+    all items, preserving cross-question covariance. row_linked=False (dense v1): resample each
+    item's rating vectors independently; dense samples are not row-linked."""
+    n = len(next(iter(next(iter(item_lists.values())).values())))
+    rng = np.random.default_rng(seed)
+    out = np.empty((B, len(MODELS), 2))
+    for b in range(B):
+        shared = rng.integers(0, n, n)
+        for k, m in enumerate(MODELS):
+            xy = []
+            for axis in (X_AXIS, Y_AXIS):
+                vals = []
+                for it in resolved[axis]:
+                    lists = item_lists[m][it["suffix"]]
+                    idx = shared if row_linked else rng.integers(0, n, n)
+                    mean_p = np.mean([lists[j] for j in idx], axis=0)
+                    if mean_p.sum() == 0:
+                        raise NoSubstantive(f"{m} {it['suffix']} has no substantive rows in this draw")
+                    vals.append(positiveness(mean_p[None, :], it["pole_idx"], it["n"]))
+                xy.append(float(np.mean(vals)))
+            out[b, k] = xy
+    return out
+
+
+def constant_and_linear_rmse(coords: np.ndarray) -> tuple[float, float]:
+    """2D residual RMSE of the n_models coordinates around (a) the family centroid and (b) the
+    release-date OLS line."""
+    x = release_years()
+    centroid = coords.mean(axis=0)
+    constant = float(np.sqrt(np.mean(np.sum((coords - centroid) ** 2, axis=1))))
+    residuals = []
+    for k in range(2):
+        slope, intercept = np.polyfit(x, coords[:, k], 1)
+        residuals.append(coords[:, k] - (slope * x + intercept))
+    linear = float(np.sqrt(np.mean(np.sum(np.stack(residuals, axis=1) ** 2, axis=1))))
+    return constant, linear
+
+
+def loo_prediction_error(coords: np.ndarray) -> dict:
+    """Leave-one-release-out prediction error (mean 2D distance) for the constant (family centroid
+    of the other releases) vs linear (OLS on the other releases) predictor. With n=4 the linear
+    fit has 1 residual dof and is expected to overfit; this makes that visible."""
+    x = release_years()
+    const_errs, lin_errs = [], []
+    for i in range(len(MODELS)):
+        others = [j for j in range(len(MODELS)) if j != i]
+        const_pred = coords[others].mean(axis=0)
+        slopes = [np.polyfit(x[others], coords[others, k], 1) for k in range(2)]
+        lin_pred = np.array([slopes[k][0] * x[i] + slopes[k][1] for k in range(2)])
+        const_errs.append(float(np.linalg.norm(coords[i] - const_pred)))
+        lin_errs.append(float(np.linalg.norm(coords[i] - lin_pred)))
+    return {"constant_loo_mean": float(np.mean(const_errs)),
+            "linear_loo_mean": float(np.mean(lin_errs)),
+            "constant_loo_per_release": const_errs, "linear_loo_per_release": lin_errs}
+
+
+def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dict],
+                      child_rows: list[dict], resolved: dict) -> dict:
+    """The fixed preregistered analysis, run on real or synthetic rows."""
+    per_model, item_lists = {}, {}
+    for m in MODELS:
+        rows = packet_rows[m]
+        if len(rows) != N_PACKETS:
+            raise RuntimeError(f"{m}: expected {N_PACKETS} rows, got {len(rows)}")
+        il = packet_item_lists(rows, battery, child_rows)
+        item_lists[m] = il
+        refused = {q["id"]: sum(1 for k in sorted(rows) if rows[k][q["id"]]["outcome"] == "refused")
+                   for q in battery}
+        per_model[m] = {"refused_per_question": refused,
+                        "refusal_rate": sum(refused.values()) / (len(refused) * N_PACKETS),
+                        "coverage_per_question": {q["id"]: 1 - refused[q["id"]] / N_PACKETS
+                                                  for q in battery}}
+    draws = coords_draws(item_lists, resolved)
+    point = draws.mean(axis=0)
+    se = draws.std(axis=0)
+    constant, linear = constant_and_linear_rmse(point)
+    # bootstrap scatter distributions
+    constant_draws = np.empty(draws.shape[0]); linear_draws = np.empty(draws.shape[0])
+    for b in range(draws.shape[0]):
+        constant_draws[b], linear_draws[b] = constant_and_linear_rmse(draws[b])
+    # noise floors: H0 = no between-release differences; draw each release from N(0, SE)
+    rng = np.random.default_rng(23)
+    floor_const, floor_lin = np.empty(2000), np.empty(2000)
+    for b in range(2000):
+        ys = np.array([rng.normal(0.0, se[k]) for k in range(len(MODELS))])
+        floor_const[b], floor_lin[b] = constant_and_linear_rmse(ys)
+    dense = dense_qwen_psamples()
+    dense_item_lists = {m: {k: list(v) for k, v in dense[m].items()} for m in MODELS}
+    dense_draws = coords_draws(dense_item_lists, resolved, seed=29, row_linked=False)
+    dense_point = dense_draws.mean(axis=0)
+    dense_se = dense_draws.std(axis=0)
+    dense_constant, dense_linear = constant_and_linear_rmse(dense_point)
+    dense_constant_draws = np.empty(draws.shape[0]); dense_linear_draws = np.empty(draws.shape[0])
+    for b in range(draws.shape[0]):
+        dense_constant_draws[b], dense_linear_draws[b] = constant_and_linear_rmse(dense_draws[b])
+    rng2 = np.random.default_rng(31)
+    dense_floor_const, dense_floor_lin = np.empty(2000), np.empty(2000)
+    for b in range(2000):
+        ys = np.array([rng2.normal(0.0, dense_se[k]) for k in range(len(MODELS))])
+        dense_floor_const[b], dense_floor_lin[b] = constant_and_linear_rmse(ys)
+    release_years_list = release_years().tolist()
+    return {
+        "eval_version": EVAL_VERSION, "n_packets": N_PACKETS,
+        "release_years": release_years_list,
+        "packet": {
+            "coords_xy_per_model": {m: [float(v) for v in point[k]] for k, m in enumerate(MODELS)},
+            "coord_se": {m: [float(v) for v in se[k]] for k, m in enumerate(MODELS)},
+            "constant_family_rmse": constant, "constant_family_rmse_se": float(np.std(constant_draws)),
+            "linear_trend_rmse": linear, "linear_trend_rmse_se": float(np.std(linear_draws)),
+            "constant_noise_floor_mean": float(np.mean(floor_const)),
+            "linear_noise_floor_mean": float(np.mean(floor_lin)),
+            "p_constant_noise_ge_observed": float(np.mean(floor_const >= constant)),
+            "p_linear_noise_ge_observed": float(np.mean(floor_lin >= linear)),
+            "loo": loo_prediction_error(point),
+            "refusal": {m: per_model[m]["refusal_rate"] for m in MODELS},
+            "coverage": {m: per_model[m]["coverage_per_question"] for m in MODELS},
+        },
+        "dense_v1": {
+            "coords_xy_per_model": {m: [float(v) for v in dense_point[k]] for k, m in enumerate(MODELS)},
+            "coord_se": {m: [float(v) for v in dense_se[k]] for k, m in enumerate(MODELS)},
+            "constant_family_rmse": dense_constant,
+            "constant_family_rmse_se": float(np.std(dense_constant_draws)),
+            "linear_trend_rmse": dense_linear, "linear_trend_rmse_se": float(np.std(dense_linear_draws)),
+            "constant_noise_floor_mean": float(np.mean(dense_floor_const)),
+            "linear_noise_floor_mean": float(np.mean(dense_floor_lin)),
+            "p_constant_noise_ge_observed": float(np.mean(dense_floor_const >= dense_constant)),
+            "p_linear_noise_ge_observed": float(np.mean(dense_floor_lin >= dense_linear)),
+            "loo": loo_prediction_error(dense_point),
+            "bootstrap_note": ("item-wise independent resampling of the 6 rating vectors per item; "
+                               "dense samples are not row-linked, so protocols are not pairable and "
+                               "differences use independent bootstraps"),
+        },
+        "coord_shifts_packet_minus_dense": {m: [float(a - b) for a, b in zip(point[k], dense_point[k])]
+                                            for k, m in enumerate(MODELS)},
+    }
+
+
+def load_wvs_recs() -> list[dict]:
+    from wvs_map import load_wvs_all
+    return load_wvs_all()
+
+
+def analyze_real() -> None:
+    battery, child_rows = build_battery()
+    resolved = resolve_items(load_wvs_recs())
+    packet_rows = {}
+    for m in MODELS:
+        rpath = OUT / "records" / m.replace("/", "__") / "packets.jsonl"
+        packet_rows[m] = prior_rows(rpath, protocol_id(m, battery))
+    analysis = analyze_from_data(packet_rows, battery, child_rows, resolved)
+    atomic_json(OUT / "analysis.json", analysis)
+    print(json.dumps({"packet": {k: analysis["packet"][k]
+                                 for k in ("constant_family_rmse", "linear_trend_rmse", "loo")},
+                      "dense": {k: analysis["dense_v1"][k]
+                                for k in ("constant_family_rmse", "linear_trend_rmse", "loo")}},
+                     indent=2))
+
+
+def synthetic_analysis_test(battery: list[dict], child_rows: list[dict]) -> None:
+    """End-to-end analysis on synthetic data: refusal semantics, covariance preservation, fits,
+    floors, and LOO all exercise without any paid call."""
+    resolved = resolve_items(load_wvs_recs())
+    rng = np.random.default_rng(5)
+    options = {q["id"]: q["options"] for q in battery}
+    packet_rows = {}
+    for k, m in enumerate(MODELS):
+        rows = {}
+        for p in range(N_PACKETS):
+            row = {}
+            for q in battery:
+                if q["id"] == "ChildQualities":
+                    pool = q["options"]
+                    if rng.random() < 0.03:
+                        row[q["id"]] = {"outcome": "refused", "selected": []}
+                    else:
+                        picked = list(rng.choice(pool, size=rng.integers(0, 6), replace=False))
+                        row[q["id"]] = {"outcome": "substantive", "selected": picked}
+                else:
+                    if rng.random() < 0.05 * (k + 1):
+                        row[q["id"]] = {"outcome": "refused", "selected": REFUSED}
+                    else:
+                        # drift with release index k so the linear fit has signal
+                        j = min(len(q["options"]) - 1, max(0, int(rng.normal(k * 0.8, 1.5))))
+                        row[q["id"]] = {"outcome": "substantive", "selected": q["options"][j]}
+            rows[p] = row
+        packet_rows[m] = rows
+    result = analyze_from_data(packet_rows, battery, child_rows, resolved)
+    for section in ("packet", "dense_v1"):
+        for key in ("constant_family_rmse", "linear_trend_rmse", "loo"):
+            value = result[section][key]
+            assert np.isfinite(value if not isinstance(value, dict) else
+                               value["constant_loo_mean"] + value["linear_loo_mean"]), (section, key)
+    assert result["packet"]["refusal"][MODELS[3]] > result["packet"]["refusal"][MODELS[0]]
+    print(f"synthetic analysis passed: packet constant={result['packet']['constant_family_rmse']:.4f} "
+          f"linear={result['packet']['linear_trend_rmse']:.4f}; "
+          f"dense constant={result['dense_v1']['constant_family_rmse']:.4f}; "
+          f"packet LOO const={result['packet']['loo']['constant_loo_mean']:.4f} "
+          f"lin={result['packet']['loo']['linear_loo_mean']:.4f}")
 
 
 if __name__ == "__main__":
