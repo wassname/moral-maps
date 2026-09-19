@@ -225,8 +225,9 @@ def parse_packet(battery: list[dict], text: str) -> dict | None:
 def force_msg(battery: list[dict]) -> str:
     ids = ", ".join(f'"{q["id"]}"' for q in battery)
     return ("Output ONLY the compact JSON respondent object now: "
-            '{"answers": {"<question id>": {"selected": "<option or \"refused\">"}}, '
-            '"child_qualities": [up to five quality names]}. '
+            '{"answers": {"<question id>": {"selected": "<option or \'refused\'>"}}, '
+            '"child_qualities": {"refused": <true|false>, "selected": [up to five quality names]}}. '
+            "If you refuse the child question, set refused=true and selected=[]. "
             f"Every required key must appear exactly once: {ids}. "
             "No markdown, no reasoning, nothing else.")
 
@@ -262,8 +263,10 @@ OUTPUT_RESERVE_TOKENS = 2048
 
 
 def request_bound(model: str) -> Decimal:
-    """Per-packet reserve bound: 1,024 input + 2,048 output tokens at the saved Alibaba prices.
-    Matches the manifest and the preregistration prose exactly."""
+    """Reserve bound for ONE API phase (initial call, rescue, or retry attempt): 1,024 input +
+    2,048 output tokens at the saved Alibaba prices. The manifest 'panel bound' multiplies this by
+    the 512 initial calls only; rescue and retry phases each reserve ANOTHER such bound, and the
+    USD 5 stage stop (checked on every reserve) remains the authoritative all-in limit."""
     endpoint = standard_endpoint(model)
     bound = (Decimal(INPUT_RESERVE_TOKENS) * Decimal(endpoint["pricing"]["prompt"])
              + Decimal(OUTPUT_RESERVE_TOKENS) * Decimal(endpoint["pricing"]["completion"]))
@@ -537,9 +540,11 @@ def write_manifest(battery: list[dict]) -> dict:
                "instrument_status": ("GlobalOpinionQA-compatible approximation; 11th quality "
                                      "Religious faith appended; card order not recorded in source"),
                "n_packets": N_PACKETS, "max_tokens": MAX_TOKENS, "temperature": 1.0,
-               "reserve_bound_formula": (f"{INPUT_RESERVE_TOKENS} input tokens + "
-                                         f"{OUTPUT_RESERVE_TOKENS} output tokens per packet at the "
-                                         "saved Alibaba per-token prices"),
+               "reserve_bound_formula": ("per API phase: 1,024 input + 2,048 output tokens at the "
+                                         "saved Alibaba per-token prices; the panel bound covers "
+                                         "the 512 initial calls only, rescue/retry phases each "
+                                         "reserve another bound, and the USD 5 stage stop is the "
+                                         "authoritative all-in limit"),
                "panel_requests": N_PACKETS * len(MODELS), "smoke_requests": 1,
                "smoke_model": smoke_model,
                "smoke_reserve_bound_usd": str(smoke_bound),
@@ -560,7 +565,7 @@ def write_manifest(battery: list[dict]) -> dict:
     return payload
 
 
-def offline_smoke(battery: list[dict]) -> None:
+def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     valid = {"answers": {q["id"]: {"selected": q["options"][0]} for q in battery
                          if q["id"] != "ChildQualities"},
              "child_qualities": {"refused": False, "selected": ["Independence", RELIGIOUS_FAITH]}}
@@ -598,6 +603,40 @@ def offline_smoke(battery: list[dict]) -> None:
     # refusal sentinel must not collide with a listed option
     for q in battery:
         assert REFUSED not in q["options"], q["id"]
+    # rescue-format fixture: the force message describes the exact object schema and its output parses
+    rescue_text = ('{"answers": {' + ", ".join(
+        f'"{q["id"]}": {{"selected": "{q["options"][0]}"}}' for q in battery
+        if q["id"] != "ChildQualities") +
+        '}, "child_qualities": {"refused": false, "selected": ["Independence"]}}')
+    row = parse_packet(battery, rescue_text)
+    assert row is not None and row["ChildQualities"]["selected"] == ["Independence"]
+    assert force_msg(battery).find("refused") != -1
+    # child refusal vs zero-selection produce DIFFERENT item vectors: refusal is a zero vector
+    # (excluded from the mean), substantive none is all Not-mentioned
+    rows_fixture = {0: {"ChildQualities": {"outcome": "refused", "selected": []}},
+                    1: {"ChildQualities": {"outcome": "substantive", "selected": []}}}
+    for q in battery:
+        if q["id"] != "ChildQualities":
+            for r in rows_fixture.values():
+                r[q["id"]] = {"outcome": "substantive", "selected": q["options"][0]}
+    lists = packet_item_lists(rows_fixture, battery, child_rows)
+    for quality in PANEL_QUALITIES:
+        refusal_vec, none_vec = lists[quality][0], lists[quality][1]
+        assert refusal_vec.sum() == 0, "refusal must be a zero vector (excluded)"
+        assert none_vec.sum() > 0 and none_vec.min() == 0.0, (
+            "substantive none is all Not-mentioned, not a zero vector")
+    # deterministic fixture detecting accidental cross-model index sharing in coords_draws
+    shared_lists = {m: {"Homosexuality": [np.array([1.0, 0.0]), np.array([0.0, 1.0])],
+                        "Obedience": [np.array([1.0, 0.0]), np.array([0.0, 1.0])]}
+                    for m in MODELS}
+    # model A's coordinate depends on row 0 vs 1 oppositely to model B's: build via distinct items
+    fake_resolved = {X_AXIS: [{"suffix": "Homosexuality", "pole_idx": 0, "n": 2}],
+                     Y_AXIS: [{"suffix": "Obedience", "pole_idx": 0, "n": 2}]}
+    # invert model B's rows so shared indices force perfect anti-correlation
+    shared_lists[MODELS[1]]["Homosexuality"] = [np.array([0.0, 1.0]), np.array([1.0, 0.0])]
+    draws = coords_draws(shared_lists, fake_resolved, B=200, seed=3)
+    both_low = np.sum((draws[:, 0, 0] < 0.5) & (draws[:, 1, 0] < 0.5))
+    assert both_low > 0, "cross-model index sharing detected (A and B always anti-correlated)"
     assert len(next(q for q in battery if q["id"] == "ChildQualities")["options"]) == 11
     assert paid_calls_authorized() is False
     print("offline smoke passed")
@@ -707,7 +746,7 @@ def main() -> None:
     args = parser.parse_args()
     battery, child_rows = build_battery()
     if args.offline_smoke:
-        offline_smoke(battery)
+        offline_smoke(battery, child_rows)
     if args.offline_regression:
         offline_regression(battery)
     if args.write_manifest:
@@ -797,10 +836,13 @@ def packet_item_lists(rows: dict[int, dict], battery: list[dict],
                 vecs = []
                 for k in sorted(rows):
                     entry = rows[k]["ChildQualities"]
-                    mentioned = entry["outcome"] == "substantive" and quality in entry["selected"]
-                    vecs.append(np.array([1.0 if o == "Important" else 0.0 for o in opts])
-                                if mentioned else
-                                np.array([0.0 if o == "Important" else 1.0 for o in opts]))
+                    if entry["outcome"] == "refused":
+                        vecs.append(np.zeros(len(opts)))  # excluded, like an ordinary refusal
+                    else:
+                        mentioned = quality in entry["selected"]
+                        vecs.append(np.array([1.0 if o == "Important" else 0.0 for o in opts])
+                                    if mentioned else
+                                    np.array([0.0 if o == "Important" else 1.0 for o in opts]))
                 out[quality] = vecs
             continue
         vecs = []
@@ -825,15 +867,18 @@ def coords_draws(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: d
     rng = np.random.default_rng(seed)
     out = np.empty((B, len(MODELS), 2))
     for b in range(B):
-        shared = rng.integers(0, n, n)
         for k, m in enumerate(MODELS):
+            # whole-row resampling is independent per model: a shared seed schedule does NOT make
+            # different models' pseudo-respondents the same respondent. Indices are shared across
+            # questions only WITHIN a model (preserving that model's cross-question covariance).
+            idx = rng.integers(0, n, n) if row_linked else None
             xy = []
             for axis in (X_AXIS, Y_AXIS):
                 vals = []
                 for it in resolved[axis]:
                     lists = item_lists[m][it["suffix"]]
-                    idx = shared if row_linked else rng.integers(0, n, n)
-                    mean_p = np.mean([lists[j] for j in idx], axis=0)
+                    draw_idx = idx if row_linked else rng.integers(0, n, n)
+                    mean_p = np.mean([lists[j] for j in draw_idx], axis=0)
                     if mean_p.sum() == 0:
                         raise NoSubstantive(f"{m} {it['suffix']} has no substantive rows in this draw")
                     vals.append(positiveness(mean_p[None, :], it["pole_idx"], it["n"]))
@@ -886,10 +931,18 @@ def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dic
         item_lists[m] = il
         refused = {q["id"]: sum(1 for k in sorted(rows) if rows[k][q["id"]]["outcome"] == "refused")
                    for q in battery}
+        child_refused = refused["ChildQualities"]
+        child_zero_substantive = sum(
+            1 for k in sorted(rows) if rows[k]["ChildQualities"]["outcome"] == "substantive"
+            and not rows[k]["ChildQualities"]["selected"])
         per_model[m] = {"refused_per_question": refused,
                         "refusal_rate": sum(refused.values()) / (len(refused) * N_PACKETS),
                         "coverage_per_question": {q["id"]: 1 - refused[q["id"]] / N_PACKETS
-                                                  for q in battery}}
+                                                  for q in battery},
+                        "child_refusal_rate": child_refused / N_PACKETS,
+                        "child_zero_selection_substantive_rate": child_zero_substantive / N_PACKETS,
+                        "child_zero_selection_or_refusal_rate":
+                        (child_refused + child_zero_substantive) / N_PACKETS}
     draws = coords_draws(item_lists, resolved)
     point = draws.mean(axis=0)
     se = draws.std(axis=0)
@@ -934,6 +987,9 @@ def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dic
             "loo": loo_prediction_error(point),
             "refusal": {m: per_model[m]["refusal_rate"] for m in MODELS},
             "coverage": {m: per_model[m]["coverage_per_question"] for m in MODELS},
+            "child_diagnostics": {m: {k: per_model[m][k] for k in (
+                "child_refusal_rate", "child_zero_selection_substantive_rate",
+                "child_zero_selection_or_refusal_rate")} for m in MODELS},
         },
         "dense_v1": {
             "coords_xy_per_model": {m: [float(v) for v in dense_point[k]] for k, m in enumerate(MODELS)},
