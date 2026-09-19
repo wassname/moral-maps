@@ -36,6 +36,7 @@ from datetime import UTC, datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 
+import dotenv  # import only; load_dotenv() runs solely in the authorized paid CLI path
 import httpx
 import numpy as np
 
@@ -843,7 +844,32 @@ def offline_regression(battery: list[dict]) -> None:
                           cwd=str(Path(__file__).parent.parent))
     assert proc.returncode != 0 and "--i-authorize-paid-calls" in (proc.stderr + proc.stdout), (
         f"CLI refusal check failed: rc={proc.returncode} stdout={proc.stdout[-500:]} stderr={proc.stderr[-500:]}")
-    print("offline regression passed: opt-in guard, mis-patch defense, and CLI refusal check all hold")
+    # dotenv gating: no credential load and no paid runner without BOTH the CLI flag and the
+    # opt-in. main() sets the opt-in only from the flag, so the flag-off case must load nothing.
+    from unittest import mock
+    module = sys.modules[__name__]
+    with mock.patch.object(dotenv, "load_dotenv") as dotenv_mock, \
+         mock.patch.object(module, "paid_smoke") as smoke_stub, \
+         mock.patch.object(module, "run") as run_stub:
+        os.environ.pop(PAID_OPTIN_ENV, None)
+        with mock.patch.object(sys, "argv", ["wvs_respondent_packet_v1.py", "--paid-smoke"]):
+            refused = False
+            try:
+                main()
+            except SystemExit:
+                refused = True
+            assert refused, "paid smoke ran without --i-authorize-paid-calls"
+        assert dotenv_mock.call_count == 0, "dotenv loaded without authorization"
+        assert smoke_stub.call_count == 0 and run_stub.call_count == 0
+        with mock.patch.object(sys, "argv", ["wvs_respondent_packet_v1.py", "--paid-smoke",
+                                                "--i-authorize-paid-calls"]):
+            main()
+        assert dotenv_mock.call_count == 1, "authorized paid path must load runtime credentials"
+        assert smoke_stub.call_count == 1 and run_stub.call_count == 0
+        assert os.environ.get(PAID_OPTIN_ENV) == "1"
+        os.environ.pop(PAID_OPTIN_ENV, None)
+    print("offline regression passed: opt-in guard, mis-patch defense, CLI refusal check, "
+          "and dotenv paid-path gating all hold")
 
 
 def paid_smoke(battery: list[dict]) -> None:
@@ -910,6 +936,9 @@ def main() -> None:
     if args.paid_smoke or args.run:
         if not args.i_authorize_paid_calls:
             raise SystemExit("--paid-smoke/--run cost money and require --i-authorize-paid-calls")
+        # Paid CLI path only: load the repo runtime credentials (OPENROUTER_API_KEY) without
+        # ever printing them. Import-time and all offline paths stay credential-free.
+        dotenv.load_dotenv()
         os.environ[PAID_OPTIN_ENV] = "1"
     if args.paid_smoke:
         paid_smoke(battery)
