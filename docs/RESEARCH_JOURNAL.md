@@ -1228,3 +1228,13 @@ After parent smoke approval: paid smoke, audit, then explicit full-run approval;
 ### Scoring geometry (exact)
 
 Humans: one categorical choice per ordinary item and up to 5 of 11 child qualities; country frequencies drop DK/refusal and renormalize over the substantive options. Dense v1: 1-5 ratings for every option of an item, normalized to an item distribution. Packet v2: one-hot choices averaged across packets, producing the same item simplex for ordinary questions with no extra z-scaling; child packets preserve the human <=5-of-11 joint selection constraint, which dense v1's independently rated child binaries do not. Axis scores remain the expected pole position per item, then the mean across items. The feasible coordinate set is a convex polytope (a subset of [0,1]^2 bounded by the item simplexes and the <=5 constraint), NOT a circle around the human cloud: models can lie outside the empirical human country cloud but cannot invent response categories.
+
+### V2 paid smoke result (2026-09-19)
+
+One approved v2 smoke on qwen/qwen3.7-plus (packet seed 0, reasoning disabled, Alibaba,
+release slug qwen/qwen3.7-plus-20260602, quantization unknown): 9/9 substantive, 0
+refusals, no rescue, all reasons 6-7 words and valid. Cost USD 0.00079616 (bound USD
+0.00294912); local conservative spend now USD 0.01018400 of the USD 5 stage stop; global
+reservation settled. Full audit: `slop/audits/20260919_resp_packet_smoke_v2.md`. The v1
+all-nine-refusal smoke stays preserved as the stopped design diagnostic. n=1 establishes
+no refusal rate; the 512-call panel needs separate approval.

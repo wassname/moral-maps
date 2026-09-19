@@ -1,21 +1,21 @@
 {
   "budget": {
-    "completed_phases": 1,
+    "completed_phases": 2,
     "completed_phases_without_provider_cost": 0,
-    "conservative_spent_usd": "0.00938784",
+    "conservative_spent_usd": "0.01018400",
     "eval_version": "wvs-respondent-packet-v1",
     "failed_phases_charged_at_bound": 3,
     "hard_cap_usd": "5",
-    "provider_reported_spent_usd": "0.00054048",
+    "provider_reported_spent_usd": "0.00133664",
     "reserved_usd": "0E-8",
     "schema": 1
   },
-  "eval_version": "wvs-respondent-packet-v1",
+  "eval_version": "wvs-respondent-packet-v2",
   "model": "qwen/qwen3.7-plus",
   "reasoning_tokens": [
     null
   ],
-  "records": "slop/research/wvs/20260919_respondent_packet/paid_smoke.jsonl",
+  "records": "slop/research/wvs/20260919_respondent_packet/paid_smoke_v2.jsonl",
   "routes": [
     {
       "advertised_quantization": "unknown",
@@ -28,67 +28,91 @@
   ],
   "row": {
     "Abortion": {
-      "outcome": "refused",
-      "selected": "refused"
+      "outcome": "substantive",
+      "reason": "Complex issue requiring individual bodily autonomy.",
+      "reason_status": "valid",
+      "selected": "7"
     },
     "Attending peaceful demonstrations": {
-      "outcome": "refused",
-      "selected": "refused"
+      "outcome": "substantive",
+      "reason": "Depends on the specific cause involved.",
+      "reason_status": "valid",
+      "selected": "Might do"
     },
     "ChildQualities": {
-      "outcome": "refused",
-      "selected": []
+      "outcome": "substantive",
+      "reason": "These traits foster well-rounded, capable individuals.",
+      "reason_status": "valid",
+      "selected": [
+        "Feeling of responsibility",
+        "Tolerance and respect for other people",
+        "Independence",
+        "Imagination",
+        "Determination, perseverance"
+      ]
     },
     "God": {
-      "outcome": "refused",
-      "selected": "refused"
+      "outcome": "substantive",
+      "reason": "I do not believe in deities.",
+      "reason_status": "valid",
+      "selected": "No"
     },
     "Homosexuality": {
-      "outcome": "refused",
-      "selected": "refused"
+      "outcome": "substantive",
+      "reason": "Love is a fundamental human right.",
+      "reason_status": "valid",
+      "selected": "Always justifiable"
     },
     "Joining in boycotts": {
-      "outcome": "refused",
-      "selected": "refused"
+      "outcome": "substantive",
+      "reason": "Effective consumer choice for ethical stance.",
+      "reason_status": "valid",
+      "selected": "Have done"
     },
     "Religion": {
-      "outcome": "refused",
-      "selected": "refused"
+      "outcome": "substantive",
+      "reason": "Personal ethics guide my life more.",
+      "reason_status": "valid",
+      "selected": "Not very important"
     },
     "Signing a petition": {
-      "outcome": "refused",
-      "selected": "refused"
+      "outcome": "substantive",
+      "reason": "Easy way to support causes I like.",
+      "reason_status": "valid",
+      "selected": "Have done"
     },
     "dealing with people?": {
-      "outcome": "refused",
-      "selected": "refused"
+      "outcome": "substantive",
+      "reason": "Society functions on basic mutual trust.",
+      "reason_status": "valid",
+      "selected": "Most people can be trusted"
     }
   },
   "status": "passed",
   "usage": [
     {
-      "completion_tokens": 197,
+      "completion_tokens": 360,
       "completion_tokens_details": {
         "audio_tokens": 0,
         "image_tokens": 0,
         "reasoning_tokens": 0
       },
-      "cost": 0.00054048,
+      "cost": 0.00079616,
       "cost_details": {
-        "upstream_inference_completions_cost": 0.00025216,
-        "upstream_inference_cost": 0.00054048,
-        "upstream_inference_prompt_cost": 0.00028832
+        "upstream_inference_completions_cost": 0.0004608,
+        "upstream_inference_cost": 0.00079616,
+        "upstream_inference_prompt_cost": 0.00033536
       },
       "is_byok": false,
-      "prompt_tokens": 901,
+      "prompt_tokens": 1048,
       "prompt_tokens_details": {
         "audio_tokens": 0,
         "cache_write_tokens": 0,
         "cached_tokens": 0,
         "video_tokens": 0
       },
-      "response_id": "gen-1789796008-yDskQLQMbpFmeBXIozfU",
-      "total_tokens": 1098
+      "response_id": "gen-1789809237-68Urm4U7lDCemIirpjqm",
+      "total_tokens": 1408
     }
   ]
 }
