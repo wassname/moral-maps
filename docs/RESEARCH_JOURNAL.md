@@ -1252,3 +1252,15 @@ but the 3.5-plus compatibility question is UNANSWERED). Raw events appended to
 summary stays in git history at 0b4238f). No further paid call until the parent decides,
 including the still-pending oldest-endpoint smoke, which needs a code change to the
 hardcoded smoke model.
+
+### Oldest-endpoint compatibility smoke result (2026-09-19)
+
+One paid v2 request on qwen/qwen3.5-plus-02-15 (packet index 0, seed 392427931, new
+protocol with the JSON transport sentence): HTTP 200, exact Alibaba route
+(qwen/qwen3.5-plus-20260216, quantization unknown), cost USD 0.00075218. The reply used
+positional keys and "answer" instead of question ids and "selected", so all 9 questions
+are observed nonconforming refusals with no rescue; reasons live only in the raw text.
+A post-hoc validation-scoping crash (stale 3.7-plus completion in the shared file) was
+fixed with a fixture; the summary was reconstructed offline from the single request, no
+second call. Full audit: `slop/audits/20260919_resp_packet_smoke_v2_35plus.md`. Stopped
+before panel dispatch as instructed.

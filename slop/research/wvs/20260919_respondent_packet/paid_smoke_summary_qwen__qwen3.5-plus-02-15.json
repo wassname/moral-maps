@@ -1,0 +1,116 @@
+{
+  "budget": {
+    "completed_phases": 4,
+    "completed_phases_without_provider_cost": 0,
+    "conservative_spent_usd": "0.02210706",
+    "eval_versions": [
+      "wvs-respondent-packet-v1",
+      "wvs-respondent-packet-v2"
+    ],
+    "failed_phases_charged_at_bound": 6,
+    "hard_cap_usd": "5",
+    "provider_reported_spent_usd": "0.00287634",
+    "reserved_usd": "0E-8",
+    "schema": 2
+  },
+  "eval_version": "wvs-respondent-packet-v2",
+  "model": "qwen/qwen3.5-plus-02-15",
+  "reasoning_tokens": [
+    null
+  ],
+  "reconstruction_note": "summary reconstructed offline from the single executed request (request seed 392427931); the embedded budget snapshot reflects the later live ledger, not smoke time; authoritative smoke cost is the attempt record USD 0.00075218",
+  "records": "slop/research/wvs/20260919_respondent_packet/paid_smoke_v2.jsonl",
+  "routes": [
+    {
+      "advertised_quantization": "unknown",
+      "endpoint_tag": "alibaba",
+      "requested_model": "qwen/qwen3.5-plus-02-15",
+      "response_model": "qwen/qwen3.5-plus-02-15",
+      "selected_provider": "Alibaba",
+      "selected_release_slug": "qwen/qwen3.5-plus-20260216"
+    }
+  ],
+  "row": {
+    "Abortion": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    },
+    "Attending peaceful demonstrations": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    },
+    "ChildQualities": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    },
+    "God": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    },
+    "Homosexuality": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    },
+    "Joining in boycotts": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    },
+    "Religion": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    },
+    "Signing a petition": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    },
+    "dealing with people?": {
+      "outcome": "refused",
+      "reason": null,
+      "reason_status": "not_available",
+      "selected": null
+    }
+  },
+  "status": "passed",
+  "usage": [
+    {
+      "completion_tokens": 306,
+      "completion_tokens_details": {
+        "audio_tokens": 0,
+        "image_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "cost": 0.00075218,
+      "cost_details": {
+        "upstream_inference_completions_cost": 0.00047736,
+        "upstream_inference_cost": 0.00075218,
+        "upstream_inference_prompt_cost": 0.00027482
+      },
+      "is_byok": false,
+      "prompt_tokens": 1057,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "response_id": "gen-1789811832-VmGdMVrUJz6IinGPn6H0",
+      "total_tokens": 1363
+    }
+  ]
+}

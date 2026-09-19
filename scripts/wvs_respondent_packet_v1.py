@@ -866,6 +866,36 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
             {"selected": True, "provider": "Alibaba", "model": slug}]}}}, target)
     assert route["selected_provider"] == "Alibaba"
     assert route["selected_release_slug"] == slug
+    # fixture: smoke validation scopes to its own run (the 3.5-plus smoke crash: a stale 3.7-plus
+    # completion in the shared file failed the new target's route check). Unscoped validation
+    # must fail with the stale event present; the run_id filter paid_smoke applies must yield
+    # exactly the new completion's route.
+    def fake_completed(run_id, model):
+        ep = standard_endpoint(model)
+        ep_slug = ep["name"].removeprefix(f"{ep['provider_name']} | ")
+        return {"event": "request_completed", "run_id": run_id, "protocol_id": "p",
+                "model": model, "phase": "initial",
+                "response": {"id": run_id, "model": model, "usage": {"cost": "0.001"},
+                             "choices": [{"message": {}}], "openrouter_metadata": {
+                                 "requested": model, "endpoints": {"available": [
+                                     {"selected": True, "provider": "Alibaba",
+                                      "model": ep_slug}]}}},
+                "usage": {}}
+    stale = fake_completed("smoke_run", MODELS[3])
+    new = fake_completed("smoke_newrun", target)
+    with mock_smoke.patch.object(sys.modules[__name__], "update_state",
+                                  lambda u: {"fixture": True}):
+        unscoped_fails = False
+        try:
+            smoke_summary_dict(target, {"row": True}, [stale, new], Path("x"))
+        except RuntimeError:
+            unscoped_fails = True
+        assert unscoped_fails, "stale other-model completion must fail unscoped validation"
+        summary = smoke_summary_dict(target, {"row": True},
+                                     [e for e in (stale, new) if e["run_id"] == "smoke_newrun"],
+                                     Path("x"))
+    assert summary["model"] == target and len(summary["routes"]) == 1
+    assert summary["routes"][0]["selected_release_slug"] == slug
     assert paid_calls_authorized() is False
     print("offline smoke passed: v2 identity, clean prompt/schema, refusal-as-observed, "
           "rescue-only-syntactic, child semantics, collapse fixtures")
@@ -1068,6 +1098,26 @@ def smoke_paths(model: str) -> tuple[Path, Path]:
     return OUT / "paid_smoke_v2.jsonl", OUT / f"paid_smoke_summary_{slug}.json"
 
 
+def smoke_summary_dict(model: str, row: dict, completed: list[dict], smoke_records: Path) -> dict:
+    """Validate one smoke run's completions against its own target and build its summary. Raises
+    on any route mismatch instead of attributing another release's output to this model."""
+    routes = []
+    for e in completed:
+        route = validate_route(e["response"], model)
+        if route["selected_provider"] != "Alibaba":
+            raise RuntimeError(f"unexpected smoke provider: {route}")
+        if (e["response"].get("usage") or {}).get("cost") is None:
+            raise RuntimeError("smoke response missing usage.cost")
+        routes.append(route)
+    return {
+        "status": "passed", "eval_version": EVAL_VERSION, "model": model,
+        "row": row, "routes": routes,
+        "usage": [(e.get("usage") or {}) | {"response_id": e["response"].get("id")} for e in completed],
+        "reasoning_tokens": [(e["response"]["choices"][0]["message"] or {}).get("reasoning")
+                             for e in completed][:1],
+        "records": str(smoke_records), "budget": update_state(lambda s: s)}
+
+
 def paid_smoke(model: str, battery: list[dict]) -> None:
     """One paid packet on the given MODELS release with reasoning disabled, matching the
     panel payload. The model is an explicit argument (CLI --smoke-model, no default)."""
@@ -1084,30 +1134,21 @@ def paid_smoke(model: str, battery: list[dict]) -> None:
         raise RuntimeError("global repository cap rejected respondent-packet smoke reservation")
     before = Decimal(update_state(lambda s: s)["conservative_spent_usd"])
     smoke_records, smoke_summary = smoke_paths(model)
+    # unique run id: the shared records file holds every smoke, so validation and summary must
+    # scope to this run only (a stale other-model completion once failed a new target's check).
+    run = f"smoke_{pid[:12]}_{datetime.now(UTC).strftime('%Y%m%dT%H%M%S')}"
     try:
-        row = asyncio.run(run_packet(model, battery, smoke_records, "smoke_run", pid, 0, req, None))
+        row = asyncio.run(run_packet(model, battery, smoke_records, run, pid, 0, req, None))
         if row is None:
             raise RuntimeError(f"paid smoke did not parse: {row}")
     finally:
         after = Decimal(update_state(lambda s: s)["conservative_spent_usd"])
         settle_external_reservation(smoke_rid, after - before)
-    completed = [e for e in load_events(smoke_records) if e["event"] == "request_completed"]
-    routes = []
-    for e in completed:
-        route = validate_route(e["response"], model)
-        if route["selected_provider"] != "Alibaba":
-            raise RuntimeError(f"unexpected smoke provider: {route}")
-        if (e["response"].get("usage") or {}).get("cost") is None:
-            raise RuntimeError("smoke response missing usage.cost")
-        routes.append(route)
-    message = completed[-1]["response"]["choices"][0]["message"]
-    atomic_json(smoke_summary, {
-        "status": "passed", "eval_version": EVAL_VERSION, "model": model,
-        "row": row, "routes": routes,
-        "usage": [(e.get("usage") or {}) | {"response_id": e["response"].get("id")} for e in completed],
-        "reasoning_tokens": [(e["response"]["choices"][0]["message"] or {}).get("reasoning")
-                             for e in completed][:1],
-        "records": str(smoke_records), "budget": update_state(lambda s: s)})
+    completed = [e for e in load_events(smoke_records) if e["event"] == "request_completed"
+                 and e.get("run_id") == run]
+    if not completed:
+        raise RuntimeError("paid smoke recorded no completed request for this run")
+    atomic_json(smoke_summary, smoke_summary_dict(model, row, completed, smoke_records))
     print(f"paid smoke passed: refusal statuses = "
           f"{[q['outcome'] for q in row.values()].count('refused')} of {len(row)}")
 
