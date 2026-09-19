@@ -3,9 +3,13 @@
 choose-up-to-five child-quality list) for the same five Gemini Flash releases. -- PI[gpt-5.6-terra]
 
 Reconstructs the instrument from the saved Anthropic/llm_global_opinions WVS rows (see the
-preregistration in docs/RESEARCH_JOURNAL.md). Non-substantive outcomes ("Don't know", "No answer",
-empty list) are recorded as explicit cannot_answer and reported separately; they are never treated
-as neutral or dropped.
+preregistration in docs/RESEARCH_JOURNAL.md). The child-quality list is a GlobalOpinionQA-compatible
+APPROXIMATION of the WVS battery, not an exact reconstruction: the saved source has 10 per-quality
+rows and no Religious faith row, while the standard WVS battery lists 11 qualities including
+Religious faith. Omitting it removes one competitor from the choose-up-to-five budget, so top-five
+selection rates for the remaining (plotted) qualities are biased upward relative to the true
+instrument. Non-substantive outcomes ("Don't know", "No answer", empty list) are recorded as
+explicit cannot_answer and reported separately; they are never treated as neutral or dropped.
 """
 from __future__ import annotations
 
