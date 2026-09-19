@@ -180,9 +180,13 @@ def packet_schema(battery: list[dict]) -> dict:
                     "refused": {"type": "boolean"},
                     "selected": {"type": "array",
                                  "items": {"type": "string", "enum": child["options"]},
-                                 "minItems": 0, "maxItems": 5, "uniqueItems": True}},
+                                 "minItems": 0, "maxItems": 5}},
                     "required": ["refused", "selected"], "additionalProperties": False}},
                 "required": ["answers", "child_qualities"], "additionalProperties": False}}}
+    # NOTE: no array-uniqueness keyword here - Alibaba rejects array schemas that contain it
+    # (its 400 says: when the schema contains that uniqueness field, the type should not be
+    # "array"); uniqueness is enforced in parse_packet, where a duplicate is an invalid packet
+    # (rescue, then a failed packet).
 
 
 def parse_packet(battery: list[dict], text: str) -> dict | None:
@@ -329,6 +333,7 @@ async def budgeted_request(model: str, payload: dict) -> dict:
                             "model": model, "payload_sha256": payload_hash, "attempt": attempt,
                             "reserved_bound_usd": str(bound), "error_type": type(error).__name__,
                             "error": str(error),
+                            "response_text": response_text,
                             "status_code": error.response.status_code if response_text else None})
             if attempt == MAX_ATTEMPTS or not is_retryable_error(error, response_text or ""):
                 raise
@@ -919,6 +924,72 @@ def loo_prediction_error(coords: np.ndarray) -> dict:
             "constant_loo_per_release": const_errs, "linear_loo_per_release": lin_errs}
 
 
+def point_coords(item_lists: dict[str, list[np.ndarray]], resolved: dict) -> np.ndarray:
+    """Empirical coordinates from ALL observed rows/samples: the point estimate. Bootstrap draws
+    are used only for SE/CI, never as the point."""
+    xy = []
+    for axis in (X_AXIS, Y_AXIS):
+        vals = []
+        for it in resolved[axis]:
+            lists = item_lists[it["suffix"]]
+            mean_p = np.mean(lists, axis=0)
+            if mean_p.sum() == 0:
+                raise NoSubstantive(f"item {it['suffix']} has zero substantive rows")
+            vals.append(positiveness(mean_p[None, :], it["pole_idx"], it["n"]))
+        xy.append(float(np.mean(vals)))
+    return np.array(xy)
+
+
+def protocol_summary(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: dict,
+                     bootstrap_seed: int, row_linked: bool) -> dict:
+    """Point estimate from observed rows; bootstrap draws give SE/CI for coordinates, the
+    constant/linear RMSEs, the LOO errors, and the response-noise floors."""
+    point = point_coords_all(item_lists, resolved)
+    draws = coords_draws(item_lists, resolved, seed=bootstrap_seed, row_linked=row_linked)
+    se = draws.std(axis=0)
+    ci95 = [np.percentile(draws[:, k, :], [2.5, 97.5], axis=0).tolist()
+            for k in range(len(MODELS))]
+    constant, linear = constant_and_linear_rmse(point)
+    constant_draws = np.empty(draws.shape[0])
+    linear_draws = np.empty(draws.shape[0])
+    loo_draws = np.empty((draws.shape[0], 2))
+    for b in range(draws.shape[0]):
+        constant_draws[b], linear_draws[b] = constant_and_linear_rmse(draws[b])
+        loo = loo_prediction_error(draws[b])
+        loo_draws[b] = (loo["constant_loo_mean"], loo["linear_loo_mean"])
+    rng = np.random.default_rng(bootstrap_seed + 6)
+    floor_const, floor_lin = np.empty(2000), np.empty(2000)
+    for b in range(2000):
+        ys = np.array([rng.normal(0.0, se[k]) for k in range(len(MODELS))])
+        floor_const[b], floor_lin[b] = constant_and_linear_rmse(ys)
+    loo_point = loo_prediction_error(point)
+    return {
+        "coords_xy_per_model": {m: [float(v) for v in point[k]] for k, m in enumerate(MODELS)},
+        "coord_se": {m: [float(v) for v in se[k]] for k, m in enumerate(MODELS)},
+        "coord_ci95": {m: ci95[k] for k, m in enumerate(MODELS)},
+        "constant_family_rmse": constant,
+        "constant_family_rmse_se": float(np.std(constant_draws)),
+        "constant_family_rmse_ci95": [float(v) for v in np.percentile(constant_draws, [2.5, 97.5])],
+        "linear_trend_rmse": linear, "linear_trend_rmse_se": float(np.std(linear_draws)),
+        "linear_trend_rmse_ci95": [float(v) for v in np.percentile(linear_draws, [2.5, 97.5])],
+        "constant_noise_floor_mean": float(np.mean(floor_const)),
+        "linear_noise_floor_mean": float(np.mean(floor_lin)),
+        "p_constant_noise_ge_observed": float(np.mean(floor_const >= constant)),
+        "p_linear_noise_ge_observed": float(np.mean(floor_lin >= linear)),
+        "loo": loo_point,
+        "loo_constant_mean_se": float(np.std(loo_draws[:, 0])),
+        "loo_linear_mean_se": float(np.std(loo_draws[:, 1])),
+        "loo_constant_mean_ci95": [float(v) for v in np.percentile(loo_draws[:, 0], [2.5, 97.5])],
+        "loo_linear_mean_ci95": [float(v) for v in np.percentile(loo_draws[:, 1], [2.5, 97.5])],
+        "draws": {"constant_rmse": constant_draws, "linear_rmse": linear_draws},
+    }
+
+
+def point_coords_all(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: dict) -> np.ndarray:
+    """(n_models, 2) empirical point coordinates, one row per model, from all observed rows."""
+    return np.array([point_coords(item_lists[m], resolved) for m in MODELS])
+
+
 def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dict],
                       child_rows: list[dict], resolved: dict) -> dict:
     """The fixed preregistered analysis, run on real or synthetic rows."""
@@ -943,71 +1014,40 @@ def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dic
                         "child_zero_selection_substantive_rate": child_zero_substantive / N_PACKETS,
                         "child_zero_selection_or_refusal_rate":
                         (child_refused + child_zero_substantive) / N_PACKETS}
-    draws = coords_draws(item_lists, resolved)
-    point = draws.mean(axis=0)
-    se = draws.std(axis=0)
-    constant, linear = constant_and_linear_rmse(point)
-    # bootstrap scatter distributions
-    constant_draws = np.empty(draws.shape[0]); linear_draws = np.empty(draws.shape[0])
-    for b in range(draws.shape[0]):
-        constant_draws[b], linear_draws[b] = constant_and_linear_rmse(draws[b])
-    # noise floors: H0 = no between-release differences; draw each release from N(0, SE)
-    rng = np.random.default_rng(23)
-    floor_const, floor_lin = np.empty(2000), np.empty(2000)
-    for b in range(2000):
-        ys = np.array([rng.normal(0.0, se[k]) for k in range(len(MODELS))])
-        floor_const[b], floor_lin[b] = constant_and_linear_rmse(ys)
+    packet_summary = protocol_summary(item_lists, resolved, bootstrap_seed=17, row_linked=True)
     dense = dense_qwen_psamples()
     dense_item_lists = {m: {k: list(v) for k, v in dense[m].items()} for m in MODELS}
+    dense_summary = protocol_summary(dense_item_lists, resolved, bootstrap_seed=29,
+                                     row_linked=False)
+    # independent-bootstrap shift distribution: packet and dense protocols are not pairable, so the
+    # packet-minus-dense shift CI subtracts independent coordinate draws.
+    packet_draws = coords_draws(item_lists, resolved, seed=17, row_linked=True)
     dense_draws = coords_draws(dense_item_lists, resolved, seed=29, row_linked=False)
-    dense_point = dense_draws.mean(axis=0)
-    dense_se = dense_draws.std(axis=0)
-    dense_constant, dense_linear = constant_and_linear_rmse(dense_point)
-    dense_constant_draws = np.empty(draws.shape[0]); dense_linear_draws = np.empty(draws.shape[0])
-    for b in range(draws.shape[0]):
-        dense_constant_draws[b], dense_linear_draws[b] = constant_and_linear_rmse(dense_draws[b])
-    rng2 = np.random.default_rng(31)
-    dense_floor_const, dense_floor_lin = np.empty(2000), np.empty(2000)
-    for b in range(2000):
-        ys = np.array([rng2.normal(0.0, dense_se[k]) for k in range(len(MODELS))])
-        dense_floor_const[b], dense_floor_lin[b] = constant_and_linear_rmse(ys)
+    shift_draws = packet_draws - dense_draws
+    shifts_ci = {m: np.percentile(shift_draws[:, k, :], [2.5, 97.5], axis=0).tolist()
+                 for k, m in enumerate(MODELS)}
     release_years_list = release_years().tolist()
+    packet_summary.pop("draws"); dense_summary.pop("draws")
     return {
         "eval_version": EVAL_VERSION, "n_packets": N_PACKETS,
         "release_years": release_years_list,
-        "packet": {
-            "coords_xy_per_model": {m: [float(v) for v in point[k]] for k, m in enumerate(MODELS)},
-            "coord_se": {m: [float(v) for v in se[k]] for k, m in enumerate(MODELS)},
-            "constant_family_rmse": constant, "constant_family_rmse_se": float(np.std(constant_draws)),
-            "linear_trend_rmse": linear, "linear_trend_rmse_se": float(np.std(linear_draws)),
-            "constant_noise_floor_mean": float(np.mean(floor_const)),
-            "linear_noise_floor_mean": float(np.mean(floor_lin)),
-            "p_constant_noise_ge_observed": float(np.mean(floor_const >= constant)),
-            "p_linear_noise_ge_observed": float(np.mean(floor_lin >= linear)),
-            "loo": loo_prediction_error(point),
+        "packet": packet_summary | {
             "refusal": {m: per_model[m]["refusal_rate"] for m in MODELS},
             "coverage": {m: per_model[m]["coverage_per_question"] for m in MODELS},
             "child_diagnostics": {m: {k: per_model[m][k] for k in (
                 "child_refusal_rate", "child_zero_selection_substantive_rate",
                 "child_zero_selection_or_refusal_rate")} for m in MODELS},
         },
-        "dense_v1": {
-            "coords_xy_per_model": {m: [float(v) for v in dense_point[k]] for k, m in enumerate(MODELS)},
-            "coord_se": {m: [float(v) for v in dense_se[k]] for k, m in enumerate(MODELS)},
-            "constant_family_rmse": dense_constant,
-            "constant_family_rmse_se": float(np.std(dense_constant_draws)),
-            "linear_trend_rmse": dense_linear, "linear_trend_rmse_se": float(np.std(dense_linear_draws)),
-            "constant_noise_floor_mean": float(np.mean(dense_floor_const)),
-            "linear_noise_floor_mean": float(np.mean(dense_floor_lin)),
-            "p_constant_noise_ge_observed": float(np.mean(dense_floor_const >= dense_constant)),
-            "p_linear_noise_ge_observed": float(np.mean(dense_floor_lin >= dense_linear)),
-            "loo": loo_prediction_error(dense_point),
-            "bootstrap_note": ("item-wise independent resampling of the 6 rating vectors per item; "
-                               "dense samples are not row-linked, so protocols are not pairable and "
-                               "differences use independent bootstraps"),
+        "dense_v1": dense_summary | {
+            "bootstrap_note": ("item-wise independent resampling of the 12 rating vectors per "
+                               "item; dense samples are not row-linked, so protocols are not "
+                               "pairable and differences use independent bootstraps"),
         },
-        "coord_shifts_packet_minus_dense": {m: [float(a - b) for a, b in zip(point[k], dense_point[k])]
-                                            for k, m in enumerate(MODELS)},
+        "coord_shifts_packet_minus_dense": {
+            m: {"point": [float(a - b) for a, b in zip(packet_summary["coords_xy_per_model"][m],
+                                                       dense_summary["coords_xy_per_model"][m])],
+                "ci95": shifts_ci[m]} for m in MODELS},
+        "shift_pairing": "independent draws (protocols not pairable)",
     }
 
 
