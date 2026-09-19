@@ -1,0 +1,95 @@
+{
+  "eval_version": "wvs-respondent-packet-v2",
+  "models": {
+    "qwen/qwen3.5-plus-02-15": {
+      "canonicalization_shape_counts": {
+        "answer_list_question_indices": 40,
+        "numbered_prefix_labels": 2,
+        "positional_labels": 86
+      },
+      "packets": 128,
+      "protocol_id": "b0e83c035e588afdac6d9b98770c84a408d0f6488d8f7fb2d624ee19f3d975b7",
+      "raw_serialization_shape_counts": {
+        "{1:{answer:str,reason:str},2:{answer:str,reason:str},3:{answer:str,reason:str},4:{answer:str,reason:str},5:{answer:str,reason:str},6:{answer:str,reason:str},7:{answer:str,reason:str},8:{answer:str,reason:str},9:{answer:[int],reason:str}}": 4,
+        "{1:{answer:str,reason:str},2:{answer:str,reason:str},3:{answer:str,reason:str},4:{answer:str,reason:str},5:{answer:str,reason:str},6:{answer:str,reason:str},7:{answer:str,reason:str},8:{answer:str,reason:str},9:{answer:[str],reason:str}}": 78,
+        "{1:{option:str,reason:str},2:{option:str,reason:str},3:{option:str,reason:str},4:{option:str,reason:str},5:{option:str,reason:str},6:{option:str,reason:str},7:{option:str,reason:str},8:{option:str,reason:str},9:{options:[int],reason:str}}": 4,
+        "{1_religion_importance:{choice:str,reason:str},2_belief_in_god:{choice:str,reason:str},3_abortion_justification:{choice:str,reason:str},4_homosexuality_justification:{choice:str,reason:str},5_general_trust:{choice:str,reason:str},6_signing_petition:{choice:str,reason:str},7_attending_demonstrations:{choice:str,reason:str},8_joining_boycotts:{choice:str,reason:str},9_child_qualities:{choices:[int],reason:str}}": 1,
+        "{1_religion_importance:{option:str,reason:str},2_belief_in_god:{option:str,reason:str},3_abortion_justification:{option:str,reason:str},4_homosexuality_justification:{option:str,reason:str},5_general_trust:{option:str,reason:str},6_signing_petition:{option:str,reason:str},7_attending_demonstrations:{option:str,reason:str},8_joining_boycotts:{option:str,reason:str},9_child_qualities:{options:[int],reason:str}}": 1,
+        "{answers:[{choice:str,question:int,reason:str},{choices:[int],question:int,reason:str}]}": 6,
+        "{answers:[{choice:str,question_id:int,reason:str},{choices:[int],question_id:int,reason:str}]}": 5,
+        "{answers:[{choice:str,question_number:int,reason:str},{choices:[int],question_number:int,reason:str}]}": 2,
+        "{answers:[{option:str,question:int,reason:str},{options:[int],question:int,reason:str}]}": 15,
+        "{answers:[{option:str,question:str,reason:str},{options:[int],question:str,reason:str}]}": 7,
+        "{answers:[{option:str,question_id:int,reason:str},{options:[int],question_id:int,reason:str}]}": 2,
+        "{answers:[{option:str,question_number:int,reason:str},{options:[int],question_number:int,reason:str}]}": 3
+      },
+      "residual_refusal_packet_kinds": {
+        "nonconforming": 7
+      },
+      "residual_refusal_reason_status_counts": {
+        "not_available": 14
+      },
+      "residual_refused_packets": 7,
+      "residual_refused_question_instances": 14
+    },
+    "qwen/qwen3.5-plus-20260420": {
+      "canonicalization_shape_counts": {
+        "positional_labels": 127,
+        "q_positional_labels": 1
+      },
+      "packets": 128,
+      "protocol_id": "a631db8fc8c46015d846a1572e61f3bbc42eec91b1d2fa840cf99a3ae3f3d937",
+      "raw_serialization_shape_counts": {
+        "{1:{answer:str,reason:str},2:{answer:str,reason:str},3:{answer:str,reason:str},4:{answer:str,reason:str},5:{answer:str,reason:str},6:{answer:str,reason:str},7:{answer:str,reason:str},8:{answer:str,reason:str},9:{answer:[int],reason:str}}": 37,
+        "{1:{answer:str,reason:str},2:{answer:str,reason:str},3:{answer:str,reason:str},4:{answer:str,reason:str},5:{answer:str,reason:str},6:{answer:str,reason:str},7:{answer:str,reason:str},8:{answer:str,reason:str},9:{answer:[str],reason:str}}": 39,
+        "{1:{answer:str,reason:str},2:{answer:str,reason:str},3:{answer:str,reason:str},4:{answer:str,reason:str},5:{answer:str,reason:str},6:{answer:str,reason:str},7:{answer:str,reason:str},8:{answer:str,reason:str},9:{answers:[int],reason:str}}": 12,
+        "{1:{answer:str,reason:str},2:{answer:str,reason:str},3:{answer:str,reason:str},4:{answer:str,reason:str},5:{answer:str,reason:str},6:{answer:str,reason:str},7:{answer:str,reason:str},8:{answer:str,reason:str},9:{answers:[str],reason:str}}": 6,
+        "{1:{answer:str,reason:str},2:{answer:str,reason:str},3:{answer:str,reason:str},4:{answer:str,reason:str},5:{answer:str,reason:str},6:{answer:str,reason:str},7:{answer:str,reason:str},8:{answer:str,reason:str},9:{choices:[int],reason:str}}": 1,
+        "{1:{choice:str,reason:str},2:{choice:str,reason:str},3:{choice:str,reason:str},4:{choice:str,reason:str},5:{choice:str,reason:str},6:{choice:str,reason:str},7:{choice:str,reason:str},8:{choice:str,reason:str},9:{choice:[int],reason:str}}": 5,
+        "{1:{choice:str,reason:str},2:{choice:str,reason:str},3:{choice:str,reason:str},4:{choice:str,reason:str},5:{choice:str,reason:str},6:{choice:str,reason:str},7:{choice:str,reason:str},8:{choice:str,reason:str},9:{choice:[str],reason:str}}": 7,
+        "{1:{choice:str,reason:str},2:{choice:str,reason:str},3:{choice:str,reason:str},4:{choice:str,reason:str},5:{choice:str,reason:str},6:{choice:str,reason:str},7:{choice:str,reason:str},8:{choice:str,reason:str},9:{choices:[int],reason:str}}": 17,
+        "{1:{choice:str,reason:str},2:{choice:str,reason:str},3:{choice:str,reason:str},4:{choice:str,reason:str},5:{choice:str,reason:str},6:{choice:str,reason:str},7:{choice:str,reason:str},8:{choice:str,reason:str},9:{choices:[str],reason:str}}": 3,
+        "{q1:{answer:str,reason:str},q2:{answer:str,reason:str},q3:{answer:str,reason:str},q4:{answer:str,reason:str},q5:{answer:str,reason:str},q6:{answer:str,reason:str},q7:{answer:str,reason:str},q8:{answer:str,reason:str},q9:{answers:[int],reason:str}}": 1
+      },
+      "residual_refusal_packet_kinds": {},
+      "residual_refusal_reason_status_counts": {},
+      "residual_refused_packets": 0,
+      "residual_refused_question_instances": 0
+    },
+    "qwen/qwen3.6-plus": {
+      "canonicalization_shape_counts": {
+        "answer_list_question_indices": 16,
+        "positional_labels": 109,
+        "q_positional_labels": 3
+      },
+      "packets": 128,
+      "protocol_id": "cfddbdccff7be22cce8bb44c7c476de42d2b2ac8b8dddfa2eb2cbca7580de95f",
+      "raw_serialization_shape_counts": {
+        "{1:{answer:str,reason:str},2:{answer:str,reason:str},3:{answer:str,reason:str},4:{answer:str,reason:str},5:{answer:str,reason:str},6:{answer:str,reason:str},7:{answer:str,reason:str},8:{answer:str,reason:str},9:{answer:[int],reason:str}}": 90,
+        "{1:{choice:str,reason:str},2:{choice:str,reason:str},3:{choice:str,reason:str},4:{choice:str,reason:str},5:{choice:str,reason:str},6:{choice:str,reason:str},7:{choice:str,reason:str},8:{choice:str,reason:str},9:{choice:[int],reason:str}}": 3,
+        "{1:{choice:str,reason:str},2:{choice:str,reason:str},3:{choice:str,reason:str},4:{choice:str,reason:str},5:{choice:str,reason:str},6:{choice:str,reason:str},7:{choice:str,reason:str},8:{choice:str,reason:str},9:{choices:[int],reason:str}}": 16,
+        "{answers:[{choice:str,question_id:int,reason:str},{choices:[int],question_id:int,reason:str}]}": 6,
+        "{answers:[{question_id:int,reason:str,selected_option:str},{question_id:int,reason:str,selected_options:[int]}]}": 10,
+        "{q1:{answer:str,reason:str},q2:{answer:str,reason:str},q3:{answer:str,reason:str},q4:{answer:str,reason:str},q5:{answer:str,reason:str},q6:{answer:str,reason:str},q7:{answer:str,reason:str},q8:{answer:str,reason:str},q9:{answer:[int],reason:str}}": 3
+      },
+      "residual_refusal_packet_kinds": {},
+      "residual_refusal_reason_status_counts": {},
+      "residual_refused_packets": 0,
+      "residual_refused_question_instances": 0
+    },
+    "qwen/qwen3.7-plus": {
+      "canonicalization_shape_counts": {
+        "canonical_schema": 128
+      },
+      "packets": 128,
+      "protocol_id": "b34e83c33ce5e27b9280d182f3bd268e69c2ce5ae2002550eb8093a79372dc65",
+      "raw_serialization_shape_counts": {
+        "{answers:{Abortion:{reason:str,selected:str},Attending peaceful demonstrations:{reason:str,selected:str},God:{reason:str,selected:str},Homosexuality:{reason:str,selected:str},Joining in boycotts:{reason:str,selected:str},Religion:{reason:str,selected:str},Signing a petition:{reason:str,selected:str},dealing with people?:{reason:str,selected:str}},child_qualities:{reason:str,selected:[str]}}": 128
+      },
+      "residual_refusal_packet_kinds": {},
+      "residual_refusal_reason_status_counts": {},
+      "residual_refused_packets": 0,
+      "residual_refused_question_instances": 0
+    }
+  }
+}

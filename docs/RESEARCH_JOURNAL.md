@@ -1266,3 +1266,34 @@ completion in the shared file) was fixed with a fixture; no second paid call. Ac
 encodings are now part of protocol identity (new protocol_id), eval_version stays v2.
 Full audit: `slop/audits/20260919_resp_packet_smoke_v2_35plus.md`. Stopped before panel
 dispatch as instructed.
+
+## 2026-09-19 -- WVS respondent packet v2 panel, task 1788
+
+Observation, from task 1788 status and raw records: the authorized Alibaba panel completed 4 x 128
+whole respondent packets, 512 `request_completed` panel records. Provider-reported panel cost was
+USD 0.416999506. The local stage ledger records USD 0.419875846 provider-reported over panel plus
+prior smoke phases and USD 0.447093766 conservative cost after eight failed attempt bounds. The
+global observed ledger now records task-1788 panel cost under `panel/resp-packet-v2/pueue-1788`.
+All completed panel routes report Alibaba and the expected dated release slug; advertised
+quantization is `unknown` for every release.
+
+Observation, from an encoding-aware reprocessing of all 512 saved raw response texts: 266 packets
+that the old parser had marked nonconforming use direct visible-label variants, including integer
+child labels, `answer`/`choice`/`option` fields, `q1` through `q9`, numeric-prefix keys, and answer
+lists with numeric question indices. They are now appended as versioned reprocessed events, while
+original events and raw text remain unchanged. Seven oldest-release list packets retain 14 refused
+question instances because two question names are paraphrases rather than visible labels or exact
+prompt IDs. Twenty packets have too-long reasons but retain their selected answers; reasons were
+not scored.
+
+Observation, from the fixed whole-row bootstrap in
+`slop/research/wvs/20260919_respondent_packet/analysis.json`: packet constant-family RMSE is
+0.0792 and linear RMSE is 0.0696. Constant LOO error is 0.0942, lower than linear LOO error 0.1318.
+Dense-v1 has the same LOO direction, 0.0338 constant versus 0.0514 linear. This is evidence against
+selecting a linear release trend from these four releases. Packet coordinate shifts from dense-v1
+are positive on both axes for three releases, but this compares two evaluator administrations, not
+a causal model-release effect. The published WVS map data, PNG, and SVG had a byte-empty diff.
+
+Full audit: `slop/audits/job_1788_wvs_respondent_packet_v2.md`.
+
+-- PI[unknown]

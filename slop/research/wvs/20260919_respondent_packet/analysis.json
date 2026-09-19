@@ -1,0 +1,558 @@
+{
+  "coord_shifts_packet_minus_dense": {
+    "qwen/qwen3.5-plus-02-15": {
+      "ci95": [
+        [
+          0.21102391286375677,
+          0.08629490858843536
+        ],
+        [
+          0.2576009286816579,
+          0.1151687370995406
+        ]
+      ],
+      "point": [
+        0.23623291446208117,
+        0.10040918076632366
+      ],
+      "valid_shift_draws": 1000
+    },
+    "qwen/qwen3.5-plus-20260420": {
+      "ci95": [
+        [
+          -0.043054920484608045,
+          0.10618798013329245
+        ],
+        [
+          0.03117986975408853,
+          0.150264314058957
+        ]
+      ],
+      "point": [
+        -0.006713939995189988,
+        0.12887195476481184
+      ],
+      "valid_shift_draws": 1000
+    },
+    "qwen/qwen3.6-plus": {
+      "ci95": [
+        [
+          0.1779594534573089,
+          0.11585783512122784
+        ],
+        [
+          0.2466465092981637,
+          0.16213250043607186
+        ]
+      ],
+      "point": [
+        0.2123533788515407,
+        0.14012042851328554
+      ],
+      "valid_shift_draws": 1000
+    },
+    "qwen/qwen3.7-plus": {
+      "ci95": [
+        [
+          0.173092647707231,
+          0.14586338595267162
+        ],
+        [
+          0.2603233162477953,
+          0.18892989554261871
+        ]
+      ],
+      "point": [
+        0.2203053350970018,
+        0.1676414689807546
+      ],
+      "valid_shift_draws": 1000
+    }
+  },
+  "dense_v1": {
+    "bootstrap_note": "item-wise independent resampling of the 12 rating vectors per item; dense samples are not row-linked, so protocols are not pairable and differences use independent bootstraps",
+    "constant_family_rmse": 0.030656386808492638,
+    "constant_family_rmse_ci95": [
+      0.019709664939171884,
+      0.04434030190202118
+    ],
+    "constant_family_rmse_se": 0.006507875414184742,
+    "constant_noise_floor_mean": 0.010782097533767028,
+    "coord_ci95": {
+      "qwen/qwen3.5-plus-02-15": [
+        [
+          0.5245582010582011,
+          0.6499197809465668
+        ],
+        [
+          0.5511746031746032,
+          0.6701631453863597
+        ]
+      ],
+      "qwen/qwen3.5-plus-20260420": [
+        [
+          0.5532252472643097,
+          0.6347606147159718
+        ],
+        [
+          0.6171024944384319,
+          0.6624319182801326
+        ]
+      ],
+      "qwen/qwen3.6-plus": [
+        [
+          0.5034069275858492,
+          0.6505467796092796
+        ],
+        [
+          0.5360376465400974,
+          0.6908188611983256
+        ]
+      ],
+      "qwen/qwen3.7-plus": [
+        [
+          0.48869833002645496,
+          0.6495983233036804
+        ],
+        [
+          0.5251521439594357,
+          0.6827553109919182
+        ]
+      ]
+    },
+    "coord_se": {
+      "qwen/qwen3.5-plus-02-15": [
+        0.006969411536743106,
+        0.005177089691727466
+      ],
+      "qwen/qwen3.5-plus-20260420": [
+        0.015929318069842775,
+        0.007075160953994892
+      ],
+      "qwen/qwen3.6-plus": [
+        0.00819408400769001,
+        0.010124807457482635
+      ],
+      "qwen/qwen3.7-plus": [
+        0.00934551982215177,
+        0.008297510115857632
+      ]
+    },
+    "family_bootstrap": {
+      "bootstrap_B": 1000,
+      "complete_draw_fraction": 1.0,
+      "complete_draws": 1000,
+      "constant_family_rmse_draws_mean": 0.03195155055660286,
+      "constant_family_rmse_draws_se": 0.006507875414184742,
+      "linear_trend_rmse_draws_mean": 0.031144856064642835,
+      "linear_trend_rmse_draws_se": 0.006765267258401058,
+      "loo_constant_mean_ci95": [
+        0.023632756088608507,
+        0.05063057965425209
+      ],
+      "loo_constant_mean_draws_mean": 0.036785573395985,
+      "loo_constant_mean_draws_se": 0.00710827972882462,
+      "loo_linear_mean_ci95": [
+        0.030943523904004264,
+        0.07694505839895653
+      ],
+      "loo_linear_mean_draws_mean": 0.053834856217117574,
+      "loo_linear_mean_draws_se": 0.012100516076685882,
+      "min_complete_draws_required": 100,
+      "status": "ok",
+      "valid_draws_per_model": {
+        "qwen/qwen3.5-plus-02-15": 1000,
+        "qwen/qwen3.5-plus-20260420": 1000,
+        "qwen/qwen3.6-plus": 1000,
+        "qwen/qwen3.7-plus": 1000
+      }
+    },
+    "family_point": {
+      "constant_family_rmse": 0.030656386808492638,
+      "linear_trend_rmse": 0.03036728669286448,
+      "loo": {
+        "constant_loo_mean": 0.03379600217245676,
+        "constant_loo_per_release": [
+          0.0024527195142407055,
+          0.026474233883769488,
+          0.06599204886374982,
+          0.040265006428067046
+        ],
+        "linear_loo_mean": 0.05138288588567405,
+        "linear_loo_per_release": [
+          0.026305590253706657,
+          0.02858299431983149,
+          0.07122248618854347,
+          0.0794204727806146
+        ]
+      },
+      "status": "ok"
+    },
+    "linear_noise_floor_mean": 0.009243758127528314,
+    "linear_trend_rmse": 0.03036728669286448,
+    "linear_trend_rmse_ci95": [
+      0.018053582001113583,
+      0.04387165462610324
+    ],
+    "linear_trend_rmse_se": 0.006765267258401058,
+    "loo": {
+      "constant_loo_mean": 0.03379600217245676,
+      "constant_loo_per_release": [
+        0.0024527195142407055,
+        0.026474233883769488,
+        0.06599204886374982,
+        0.040265006428067046
+      ],
+      "linear_loo_mean": 0.05138288588567405,
+      "linear_loo_per_release": [
+        0.026305590253706657,
+        0.02858299431983149,
+        0.07122248618854347,
+        0.0794204727806146
+      ]
+    },
+    "loo_constant_mean_ci95": [
+      0.023632756088608507,
+      0.05063057965425209
+    ],
+    "loo_constant_mean_se": 0.00710827972882462,
+    "loo_linear_mean_ci95": [
+      0.030943523904004264,
+      0.07694505839895653
+    ],
+    "loo_linear_mean_se": 0.012100516076685882,
+    "p_constant_noise_ge_observed": 0.0,
+    "p_linear_noise_ge_observed": 0.0,
+    "point_coords_xy_per_model": {
+      "qwen/qwen3.5-plus-02-15": [
+        0.5372045855379188,
+        0.6595114541543113
+      ],
+      "qwen/qwen3.5-plus-20260420": [
+        0.5856201899951899,
+        0.6494018547589976
+      ],
+      "qwen/qwen3.6-plus": [
+        0.5196778711484593,
+        0.6698994127565557
+      ],
+      "qwen/qwen3.7-plus": [
+        0.5078196649029982,
+        0.6664359119716262
+      ]
+    },
+    "point_status": "ok",
+    "unavailable_items": {
+      "qwen/qwen3.5-plus-02-15": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": []
+      },
+      "qwen/qwen3.5-plus-20260420": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": []
+      },
+      "qwen/qwen3.6-plus": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": []
+      },
+      "qwen/qwen3.7-plus": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": []
+      }
+    }
+  },
+  "eval_version": "wvs-respondent-packet-v2",
+  "n_packets": 128,
+  "packet": {
+    "child_diagnostics": {
+      "qwen/qwen3.5-plus-02-15": {
+        "child_refusal_rate": 0.0546875,
+        "child_zero_selection_or_refusal_rate": 0.0546875,
+        "child_zero_selection_substantive_rate": 0.0
+      },
+      "qwen/qwen3.5-plus-20260420": {
+        "child_refusal_rate": 0.0,
+        "child_zero_selection_or_refusal_rate": 0.0,
+        "child_zero_selection_substantive_rate": 0.0
+      },
+      "qwen/qwen3.6-plus": {
+        "child_refusal_rate": 0.0,
+        "child_zero_selection_or_refusal_rate": 0.0,
+        "child_zero_selection_substantive_rate": 0.0
+      },
+      "qwen/qwen3.7-plus": {
+        "child_refusal_rate": 0.0,
+        "child_zero_selection_or_refusal_rate": 0.0,
+        "child_zero_selection_substantive_rate": 0.0
+      }
+    },
+    "collapse_handling": "zero-substantive items make the containing axis coordinate unavailable for that model; bootstrap draws with a zero-coverage model/axis are invalid; family/trend/LOO metrics require all four finite coordinates and are otherwise an explicit unavailable result",
+    "constant_family_rmse": 0.07920916692361614,
+    "constant_family_rmse_ci95": [
+      0.07029038942655565,
+      0.090037860156031
+    ],
+    "constant_family_rmse_se": 0.004982451191867189,
+    "constant_noise_floor_mean": 0.013200677009896994,
+    "coord_ci95": {
+      "qwen/qwen3.5-plus-02-15": [
+        [
+          0.75390625,
+          0.7495039682539683
+        ],
+        [
+          0.790625,
+          0.771462673611111
+        ]
+      ],
+      "qwen/qwen3.5-plus-20260420": [
+        [
+          0.55859375,
+          0.7615265376984126
+        ],
+        [
+          0.59921875,
+          0.7945188492063492
+        ]
+      ],
+      "qwen/qwen3.6-plus": [
+        [
+          0.70234375,
+          0.7971137152777777
+        ],
+        [
+          0.7609375,
+          0.822420634920635
+        ]
+      ],
+      "qwen/qwen3.7-plus": [
+        [
+          0.6866992187500001,
+          0.8193204365079365
+        ],
+        [
+          0.76484375,
+          0.8485863095238094
+        ]
+      ]
+    },
+    "coord_se": {
+      "qwen/qwen3.5-plus-02-15": [
+        0.00936839754486294,
+        0.005779626357293611
+      ],
+      "qwen/qwen3.5-plus-20260420": [
+        0.01045546953807998,
+        0.008414758589596337
+      ],
+      "qwen/qwen3.6-plus": [
+        0.015462501184190536,
+        0.006650011173460525
+      ],
+      "qwen/qwen3.7-plus": [
+        0.020434011492695057,
+        0.007459677208890916
+      ]
+    },
+    "coverage": {
+      "qwen/qwen3.5-plus-02-15": {
+        "Abortion": 1.0,
+        "Attending peaceful demonstrations": 1.0,
+        "ChildQualities": 0.9453125,
+        "God": 1.0,
+        "Homosexuality": 1.0,
+        "Joining in boycotts": 1.0,
+        "Religion": 1.0,
+        "Signing a petition": 1.0,
+        "dealing with people?": 0.9453125
+      },
+      "qwen/qwen3.5-plus-20260420": {
+        "Abortion": 1.0,
+        "Attending peaceful demonstrations": 1.0,
+        "ChildQualities": 1.0,
+        "God": 1.0,
+        "Homosexuality": 1.0,
+        "Joining in boycotts": 1.0,
+        "Religion": 1.0,
+        "Signing a petition": 1.0,
+        "dealing with people?": 1.0
+      },
+      "qwen/qwen3.6-plus": {
+        "Abortion": 1.0,
+        "Attending peaceful demonstrations": 1.0,
+        "ChildQualities": 1.0,
+        "God": 1.0,
+        "Homosexuality": 1.0,
+        "Joining in boycotts": 1.0,
+        "Religion": 1.0,
+        "Signing a petition": 1.0,
+        "dealing with people?": 1.0
+      },
+      "qwen/qwen3.7-plus": {
+        "Abortion": 1.0,
+        "Attending peaceful demonstrations": 1.0,
+        "ChildQualities": 1.0,
+        "God": 1.0,
+        "Homosexuality": 1.0,
+        "Joining in boycotts": 1.0,
+        "Religion": 1.0,
+        "Signing a petition": 1.0,
+        "dealing with people?": 1.0
+      }
+    },
+    "family_bootstrap": {
+      "bootstrap_B": 1000,
+      "complete_draw_fraction": 1.0,
+      "complete_draws": 1000,
+      "constant_family_rmse_draws_mean": 0.0803271141879629,
+      "constant_family_rmse_draws_se": 0.004982451191867189,
+      "linear_trend_rmse_draws_mean": 0.07022643468549188,
+      "linear_trend_rmse_draws_se": 0.00649812277993048,
+      "loo_constant_mean_ci95": [
+        0.084038460643986,
+        0.10719011065472368
+      ],
+      "loo_constant_mean_draws_mean": 0.09545751207517682,
+      "loo_constant_mean_draws_se": 0.00603369466486572,
+      "loo_linear_mean_ci95": [
+        0.10178578915597014,
+        0.1599172603475517
+      ],
+      "loo_linear_mean_draws_mean": 0.1324065819800495,
+      "loo_linear_mean_draws_se": 0.014656720453106738,
+      "min_complete_draws_required": 100,
+      "status": "ok",
+      "valid_draws_per_model": {
+        "qwen/qwen3.5-plus-02-15": 1000,
+        "qwen/qwen3.5-plus-20260420": 1000,
+        "qwen/qwen3.6-plus": 1000,
+        "qwen/qwen3.7-plus": 1000
+      }
+    },
+    "family_point": {
+      "constant_family_rmse": 0.07920916692361614,
+      "linear_trend_rmse": 0.06958954455626604,
+      "loo": {
+        "constant_loo_mean": 0.0941587701606303,
+        "constant_loo_per_release": [
+          0.10511312720597471,
+          0.043087196748553526,
+          0.16722337401479925,
+          0.06121138267319377
+        ],
+        "linear_loo_mean": 0.13180142344503615,
+        "linear_loo_per_release": [
+          0.11421955351144603,
+          0.04002699055118485,
+          0.16201890071921912,
+          0.21094024899829453
+        ]
+      },
+      "status": "ok"
+    },
+    "linear_noise_floor_mean": 0.010376662428162988,
+    "linear_trend_rmse": 0.06958954455626604,
+    "linear_trend_rmse_ci95": [
+      0.05728500776210495,
+      0.08291809923509534
+    ],
+    "linear_trend_rmse_se": 0.00649812277993048,
+    "loo": {
+      "constant_loo_mean": 0.0941587701606303,
+      "constant_loo_per_release": [
+        0.10511312720597471,
+        0.043087196748553526,
+        0.16722337401479925,
+        0.06121138267319377
+      ],
+      "linear_loo_mean": 0.13180142344503615,
+      "linear_loo_per_release": [
+        0.11421955351144603,
+        0.04002699055118485,
+        0.16201890071921912,
+        0.21094024899829453
+      ]
+    },
+    "loo_constant_mean_ci95": [
+      0.084038460643986,
+      0.10719011065472368
+    ],
+    "loo_constant_mean_se": 0.00603369466486572,
+    "loo_linear_mean_ci95": [
+      0.10178578915597014,
+      0.1599172603475517
+    ],
+    "loo_linear_mean_se": 0.014656720453106738,
+    "p_constant_noise_ge_observed": 0.0,
+    "p_linear_noise_ge_observed": 0.0,
+    "point_coords_xy_per_model": {
+      "qwen/qwen3.5-plus-02-15": [
+        0.7734375,
+        0.759920634920635
+      ],
+      "qwen/qwen3.5-plus-20260420": [
+        0.57890625,
+        0.7782738095238094
+      ],
+      "qwen/qwen3.6-plus": [
+        0.73203125,
+        0.8100198412698413
+      ],
+      "qwen/qwen3.7-plus": [
+        0.728125,
+        0.8340773809523808
+      ]
+    },
+    "point_status": "ok",
+    "refusal": {
+      "qwen/qwen3.5-plus-02-15": 0.012152777777777778,
+      "qwen/qwen3.5-plus-20260420": 0.0,
+      "qwen/qwen3.6-plus": 0.0,
+      "qwen/qwen3.7-plus": 0.0
+    },
+    "source_shapes": {
+      "qwen/qwen3.5-plus-02-15": {
+        "answer_list_question_indices": 40,
+        "numbered_prefix_labels": 2,
+        "positional_labels": 86
+      },
+      "qwen/qwen3.5-plus-20260420": {
+        "positional_labels": 127,
+        "q_positional_labels": 1
+      },
+      "qwen/qwen3.6-plus": {
+        "answer_list_question_indices": 16,
+        "positional_labels": 109,
+        "q_positional_labels": 3
+      },
+      "qwen/qwen3.7-plus": {
+        "canonical_schema": 128
+      }
+    },
+    "unavailable_items": {
+      "qwen/qwen3.5-plus-02-15": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": []
+      },
+      "qwen/qwen3.5-plus-20260420": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": []
+      },
+      "qwen/qwen3.6-plus": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": []
+      },
+      "qwen/qwen3.7-plus": {
+        "Survival <-> Self-expression": [],
+        "Traditional <-> Secular-Rational": []
+      }
+    }
+  },
+  "release_years": [
+    2026.1269601725012,
+    2026.2507596714865,
+    2026.3182321156773,
+    2026.4206679033487
+  ],
+  "shift_pairing": "independent draws (protocols not pairable)"
+}

@@ -1,14 +1,15 @@
 {
-  "completed_phases": 3,
+  "completed_phases": 516,
   "completed_phases_without_provider_cost": 0,
-  "conservative_spent_usd": "0.02135488",
+  "conservative_spent_usd": "0.447093766",
   "eval_versions": [
     "wvs-respondent-packet-v1",
     "wvs-respondent-packet-v2"
   ],
-  "failed_phases_charged_at_bound": 6,
+  "failed_phases_charged_at_bound": 8,
+  "finished_utc": "2026-09-19T11:13:41.750461+00:00",
   "hard_cap_usd": "5",
-  "provider_reported_spent_usd": "0.00212416",
-  "reserved_usd": "0E-8",
+  "provider_reported_spent_usd": "0.419875846",
+  "reserved_usd": "0E-9",
   "schema": 2
 }

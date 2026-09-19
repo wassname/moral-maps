@@ -1,0 +1,785 @@
+{
+  "budget": {
+    "conservative_spent_usd": "0.447093766",
+    "failed_phases_charged_at_bound": 8,
+    "provider_reported_spent_usd": "0.419875846"
+  },
+  "eval_version": "wvs-respondent-packet-v2",
+  "merge_into_primary": false,
+  "models": [
+    {
+      "eval_version": "wvs-respondent-packet-v2",
+      "model": "qwen/qwen3.5-plus-02-15",
+      "per_question": {
+        "Abortion": {
+          "coverage": 0.609375,
+          "n": 128,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.609375,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.0,
+            "Never justifiable": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "substantive": 78
+        },
+        "Attending peaceful demonstrations": {
+          "coverage": 0.609375,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.0,
+            "Might do": 0.609375,
+            "Would never do": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "substantive": 78
+        },
+        "ChildQualities": {
+          "coverage": 0.609375,
+          "n": 128,
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "selection_rates": {
+            "Determination, perseverance": 0.609375,
+            "Feeling of responsibility": 0.609375,
+            "Good manners": 0.0546875,
+            "Hard work": 0.2890625,
+            "Imagination": 0.0625,
+            "Independence": 0.609375,
+            "Not being selfish (unselfishness)": 0.203125,
+            "Obedience": 0.0,
+            "Religious faith": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 0.609375
+          },
+          "substantive": 78,
+          "zero_selection_or_refusal": 50,
+          "zero_selection_substantive": 0
+        },
+        "God": {
+          "coverage": 0.609375,
+          "n": 128,
+          "option_frequencies": {
+            "No": 0.609375,
+            "Yes": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "substantive": 78
+        },
+        "Homosexuality": {
+          "coverage": 0.609375,
+          "n": 128,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.609375,
+            "Never justifiable": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "substantive": 78
+        },
+        "Joining in boycotts": {
+          "coverage": 0.609375,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.1015625,
+            "Might do": 0.5078125,
+            "Would never do": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "substantive": 78
+        },
+        "Religion": {
+          "coverage": 0.609375,
+          "n": 128,
+          "option_frequencies": {
+            "Not at all important": 0.0,
+            "Not very important": 0.609375,
+            "Rather important": 0.0,
+            "Very important": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "substantive": 78
+        },
+        "Signing a petition": {
+          "coverage": 0.609375,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.609375,
+            "Might do": 0.0,
+            "Would never do": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "substantive": 78
+        },
+        "dealing with people?": {
+          "coverage": 0.609375,
+          "n": 128,
+          "option_frequencies": {
+            "Most people can be trusted": 0.3984375,
+            "Need to be very careful": 0.2109375
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 50,
+            "too_long": 0,
+            "valid": 78
+          },
+          "refused": 50,
+          "substantive": 78
+        }
+      },
+      "protocol_id": "508959e4ac3a0245ab2d2630f029a2f333199235a5ad9f9c8055a8e79d49cc57",
+      "records": "slop/research/wvs/20260919_respondent_packet/records/qwen__qwen3.5-plus-02-15/packets.jsonl",
+      "refusal_kinds": {
+        "nonconforming": 50
+      },
+      "refusal_rate_overall": 0.390625,
+      "source_shape_counts": {
+        "no_usable_response": 50,
+        "positional_labels": 78
+      },
+      "valid_packets": 128,
+      "zero_selection_or_refusal_rate_overall": 0.390625
+    },
+    {
+      "eval_version": "wvs-respondent-packet-v2",
+      "model": "qwen/qwen3.6-plus",
+      "per_question": {
+        "Abortion": {
+          "coverage": 0.0,
+          "n": 128,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.0,
+            "Never justifiable": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "substantive": 0
+        },
+        "Attending peaceful demonstrations": {
+          "coverage": 0.0,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.0,
+            "Might do": 0.0,
+            "Would never do": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "substantive": 0
+        },
+        "ChildQualities": {
+          "coverage": 0.0,
+          "n": 128,
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "selection_rates": {
+            "Determination, perseverance": 0.0,
+            "Feeling of responsibility": 0.0,
+            "Good manners": 0.0,
+            "Hard work": 0.0,
+            "Imagination": 0.0,
+            "Independence": 0.0,
+            "Not being selfish (unselfishness)": 0.0,
+            "Obedience": 0.0,
+            "Religious faith": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 0.0
+          },
+          "substantive": 0,
+          "zero_selection_or_refusal": 128,
+          "zero_selection_substantive": 0
+        },
+        "God": {
+          "coverage": 0.0,
+          "n": 128,
+          "option_frequencies": {
+            "No": 0.0,
+            "Yes": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "substantive": 0
+        },
+        "Homosexuality": {
+          "coverage": 0.0,
+          "n": 128,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.0,
+            "Never justifiable": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "substantive": 0
+        },
+        "Joining in boycotts": {
+          "coverage": 0.0,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.0,
+            "Might do": 0.0,
+            "Would never do": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "substantive": 0
+        },
+        "Religion": {
+          "coverage": 0.0,
+          "n": 128,
+          "option_frequencies": {
+            "Not at all important": 0.0,
+            "Not very important": 0.0,
+            "Rather important": 0.0,
+            "Very important": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "substantive": 0
+        },
+        "Signing a petition": {
+          "coverage": 0.0,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.0,
+            "Might do": 0.0,
+            "Would never do": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "substantive": 0
+        },
+        "dealing with people?": {
+          "coverage": 0.0,
+          "n": 128,
+          "option_frequencies": {
+            "Most people can be trusted": 0.0,
+            "Need to be very careful": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 128,
+            "too_long": 0,
+            "valid": 0
+          },
+          "refused": 128,
+          "substantive": 0
+        }
+      },
+      "protocol_id": "c27bc922cd2d8267fb2c5f7e3f5de33f90e825f05fd6a1aac2980de7841a0e32",
+      "records": "slop/research/wvs/20260919_respondent_packet/records/qwen__qwen3.6-plus/packets.jsonl",
+      "refusal_kinds": {
+        "nonconforming": 128
+      },
+      "refusal_rate_overall": 1.0,
+      "source_shape_counts": {
+        "no_usable_response": 128
+      },
+      "valid_packets": 128,
+      "zero_selection_or_refusal_rate_overall": 1.0
+    },
+    {
+      "eval_version": "wvs-respondent-packet-v2",
+      "model": "qwen/qwen3.5-plus-20260420",
+      "per_question": {
+        "Abortion": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.09375,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.1640625,
+            "Never justifiable": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "substantive": 33
+        },
+        "Attending peaceful demonstrations": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.0,
+            "Might do": 0.078125,
+            "Would never do": 0.1796875
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "substantive": 33
+        },
+        "ChildQualities": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "selection_rates": {
+            "Determination, perseverance": 0.0234375,
+            "Feeling of responsibility": 0.2578125,
+            "Good manners": 0.0,
+            "Hard work": 0.125,
+            "Imagination": 0.0859375,
+            "Independence": 0.2578125,
+            "Not being selfish (unselfishness)": 0.203125,
+            "Obedience": 0.0,
+            "Religious faith": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 0.2578125
+          },
+          "substantive": 33,
+          "zero_selection_or_refusal": 95,
+          "zero_selection_substantive": 0
+        },
+        "God": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "option_frequencies": {
+            "No": 0.2578125,
+            "Yes": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "substantive": 33
+        },
+        "Homosexuality": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.2578125,
+            "Never justifiable": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "substantive": 33
+        },
+        "Joining in boycotts": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.0,
+            "Might do": 0.1171875,
+            "Would never do": 0.140625
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "substantive": 33
+        },
+        "Religion": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "option_frequencies": {
+            "Not at all important": 0.2578125,
+            "Not very important": 0.0,
+            "Rather important": 0.0,
+            "Very important": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "substantive": 33
+        },
+        "Signing a petition": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.0703125,
+            "Might do": 0.1796875,
+            "Would never do": 0.0078125
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "substantive": 33
+        },
+        "dealing with people?": {
+          "coverage": 0.2578125,
+          "n": 128,
+          "option_frequencies": {
+            "Most people can be trusted": 0.2578125,
+            "Need to be very careful": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 95,
+            "too_long": 0,
+            "valid": 33
+          },
+          "refused": 95,
+          "substantive": 33
+        }
+      },
+      "protocol_id": "d2d991d79ab70067a781d7c5220cd9ed970e5d1b3a23f053cbcfd3180278f175",
+      "records": "slop/research/wvs/20260919_respondent_packet/records/qwen__qwen3.5-plus-20260420/packets.jsonl",
+      "refusal_kinds": {
+        "nonconforming": 95
+      },
+      "refusal_rate_overall": 0.7421875,
+      "source_shape_counts": {
+        "no_usable_response": 95,
+        "positional_labels": 33
+      },
+      "valid_packets": 128,
+      "zero_selection_or_refusal_rate_overall": 0.7421875
+    },
+    {
+      "eval_version": "wvs-respondent-packet-v2",
+      "model": "qwen/qwen3.7-plus",
+      "per_question": {
+        "Abortion": {
+          "coverage": 1.0,
+          "n": 128,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0078125,
+            "5": 0.8203125,
+            "6": 0.0,
+            "7": 0.15625,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 0.015625,
+            "Never justifiable": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "substantive": 128
+        },
+        "Attending peaceful demonstrations": {
+          "coverage": 1.0,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.0,
+            "Might do": 0.8515625,
+            "Would never do": 0.1484375
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "substantive": 128
+        },
+        "ChildQualities": {
+          "coverage": 1.0,
+          "n": 128,
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "selection_rates": {
+            "Determination, perseverance": 0.875,
+            "Feeling of responsibility": 1.0,
+            "Good manners": 0.0078125,
+            "Hard work": 0.40625,
+            "Imagination": 0.6875,
+            "Independence": 1.0,
+            "Not being selfish (unselfishness)": 0.0,
+            "Obedience": 0.0,
+            "Religious faith": 0.0,
+            "Thrift saving money and things": 0.0,
+            "Tolerance and respect for other people": 1.0
+          },
+          "substantive": 128,
+          "zero_selection_or_refusal": 0,
+          "zero_selection_substantive": 0
+        },
+        "God": {
+          "coverage": 1.0,
+          "n": 128,
+          "option_frequencies": {
+            "No": 1.0,
+            "Yes": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "substantive": 128
+        },
+        "Homosexuality": {
+          "coverage": 1.0,
+          "n": 128,
+          "option_frequencies": {
+            "2": 0.0,
+            "3": 0.0,
+            "4": 0.0,
+            "5": 0.0,
+            "6": 0.0,
+            "7": 0.0,
+            "8": 0.0,
+            "9": 0.0,
+            "Always justifiable": 1.0,
+            "Never justifiable": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "substantive": 128
+        },
+        "Joining in boycotts": {
+          "coverage": 1.0,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.484375,
+            "Might do": 0.390625,
+            "Would never do": 0.125
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "substantive": 128
+        },
+        "Religion": {
+          "coverage": 1.0,
+          "n": 128,
+          "option_frequencies": {
+            "Not at all important": 0.3671875,
+            "Not very important": 0.6328125,
+            "Rather important": 0.0,
+            "Very important": 0.0
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "substantive": 128
+        },
+        "Signing a petition": {
+          "coverage": 1.0,
+          "n": 128,
+          "option_frequencies": {
+            "Have done": 0.7734375,
+            "Might do": 0.1015625,
+            "Would never do": 0.125
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "substantive": 128
+        },
+        "dealing with people?": {
+          "coverage": 1.0,
+          "n": 128,
+          "option_frequencies": {
+            "Most people can be trusted": 0.7109375,
+            "Need to be very careful": 0.2890625
+          },
+          "reason_status_counts": {
+            "missing": 0,
+            "not_available": 0,
+            "too_long": 0,
+            "valid": 128
+          },
+          "refused": 0,
+          "substantive": 128
+        }
+      },
+      "protocol_id": "f7f8f85a573bbacdae82da0f7564d55a4bb4c64f690cce696ddcdd1311f7f4f6",
+      "records": "slop/research/wvs/20260919_respondent_packet/records/qwen__qwen3.7-plus/packets.jsonl",
+      "refusal_kinds": {},
+      "refusal_rate_overall": 0.0,
+      "source_shape_counts": {
+        "canonical_schema": 128
+      },
+      "valid_packets": 128,
+      "zero_selection_or_refusal_rate_overall": 0.0
+    }
+  ],
+  "not_published": true,
+  "schema": 1
+}

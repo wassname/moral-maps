@@ -220,8 +220,12 @@ def packet_schema(battery: list[dict]) -> dict:
 
 CANONICAL_SHAPE = "canonical_schema"
 POSITIONAL_SHAPE = "positional_labels"
+Q_POSITIONAL_SHAPE = "q_positional_labels"
+PREFIX_POSITIONAL_SHAPE = "numbered_prefix_labels"
+ANSWER_LIST_SHAPE = "answer_list_question_indices"
 NO_RESPONSE_SHAPE = "no_usable_response"
-ACCEPTED_ENCODINGS = (CANONICAL_SHAPE, POSITIONAL_SHAPE)
+ACCEPTED_ENCODINGS = (CANONICAL_SHAPE, POSITIONAL_SHAPE, Q_POSITIONAL_SHAPE,
+                      PREFIX_POSITIONAL_SHAPE, ANSWER_LIST_SHAPE)
 
 
 def refusal_row(battery: list[dict]) -> dict:
@@ -245,71 +249,118 @@ def substantive_row(selected: object, reason: object, shape: str = CANONICAL_SHA
             "reason_status": status, "source_shape": shape}
 
 
-def positional_labels(battery: list[dict]) -> dict:
-    """The labels render_packet displays: blocks numbered 1..9 in battery order, ordinary
-    options lettered A.. per block, child qualities numbered 1..11."""
-    labels = {}
-    for number, q in enumerate(battery, 1):
-        if q["id"] == "ChildQualities":
-            labels[str(number)] = ("child", [str(j) for j in range(1, len(q["options"]) + 1)])
-        else:
-            labels[str(number)] = ("ordinary", [chr(64 + j) for j in range(1, len(q["options"]) + 1)])
-    return labels
+def refused_entry(reason: object, shape: str) -> dict:
+    return {"outcome": "refused", "selected": None, "reason": reason,
+            "reason_status": "not_available", "source_shape": shape}
+
+
+def labeled_entry(q: dict, block: object, shape: str) -> dict:
+    """Map one block only when it contains exactly one answer field for its visible labels."""
+    if not isinstance(block, dict):
+        return refused_entry(None, shape)
+    reason = block.get("reason")
+    fields = ("answer", "choice", "option", "selected_option")
+    if q["id"] == "ChildQualities":
+        fields = fields + ("answers", "choices", "options", "selected_options")
+    present = [field for field in fields if field in block]
+    if len(present) != 1 or set(block) - {present[0], "reason"}:
+        return refused_entry(reason, shape)
+    value = block[present[0]]
+    if q["id"] == "ChildQualities":
+        if (not isinstance(value, list) or len(value) > 5
+                or any(not isinstance(item, (str, int)) for item in value)
+                or len(set(value)) != len(value)):
+            return refused_entry(reason, shape)
+        labels = [str(item) for item in value]
+        if any(not item.isdecimal() or not 1 <= int(item) <= len(q["options"]) for item in labels):
+            return refused_entry(reason, shape)
+        return substantive_row([q["options"][int(item) - 1] for item in labels], reason, shape)
+    if not isinstance(value, str) or len(value) != 1:
+        return refused_entry(reason, shape)
+    index = ord(value) - ord("A")
+    if not 0 <= index < len(q["options"]):
+        return refused_entry(reason, shape)
+    return substantive_row(q["options"][index], reason, shape)
+
+
+def canonical_entry(q: dict, block: object, shape: str) -> dict:
+    if not isinstance(block, dict) or set(block) - {"selected", "reason"}:
+        return refused_entry(None, shape)
+    selected, reason = block.get("selected"), block.get("reason")
+    if q["id"] == "ChildQualities":
+        if (isinstance(selected, list) and len(selected) <= 5
+                and all(isinstance(item, str) for item in selected)
+                and len(set(selected)) == len(selected) and set(selected) <= set(q["options"])):
+            return substantive_row(selected, reason, shape)
+    elif selected in q["options"]:
+        return substantive_row(selected, reason, shape)
+    return refused_entry(reason, shape)
+
+
+def positional_keys(raw: object, battery: list[dict]) -> tuple[list[str], str] | None:
+    if not isinstance(raw, dict):
+        return None
+    numbered = [str(number) for number in range(1, len(battery) + 1)]
+    if set(raw) == set(numbered):
+        return numbered, POSITIONAL_SHAPE
+    q_numbered = [f"q{number}" for number in range(1, len(battery) + 1)]
+    if set(raw) == set(q_numbered):
+        return q_numbered, Q_POSITIONAL_SHAPE
+    prefix = {key.split("_", 1)[0]: key for key in raw if re.fullmatch(r"[1-9]_.+", key)}
+    if len(prefix) == len(battery) and set(prefix) == set(numbered) and len(raw) == len(battery):
+        return [prefix[str(number)] for number in range(1, len(battery) + 1)], PREFIX_POSITIONAL_SHAPE
+    return None
 
 
 def normalize_positional(battery: list[dict], raw: object) -> dict | None:
-    """Narrow deterministic normalizer for the positional encoding: exact top-level keys
-    1..9, each value exactly {answer, reason}, ordinary answers one displayed letter of that
-    block, child answers a unique list of 0..5 displayed number strings. Anything else ->
-    None (not this encoding; the caller records nonconforming refusal). Selected values map
-    through the rendered battery labels to the same canonical option text, so scoring is
-    identical to the canonical shape."""
-    labels = positional_labels(battery)
-    if not isinstance(raw, dict) or set(raw) != set(labels):
+    """Map complete visible 1..9 blocks. Field names vary, labels do not."""
+    keyed = positional_keys(raw, battery)
+    if keyed is None:
         return None
-    row = {}
-    for number, q in enumerate(battery, 1):
-        key = str(number)
-        block = raw[key]
-        if not isinstance(block, dict) or set(block) != {"answer", "reason"}:
+    keys, shape = keyed
+    return {q["id"]: labeled_entry(q, raw[key], shape) for q, key in zip(battery, keys)}
+
+
+def normalize_answer_list(battery: list[dict], raw: object) -> dict | None:
+    """Map a list only through explicit visible question numbers or exact prompt IDs, never order."""
+    if not isinstance(raw, dict) or set(raw) != {"answers"} or not isinstance(raw["answers"], list):
+        return None
+    by_id = {}
+    for block in raw["answers"]:
+        if not isinstance(block, dict):
             return None
-        answer, reason = block["answer"], block["reason"]
-        if reason_status(reason) != "valid":
+        index_fields = [field for field in ("question", "question_number", "question_id") if field in block]
+        if len(index_fields) != 1:
             return None
-        kind, valid = labels[key]
-        if kind == "child":
-            if (not isinstance(answer, list) or len(answer) > 5
-                    or any(not isinstance(a, str) for a in answer)
-                    or len(set(answer)) != len(answer)
-                    or any(a not in valid for a in answer)):
-                return None
-            selected = [q["options"][int(a) - 1] for a in answer]
+        index = block[index_fields[0]]
+        if isinstance(index, int) and 1 <= index <= len(battery):
+            qid = battery[index - 1]["id"]
+        elif isinstance(index, str) and index in {q["id"] for q in battery}:
+            qid = index
         else:
-            if not isinstance(answer, str) or answer not in valid:
-                return None
-            selected = q["options"][ord(answer) - 65]
-        row[q["id"]] = substantive_row(selected, reason, POSITIONAL_SHAPE)
-    return row
+            continue
+        if qid in by_id:
+            return None
+        by_id[qid] = {key: value for key, value in block.items() if key != index_fields[0]}
+    return {q["id"]: (labeled_entry(q, by_id[q["id"]], ANSWER_LIST_SHAPE)
+                      if q["id"] in by_id else refused_entry(None, ANSWER_LIST_SHAPE))
+            for q in battery}
+
+
+def normalize_raw(battery: list[dict], raw: object) -> dict | None:
+    if not isinstance(raw, dict):
+        return None
+    answers, child = raw.get("answers"), raw.get("child_qualities")
+    if isinstance(answers, dict) and isinstance(child, dict):
+        row = {q["id"]: canonical_entry(q, child if q["id"] == "ChildQualities" else
+                                           answers.get(q["id"]), CANONICAL_SHAPE)
+               for q in battery}
+        return row
+    return normalize_positional(battery, raw) or normalize_answer_list(battery, raw)
 
 
 def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | None, bool]:
-    """Classify one response. Returns (row, refusal_kind, rescueable).
-
-    - (refusal_row, kind, False): no usable value despite the schema -> OBSERVED refusal, never
-      rescued. kind: 'empty_content' (empty/no content), 'no_json' (a plain-text reply with no
-      JSON object), or 'nonconforming' (parsed but structure/values outside the substantive
-      space; offending questions are refused, conforming questions keep their answers).
-    - a valid selected answer with a missing/too-long reason remains substantive and scored, but
-      gets kind 'reason_format_failure' and is retained with its raw response for qualitative audit;
-      it is never rescued.
-    - (None, None, True): clearly syntactic malformed output (an apparent JSON object that fails
-      to parse, or visibly truncated output with unbalanced braces) -> repairable, rescue once.
-    Two accepted encodings map to identical canonical selections: the schema shape
-    (answers/child_qualities objects) and the positional-labels shape (blocks 1..9 with one
-    displayed letter / 0..5 displayed numbers plus reason each). Every row entry records its
-    source_shape; shapes never affect scoring.
-    Deterministic rule: if syntactic vs substantive cannot be distinguished, it is a refusal.
-    """
+    """Classify a response without letting reason formatting change its selected answer."""
     if not (text or "").strip():
         return refusal_row(battery), "empty_content", False
     objs = re.findall(r"\{.*\}", text, re.S)
@@ -319,37 +370,12 @@ def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | Non
     try:
         raw = json.loads(objs[-1])
     except (json.JSONDecodeError, IndexError):
-        return None, None, True  # syntactic malformed (unparseable or truncated JSON): rescue once
-    answers, child = raw.get("answers"), raw.get("child_qualities")
-    if isinstance(answers, dict) and isinstance(child, dict):
-        row = {}
-        for q in battery:
-            if q["id"] == "ChildQualities":
-                selected, reason = child.get("selected"), child.get("reason")
-                if (isinstance(selected, list) and len(selected) <= 5 and len(set(selected)) == len(selected)
-                        and set(selected) <= set(q["options"])):
-                    row[q["id"]] = substantive_row(selected, reason)
-                else:
-                    row[q["id"]] = {"outcome": "refused", "selected": None, "reason": reason,
-                                     "reason_status": "not_available",
-                                     "source_shape": CANONICAL_SHAPE}
-                continue
-            answer = answers.get(q["id"])
-            selected = answer.get("selected") if isinstance(answer, dict) else None
-            reason = answer.get("reason") if isinstance(answer, dict) else None
-            if selected in q["options"]:
-                row[q["id"]] = substantive_row(selected, reason)
-            else:
-                row[q["id"]] = {"outcome": "refused", "selected": None, "reason": reason,
-                                 "reason_status": "not_available",
-                                 "source_shape": CANONICAL_SHAPE}
-    else:
-        positional = normalize_positional(battery, raw)
-        if positional is None:
-            return refusal_row(battery), "nonconforming", False
-        row = positional
-    outcomes = [v["outcome"] for v in row.values()]
-    reasons = [v["reason_status"] for v in row.values()]
+        return None, None, True
+    row = normalize_raw(battery, raw)
+    if row is None:
+        return refusal_row(battery), "nonconforming", False
+    outcomes = [value["outcome"] for value in row.values()]
+    reasons = [value["reason_status"] for value in row.values()]
     kind = ("nonconforming" if "refused" in outcomes else
             "reason_format_failure" if any(status != "valid" for status in reasons) else None)
     return row, kind, False
@@ -594,6 +620,103 @@ def prior_rows(rpath: Path, pid: str) -> dict[int, dict]:
             and record.get("protocol_id") == pid}
 
 
+def raw_shape_signature(text: str) -> str:
+    """A lossless-enough structural label for auditing endpoint serialization variation."""
+    try:
+        raw = json.loads(text)
+    except json.JSONDecodeError:
+        return "unparseable_json"
+
+    def signature(value: object) -> str:
+        if isinstance(value, dict):
+            return "{" + ",".join(f"{key}:{signature(item)}" for key, item in sorted(value.items())) + "}"
+        if isinstance(value, list):
+            values = sorted({signature(item) for item in value})
+            return "[" + ",".join(values) + "]"
+        return type(value).__name__
+    return signature(raw)
+
+
+def reprocessed_rows(rpath: Path, pid: str) -> dict[int, dict]:
+    rows = {record["packet"]: record["row"] for record in load_events(rpath)
+            if record.get("event") == "respondent_reprocessed"
+            and record.get("protocol_id") == pid}
+    if set(rows) != set(range(N_PACKETS)):
+        raise RuntimeError(f"reprocessed rows incomplete for {rpath}: {len(rows)}/{N_PACKETS}")
+    return rows
+
+
+def reprocess_existing(battery: list[dict]) -> None:
+    """Append, never overwrite, one parser-v2 event per completed packet without API calls."""
+    inventory = {"eval_version": EVAL_VERSION, "models": {}}
+    for model in MODELS:
+        rpath = OUT / "records" / model.replace("/", "__") / "packets.jsonl"
+        pid = protocol_id(model, battery)
+        events = load_events(rpath)
+        previous = [event for event in events if event.get("event") == "respondent_reprocessed"
+                    and event.get("protocol_id") == pid]
+        if previous:
+            if len(previous) != N_PACKETS or {event["packet"] for event in previous} != set(range(N_PACKETS)):
+                raise RuntimeError(f"partial reprocessing already exists for {model} under {pid}")
+            rows = {event["packet"]: event["row"] for event in previous}
+        else:
+            originals = [event for event in events if event.get("event") == "respondent_parsed"
+                         and event.get("parsed") is True]
+            if len(originals) != N_PACKETS or {event["packet"] for event in originals} != set(range(N_PACKETS)):
+                raise RuntimeError(f"expected one original parsed event per packet for {model}")
+            rows = {}
+            pending = []
+            for original in originals:
+                row, refusal_kind, rescueable = parse_packet(battery, original["text"])
+                if rescueable:
+                    row, refusal_kind = refusal_row(battery), "unparseable_json"
+                assert row is not None
+                rows[original["packet"]] = row
+                pending.append({"event": "respondent_reprocessed", "model": model,
+                                "packet": original["packet"], "seed": original["seed"],
+                                "run_id": original["run_id"], "protocol_id": pid,
+                                "eval_version": EVAL_VERSION,
+                                "source_event_recorded_at_utc": original["recorded_at_utc"],
+                                "source_protocol_id": original["protocol_id"],
+                                "source_request_id": original["request_id"],
+                                "normalizer_version": "encoding-aware-v1",
+                                "raw_serialization_shape": raw_shape_signature(original["text"]),
+                                "row": row, "refusal_kind": refusal_kind,
+                                "rescued": False})
+            for event in pending:
+                append_record(rpath, event)
+        reprocessed = [event for event in load_events(rpath)
+                       if event.get("event") == "respondent_reprocessed"
+                       and event.get("protocol_id") == pid]
+        shape_counts, raw_shape_counts, refusal_kinds = {}, {}, {}
+        for row in rows.values():
+            shapes = {value["source_shape"] for value in row.values()}
+            if len(shapes) != 1:
+                raise RuntimeError(f"reprocessed packet used mixed source shapes: {model}")
+            shape = next(iter(shapes))
+            shape_counts[shape] = shape_counts.get(shape, 0) + 1
+            for value in row.values():
+                if value["outcome"] == "refused":
+                    refusal_kinds[value["reason_status"]] = refusal_kinds.get(value["reason_status"], 0) + 1
+        for event in reprocessed:
+            shape = event["raw_serialization_shape"]
+            raw_shape_counts[shape] = raw_shape_counts.get(shape, 0) + 1
+        packet_kinds = {}
+        for event in reprocessed:
+            if event["refusal_kind"] not in (None, "reason_format_failure"):
+                kind = event["refusal_kind"]
+                packet_kinds[kind] = packet_kinds.get(kind, 0) + 1
+        inventory["models"][model] = {"protocol_id": pid, "packets": len(rows),
+                                      "canonicalization_shape_counts": shape_counts,
+                                      "raw_serialization_shape_counts": raw_shape_counts,
+                                      "residual_refused_packets": sum(packet_kinds.values()),
+                                      "residual_refusal_packet_kinds": packet_kinds,
+                                      "residual_refused_question_instances": sum(refusal_kinds.values()),
+                                      "residual_refusal_reason_status_counts": refusal_kinds}
+    atomic_json(OUT / "reprocessing_inventory.json", inventory)
+    print("reprocessing complete: appended encoding-aware rows without API calls")
+
+
 def protocol_body(model: str, battery: list[dict]) -> dict:
     return {
         "schema": 1, "eval_version": EVAL_VERSION, "model": model,
@@ -779,7 +902,7 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     # identity: v2 everywhere; protocol/cache identity includes accepted response encodings
     assert EVAL_VERSION == "wvs-respondent-packet-v2"
     body = protocol_body(MODELS[0], battery)
-    assert body["accepted_response_encodings"] == ["canonical_schema", "positional_labels"]
+    assert body["accepted_response_encodings"] == list(ACCEPTED_ENCODINGS)
     assert body["eval_version"] == EVAL_VERSION
     # fixture: visible prompt contains no refusal/null/AI-identity language
     prompt = render_packet(battery).lower()
@@ -920,8 +1043,41 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     assert pos_row["ChildQualities"]["selected"] == [child_opts[0], child_opts[1],
                                                         child_opts[5], child_opts[7],
                                                         child_opts[9]]
-    # fixture: positional ambiguity rejections. Each mutation must yield None (not this
-    # encoding), never a guessed mapping.
+    # fixture: endpoint serialization variants preserve the visible labels, not guessed meaning.
+    # These are the observed q1..q9, numbered-prefix, and explicit-index list encodings.
+    q_blocks = {f"q{number}": {"choice": raw_positional[str(number)]["answer"],
+                                  "reason": raw_positional[str(number)]["reason"]}
+                for number in range(1, 9)}
+    q_blocks["q9"] = {"choices": [int(value) for value in raw_positional["9"]["answer"]],
+                       "reason": raw_positional["9"]["reason"]}
+    q_row, q_kind, _ = parse_packet(battery, json.dumps(q_blocks))
+    assert q_kind is None and all(value["outcome"] == "substantive" for value in q_row.values())
+    assert {value["source_shape"] for value in q_row.values()} == {Q_POSITIONAL_SHAPE}
+    prefix_blocks = {f"{number}_visible_label": {"option": raw_positional[str(number)]["answer"],
+                                                    "reason": raw_positional[str(number)]["reason"]}
+                     for number in range(1, 9)}
+    prefix_blocks["9_visible_label"] = {"options": [int(value) for value in raw_positional["9"]["answer"]],
+                                         "reason": raw_positional["9"]["reason"]}
+    prefix_row, prefix_kind, _ = parse_packet(battery, json.dumps(prefix_blocks))
+    assert prefix_kind is None and all(value["outcome"] == "substantive" for value in prefix_row.values())
+    assert {value["source_shape"] for value in prefix_row.values()} == {PREFIX_POSITIONAL_SHAPE}
+    answer_list = {"answers": [{"question_id": number,
+                                 "selected_option": raw_positional[str(number)]["answer"],
+                                 "reason": raw_positional[str(number)]["reason"]}
+                                for number in range(1, 9)] +
+                   [{"question_id": 9, "selected_options": [int(value) for value in raw_positional["9"]["answer"]],
+                     "reason": raw_positional["9"]["reason"]}]}
+    list_row, list_kind, _ = parse_packet(battery, json.dumps(answer_list))
+    assert list_kind is None and all(value["outcome"] == "substantive" for value in list_row.values())
+    assert {value["source_shape"] for value in list_row.values()} == {ANSWER_LIST_SHAPE}
+    duplicate_index = json.loads(json.dumps(answer_list))
+    duplicate_index["answers"][1]["question_id"] = 1
+    assert normalize_answer_list(battery, duplicate_index) is None
+    unknown_index = json.loads(json.dumps(answer_list))
+    unknown_index["answers"][4]["question_id"] = "Trust in people"
+    unknown_row = normalize_answer_list(battery, unknown_index)
+    assert unknown_row is not None and unknown_row["dealing with people?"]["outcome"] == "refused"
+    # fixture: positional ambiguity rejections. No invalid or ambiguous label becomes substantive.
     def mutate(block_key, field, value):
         mutated = json.loads(json.dumps(raw_positional))
         if block_key not in mutated:
@@ -946,15 +1102,17 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
         mutate("9", "answer", ["1", "1"]),
         mutate("9", "answer", ["0"]),
         mutate("9", "answer", ["12"]),
-        mutate("9", "answer", [1, 2]),
         mutate("9", "answer", ["1", "2", "3", "4", "5", "6"]),
-        mutate("1", "reason", "These nine separate words exceed the permitted reason length now"),
-        mutate("1", "reason", ""),
-        mutate("2", "reason", None),
         mutate("3", "__extra_block_key__", ("confidence", "high")),
     ]
     for i, bad in enumerate(rejections):
-        assert normalize_positional(battery, bad) is None, f"rejection fixture {i} mapped"
+        rejected = normalize_positional(battery, bad)
+        assert rejected is None or any(value["outcome"] == "refused" for value in rejected.values()), (
+            f"rejection fixture {i} mapped to substantive answers")
+    long_reason = mutate("1", "reason", "These nine separate words exceed the permitted reason length now")
+    long_row = normalize_positional(battery, long_reason)
+    assert long_row is not None and long_row["Religion"]["outcome"] == "substantive"
+    assert long_row["Religion"]["reason_status"] == "too_long"
     # fixture: duplicate / oversized child lists are nonconforming (uniqueness enforced in parsing,
     # since Alibaba rejects array schemas with the uniqueness keyword)
     dup_row, dup_kind, rescueable = parse_packet(battery, json.dumps(
@@ -1356,6 +1514,7 @@ def main() -> None:
     actions.add_argument("--write-manifest", action="store_true")
     actions.add_argument("--paid-smoke", action="store_true")
     actions.add_argument("--reinterpret-smoke", action="store_true")
+    actions.add_argument("--reprocess-existing", action="store_true")
     actions.add_argument("--run", action="store_true")
     actions.add_argument("--analyze", action="store_true")
     actions.add_argument("--synthetic-analysis-test", action="store_true")
@@ -1385,6 +1544,8 @@ def main() -> None:
         paid_smoke(args.smoke_model, battery)
     if args.reinterpret_smoke:
         reinterpret_smoke_35plus(battery)
+    if args.reprocess_existing:
+        reprocess_existing(battery)
     if args.run:
         run(battery)
     if args.analyze:
@@ -1795,7 +1956,7 @@ def analyze_real() -> None:
     packet_rows = {}
     for m in MODELS:
         rpath = OUT / "records" / m.replace("/", "__") / "packets.jsonl"
-        packet_rows[m] = prior_rows(rpath, protocol_id(m, battery))
+        packet_rows[m] = reprocessed_rows(rpath, protocol_id(m, battery))
     analysis = analyze_from_data(packet_rows, battery, child_rows, resolved)
     atomic_json(OUT / "analysis.json", analysis)
     print(json.dumps({"packet": {k: analysis["packet"][k]

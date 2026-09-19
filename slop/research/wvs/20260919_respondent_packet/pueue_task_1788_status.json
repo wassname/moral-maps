@@ -1,0 +1,18 @@
+{
+  "id": 1788,
+  "command": "scripts/wvs_api/10_respondent_packet_v2_panel.sh",
+  "path": "/workspace/2026/lite/moralmaps",
+  "group": "api",
+  "label": "why: compare human-format respondent packets with dense WVS on four Qwen Plus releases; resolve: audit uncertainty, refusals, family scatter and release trend without publishing",
+  "status": {
+    "Done": {
+      "enqueued_at": "2026-09-19T18:22:06.767920870+08:00",
+      "start": "2026-09-19T18:22:06.906420644+08:00",
+      "end": "2026-09-19T19:13:42.808979385+08:00",
+      "result": "Success"
+    }
+  },
+  "clean_log": "pueue_task_1788_clean.log",
+  "clean_log_lines": 1,
+  "raw_log_bytes": 15
+}
