@@ -442,6 +442,7 @@ async def budgeted_request(model: str, payload: dict) -> dict:
 def append_record(rpath: Path, record: dict) -> None:
     record["eval_version"] = EVAL_VERSION
     record["recorded_at_utc"] = datetime.now(UTC).isoformat()
+    rpath.parent.mkdir(parents=True, exist_ok=True)  # panel writes per-model subdirs
     with rpath.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(record, ensure_ascii=True, sort_keys=True) + "\n")
         fh.flush()
@@ -899,6 +900,13 @@ def offline_regression(battery: list[dict]) -> None:
             continue
         assert migrated[key] == value, f"migration changed numeric field {key}"
     assert migrate_ledger(migrated) == migrated, "migration must be idempotent"
+    # fixture: append_record creates missing per-model record subdirs (the 1798 panel crash)
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        nested = Path(tmp) / "records" / "qwen__test" / "packets.jsonl"
+        append_record(nested, {"event": "run_started", "protocol_id": "test"})
+        stored = json.loads(nested.read_text().splitlines()[0])
+        assert stored["eval_version"] == EVAL_VERSION and stored["protocol_id"] == "test"
     print("offline regression passed: opt-in guard, mis-patch defense, CLI refusal check, "
           "dotenv paid-path gating, and ledger migration all hold")
 
