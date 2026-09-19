@@ -278,10 +278,13 @@
       }
     }
   },
-  "schema": 2,
+  "schema": 3,
   "sensitivity_fixed_item_sets": {
     "cov25": {
       "dense_normal_high": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.09168224007738288,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.40776014109347436,
@@ -304,11 +307,38 @@
             0.661552028218695
           ]
         },
+        "delta_vs_reference": {
+          "delta_95": [
+            -0.049495950486881775,
+            0.012848903001074522
+          ],
+          "delta_mean": -0.016472530515621458,
+          "delta_sd": 0.016112729833657895,
+          "p_delta_gt_0": 0.158,
+          "pairing": "independent (protocols not pairable)",
+          "reference": "dense_normal_minimum"
+        },
+        "noise_floor_95": [
+          0.0074867466041089025,
+          0.036994437064764026
+        ],
+        "noise_floor_mean": 0.01956247640317524,
+        "noise_floor_sd": 0.007791416399010727,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.09374605926987896,
+        "rmse_point": 0.09374605926987896,
+        "rmse_resample_95": [
+          0.07548872292113454,
+          0.11457521153920193
+        ],
+        "rmse_resample_se": 0.010208166746957629,
         "slope_x_per_year": -0.012891078161264849,
         "slope_y_per_year": -0.0989300777864456
       },
       "dense_normal_minimum": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.10928444345811475,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.6434413580246913,
@@ -331,7 +361,20 @@
             0.6769761103094437
           ]
         },
+        "noise_floor_95": [
+          0.006525321793365313,
+          0.03397810983248242
+        ],
+        "noise_floor_mean": 0.017171231731496765,
+        "noise_floor_sd": 0.00711383237421202,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.11062522669412543,
+        "rmse_point": 0.11062522669412543,
+        "rmse_resample_95": [
+          0.09210206960090721,
+          0.12961977188903903
+        ],
+        "rmse_resample_se": 0.009847282494893162,
         "slope_x_per_year": -0.3918383833725489,
         "slope_y_per_year": -0.0036253479507921704
       },
@@ -355,6 +398,9 @@
         "Traditional <-> Secular-Rational": 5
       },
       "original_choice": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.1657650427262316,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.9375,
@@ -377,13 +423,45 @@
             0.9083333333333334
           ]
         },
+        "delta_vs_reference": {
+          "delta_95": [
+            0.025486817408374655,
+            0.09364267224757597
+          ],
+          "delta_mean": 0.06060234467260996,
+          "delta_sd": 0.016905980881939116,
+          "p_delta_gt_0": 1.0,
+          "pairing": "independent (protocols not pairable)",
+          "reference": "dense_normal_minimum"
+        },
+        "noise_floor_95": [
+          0.014307036487928778,
+          0.06219904060098702
+        ],
+        "noise_floor_mean": 0.03344330707793151,
+        "noise_floor_sd": 0.012244779458388698,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.16910500932360994,
+        "rmse_paired_bootstrap_95": [
+          0.14629824822987125,
+          0.19596296365294413
+        ],
+        "rmse_paired_bootstrap_se": 0.01222835238346561,
+        "rmse_point": 0.16910500932360994,
+        "rmse_resample_95": [
+          0.1438421309018332,
+          0.19796736457756356
+        ],
+        "rmse_resample_se": 0.013905561509386736,
         "slope_x_per_year": -0.7221633278414168,
         "slope_y_per_year": 0.13230329671184193
       }
     },
     "cov50": {
       "dense_normal_high": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.17300224280335424,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.5380952380952381,
@@ -406,11 +484,38 @@
             0.661552028218695
           ]
         },
+        "delta_vs_reference": {
+          "delta_95": [
+            0.008241050772593095,
+            0.09146428788046454
+          ],
+          "delta_mean": 0.04617901638579465,
+          "delta_sd": 0.02147937129329059,
+          "p_delta_gt_0": 0.992,
+          "pairing": "independent (protocols not pairable)",
+          "reference": "dense_normal_minimum"
+        },
+        "noise_floor_95": [
+          0.007961109735249565,
+          0.046249988196655836
+        ],
+        "noise_floor_mean": 0.02316126631322576,
+        "noise_floor_sd": 0.010177723976407678,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.1745457540939421,
+        "rmse_point": 0.1745457540939421,
+        "rmse_resample_95": [
+          0.15538943592350235,
+          0.20370492492140516
+        ],
+        "rmse_resample_se": 0.012180378527940329,
         "slope_x_per_year": -0.2189997556490904,
         "slope_y_per_year": -0.0989300777864456
       },
       "dense_normal_minimum": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.12150004438708444,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.711111111111111,
@@ -433,7 +538,20 @@
             0.6769761103094437
           ]
         },
+        "noise_floor_95": [
+          0.008548613012531308,
+          0.07405940678720917
+        ],
+        "noise_floor_mean": 0.03309830045242646,
+        "noise_floor_sd": 0.01711139337989816,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.12592759141229765,
+        "rmse_point": 0.12592759141229765,
+        "rmse_resample_95": [
+          0.08961440908509812,
+          0.1593281762193986
+        ],
+        "rmse_resample_se": 0.01831146051837376,
         "slope_x_per_year": -0.40806802305431017,
         "slope_y_per_year": -0.0036253479507921704
       },
@@ -455,6 +573,9 @@
         "Traditional <-> Secular-Rational": 5
       },
       "original_choice": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.25978574415522504,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.9791666666666666,
@@ -477,66 +598,41 @@
             0.9083333333333334
           ]
         },
+        "delta_vs_reference": {
+          "delta_95": [
+            0.08199882436446147,
+            0.19349022000149343
+          ],
+          "delta_mean": 0.13852258032129577,
+          "delta_sd": 0.029169390082220047,
+          "p_delta_gt_0": 1.0,
+          "pairing": "independent (protocols not pairable)",
+          "reference": "dense_normal_minimum"
+        },
+        "noise_floor_95": [
+          0.017691749690102194,
+          0.10212712156565884
+        ],
+        "noise_floor_mean": 0.04890290360069082,
+        "noise_floor_sd": 0.022080674025025386,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.2643484950720592,
+        "rmse_paired_bootstrap_95": [
+          0.23029070563444518,
+          0.30357532811512344
+        ],
+        "rmse_paired_bootstrap_se": 0.01960146980262049,
+        "rmse_point": 0.2643484950720592,
+        "rmse_resample_95": [
+          0.2177686565930083,
+          0.3116048186439187
+        ],
+        "rmse_resample_se": 0.023105545746474533,
         "slope_x_per_year": -0.8339691792184623,
         "slope_y_per_year": 0.13230329671184193
       }
     },
     "cov75": {
-      "dense_normal_high": {
-        "coords_xy_per_model": {
-          "google/gemini-3-flash-preview": [
-            NaN,
-            0.7365039281705948
-          ],
-          "google/gemini-3.5-flash": [
-            NaN,
-            0.694352252685586
-          ],
-          "google/gemini-3.6-flash": [
-            NaN,
-            0.6945206028539362
-          ],
-          "google/gemini-3.7-flash": [
-            NaN,
-            0.6669552669552671
-          ],
-          "google/gemini-3.8-flash": [
-            NaN,
-            0.661552028218695
-          ]
-        },
-        "rmse_2d": NaN,
-        "slope_x_per_year": NaN,
-        "slope_y_per_year": -0.0989300777864456
-      },
-      "dense_normal_minimum": {
-        "coords_xy_per_model": {
-          "google/gemini-3-flash-preview": [
-            NaN,
-            0.6795634920634921
-          ],
-          "google/gemini-3.5-flash": [
-            NaN,
-            0.624968734968735
-          ],
-          "google/gemini-3.6-flash": [
-            NaN,
-            0.6437301587301588
-          ],
-          "google/gemini-3.7-flash": [
-            NaN,
-            0.6824835658168993
-          ],
-          "google/gemini-3.8-flash": [
-            NaN,
-            0.6769761103094437
-          ]
-        },
-        "rmse_2d": NaN,
-        "slope_x_per_year": NaN,
-        "slope_y_per_year": -0.0036253479507921704
-      },
       "items": {
         "Survival <-> Self-expression": [],
         "Traditional <-> Secular-Rational": [
@@ -552,36 +648,14 @@
         "Survival <-> Self-expression": 0,
         "Traditional <-> Secular-Rational": 5
       },
-      "original_choice": {
-        "coords_xy_per_model": {
-          "google/gemini-3-flash-preview": [
-            NaN,
-            0.8
-          ],
-          "google/gemini-3.5-flash": [
-            NaN,
-            0.6805555555555556
-          ],
-          "google/gemini-3.6-flash": [
-            NaN,
-            0.7444444444444445
-          ],
-          "google/gemini-3.7-flash": [
-            NaN,
-            0.9
-          ],
-          "google/gemini-3.8-flash": [
-            NaN,
-            0.9083333333333334
-          ]
-        },
-        "rmse_2d": NaN,
-        "slope_x_per_year": NaN,
-        "slope_y_per_year": 0.13230329671184193
-      }
+      "reason": "an axis has no items meeting the rule; coordinates need both axes, so no fit or bootstrap is computed",
+      "status": "unavailable"
     },
     "nonzero": {
       "dense_normal_high": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.05026158696903425,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.4495943562610229,
@@ -604,11 +678,38 @@
             0.661552028218695
           ]
         },
+        "delta_vs_reference": {
+          "delta_95": [
+            -0.027749413335473143,
+            0.006974012441289451
+          ],
+          "delta_mean": -0.009936400105088592,
+          "delta_sd": 0.0090212190780167,
+          "p_delta_gt_0": 0.133,
+          "pairing": "independent (protocols not pairable)",
+          "reference": "dense_normal_minimum"
+        },
+        "noise_floor_95": [
+          0.006043292073478365,
+          0.024312060653168297
+        ],
+        "noise_floor_mean": 0.013657202614774922,
+        "noise_floor_sd": 0.004731731022323938,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.05208403121789642,
+        "rmse_point": 0.05208403121789642,
+        "rmse_resample_95": [
+          0.04310434591212797,
+          0.06450458265127554
+        ],
+        "rmse_resample_se": 0.0055389036293576905,
         "slope_x_per_year": 0.03264101067017449,
         "slope_y_per_year": -0.0989300777864456
       },
       "dense_normal_minimum": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.06163790434786132,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.6170217569786536,
@@ -631,7 +732,20 @@
             0.6769761103094437
           ]
         },
+        "noise_floor_95": [
+          0.004918974538670392,
+          0.02114322212925259
+        ],
+        "noise_floor_mean": 0.011556062623314087,
+        "noise_floor_sd": 0.004195235568165913,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.06271183170463177,
+        "rmse_point": 0.06271183170463177,
+        "rmse_resample_95": [
+          0.05023881806509953,
+          0.07496775245550436
+        ],
+        "rmse_resample_se": 0.006291698481741149,
         "slope_x_per_year": -0.2368815371407787,
         "slope_y_per_year": -0.0036253479507921704
       },
@@ -657,6 +771,9 @@
         "Traditional <-> Secular-Rational": 5
       },
       "original_choice": {
+        "between_release_caveat": "n=5 releases with 3 residual dof per axis; the noise correction is itself noisy and is reported as indicative only",
+        "between_release_estimate_stable": false,
+        "between_release_rmse_after_noise": 0.11965073196174088,
         "coords_xy_per_model": {
           "google/gemini-3-flash-preview": [
             0.9125,
@@ -679,7 +796,36 @@
             0.9083333333333334
           ]
         },
+        "delta_vs_reference": {
+          "delta_95": [
+            0.03757390215963283,
+            0.08695287256192523
+          ],
+          "delta_mean": 0.06278806064105323,
+          "delta_sd": 0.012654976335905763,
+          "p_delta_gt_0": 1.0,
+          "pairing": "independent (protocols not pairable)",
+          "reference": "dense_normal_minimum"
+        },
+        "noise_floor_95": [
+          0.013689670850865065,
+          0.049755614583820065
+        ],
+        "noise_floor_mean": 0.02924560309197083,
+        "noise_floor_sd": 0.009262464573030635,
+        "p_noise_floor_exceeds_observed": 0.0,
         "rmse_2d": 0.12317306101251788,
+        "rmse_paired_bootstrap_95": [
+          0.10633676492867206,
+          0.14611354386500705
+        ],
+        "rmse_paired_bootstrap_se": 0.010343581618709716,
+        "rmse_point": 0.12317306101251788,
+        "rmse_resample_95": [
+          0.10450764682679538,
+          0.14693352417000966
+        ],
+        "rmse_resample_se": 0.011238734793854599,
         "slope_x_per_year": -0.6061984096087086,
         "slope_y_per_year": 0.13230329671184193
       }

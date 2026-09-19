@@ -49,12 +49,16 @@ All-items release OLS (exploratory, not a prediction test): x slope -0.6062/year
 
 The all-items comparison changed the estimand: original-choice 3.7/3.8 Y coordinates omit God and Abortion (zero coverage) while the dense comparators use the full item sets, and different releases omit different items. The corrected comparison fixes one item set per coverage rule, applied to ALL five original-choice releases simultaneously, and recomputes both dense `normal_minimum` and `normal_high` comparators on exactly the same items. Original-choice coverage thresholds are on the substantive-answer fraction; dense comparators have 6/6 valid samples on every item.
 
-| rule | X items | Y items | original RMSE | dense min RMSE | dense high RMSE |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| common nonzero coverage | 5 | 5 | 0.1232 | 0.0627 | 0.0521 |
-| >= 25% per-model coverage | 3 | 5 | 0.1691 | 0.1106 | 0.0937 |
-| >= 50% per-model coverage | 1 | 5 | 0.2643 | 0.1259 | 0.1745 |
-| >= 75% per-model coverage | 0 | 0 | undefined (no common items) | | |
+| rule | X items | Y items | original RMSE (SE) | dense min RMSE (SE) | dense high RMSE (SE) | orig-vs-min delta (95%) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| common nonzero coverage | 5 | 5 | 0.1232 (0.0112) | 0.0627 (0.0063) | 0.0521 (0.0055) | +0.0628 [0.0376, 0.0870], p(>0)=1.000 |
+| >= 25% per-model coverage | 3 | 5 | 0.1691 (0.0139) | 0.1106 (0.0098) | 0.0937 (0.0102) | +0.0606 [0.0255, 0.0936], p(>0)=1.000 |
+| >= 50% per-model coverage | 1 | 5 | 0.2643 (0.0231) | 0.1259 (0.0183) | 0.1745 (0.0122) | +0.1385 [0.0820, 0.1935], p(>0)=1.000 |
+| >= 75% per-model coverage | 0 | 5 | unavailable | unavailable | unavailable | unavailable |
+
+Uncertainty method: for each protocol and rule, 1,000 response-resampling draws of the release coordinates. Original choice has two variants: the paired within-protocol bootstrap (one shared sample-index draw per release pair) and independent per-release resampling. The dense comparators are bootstrapped by resampling their 6 rating vectors per item (their per-model seed schedules are not pairable with the original 24-sample schedule, so original-minus-dense deltas subtract INDEPENDENT draws; this is stated in `analysis.json`). The >= 75% rule is emitted as an explicit `unavailable` entry with no mean/polyfit call, so no empty-array RuntimeWarning.
+
+Noise floor (does the scatter survive sampling uncertainty?): under H0 of no between-release differences, each release's coordinates were drawn from N(0, diag(per-release response-sampling SD)) and the release-date OLS RMSE recomputed (2,000 draws). Observed versus floor: original 0.1232 vs 0.0292 (95% [0.0137, 0.0498]); dense min 0.0627 vs 0.0116; dense high 0.0521 vs 0.0137 (common nonzero rule). P(noise floor >= observed) = 0.000 for every protocol and rule. Estimated between-release RMSE after subtracting the noise floor: original 0.1197, dense min 0.0612, dense high 0.0502. With n=5 releases (3 residual dof per axis) this variance decomposition is itself unstable and is reported as indicative only; the robust statement is that BOTH protocols show real between-release differences (observed scatter far above their own response-noise floors), and the original-choice estimator's excess over dense survives its own noisier one-hot N=24 estimator: the delta CI excludes zero under every comparable rule.
 
 Item membership per rule (common nonzero): X = {Homosexuality, trust, petition, demonstrations, boycotts}; Y = {Religion, Obedience, Independence, Determination, Imagination}. cov25 drops Homosexuality and trust from X; cov50 keeps only Signing a petition in X. Full coordinates and slopes per rule are in `analysis.json` (`sensitivity_fixed_item_sets`).
 

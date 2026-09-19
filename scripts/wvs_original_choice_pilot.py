@@ -858,6 +858,93 @@ def coords_on_items(per_item: dict[str, dict[str, np.ndarray]], resolved: dict,
             "slope_x_per_year": slopes[0], "slope_y_per_year": slopes[1], "rmse_2d": rmse2}
 
 
+def bootstrap_coords(per_item: dict[str, dict[str, list[np.ndarray]]], resolved: dict,
+                     item_ids: set[str], paired: bool, B: int = 1000) -> np.ndarray:
+    """(B, 5, 2) coordinate draws under response resampling.
+
+    paired=True resamples the shared sample index once per draw for all five releases (within-protocol
+    pairing); paired=False resamples each release independently."""
+    x = release_years()
+    n = len(next(iter(per_item[MODELS[0]].values())))
+    rng = np.random.default_rng(11)
+    out = np.empty((B, len(MODELS), 2))
+    for b in range(B):
+        shared = rng.integers(0, n, n)
+        for k, m in enumerate(MODELS):
+            idx = shared if paired else rng.integers(0, n, n)
+            xy = []
+            for axis in (X_AXIS, Y_AXIS):
+                vals = [positiveness(np.mean([per_item[m][it["suffix"]][j] for j in idx], axis=0)[None, :],
+                                     it["pole_idx"], it["n"])
+                        for it in resolved[axis] if it["suffix"] in item_ids]
+                xy.append(float(np.mean(vals)))
+            out[b, k] = xy
+    return out
+
+
+def rmse_of(coord_draws: np.ndarray) -> np.ndarray:
+    """Release-date 2D residual RMSE for each (B, 5, 2) coordinate draw."""
+    x = release_years()
+    out = np.empty(coord_draws.shape[0])
+    for b, ys in enumerate(coord_draws):
+        preds = []
+        for k in range(2):
+            slope, intercept = np.polyfit(x, ys[:, k], 1)
+            preds.append(slope * x + intercept)
+        out[b] = np.sqrt(np.mean(np.sum((ys - np.column_stack(preds)) ** 2, axis=1)))
+    return out
+
+
+def noise_floor_rmse(coord_ses: np.ndarray, B: int = 2000) -> np.ndarray:
+    """RMSE distribution when releases differ only by response-sampling noise (H0: no between-release
+    differences). Each release's coordinates are drawn from N(0, diag(response_sd)) in the OLS-shift-
+    invariant frame; the observed RMSE should far exceed this floor if release differences are real.
+    With n=5 (3 residual dof) this floor is itself noisy: treat it as indicative, not a stable
+    variance-components estimate."""
+    x = release_years()
+    rng = np.random.default_rng(13)
+    out = np.empty(B)
+    for b in range(B):
+        ys = np.array([rng.normal(0.0, coord_ses[k]) for k in range(len(MODELS))])
+        preds = []
+        for k in range(2):
+            slope, intercept = np.polyfit(x, ys[:, k], 1)
+            preds.append(slope * x + intercept)
+        out[b] = np.sqrt(np.mean(np.sum((ys - np.column_stack(preds)) ** 2, axis=1)))
+    return out
+
+
+def summarize_rmse(point: float, paired_rmse: np.ndarray | None, indep_rmse: np.ndarray,
+                   noise: np.ndarray, reference: dict | None = None) -> dict:
+    entry = {
+        "rmse_point": point,
+        "rmse_resample_se": float(np.std(indep_rmse)),
+        "rmse_resample_95": [float(v) for v in np.percentile(indep_rmse, [2.5, 97.5])],
+        "noise_floor_mean": float(np.mean(noise)),
+        "noise_floor_sd": float(np.std(noise)),
+        "noise_floor_95": [float(v) for v in np.percentile(noise, [2.5, 97.5])],
+        "p_noise_floor_exceeds_observed": float(np.mean(noise >= point)),
+        "between_release_rmse_after_noise": float(np.sqrt(max(point ** 2 - float(np.mean(noise)) ** 2, 0.0))),
+        "between_release_estimate_stable": False,
+        "between_release_caveat": ("n=5 releases with 3 residual dof per axis; the noise correction "
+                                   "is itself noisy and is reported as indicative only"),
+    }
+    if paired_rmse is not None:
+        entry["rmse_paired_bootstrap_se"] = float(np.std(paired_rmse))
+        entry["rmse_paired_bootstrap_95"] = [float(v) for v in np.percentile(paired_rmse, [2.5, 97.5])]
+    if reference is not None:
+        # protocols differ in sample count (24 one-hot vs 6 rating vectors) and design, so original
+        # and dense bootstrap draws are INDEPENDENT, not pairable; the delta subtracts independent draws.
+        delta = indep_rmse - reference["indep_rmse"]
+        entry["delta_vs_reference"] = {
+            "reference": reference["name"], "pairing": "independent (protocols not pairable)",
+            "delta_mean": float(np.mean(delta)), "delta_sd": float(np.std(delta)),
+            "delta_95": [float(v) for v in np.percentile(delta, [2.5, 97.5])],
+            "p_delta_gt_0": float(np.mean(delta > 0)),
+        }
+    return entry
+
+
 def sensitivity(items: list[dict], child_rows: list[dict], resolved: dict,
                summaries: dict[str, dict]) -> dict:
     """Release fits on fixed common item sets (coverage rule applied to ALL five original-choice
@@ -875,15 +962,59 @@ def sensitivity(items: list[dict], child_rows: list[dict], resolved: dict,
         keep = [s for s in all_suffixes
                 if all(sum(v.sum() > 0 for v in orig[m][s]) / len(orig[m][s]) > threshold
                        for m in MODELS)]
+        if not keep:
+            out[rule] = {"min_per_model_coverage": threshold, "n_items": {"X": 0, "Y": 0},
+                         "status": "unavailable",
+                         "reason": ("no item meets the coverage rule for all five releases; "
+                                    "no coordinates, fit, or bootstrap computed (no empty-array "
+                                    "mean/polyfit calls)")}
+            continue
+        if not keep:
+            out[rule] = {"min_per_model_coverage": threshold, "n_items": {"X": 0, "Y": 0},
+                         "status": "unavailable",
+                         "reason": ("no item meets the coverage rule for all five releases; "
+                                    "no coordinates, fit, or bootstrap computed (no empty-array "
+                                    "mean/polyfit calls)")}
+            continue
         keep = set(keep)
         counts = {axis: sorted(it["suffix"] for it in resolved[axis] if it["suffix"] in keep)
                   for axis in (X_AXIS, Y_AXIS)}
+        if not counts[X_AXIS] or not counts[Y_AXIS]:
+            out[rule] = {"min_per_model_coverage": threshold, "items": counts,
+                         "n_items": {axis: len(counts[axis]) for axis in (X_AXIS, Y_AXIS)},
+                         "status": "unavailable",
+                         "reason": ("an axis has no items meeting the rule; coordinates need both "
+                                    "axes, so no fit or bootstrap is computed")}
+            continue
+        orig_k = {m: {s: orig[m][s] for s in keep} for m in MODELS}
+        dense_min_k = {m: {s: v for s, v in dense_min[m].items() if s in keep} for m in MODELS}
+        dense_high_k = {m: {s: v for s, v in dense_high[m].items() if s in keep} for m in MODELS}
+        orig_point = coords_on_items(orig_k, resolved, keep)
+        dense_min_point = coords_on_items(dense_min_k, resolved, keep)
+        dense_high_point = coords_on_items(dense_high_k, resolved, keep)
+        # response-sampling draws: paired (shared index across releases) and independent per release
+        orig_paired = rmse_of(bootstrap_coords(orig_k, resolved, keep, paired=True))
+        orig_indep = bootstrap_coords(orig_k, resolved, keep, paired=False)
+        dense_min_indep = bootstrap_coords(dense_min_k, resolved, keep, paired=False)
+        dense_high_indep = bootstrap_coords(dense_high_k, resolved, keep, paired=False)
+        orig_rmse_indep = rmse_of(orig_indep)
+        dense_min_rmse_indep = rmse_of(dense_min_indep)
+        dense_high_rmse_indep = rmse_of(dense_high_indep)
+        # noise floors: response-sampling SD per release per axis (from independent draws)
+        orig_noise = noise_floor_rmse(orig_indep.std(axis=0))
+        dense_min_noise = noise_floor_rmse(dense_min_indep.std(axis=0))
+        dense_high_noise = noise_floor_rmse(dense_high_indep.std(axis=0))
         out[rule] = {"min_per_model_coverage": threshold,
                      "items": counts,
                      "n_items": {axis: len(counts[axis]) for axis in (X_AXIS, Y_AXIS)},
-                     "original_choice": coords_on_items(orig, resolved, keep),
-                     "dense_normal_minimum": coords_on_items(dense_min, resolved, keep),
-                     "dense_normal_high": coords_on_items(dense_high, resolved, keep)}
+                     "original_choice": orig_point | summarize_rmse(
+                         orig_point["rmse_2d"], orig_paired, orig_rmse_indep, orig_noise,
+                         {"name": "dense_normal_minimum", "indep_rmse": dense_min_rmse_indep}),
+                     "dense_normal_minimum": dense_min_point | summarize_rmse(
+                         dense_min_point["rmse_2d"], None, dense_min_rmse_indep, dense_min_noise),
+                     "dense_normal_high": dense_high_point | summarize_rmse(
+                         dense_high_point["rmse_2d"], None, dense_high_rmse_indep, dense_high_noise,
+                         {"name": "dense_normal_minimum", "indep_rmse": dense_min_rmse_indep})}
     return out
 
 
@@ -945,8 +1076,9 @@ def analyze() -> None:
                   for item_id, stats in summaries[m]["per_question"].items()} for m in MODELS}
     coverage = {m: {item_id: stats["coverage"]
                     for item_id, stats in summaries[m]["per_question"].items()} for m in MODELS}
+    sensitivity_out = sensitivity(items, child_rows, resolved, summaries)
     atomic_json(OUT / "analysis.json", {
-        "schema": 2,
+        "schema": 3,
         "status_labels": {
             "gemini-3-flash-preview": "preregistered", "google/gemini-3.5-flash": "preregistered",
             "google/gemini-3.6-flash": "preregistered", "google/gemini-3.7-flash": "smoke-then-preregistered-panel",
@@ -954,18 +1086,23 @@ def analyze() -> None:
         "note": ("the all-items five-release fit below is therefore NOT a preregistered prediction "
                  "test; preregistered claims are per-release P1/P2 only"),
         "fits_all_items_exploratory": fits,
-        "sensitivity_fixed_item_sets": sensitivity(items, child_rows, resolved, summaries),
+        "sensitivity_fixed_item_sets": sensitivity_out,
         "position_contrast": position_contrast(items),
         "cannot_answer_rate_per_model": {m: sum(cannot[m].values()) / len(cannot[m]) for m in MODELS},
         "cannot_answer_rate_per_question_per_model": cannot,
         "coverage_per_question_per_model": coverage,
     })
     print(json.dumps({"all_items": fits["point"],
-                      "sensitivity": {k: {"n_items": v["n_items"],
-                                          "orig_rmse": v["original_choice"]["rmse_2d"],
-                                          "dense_min_rmse": v["dense_normal_minimum"]["rmse_2d"],
-                                          "dense_high_rmse": v["dense_normal_high"]["rmse_2d"]}
-                                      for k, v in sensitivity(items, child_rows, resolved, summaries).items()}},
+                      "sensitivity": {k: ({"n_items": v["n_items"],
+                                           "orig_rmse": v["original_choice"]["rmse_2d"],
+                                           "orig_rmse_se": v["original_choice"]["rmse_paired_bootstrap_se"],
+                                           "orig_noise_floor_95": v["original_choice"]["noise_floor_95"],
+                                           "orig_p_noise": v["original_choice"]["p_noise_floor_exceeds_observed"],
+                                           "delta_vs_dense_min": v["original_choice"]["delta_vs_reference"],
+                                           "dense_min_rmse": v["dense_normal_minimum"]["rmse_2d"],
+                                           "dense_high_rmse": v["dense_normal_high"]["rmse_2d"]}
+                                          if "original_choice" in v else v)
+                                      for k, v in sensitivity_out.items()}},
                      indent=2))
 
 
