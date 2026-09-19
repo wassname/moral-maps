@@ -103,7 +103,7 @@
       "question": "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important? Please choose up to five."
     }
   ],
-  "created_utc": "2026-09-19T06:05:06.365605+00:00",
+  "created_utc": "2026-09-19T08:32:07.352491+00:00",
   "endpoint_provenance": "endpoints and pricing from the authenticated 2026-09-18 snapshot; the unauthenticated live models GET returns endpoints=null, so the paid smoke is the current live route test",
   "eval_version": "wvs-respondent-packet-v2",
   "instrument_status": "GlobalOpinionQA-compatible approximation; 11th quality Religious faith appended; card order not recorded in source",
@@ -161,11 +161,279 @@
   ],
   "n_packets": 128,
   "not_published": true,
+  "packet_prompt": "You are one person answering a social values survey. Answer every question as yourself, in order: choose the listed answer first, then give its short reason.\n\n1. For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all\n\nReligion\n   A. Very important\n   B. Rather important\n   C. Not very important\n   D. Not at all important\nChoose exactly one option; if none fits exactly, choose the closest. Then give a short English reason in at most eight words.\n\n2. In which of the following things do you believe, if you believe in any?\n\nGod\n   A. Yes\n   B. No\nChoose exactly one option; if none fits exactly, choose the closest. Then give a short English reason in at most eight words.\n\n3. Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card.\n\nAbortion\n   A. Never justifiable\n   B. 2\n   C. 3\n   D. 4\n   E. 5\n   F. 6\n   G. 7\n   H. 8\n   I. 9\n   J. Always justifiable\nChoose exactly one option; if none fits exactly, choose the closest. Then give a short English reason in at most eight words.\n\n4. Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card.\n\nHomosexuality\n   A. Never justifiable\n   B. 2\n   C. 3\n   D. 4\n   E. 5\n   F. 6\n   G. 7\n   H. 8\n   I. 9\n   J. Always justifiable\nChoose exactly one option; if none fits exactly, choose the closest. Then give a short English reason in at most eight words.\n\n5. Generally speaking, would you say that most people can be trusted or that you need to be very careful in dealing with people?\n   A. Most people can be trusted\n   B. Need to be very careful\nChoose exactly one option; if none fits exactly, choose the closest. Then give a short English reason in at most eight words.\n\n6. Now I'd like you to look at this card. I'm going to read out some different forms of political action that people can take, and I'd like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it.\n\nSigning a petition\n   A. Have done\n   B. Might do\n   C. Would never do\nChoose exactly one option; if none fits exactly, choose the closest. Then give a short English reason in at most eight words.\n\n7. Now I'd like you to look at this card. I'm going to read out some different forms of political action that people can take, and I'd like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it.\n\nAttending peaceful demonstrations\n   A. Have done\n   B. Might do\n   C. Would never do\nChoose exactly one option; if none fits exactly, choose the closest. Then give a short English reason in at most eight words.\n\n8. Now I'd like you to look at this card. I'm going to read out some different forms of political action that people can take, and I'd like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it.\n\nJoining in boycotts\n   A. Have done\n   B. Might do\n   C. Would never do\nChoose exactly one option; if none fits exactly, choose the closest. Then give a short English reason in at most eight words.\n\n9. Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important? Please choose up to five.\n   1. Feeling of responsibility\n   2. Tolerance and respect for other people\n   3. Obedience\n   4. Good manners\n   5. Not being selfish (unselfishness)\n   6. Independence\n   7. Thrift saving money and things\n   8. Hard work\n   9. Imagination\n   10. Determination, perseverance\n   11. Religious faith\nChoose up to five; give an empty list if none. Then give a short English reason in at most eight words.",
   "panel_plus_smoke_bound_usd": "1.888419840",
   "panel_requests": 512,
   "panel_reserve_bound_usd": "1.885470720",
-  "refusal_rule": "ordinary: per-question \"refused\" status inside the schema, never displayed as an option; child: separate refused flag plus a 0..5 selected list, zero selections with refused=false is a valid substantive none; all refusals reported separately, never neutral",
+  "reason_rule": "each ordinary selection and the child selection include a required short English reason of one to eight whitespace-delimited words; reasons are qualitative audit fields only and are never scored",
+  "refusal_rule": "v2: neither the visible prompt nor the JSON schema offers refusal, null or missing as an answer; ordinary answers select one listed option and then give a short reason, while the child field selects 0..5 of the 11 listed qualities ([] is a substantive none) and then gives a short reason. Refusal is recorded only when the model/API produces no usable selection despite the schema (empty/no content, no JSON, or nonconforming selections); refusals are reported separately, never scored as neutral, and never rescued. A missing/too-long reason is a qualitative format failure: its selected answer is retained and scored, its raw response is retained for audit, and it is never rescued; only clearly syntactic malformed output (unparseable or truncated JSON) is rescued once",
   "reserve_bound_formula": "per API phase: 1,024 input + 2,048 output tokens at the saved Alibaba per-token prices; the panel bound covers the 512 initial calls only, rescue/retry phases each reserve another bound, and the USD 5 stage stop is the authoritative all-in limit",
+  "response_schema": {
+    "json_schema": {
+      "name": "wvs_respondent_packet",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "answers": {
+            "additionalProperties": false,
+            "properties": {
+              "Abortion": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "description": "short English reason, at most eight words",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected": {
+                    "enum": [
+                      "Never justifiable",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "Always justifiable"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "selected",
+                  "reason"
+                ],
+                "type": "object"
+              },
+              "Attending peaceful demonstrations": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "description": "short English reason, at most eight words",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected": {
+                    "enum": [
+                      "Have done",
+                      "Might do",
+                      "Would never do"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "selected",
+                  "reason"
+                ],
+                "type": "object"
+              },
+              "God": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "description": "short English reason, at most eight words",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected": {
+                    "enum": [
+                      "Yes",
+                      "No"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "selected",
+                  "reason"
+                ],
+                "type": "object"
+              },
+              "Homosexuality": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "description": "short English reason, at most eight words",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected": {
+                    "enum": [
+                      "Never justifiable",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "Always justifiable"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "selected",
+                  "reason"
+                ],
+                "type": "object"
+              },
+              "Joining in boycotts": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "description": "short English reason, at most eight words",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected": {
+                    "enum": [
+                      "Have done",
+                      "Might do",
+                      "Would never do"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "selected",
+                  "reason"
+                ],
+                "type": "object"
+              },
+              "Religion": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "description": "short English reason, at most eight words",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected": {
+                    "enum": [
+                      "Very important",
+                      "Rather important",
+                      "Not very important",
+                      "Not at all important"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "selected",
+                  "reason"
+                ],
+                "type": "object"
+              },
+              "Signing a petition": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "description": "short English reason, at most eight words",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected": {
+                    "enum": [
+                      "Have done",
+                      "Might do",
+                      "Would never do"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "selected",
+                  "reason"
+                ],
+                "type": "object"
+              },
+              "dealing with people?": {
+                "additionalProperties": false,
+                "properties": {
+                  "reason": {
+                    "description": "short English reason, at most eight words",
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "selected": {
+                    "enum": [
+                      "Most people can be trusted",
+                      "Need to be very careful"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "selected",
+                  "reason"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "Religion",
+              "God",
+              "Abortion",
+              "Homosexuality",
+              "dealing with people?",
+              "Signing a petition",
+              "Attending peaceful demonstrations",
+              "Joining in boycotts"
+            ],
+            "type": "object"
+          },
+          "child_qualities": {
+            "additionalProperties": false,
+            "properties": {
+              "reason": {
+                "description": "short English reason, at most eight words",
+                "minLength": 1,
+                "type": "string"
+              },
+              "selected": {
+                "items": {
+                  "enum": [
+                    "Feeling of responsibility",
+                    "Tolerance and respect for other people",
+                    "Obedience",
+                    "Good manners",
+                    "Not being selfish (unselfishness)",
+                    "Independence",
+                    "Thrift saving money and things",
+                    "Hard work",
+                    "Imagination",
+                    "Determination, perseverance",
+                    "Religious faith"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 5,
+                "minItems": 0,
+                "type": "array"
+              }
+            },
+            "required": [
+              "selected",
+              "reason"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "answers",
+          "child_qualities"
+        ],
+        "type": "object"
+      },
+      "strict": true
+    },
+    "type": "json_schema"
+  },
   "schema": 2,
   "smoke_model": "qwen/qwen3.7-plus",
   "smoke_requests": 1,

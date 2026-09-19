@@ -10,7 +10,7 @@ when the model/API produces no usable value despite that schema (empty/no conten
 nonconforming output); it is never a schema value, never shown as an option, never scored as
 neutral, and never rescued into an answer. Only clearly syntactic malformed output (unparseable
 JSON) is rescued once; if syntactic vs substantive cannot be distinguished, record refusal.
-Child [] is a substantive zero-selection ("Which, if any"). Zero-substantive-coverage collapse is
+Each ordinary selection and the child selection also carry a required short English reason of at most eight words; reasons are qualitative audit fields only and are never scored. A missing/too-long reason is a format failure that preserves and scores the selected answer, never a new refusal channel. Child [] is a substantive zero-selection ("Which, if any"). Zero-substantive-coverage collapse is
 handled explicitly: unavailable point coordinates, invalid bootstrap draws, unavailable
 family/trend/LOO metrics with valid-draw counts, never a crash or a fit of the remaining releases.
 
@@ -66,7 +66,21 @@ REQUEST_TIMEOUT = 600
 TRANSPORT_TIMEOUT = 240
 MAX_ATTEMPTS = 3
 STAGE_CAP_USD = Decimal("5")
-REFUSED = "refused"
+REFUSED = "refused"  # legacy v1 token; retained only so v1 smoke artifacts stay readable
+REASON_MAX_WORDS = 8
+REASON_RULE_V2 = ("each ordinary selection and the child selection include a required short English "
+                  "reason of one to eight whitespace-delimited words; reasons are qualitative audit "
+                  "fields only and are never scored")
+REFUSAL_RULE_V2 = ("v2: neither the visible prompt nor the JSON schema offers refusal, null or "
+                   "missing as an answer; ordinary answers select one listed option and then give a "
+                   "short reason, while the child field selects 0..5 of the 11 listed qualities ([] "
+                   "is a substantive none) and then gives a short reason. Refusal is recorded only "
+                   "when the model/API produces no usable selection despite the schema (empty/no "
+                   "content, no JSON, or nonconforming selections); refusals are reported separately, "
+                   "never scored as neutral, and never rescued. A missing/too-long reason is a "
+                   "qualitative format failure: its selected answer is retained and scored, its raw "
+                   "response is retained for audit, and it is never rescued; only clearly syntactic "
+                   "malformed output (unparseable or truncated JSON) is rescued once")
 RELIGIOUS_FAITH = "Religious faith"
 OUT = Path("slop/research/wvs/20260919_respondent_packet")
 ENDPOINT_CATALOG = Path("slop/research/wvs/20260918_gemini_flash_rubric_pilot/endpoint_catalog.json")
@@ -160,48 +174,66 @@ def build_battery() -> tuple[list[dict], list[dict]]:
 
 def render_packet(battery: list[dict]) -> str:
     """V2 questionnaire: never mentions refusal, inability, AI identity, or any escape token.
-    Says only: pick the closest listed option (ordinary); choose up to five (child)."""
+    Every selection comes first, followed by its short qualitative reason."""
     blocks = []
     for number, q in enumerate(battery, 1):
         if q["id"] == "ChildQualities":
             opts = "\n".join(f"   {j}. {o}" for j, o in enumerate(q["options"], 1))
             blocks.append(f"{number}. {q['question']}\n{opts}\n"
-                          "Choose up to five; give an empty list if none.")
+                          "Choose up to five; give an empty list if none. Then give a short English "
+                          "reason in at most eight words.")
         else:
             opts = "\n".join(f"   {chr(64 + j)}. {o}" for j, o in enumerate(q["options"], 1))
             blocks.append(f"{number}. {q['question']}\n{opts}\n"
-                          "Choose exactly one option; if none fits exactly, choose the closest.")
+                          "Choose exactly one option; if none fits exactly, choose the closest. Then "
+                          "give a short English reason in at most eight words.")
     return ("You are one person answering a social values survey. Answer every question as yourself, "
-            "in order, choosing the listed option that is closest to your own views.\n\n"
+            "in order: choose the listed answer first, then give its short reason.\n\n"
             + "\n\n".join(blocks))
 
 
 def packet_schema(battery: list[dict]) -> dict:
-    """V2 schema permits ONLY substantive listed values: ordinary enums are exactly the listed
-    options (no refusal token, no null); the child field is only a 0..5 array of listed qualities.
-    The schema is shown to the model, so it must not advertise an escape. No array-uniqueness
-    keyword (Alibaba rejects array schemas that contain it); duplicates are invalid in
-    parse_packet."""
+    """V2 schema permits ONLY substantive listed values plus required audit reasons. Ordinary
+    enums remain exactly the listed options; the child selection remains a 0..5 array of listed
+    qualities. The schema never advertises an escape. No array-uniqueness keyword (Alibaba rejects
+    it); duplicates are invalid in parse_packet. Word count is parser-enforced, not schema-enforced."""
+    reason = {"type": "string", "minLength": 1, "description": "short English reason, at most eight words"}
     child = next(q for q in battery if q["id"] == "ChildQualities")
     ordinary = {q["id"]: {"type": "object",
-                          "properties": {"selected": {"type": "string",
-                                                      "enum": q["options"]}},
-                          "required": ["selected"], "additionalProperties": False}
+                          "properties": {"selected": {"type": "string", "enum": q["options"]},
+                                         "reason": reason},
+                          "required": ["selected", "reason"], "additionalProperties": False}
                 for q in battery if q["id"] != "ChildQualities"}
     return {"type": "json_schema", "json_schema": {"name": "wvs_respondent_packet", "strict": True,
             "schema": {"type": "object", "properties": {
                 "answers": {"type": "object", "properties": ordinary,
                             "required": list(ordinary), "additionalProperties": False},
-                "child_qualities": {"type": "array",
-                                    "items": {"type": "string", "enum": child["options"]},
-                                    "minItems": 0, "maxItems": 5}},
+                "child_qualities": {"type": "object", "properties": {
+                    "selected": {"type": "array", "items": {"type": "string", "enum": child["options"]},
+                                 "minItems": 0, "maxItems": 5},
+                    "reason": reason}, "required": ["selected", "reason"],
+                    "additionalProperties": False}},
                 "required": ["answers", "child_qualities"], "additionalProperties": False}}}
 
 
 def refusal_row(battery: list[dict]) -> dict:
     """Packet-level refusal: no usable value anywhere; every question is refused (observed, not
     scored as neutral)."""
-    return {q["id"]: {"outcome": "refused", "selected": None} for q in battery}
+    return {q["id"]: {"outcome": "refused", "selected": None, "reason": None,
+                     "reason_status": "not_available"} for q in battery}
+
+
+def reason_status(value: object) -> str:
+    """Reasons are audit-only. Whitespace-delimited count matches the preregistered rule."""
+    if not isinstance(value, str) or not value.split():
+        return "missing"
+    return "valid" if len(value.split()) <= REASON_MAX_WORDS else "too_long"
+
+
+def substantive_row(selected: object, reason: object) -> dict:
+    status = reason_status(reason)
+    return {"outcome": "substantive", "selected": selected, "reason": reason,
+            "reason_status": status}
 
 
 def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | None, bool]:
@@ -211,6 +243,9 @@ def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | Non
       rescued. kind: 'empty_content' (empty/no content), 'no_json' (a plain-text reply with no
       JSON object), or 'nonconforming' (parsed but structure/values outside the substantive
       space; offending questions are refused, conforming questions keep their answers).
+    - a valid selected answer with a missing/too-long reason remains substantive and scored, but
+      gets kind 'reason_format_failure' and is retained with its raw response for qualitative audit;
+      it is never rescued.
     - (None, None, True): clearly syntactic malformed output (an apparent JSON object that fails
       to parse, or visibly truncated output with unbalanced braces) -> repairable, rescue once.
     Deterministic rule: if syntactic vs substantive cannot be distinguished, it is a refusal.
@@ -226,24 +261,31 @@ def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | Non
     except (json.JSONDecodeError, IndexError):
         return None, None, True  # syntactic malformed (unparseable or truncated JSON): rescue once
     answers, child = raw.get("answers"), raw.get("child_qualities")
-    if not isinstance(answers, dict) or not isinstance(child, list):
+    if not isinstance(answers, dict) or not isinstance(child, dict):
         return refusal_row(battery), "nonconforming", False
     row = {}
     for q in battery:
         if q["id"] == "ChildQualities":
-            if (len(child) <= 5 and len(set(child)) == len(child)
-                    and set(child) <= set(q["options"])):
-                row[q["id"]] = {"outcome": "substantive", "selected": child}
+            selected, reason = child.get("selected"), child.get("reason")
+            if (isinstance(selected, list) and len(selected) <= 5 and len(set(selected)) == len(selected)
+                    and set(selected) <= set(q["options"])):
+                row[q["id"]] = substantive_row(selected, reason)
             else:
-                row[q["id"]] = {"outcome": "refused", "selected": None}
+                row[q["id"]] = {"outcome": "refused", "selected": None, "reason": reason,
+                                 "reason_status": "not_available"}
             continue
         answer = answers.get(q["id"])
         selected = answer.get("selected") if isinstance(answer, dict) else None
+        reason = answer.get("reason") if isinstance(answer, dict) else None
         if selected in q["options"]:
-            row[q["id"]] = {"outcome": "substantive", "selected": selected}
+            row[q["id"]] = substantive_row(selected, reason)
         else:
-            row[q["id"]] = {"outcome": "refused", "selected": None}
-    kind = None if all(v["outcome"] == "substantive" for v in row.values()) else "nonconforming"
+            row[q["id"]] = {"outcome": "refused", "selected": None, "reason": reason,
+                             "reason_status": "not_available"}
+    outcomes = [v["outcome"] for v in row.values()]
+    reasons = [v["reason_status"] for v in row.values()]
+    kind = ("nonconforming" if "refused" in outcomes else
+            "reason_format_failure" if any(status != "valid" for status in reasons) else None)
     return row, kind, False
 
 
@@ -252,9 +294,11 @@ def force_msg(battery: list[dict]) -> str:
     mentions refusal."""
     ids = ", ".join(f'"{q["id"]}"' for q in battery)
     return ("Output ONLY the compact JSON respondent object now: "
-            '{"answers": {"<question id>": {"selected": "<one listed option>"}}, '
-            '"child_qualities": [up to five quality names]}. '
-            f"Every required key must appear exactly once: {ids}. "
+            '{"answers": {"<question id>": {"selected": "<one listed option>", '
+            '"reason": "<short English reason>"}}, "child_qualities": '
+            '{"selected": [up to five quality names], "reason": "<short English reason>"}}. '
+            f"Every required question key must appear exactly once: {ids}. "
+            "Choose each answer first; each reason must be at most eight words. "
             "No markdown, no reasoning, nothing else.")
 
 
@@ -454,7 +498,8 @@ def protocol_id(model: str, battery: list[dict]) -> str:
         "provider": PROVIDER, "n_packets": N_PACKETS, "seeds": paired_seeds(N_PACKETS),
         "battery": [{"id": q["id"], "question": q["question"], "options": q["options"]}
                     for q in battery],
-        "packet_prompt": render_packet(battery),
+        "packet_prompt": render_packet(battery), "response_schema": packet_schema(battery),
+        "reason_rule": REASON_RULE_V2,
     }
     encoded = json.dumps(protocol, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
     return hashlib.sha256(encoded).hexdigest()
@@ -514,6 +559,9 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
         outcomes = [rows[k][q["id"]] for k in sorted(rows)]
         refused = [o for o in outcomes if o["outcome"] == "refused"]
         substantive = [o for o in outcomes if o["outcome"] == "substantive"]
+        reason_statuses = [o["reason_status"] for o in outcomes]
+        reason_counts = {s: reason_statuses.count(s) for s in
+                         ("valid", "missing", "too_long", "not_available")}
         if q["id"] == "ChildQualities":
             counts = {opt: 0 for opt in q["options"]}
             zero_selection = 0
@@ -524,6 +572,7 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
                     zero_selection += 1
             per_question[q["id"]] = {"n": len(outcomes), "substantive": len(substantive),
                                      "refused": len(refused),
+                                     "reason_status_counts": reason_counts,
                                      "zero_selection_substantive": zero_selection,
                                      "zero_selection_or_refusal": zero_selection + len(refused),
                                      "coverage": len(substantive) / len(outcomes),
@@ -535,6 +584,7 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
                 counts[o["selected"]] += 1
             per_question[q["id"]] = {"n": len(outcomes), "substantive": len(substantive),
                                      "refused": len(refused),
+                                     "reason_status_counts": reason_counts,
                                      "coverage": len(substantive) / len(outcomes),
                                      "option_frequencies": {opt: counts[opt] / len(outcomes)
                                                             for opt in counts}}
@@ -574,6 +624,8 @@ def write_manifest(battery: list[dict]) -> dict:
                "created_utc": datetime.now(UTC).isoformat(), "models": rows,
                "battery": [{"id": q["id"], "question": q["question"], "options": q["options"]}
                            for q in battery],
+               "packet_prompt": render_packet(battery), "response_schema": packet_schema(battery),
+               "reason_rule": REASON_RULE_V2,
                "instrument_status": ("GlobalOpinionQA-compatible approximation; 11th quality "
                                      "Religious faith appended; card order not recorded in source"),
                "n_packets": N_PACKETS, "max_tokens": MAX_TOKENS, "temperature": 1.0,
@@ -592,12 +644,15 @@ def write_manifest(battery: list[dict]) -> dict:
                                        "endpoints=null, so the paid smoke is the current live "
                                        "route test"),
                "stage_hard_stop_usd": str(STAGE_CAP_USD),
-               "refusal_rule": ("ordinary: per-question \"refused\" status inside the schema, "
-                                "never displayed as an option; child: separate refused flag plus "
-                                "a 0..5 selected list, zero selections with refused=false is a "
-                                "valid substantive none; all refusals reported separately, never "
-                                "neutral"),
+               "refusal_rule": REFUSAL_RULE_V2,
                "not_published": True, "merge_into_primary": False}
+    # canonical-rule assertions: neither manifest prompt nor schema may advertise an escape.
+    advertised = json.dumps({"battery": payload["battery"], "prompt": payload["packet_prompt"],
+                             "schema": payload["response_schema"]}).lower()
+    for forbidden in ("refused", "null", "missing"):
+        assert forbidden not in advertised, f"manifest advertises {forbidden!r}"
+    assert payload["refusal_rule"] == REFUSAL_RULE_V2
+    assert payload["reason_rule"] == REASON_RULE_V2
     atomic_json(MANIFEST, payload)
     return payload
 
@@ -615,29 +670,36 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     assert "refused" not in schema_text and "null" not in schema_text
     schema = packet_schema(battery)["json_schema"]["schema"]
     child_schema = schema["properties"]["child_qualities"]
-    assert child_schema["type"] == "array" and child_schema["minItems"] == 0
-    assert child_schema["maxItems"] == 5
+    assert child_schema["type"] == "object"
+    assert child_schema["properties"]["selected"]["type"] == "array"
+    assert child_schema["properties"]["selected"]["minItems"] == 0
+    assert child_schema["properties"]["selected"]["maxItems"] == 5
+    assert child_schema["required"] == ["selected", "reason"]
     for q in battery:
         if q["id"] == "ChildQualities":
             continue
-        enum = schema["properties"]["answers"]["properties"][q["id"]]["properties"]["selected"]["enum"]
+        answer_schema = schema["properties"]["answers"]["properties"][q["id"]]
+        enum = answer_schema["properties"]["selected"]["enum"]
         assert enum == q["options"], f"{q['id']} enum must be exactly the listed options"
+        assert answer_schema["required"] == ["selected", "reason"]
 
-    def answers_row(child_value):
-        return {"answers": {q["id"]: {"selected": q["options"][0]} for q in battery
-                            if q["id"] != "ChildQualities"},
-                "child_qualities": child_value}
+    def answers_row(child_value, reason="Personal values shape my view"):
+        return {"answers": {q["id"]: {"selected": q["options"][0], "reason": reason}
+                            for q in battery if q["id"] != "ChildQualities"},
+                "child_qualities": {"selected": child_value, "reason": reason}}
 
     # fixture: fully conforming packet -> all substantive
     row, kind, rescueable = parse_packet(battery, json.dumps(
         answers_row(["Independence", RELIGIOUS_FAITH])))
     assert row is not None and kind is None and not rescueable
     assert row["ChildQualities"] == {"outcome": "substantive",
-                                     "selected": ["Independence", RELIGIOUS_FAITH]}
+                                     "selected": ["Independence", RELIGIOUS_FAITH],
+                                     "reason": "Personal values shape my view", "reason_status": "valid"}
     # fixture: child [] parses as SUBSTANTIVE none (the stem says "Which, if any")
     row, kind, rescueable = parse_packet(battery, json.dumps(answers_row([])))
     assert row is not None and not rescueable
-    assert row["ChildQualities"] == {"outcome": "substantive", "selected": []}
+    assert row["ChildQualities"] == {"outcome": "substantive", "selected": [],
+                                     "reason": "Personal values shape my view", "reason_status": "valid"}
     # fixture: empty content is an OBSERVED refusal (never rescued, never neutral)
     row, kind, rescueable = parse_packet(battery, "")
     assert row is not None and kind == "empty_content" and not rescueable
@@ -649,7 +711,7 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     # fixture: parsed but nonconforming values are refusals per question, never rescued, and
     # conforming questions in the same packet keep their answers
     mixed = answers_row(["Obedience"])
-    mixed["answers"]["Homosexuality"] = {"selected": "Don't know"}  # not a listed option in v2
+    mixed["answers"]["Homosexuality"] = {"selected": "Don't know", "reason": "Personal values shape my view"}  # not a listed option in v2
     row, kind, rescueable = parse_packet(battery, json.dumps(mixed))
     assert row is not None and kind == "nonconforming" and not rescueable
     assert row["Homosexuality"]["outcome"] == "refused" and row["Homosexuality"]["selected"] is None
@@ -660,11 +722,45 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     assert row is None and kind is None and rescueable
     # fixture: rescue-format output (what force_msg asks for) parses
     rescue_text = ('{"answers": {' + ", ".join(
-        f'"{q["id"]}": {{"selected": "{q["options"][0]}"}}' for q in battery
-        if q["id"] != "ChildQualities") + '}, "child_qualities": ["Independence"]}')
+        f'"{q["id"]}": {{"selected": "{q["options"][0]}", "reason": "Personal values shape my view"}}'
+        for q in battery if q["id"] != "ChildQualities")
+        + '}, "child_qualities": {"selected": ["Independence"], "reason": "Personal values shape my view"}}')
     row, kind, rescueable = parse_packet(battery, rescue_text)
     assert row is not None and kind is None and not rescueable
     assert "refused" not in force_msg(battery)
+    # fixture: reason text is audit-only. Valid, missing, and too-long reasons retain the selected
+    # answer; they cannot change item scoring. A contradictory-looking reason remains visible for
+    # human audit without a semantic classifier deciding whether it is inconsistent.
+    ordinary = next(q for q in battery if q["id"] == "Religion")
+    valid_row, _, _ = parse_packet(battery, json.dumps(answers_row([], "Family practice matters most")))
+    too_long_row, too_long_kind, _ = parse_packet(battery, json.dumps(
+        answers_row([], "These nine separate words exceed the permitted reason length now")))
+    missing_reason = answers_row([])
+    del missing_reason["answers"][ordinary["id"]]["reason"]
+    missing_row, missing_kind, _ = parse_packet(battery, json.dumps(missing_reason))
+    assert too_long_kind == "reason_format_failure" and missing_kind == "reason_format_failure"
+    assert valid_row[ordinary["id"]]["selected"] == too_long_row[ordinary["id"]]["selected"]
+    assert valid_row[ordinary["id"]]["selected"] == missing_row[ordinary["id"]]["selected"]
+    assert too_long_row[ordinary["id"]]["reason_status"] == "too_long"
+    assert missing_row[ordinary["id"]]["reason_status"] == "missing"
+    inconsistent = answers_row([])
+    inconsistent["answers"][ordinary["id"]]["reason"] = "Religion has no role in life"
+    inconsistent_row, _, _ = parse_packet(battery, json.dumps(inconsistent))
+    assert inconsistent_row[ordinary["id"]]["selected"] == ordinary["options"][0]
+    assert inconsistent_row[ordinary["id"]]["reason"] == "Religion has no role in life"
+    score_rows = {0: valid_row, 1: too_long_row, 2: missing_row}
+    score_lists = packet_item_lists(score_rows, battery, child_rows)
+    religion_vectors = score_lists[ordinary["id"]]
+    assert np.array_equal(religion_vectors[0], religion_vectors[1])
+    assert np.array_equal(religion_vectors[0], religion_vectors[2])
+    child_valid, _, _ = parse_packet(battery, json.dumps(answers_row(["Independence"], "Family values matter")))
+    child_long, child_long_kind, _ = parse_packet(battery, json.dumps(
+        answers_row(["Independence"], "These nine separate words exceed the child reason length now")))
+    assert child_long_kind == "reason_format_failure"
+    assert child_valid["ChildQualities"]["selected"] == child_long["ChildQualities"]["selected"]
+    child_lists = packet_item_lists({0: child_valid, 1: child_long}, battery, child_rows)
+    for quality in PANEL_QUALITIES:
+        assert np.array_equal(child_lists[quality][0], child_lists[quality][1])
     # fixture: duplicate / oversized child lists are nonconforming (uniqueness enforced in parsing,
     # since Alibaba rejects array schemas with the uniqueness keyword)
     dup_row, dup_kind, rescueable = parse_packet(battery, json.dumps(
@@ -928,20 +1024,20 @@ def unavailable_items(item_lists: dict[str, list[np.ndarray]], resolved: dict) -
 def point_coords(item_lists: dict[str, list[np.ndarray]], resolved: dict) -> tuple[np.ndarray | None,
                                                                                    dict[str, list[str]]]:
     """Empirical coordinates from ALL observed rows/samples: the point estimate. Bootstrap draws
-    are used only for SE/CI, never as the point. Returns (None, unavailable) when any required item
-    on an axis has zero substantive responses; the axis coordinate is then unavailable, not zero."""
+    are used only for SE/CI, never as the point. Fixed-battery rule: if ANY required item on an
+    axis has zero substantive responses, that AXIS is unavailable (the battery changed, so no
+    plausible coordinate may be computed from the remaining items); the model's 2D point requires
+    both axes and is None then."""
     missing = unavailable_items(item_lists, resolved)
     xy = []
     for axis in (X_AXIS, Y_AXIS):
+        if missing[axis]:  # any zero-coverage required item -> whole axis unavailable
+            return None, missing
         vals = []
         for it in resolved[axis]:
-            if it["suffix"] in missing[axis]:
-                continue
             lists = item_lists[it["suffix"]]
             mean_p = np.mean(lists, axis=0)
             vals.append(positiveness(mean_p[None, :], it["pole_idx"], it["n"]))
-        if not vals:  # whole axis unavailable
-            return None, missing
         xy.append(float(np.mean(vals)))
     return np.array(xy), missing
 
@@ -1295,6 +1391,26 @@ def synthetic_analysis_test(battery: list[dict], child_rows: list[dict]) -> None
     assert result["packet"]["family_bootstrap"]["valid_draws_per_model"][MODELS[0]] > 0
     print("synthetic all-refusal fixture passed: analysis completes, family/trend/LOO explicitly "
           "unavailable, diagnostics retained")
+
+    # one-missing-item fixture: exactly one zero-coverage item on an otherwise-covered axis makes
+    # that AXIS unavailable for the model; the 2D point is None; family metrics are unavailable and
+    # must NOT be computed from the remaining releases.
+    one_missing = dict(packet_rows)
+    broken = {k: dict(v) for k, v in packet_rows[MODELS[1]].items()}
+    for k in broken:
+        broken[k]["God"] = {"outcome": "refused", "selected": None}
+    one_missing[MODELS[1]] = broken
+    result = analyze_from_data(one_missing, battery, child_rows, resolved)
+    ps = result["packet"]["point_coords_xy_per_model"]
+    assert ps[MODELS[1]] is None, "a model with one dead Y item must have no 2D point"
+    assert ps[MODELS[0]] is not None
+    assert "God" in result["packet"]["unavailable_items"][MODELS[1]][Y_AXIS]
+    assert result["packet"]["family_point"]["status"] == "unavailable"
+    assert result["packet"]["constant_family_rmse"] is None
+    assert result["packet"]["loo"] is None
+    assert result["packet"]["refusal"][MODELS[1]] > 0  # diagnostics retained
+    print("one-missing-item fixture passed: axis unavailable, 2D point None, family metrics "
+          "explicitly unavailable (not fitted from remaining releases)")
 
 
 if __name__ == "__main__":
