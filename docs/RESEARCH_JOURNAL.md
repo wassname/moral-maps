@@ -1208,7 +1208,7 @@ One API call is ONE pseudo-respondent answering the complete selected battery in
 
 ### Design, request count, cost
 
-N=128 whole respondent packets per release with 128 paired deterministic seeds shared across releases (same seed per packet index on every release); canonical option order (no rotation; the packet is one coherent questionnaire). Request count: 4 releases x 128 packets = 512 panel calls plus 1 paid smoke = 513. Reserve bound per packet: 1,024 input + 2,048 output tokens at the saved Alibaba prices (prompt 0.26-0.325 and completion 1.28-1.95 USD per million): panel bound USD 3.770941440, smoke USD 0.00692224, total USD 3.777863680 against the USD 5 stage stop, all inside the existing locked USD 80 repository ledger under lane `google` with reservation `pilot/resp-packet`.
+N=128 whole respondent packets per release with 128 paired deterministic seeds shared across releases (same seed per packet index on every release); canonical option order (no rotation; the packet is one coherent questionnaire). Request count: 4 releases x 128 packets = 512 panel calls plus 1 paid smoke = 513. Reserve bound per API phase: 1,024 input + 2,048 output tokens at the saved Alibaba prices: panel initial-call bound USD 1.885470720, smoke bound USD 0.00294912 on qwen/qwen3.7-plus, total USD 1.888419840; each rescue/retry phase reserves another per-phase bound, and the USD 5 stage stop (checked on every reserve) is the authoritative all-in limit, all inside the existing locked USD 80 repository ledger under lane `alibaba` with reservation `pilot/resp-packet-smoke` for the smoke. (An earlier draft of this paragraph quoted doubled bounds and the wrong lane; the manifest and code values above govern.)
 
 ### Analysis (fixed before unblinding)
 

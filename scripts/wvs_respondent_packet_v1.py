@@ -847,7 +847,7 @@ def offline_regression(battery: list[dict]) -> None:
 
 
 def paid_smoke(battery: list[dict]) -> None:
-    """One paid packet on qwen/qwen3.7-plus (default reasoning enabled: riskiest parse path)."""
+    """One paid packet on qwen/qwen3.7-plus with reasoning disabled, matching the panel payload."""
     model = "qwen/qwen3.7-plus"
     pid = protocol_id(model, battery)
     req = {"packet": 0, "seed": paired_seeds(N_PACKETS)[0], "prompt": render_packet(battery)}
