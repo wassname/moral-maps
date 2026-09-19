@@ -594,8 +594,8 @@ def offline_regression(battery: list[dict]) -> None:
                           capture_output=True, text=True, timeout=600,
                           cwd=str(Path(__file__).parent.parent))
     assert proc.returncode != 0 and "--i-authorize-paid-calls" in (proc.stderr + proc.stdout), (
-        f"CLI gate failed: rc={proc.returncode} stdout={proc.stdout[-500:]} stderr={proc.stderr[-500:]}")
-    print("offline regression passed: guard, mis-patch defense, and CLI gate all hold")
+        f"CLI refusal check failed: rc={proc.returncode} stdout={proc.stdout[-500:]} stderr={proc.stderr[-500:]}")
+    print("offline regression passed: opt-in guard, mis-patch defense, and CLI refusal check all hold")
 
 
 def paid_smoke(battery: list[dict]) -> None:
