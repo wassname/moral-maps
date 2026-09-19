@@ -189,7 +189,8 @@ def render_packet(battery: list[dict]) -> str:
                           "Choose exactly one option; if none fits exactly, choose the closest. Then "
                           "give a short English reason in at most eight words.")
     return ("You are one person answering a social values survey. Answer every question as yourself, "
-            "in order: choose the listed answer first, then give its short reason.\n\n"
+            "in order: choose the listed answer first, then give its short reason. "
+            "Return one JSON object matching the required schema.\n\n"
             + "\n\n".join(blocks))
 
 
@@ -397,6 +398,19 @@ def append_attempt(record: dict) -> None:
         os.fsync(file.fileno())
 
 
+def request_retryable(error: Exception, response_text: str | None) -> bool:
+    """Local HTTP-status gate in front of the vendored substring matcher: deterministic 4xx
+    (e.g. Alibaba's invalid_parameter_error 400) fail after exactly one attempt instead of
+    burning three bound-charged retries on the same rejection. Retries stay for 408/429, 5xx,
+    and transport failures."""
+    if isinstance(error, httpx.HTTPStatusError) and error.response is not None:
+        status = error.response.status_code
+        if status == 408 or status == 429 or status >= 500:
+            return True
+        return False
+    return is_retryable_error(error, response_text or "")
+
+
 async def budgeted_request(model: str, payload: dict) -> dict:
     if not paid_calls_authorized():
         raise PaidCallsNotAuthorized(
@@ -408,6 +422,14 @@ async def budgeted_request(model: str, payload: dict) -> dict:
         bound = reserve_request(model)
         try:
             response = await openrouter_request_with_metadata_once(payload, timeout=TRANSPORT_TIMEOUT)
+        except asyncio.CancelledError:
+            # cancelled mid-flight (loop teardown after a sibling packet failed): the reserved
+            # hold must not leak. Settle once, write a durable cancelled record, re-raise.
+            settle_request(bound, None)
+            append_attempt({"event": "request_attempt_cancelled", "eval_version": EVAL_VERSION,
+                            "model": model, "payload_sha256": payload_hash, "attempt": attempt,
+                            "reserved_bound_usd": str(bound)})
+            raise
         except Exception as error:
             settle_request(bound, None)
             response_text = error.response.text if isinstance(error, httpx.HTTPStatusError) else None
@@ -417,7 +439,7 @@ async def budgeted_request(model: str, payload: dict) -> dict:
                             "error": str(error),
                             "response_text": response_text,
                             "status_code": error.response.status_code if response_text else None})
-            if attempt == MAX_ATTEMPTS or not is_retryable_error(error, response_text or ""):
+            if attempt == MAX_ATTEMPTS or not request_retryable(error, response_text):
                 raise
             await asyncio.sleep(2 ** (attempt - 1))
             continue
@@ -900,6 +922,87 @@ def offline_regression(battery: list[dict]) -> None:
             continue
         assert migrated[key] == value, f"migration changed numeric field {key}"
     assert migrate_ledger(migrated) == migrated, "migration must be idempotent"
+    # fixture: local retry gate (the 1799 triple-charge). The exact Alibaba 400 shape retried
+    # under the old matcher, so the fixture first proves sensitivity, then the fixed behavior:
+    # 400 -> exactly one attempt; 429 and 500 keep retrying to MAX_ATTEMPTS; every attempt
+    # settles exactly once; the real ledger is untouched (all accounting faked).
+    alibaba_text = ('{"error": {"message": "Provider returned error", "code": 400, '
+                    '"metadata": {"provider_name": "Alibaba"}}}')
+
+    def http_error(status: int, text: str) -> httpx.HTTPStatusError:
+        req = httpx.Request("POST", "https://openrouter.ai/api/v1/chat/completions")
+        return httpx.HTTPStatusError("Client error", request=req,
+                                     response=httpx.Response(status, text=text, request=req))
+    err400 = http_error(400, alibaba_text)
+    assert is_retryable_error(err400, alibaba_text) is True, \
+        "fixture insensitive: old matcher must retry this 400"
+    assert request_retryable(err400, alibaba_text) is False
+    assert request_retryable(http_error(429, "rate limited"), "") is True
+    assert request_retryable(http_error(500, "bad gateway"), "") is True
+    assert request_retryable(http_error(408, "timeout"), "") is True
+
+    def run_failures(status: int, text: str) -> dict:
+        calls = {"attempts": 0, "settles": 0, "records": []}
+
+        async def failing(payload, timeout=60.0, **kwargs):
+            calls["attempts"] += 1
+            raise http_error(status, text)
+        with mock.patch.object(module, "openrouter_request_with_metadata_once", failing), \
+             mock.patch.object(module, "reserve_request", lambda model: Decimal("0.001")), \
+             mock.patch.object(module, "settle_request",
+                               lambda bound, response: calls.__setitem__(
+                                   "settles", calls["settles"] + 1)), \
+             mock.patch.object(module, "append_attempt",
+                               lambda record: calls["records"].append(record)), \
+             mock.patch("asyncio.sleep", new_callable=mock.AsyncMock):
+            os.environ[PAID_OPTIN_ENV] = "1"
+            try:
+                asyncio.run(budgeted_request(MODELS[0], {"model": MODELS[0]}))
+            except httpx.HTTPStatusError:
+                pass
+            finally:
+                os.environ.pop(PAID_OPTIN_ENV, None)
+        return calls
+    got400 = run_failures(400, alibaba_text)
+    assert got400["attempts"] == 1, f"deterministic 400 must cost one attempt, got {got400}"
+    assert got400["settles"] == 1 and len(got400["records"]) == 1
+    for status in (429, 500):
+        got = run_failures(status, "error")
+        assert got["attempts"] == MAX_ATTEMPTS, f"{status} must keep retrying, got {got}"
+        assert got["settles"] == MAX_ATTEMPTS, f"{status} must settle every attempt, got {got}"
+    # fixture: a cancelled mid-flight phase settles its bound (the 1799 packet-1 hold leak).
+    # Uses the real update_state against temp files: hold returns to zero, conservative spend
+    # rises by exactly one bound, and a durable cancelled record exists.
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        tmpdir = Path(tmp)
+        expected_bound = request_bound(MODELS[0])
+
+        async def cancelled(payload, timeout=60.0, **kwargs):
+            raise asyncio.CancelledError()
+        with mock.patch.object(module, "STATE", tmpdir / "budget.json"), \
+             mock.patch.object(module, "LOCK", tmpdir / "budget.lock"), \
+             mock.patch.object(module, "REQUEST_ATTEMPTS", tmpdir / "attempts.jsonl"), \
+             mock.patch.object(module, "openrouter_request_with_metadata_once", cancelled):
+            os.environ[PAID_OPTIN_ENV] = "1"
+            try:
+                raised = False
+                try:
+                    asyncio.run(budgeted_request(MODELS[0], {"model": MODELS[0]}))
+                except asyncio.CancelledError:
+                    raised = True
+                assert raised, "cancellation must propagate after settling"
+            finally:
+                os.environ.pop(PAID_OPTIN_ENV, None)
+            cancelled_state = json.loads((tmpdir / "budget.json").read_text())
+            assert Decimal(cancelled_state["reserved_usd"]) == 0, \
+                "cancelled phase must release its hold"
+            assert Decimal(cancelled_state["conservative_spent_usd"]) == expected_bound
+            assert cancelled_state["failed_phases_charged_at_bound"] == 1
+            cancelled_events = [json.loads(line) for line in
+                                (tmpdir / "attempts.jsonl").read_text().splitlines()]
+            assert any(event["event"] == "request_attempt_cancelled"
+                       for event in cancelled_events)
     # fixture: append_record creates missing per-model record subdirs (the 1798 panel crash)
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:

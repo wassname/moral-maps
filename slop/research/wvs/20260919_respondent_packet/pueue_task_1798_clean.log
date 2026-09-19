@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 1477, in <module>
+    main()
+    ~~~~^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 977, in main
+    run(battery)
+    ~~~^^^^^^^^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 989, in run
+    summary = asyncio.run(run_model(model, battery, pids[model]))
+  File "/home/code/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/home/code/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/code/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 532, in run_model
+    append_record(rpath, {"event": "run_started", "run_id": run, "protocol_id": pid, "model": model,
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          "planned_requests": len(plan),
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          "settings": {"temperature": 1.0, "max_tokens": MAX_TOKENS,
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                       "reasoning": {"enabled": False}, "provider": PROVIDER,
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                       "n_packets": N_PACKETS, "eval_version": EVAL_VERSION}})
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 445, in append_record
+    with rpath.open("a", encoding="utf-8") as fh:
+         ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/code/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/pathlib/_local.py", line 537, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'slop/research/wvs/20260919_respondent_packet/records/qwen__qwen3.5-plus-02-15/packets.jsonl'

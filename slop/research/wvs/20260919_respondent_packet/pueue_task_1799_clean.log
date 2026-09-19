@@ -1,0 +1,48 @@
+2026-09-19 17:32:01.744 | INFO     | openrouter_wrapper.retry:is_retryable_error:73 - Evaluating error for retry: Client error '400 Bad Request' for url 'https://openrouter.ai/api/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+2026-09-19 17:32:01.744 | ERROR    | openrouter_wrapper.retry:is_retryable_error:113 - HTTP error 400: {"error":{"message":"Provider returned error","code":400,"metadata":{"raw":"data: {\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.\",\"type\":\"invalid_request_error\"},\"id\":\"chatcmpl-d849da57-1cc3-97cf-98e1-1e8bae738de1\"}\n\n","provider_name":"Alibaba","is_byok":false}},"user_id":"user_2ffkoR4mYsVn0rZWphIZivDqvFW","openrouter_metadata":{"requested":"qwen/qwen3.5-plus-02-15","strategy":"direct","region":"PER","summary":"available=1","attempt":1,"is_byok":false,"endpoints":{"total":1,"available":[{"provider":"Alibaba","model":"qwen/qwen3.5-plus-20260216","selected":false}]},"generation_time":717}} Headers({'date': 'Sat, 19 Sep 2026 09:32:01 GMT', 'content-type': 'application/json', 'transfer-encoding': 'chunked', 'connection': 'keep-alive', 'access-control-allow-origin': '*', 'access-control-expose-headers': 'X-Generation-Id,X-Provider-Name,request-id,cf-ray', 'x-generation-id': 'gen-1789810320-XeF53TGjypVnJ65hERrr', 'set-cookie': '__cf_bm=IlB8e4W8jKAWwoUUpw7.aotFr0Jf1u9i8tCBg358BNc-1789810320.7078166-1.0.1.1-8yd4aqUOoh6yCd.EaLPQGHCe4f6wp3T1Z.s32mybD6glZlqIef6p_se4742BN3hdRSuFoEcbBYvNFWh0V7dJeWu12uTo8QHVV3HhRF5AFSoSrnym_N5doH.p.xnONF0l; HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Sat, 19 Sep 2026 10:02:01 GMT', 'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")', 'referrer-policy': 'no-referrer, strict-origin-when-cross-origin', 'x-content-type-options': 'nosniff', 'server': 'cloudflare', 'cf-ray': 'a3d794a86ff8865b-PER'})
+2026-09-19 17:32:01.744 | WARNING  | openrouter_wrapper.retry:is_retryable_error:124 - Retryable: retryable pattern in response - {"error":{"message":"Provider returned error","code":400,"metadata":{"raw":"data: {\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.\",\"type\":\"invalid_request_error\"},\"id\":\"chatcmpl-d849da57-1cc3-97cf-98e1-1e8bae738de1\"}\n\n","provider_name":"Alibaba","is_byok":false}},"user_id":"user_2ffkoR4mYsVn0rZWphIZivDqvFW","openrouter_metadata":{"requested":"qwen/qwen3.5-plus-02-15","strategy":"direct","region":"PER","summary":"available=1","attempt":1,"is_byok":false,"endpoints":{"total":1,"available":[{"provider":"Alibaba","model":"qwen/qwen3.5-plus-20260216","selected":false}]},"generation_time":717}}
+2026-09-19 17:32:03.302 | INFO     | openrouter_wrapper.retry:is_retryable_error:73 - Evaluating error for retry: Client error '400 Bad Request' for url 'https://openrouter.ai/api/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+2026-09-19 17:32:03.302 | ERROR    | openrouter_wrapper.retry:is_retryable_error:113 - HTTP error 400: {"error":{"message":"Provider returned error","code":400,"metadata":{"raw":"data: {\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.\",\"type\":\"invalid_request_error\"},\"id\":\"chatcmpl-080ed385-789f-90df-880c-9b8d39f28b00\"}\n\n","provider_name":"Alibaba","is_byok":false}},"user_id":"user_2ffkoR4mYsVn0rZWphIZivDqvFW","openrouter_metadata":{"requested":"qwen/qwen3.5-plus-02-15","strategy":"direct","region":"PER","summary":"available=1","attempt":1,"is_byok":false,"endpoints":{"total":1,"available":[{"provider":"Alibaba","model":"qwen/qwen3.5-plus-20260216","selected":false}]},"generation_time":317}} Headers({'date': 'Sat, 19 Sep 2026 09:32:03 GMT', 'content-type': 'application/json', 'transfer-encoding': 'chunked', 'connection': 'keep-alive', 'access-control-allow-origin': '*', 'access-control-expose-headers': 'X-Generation-Id,X-Provider-Name,request-id,cf-ray', 'x-generation-id': 'gen-1789810322-mThWcRJIM5xUkHRa97bY', 'set-cookie': '__cf_bm=vDvDrTkwQsT07YaumEBk_Bj8z4LhfZTcs2OFCBnHkjo-1789810322.8780377-1.0.1.1-NJWA70Gf_LlVog0p5JbdMw5EnGEDn052mlNXuat2DeQH3Dt4ESC9lUzZHRG5tss2z47Pqsnn1.BKYP2xZXoEk1s5O0CslhqWLPEvT03_Kmf5F9z7fqs9mS6PE.aaSiJf; HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Sat, 19 Sep 2026 10:02:03 GMT', 'permissions-policy': 'payment=(self "https://checkout.stripe.com" "https://connect-js.stripe.com" "https://js.stripe.com" "https://*.js.stripe.com" "https://hooks.stripe.com")', 'referrer-policy': 'no-referrer, strict-origin-when-cross-origin', 'x-content-type-options': 'nosniff', 'server': 'cloudflare', 'cf-ray': 'a3d794b5fdbf87bb-PER'})
+2026-09-19 17:32:03.302 | WARNING  | openrouter_wrapper.retry:is_retryable_error:124 - Retryable: retryable pattern in response - {"error":{"message":"Provider returned error","code":400,"metadata":{"raw":"data: {\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.\",\"type\":\"invalid_request_error\"},\"id\":\"chatcmpl-080ed385-789f-90df-880c-9b8d39f28b00\"}\n\n","provider_name":"Alibaba","is_byok":false}},"user_id":"user_2ffkoR4mYsVn0rZWphIZivDqvFW","openrouter_metadata":{"requested":"qwen/qwen3.5-plus-02-15","strategy":"direct","region":"PER","summary":"available=1","attempt":1,"is_byok":false,"endpoints":{"total":1,"available":[{"provider":"Alibaba","model":"qwen/qwen3.5-plus-20260216","selected":false}]},"generation_time":317}}
+Traceback (most recent call last):
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 1485, in <module>
+    main()
+    ~~~~^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 985, in main
+    run(battery)
+    ~~~^^^^^^^^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 997, in run
+    summary = asyncio.run(run_model(model, battery, pids[model]))
+  File "/home/code/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/home/code/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/code/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 545, in run_model
+    rows = await asyncio.gather(*(guarded(pair) for pair in enumerate(plan)))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 543, in guarded
+    return await run_packet(model, battery, rpath, run, pid, seq, req, prior.get(req["packet"]))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 471, in run_packet
+    response = await asyncio.wait_for(budgeted_request(model, payload), timeout=REQUEST_TIMEOUT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/code/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/workspace/2026/lite/moralmaps/scripts/wvs_respondent_packet_v1.py", line 410, in budgeted_request
+    response = await openrouter_request_with_metadata_once(payload, timeout=TRANSPORT_TIMEOUT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/2026/lite/moralmaps/src/moralmaps/read_api.py", line 218, in openrouter_request_with_metadata_once
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/code/.cache/uv/archive-v0/5XD_KrGj1Sc00K2KguvBs/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '400 Bad Request' for url 'https://openrouter.ai/api/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
