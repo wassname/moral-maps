@@ -21,21 +21,23 @@ no retry, no panel.
   advertised quantization `unknown` (as preregistered).
 - Usage: 306 completion tokens, reasoning_tokens 0, provider-reported cost USD 0.00075218.
 
-## Parse result
+## Parse result (corrected: parser compatibility difference, not refusal)
 
-- 9/9 questions recorded as OBSERVED refusals, kind `nonconforming`, no rescue. The model
-  answered every block choice-first with short reasons, but with the wrong shape:
-  positional keys `"1"`–`"9"` instead of question ids, and field `"answer"` instead of
-  `"selected"` (child: `{"answer": ["1","2","6","8","10"], "reason": "..."}`).
-- Per v2 rules this is parsed-but-nonconforming, never rescued: only unparseable or
-  truncated JSON is. Correct handling; the run-scoping crash that followed (stale
-  3.7-plus completion in the shared file failed the new target's route check) is fixed
-  separately with a fixture, and the summary here was reconstructed offline from the
-  single executed request via the committed `smoke_summary_dict`.
-- Reasons do NOT survive in the scored row (`reason` None, `reason_status`
-  `not_available`: the keys never matched); they survive verbatim in the raw record text
-  for qualitative audit. The child positional list is uninterpretable (the model's own
-  numbering assumption is unknown) and is not interpreted.
+- The reply used positional keys `"1"`–`"9"` with field `"answer"` instead of question ids
+  and `"selected"` (child: `{"answer": ["1","2","6","8","10"], "reason": "..."}`). The
+  visible prompt itself numbers the blocks 1..9, letters ordinary options A.., and numbers
+  child qualities 1..11, so this encoding is unambiguous: a narrow deterministic normalizer
+  maps it to canonical selections with reasons recovered exactly. 9/9 substantive, every
+  reason valid, every entry tagged `positional_labels`.
+- The original `respondent_parsed` event (kind `nonconforming`, canonical-only parser) is
+  preserved untouched; a clearly labeled offline `respondent_reinterpreted` event is
+  appended with the new protocol_id (accepted encodings are part of protocol identity),
+  and the per-release summary carries the reinterpretation. Shapes never affect scoring:
+  one-hot canonical selections are identical either way.
+- The run-scoping crash that followed (stale 3.7-plus completion in the shared file failed
+  the new target's route check) is fixed separately with a fixture; the first summary was
+  reconstructed offline from the single executed request via the committed
+  `smoke_summary_dict`.
 
 ## Ledger reconciliation
 
@@ -47,7 +49,7 @@ no retry, no panel.
 
 ## Conclusion
 
-Compatibility established at the transport and accounting layers; the oldest endpoint
-serves the v2 instrument and reporting, but returns a nonconforming shape (n=1). No
-refusal rate, no coordinate, no protocol selection follows. Stopping before panel
-dispatch as instructed.
+Compatibility established at transport, accounting, and parser layers: the oldest
+endpoint serves the v2 instrument, and its positional reply is 9/9 substantive with
+reasons exact (n=1). No refusal rate, no coordinate, no protocol selection follows.
+Stopping before panel dispatch as instructed.

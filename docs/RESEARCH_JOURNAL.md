@@ -1258,9 +1258,11 @@ hardcoded smoke model.
 One paid v2 request on qwen/qwen3.5-plus-02-15 (packet index 0, seed 392427931, new
 protocol with the JSON transport sentence): HTTP 200, exact Alibaba route
 (qwen/qwen3.5-plus-20260216, quantization unknown), cost USD 0.00075218. The reply used
-positional keys and "answer" instead of question ids and "selected", so all 9 questions
-are observed nonconforming refusals with no rescue; reasons live only in the raw text.
-A post-hoc validation-scoping crash (stale 3.7-plus completion in the shared file) was
-fixed with a fixture; the summary was reconstructed offline from the single request, no
-second call. Full audit: `slop/audits/20260919_resp_packet_smoke_v2_35plus.md`. Stopped
-before panel dispatch as instructed.
+positional labels matching the prompt's own numbering, so after a normalizer correction
+(all-or-nothing, ambiguity-rejecting, fixture-covered) all 9 are substantive with reasons
+recovered exactly; the original nonconforming interpretation event is preserved and a
+labeled reinterpretation appended. A post-hoc validation-scoping crash (stale 3.7-plus
+completion in the shared file) was fixed with a fixture; no second paid call. Accepted
+encodings are now part of protocol identity (new protocol_id), eval_version stays v2.
+Full audit: `slop/audits/20260919_resp_packet_smoke_v2_35plus.md`. Stopped before panel
+dispatch as instructed.

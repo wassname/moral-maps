@@ -20,6 +20,84 @@
   ],
   "reconstruction_note": "summary reconstructed offline from the single executed request (request seed 392427931); the embedded budget snapshot reflects the later live ledger, not smoke time; authoritative smoke cost is the attempt record USD 0.00075218",
   "records": "slop/research/wvs/20260919_respondent_packet/paid_smoke_v2.jsonl",
+  "reinterpretation": {
+    "note": "parser compatibility difference, not refusal: positional labels map to canonical selections with reasons recovered exactly; original nonconforming event preserved",
+    "original_protocol_id": "a4418fb1b2afd164b27b11ef03dd714f04bb020769bb986f34f22c3bfde3375d",
+    "protocol_id": "508959e4ac3a0245ab2d2630f029a2f333199235a5ad9f9c8055a8e79d49cc57",
+    "refused": 0,
+    "row": {
+      "Abortion": {
+        "outcome": "substantive",
+        "reason": "Complex issue requiring individual medical consideration.",
+        "reason_status": "valid",
+        "selected": "5",
+        "source_shape": "positional_labels"
+      },
+      "Attending peaceful demonstrations": {
+        "outcome": "substantive",
+        "reason": "I might join if the cause matters.",
+        "reason_status": "valid",
+        "selected": "Might do",
+        "source_shape": "positional_labels"
+      },
+      "ChildQualities": {
+        "outcome": "substantive",
+        "reason": "These traits build strong, independent character.",
+        "reason_status": "valid",
+        "selected": [
+          "Feeling of responsibility",
+          "Tolerance and respect for other people",
+          "Independence",
+          "Hard work",
+          "Determination, perseverance"
+        ],
+        "source_shape": "positional_labels"
+      },
+      "God": {
+        "outcome": "substantive",
+        "reason": "I rely on science, not deities.",
+        "reason_status": "valid",
+        "selected": "No",
+        "source_shape": "positional_labels"
+      },
+      "Homosexuality": {
+        "outcome": "substantive",
+        "reason": "Love between consenting adults is valid.",
+        "reason_status": "valid",
+        "selected": "Always justifiable",
+        "source_shape": "positional_labels"
+      },
+      "Joining in boycotts": {
+        "outcome": "substantive",
+        "reason": "I might boycott unethical companies occasionally.",
+        "reason_status": "valid",
+        "selected": "Might do",
+        "source_shape": "positional_labels"
+      },
+      "Religion": {
+        "outcome": "substantive",
+        "reason": "Spirituality matters more than organized religion.",
+        "reason_status": "valid",
+        "selected": "Not very important",
+        "source_shape": "positional_labels"
+      },
+      "Signing a petition": {
+        "outcome": "substantive",
+        "reason": "I have signed petitions for causes.",
+        "reason_status": "valid",
+        "selected": "Have done",
+        "source_shape": "positional_labels"
+      },
+      "dealing with people?": {
+        "outcome": "substantive",
+        "reason": "Society functions best with mutual trust.",
+        "reason_status": "valid",
+        "selected": "Most people can be trusted",
+        "source_shape": "positional_labels"
+      }
+    },
+    "substantive": 9
+  },
   "routes": [
     {
       "advertised_quantization": "unknown",

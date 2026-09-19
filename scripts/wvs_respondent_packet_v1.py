@@ -218,11 +218,18 @@ def packet_schema(battery: list[dict]) -> dict:
                 "required": ["answers", "child_qualities"], "additionalProperties": False}}}
 
 
+CANONICAL_SHAPE = "canonical_schema"
+POSITIONAL_SHAPE = "positional_labels"
+NO_RESPONSE_SHAPE = "no_usable_response"
+ACCEPTED_ENCODINGS = (CANONICAL_SHAPE, POSITIONAL_SHAPE)
+
+
 def refusal_row(battery: list[dict]) -> dict:
     """Packet-level refusal: no usable value anywhere; every question is refused (observed, not
     scored as neutral)."""
     return {q["id"]: {"outcome": "refused", "selected": None, "reason": None,
-                     "reason_status": "not_available"} for q in battery}
+                     "reason_status": "not_available",
+                     "source_shape": NO_RESPONSE_SHAPE} for q in battery}
 
 
 def reason_status(value: object) -> str:
@@ -232,10 +239,57 @@ def reason_status(value: object) -> str:
     return "valid" if len(value.split()) <= REASON_MAX_WORDS else "too_long"
 
 
-def substantive_row(selected: object, reason: object) -> dict:
+def substantive_row(selected: object, reason: object, shape: str = CANONICAL_SHAPE) -> dict:
     status = reason_status(reason)
     return {"outcome": "substantive", "selected": selected, "reason": reason,
-            "reason_status": status}
+            "reason_status": status, "source_shape": shape}
+
+
+def positional_labels(battery: list[dict]) -> dict:
+    """The labels render_packet displays: blocks numbered 1..9 in battery order, ordinary
+    options lettered A.. per block, child qualities numbered 1..11."""
+    labels = {}
+    for number, q in enumerate(battery, 1):
+        if q["id"] == "ChildQualities":
+            labels[str(number)] = ("child", [str(j) for j in range(1, len(q["options"]) + 1)])
+        else:
+            labels[str(number)] = ("ordinary", [chr(64 + j) for j in range(1, len(q["options"]) + 1)])
+    return labels
+
+
+def normalize_positional(battery: list[dict], raw: object) -> dict | None:
+    """Narrow deterministic normalizer for the positional encoding: exact top-level keys
+    1..9, each value exactly {answer, reason}, ordinary answers one displayed letter of that
+    block, child answers a unique list of 0..5 displayed number strings. Anything else ->
+    None (not this encoding; the caller records nonconforming refusal). Selected values map
+    through the rendered battery labels to the same canonical option text, so scoring is
+    identical to the canonical shape."""
+    labels = positional_labels(battery)
+    if not isinstance(raw, dict) or set(raw) != set(labels):
+        return None
+    row = {}
+    for number, q in enumerate(battery, 1):
+        key = str(number)
+        block = raw[key]
+        if not isinstance(block, dict) or set(block) != {"answer", "reason"}:
+            return None
+        answer, reason = block["answer"], block["reason"]
+        if reason_status(reason) != "valid":
+            return None
+        kind, valid = labels[key]
+        if kind == "child":
+            if (not isinstance(answer, list) or len(answer) > 5
+                    or any(not isinstance(a, str) for a in answer)
+                    or len(set(answer)) != len(answer)
+                    or any(a not in valid for a in answer)):
+                return None
+            selected = [q["options"][int(a) - 1] for a in answer]
+        else:
+            if not isinstance(answer, str) or answer not in valid:
+                return None
+            selected = q["options"][ord(answer) - 65]
+        row[q["id"]] = substantive_row(selected, reason, POSITIONAL_SHAPE)
+    return row
 
 
 def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | None, bool]:
@@ -250,6 +304,10 @@ def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | Non
       it is never rescued.
     - (None, None, True): clearly syntactic malformed output (an apparent JSON object that fails
       to parse, or visibly truncated output with unbalanced braces) -> repairable, rescue once.
+    Two accepted encodings map to identical canonical selections: the schema shape
+    (answers/child_qualities objects) and the positional-labels shape (blocks 1..9 with one
+    displayed letter / 0..5 displayed numbers plus reason each). Every row entry records its
+    source_shape; shapes never affect scoring.
     Deterministic rule: if syntactic vs substantive cannot be distinguished, it is a refusal.
     """
     if not (text or "").strip():
@@ -263,27 +321,33 @@ def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | Non
     except (json.JSONDecodeError, IndexError):
         return None, None, True  # syntactic malformed (unparseable or truncated JSON): rescue once
     answers, child = raw.get("answers"), raw.get("child_qualities")
-    if not isinstance(answers, dict) or not isinstance(child, dict):
-        return refusal_row(battery), "nonconforming", False
-    row = {}
-    for q in battery:
-        if q["id"] == "ChildQualities":
-            selected, reason = child.get("selected"), child.get("reason")
-            if (isinstance(selected, list) and len(selected) <= 5 and len(set(selected)) == len(selected)
-                    and set(selected) <= set(q["options"])):
+    if isinstance(answers, dict) and isinstance(child, dict):
+        row = {}
+        for q in battery:
+            if q["id"] == "ChildQualities":
+                selected, reason = child.get("selected"), child.get("reason")
+                if (isinstance(selected, list) and len(selected) <= 5 and len(set(selected)) == len(selected)
+                        and set(selected) <= set(q["options"])):
+                    row[q["id"]] = substantive_row(selected, reason)
+                else:
+                    row[q["id"]] = {"outcome": "refused", "selected": None, "reason": reason,
+                                     "reason_status": "not_available",
+                                     "source_shape": CANONICAL_SHAPE}
+                continue
+            answer = answers.get(q["id"])
+            selected = answer.get("selected") if isinstance(answer, dict) else None
+            reason = answer.get("reason") if isinstance(answer, dict) else None
+            if selected in q["options"]:
                 row[q["id"]] = substantive_row(selected, reason)
             else:
                 row[q["id"]] = {"outcome": "refused", "selected": None, "reason": reason,
-                                 "reason_status": "not_available"}
-            continue
-        answer = answers.get(q["id"])
-        selected = answer.get("selected") if isinstance(answer, dict) else None
-        reason = answer.get("reason") if isinstance(answer, dict) else None
-        if selected in q["options"]:
-            row[q["id"]] = substantive_row(selected, reason)
-        else:
-            row[q["id"]] = {"outcome": "refused", "selected": None, "reason": reason,
-                             "reason_status": "not_available"}
+                                 "reason_status": "not_available",
+                                 "source_shape": CANONICAL_SHAPE}
+    else:
+        positional = normalize_positional(battery, raw)
+        if positional is None:
+            return refusal_row(battery), "nonconforming", False
+        row = positional
     outcomes = [v["outcome"] for v in row.values()]
     reasons = [v["reason_status"] for v in row.values()]
     kind = ("nonconforming" if "refused" in outcomes else
@@ -530,8 +594,8 @@ def prior_rows(rpath: Path, pid: str) -> dict[int, dict]:
             and record.get("protocol_id") == pid}
 
 
-def protocol_id(model: str, battery: list[dict]) -> str:
-    protocol = {
+def protocol_body(model: str, battery: list[dict]) -> dict:
+    return {
         "schema": 1, "eval_version": EVAL_VERSION, "model": model,
         "temperature": 1.0, "max_tokens": MAX_TOKENS, "reasoning": {"enabled": False},
         "provider": PROVIDER, "n_packets": N_PACKETS, "seeds": paired_seeds(N_PACKETS),
@@ -539,7 +603,14 @@ def protocol_id(model: str, battery: list[dict]) -> str:
                     for q in battery],
         "packet_prompt": render_packet(battery), "response_schema": packet_schema(battery),
         "reason_rule": REASON_RULE_V2,
+        # accepted response encodings are part of the protocol: widening them changes how the
+        # same bytes map to scores, so it changes the identity even with eval_version fixed.
+        "accepted_response_encodings": list(ACCEPTED_ENCODINGS),
     }
+
+
+def protocol_id(model: str, battery: list[dict]) -> str:
+    protocol = protocol_body(model, battery)
     encoded = json.dumps(protocol, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
     return hashlib.sha256(encoded).hexdigest()
 
@@ -593,6 +664,12 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
             rows[event["packet"]] = event["row"]
     if len(rows) != N_PACKETS:
         raise RuntimeError(f"incomplete packet set for {model}: {len(rows)}/{N_PACKETS}")
+    packet_shapes = []
+    for k in sorted(rows):
+        entry_shapes = {rows[k][q["id"]]["source_shape"] for q in battery}
+        assert len(entry_shapes) == 1, "one packet has one source encoding"
+        packet_shapes.append(next(iter(entry_shapes)))
+    shape_counts = {s: packet_shapes.count(s) for s in sorted(set(packet_shapes))}
     per_question = {}
     for q in battery:
         outcomes = [rows[k][q["id"]] for k in sorted(rows)]
@@ -601,6 +678,7 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
         reason_statuses = [o["reason_status"] for o in outcomes]
         reason_counts = {s: reason_statuses.count(s) for s in
                          ("valid", "missing", "too_long", "not_available")}
+
         if q["id"] == "ChildQualities":
             counts = {opt: 0 for opt in q["options"]}
             zero_selection = 0
@@ -634,7 +712,7 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
                 and event.get("protocol_id") == pid and event.get("refusal_kind")):
             kinds[event["refusal_kind"]] = kinds.get(event["refusal_kind"], 0) + 1
     return {"model": model, "eval_version": EVAL_VERSION, "protocol_id": pid, "records": str(rpath),
-            "valid_packets": len(rows),
+            "valid_packets": len(rows), "source_shape_counts": shape_counts,
             "refusal_kinds": kinds,  # observed refusal classification per packet (v2: never schema-offered)
             "refusal_rate_overall": sum(q["refused"] for q in per_question.values())
             / sum(q["n"] for q in per_question.values()),
@@ -665,6 +743,7 @@ def write_manifest(battery: list[dict]) -> dict:
                            for q in battery],
                "packet_prompt": render_packet(battery), "response_schema": packet_schema(battery),
                "reason_rule": REASON_RULE_V2,
+               "accepted_response_encodings": list(ACCEPTED_ENCODINGS),
                "instrument_status": ("GlobalOpinionQA-compatible approximation; 11th quality "
                                      "Religious faith appended; card order not recorded in source"),
                "n_packets": N_PACKETS, "max_tokens": MAX_TOKENS, "temperature": 1.0,
@@ -697,8 +776,11 @@ def write_manifest(battery: list[dict]) -> dict:
 
 
 def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
-    # identity: v2 everywhere
+    # identity: v2 everywhere; protocol/cache identity includes accepted response encodings
     assert EVAL_VERSION == "wvs-respondent-packet-v2"
+    body = protocol_body(MODELS[0], battery)
+    assert body["accepted_response_encodings"] == ["canonical_schema", "positional_labels"]
+    assert body["eval_version"] == EVAL_VERSION
     # fixture: visible prompt contains no refusal/null/AI-identity language
     prompt = render_packet(battery).lower()
     for banned in ("refus", "cannot", "unable", "prefer not", "no answer", "don't know",
@@ -733,12 +815,14 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     assert row is not None and kind is None and not rescueable
     assert row["ChildQualities"] == {"outcome": "substantive",
                                      "selected": ["Independence", RELIGIOUS_FAITH],
-                                     "reason": "Personal values shape my view", "reason_status": "valid"}
+                                     "reason": "Personal values shape my view", "reason_status": "valid",
+                                     "source_shape": "canonical_schema"}
     # fixture: child [] parses as SUBSTANTIVE none (the stem says "Which, if any")
     row, kind, rescueable = parse_packet(battery, json.dumps(answers_row([])))
     assert row is not None and not rescueable
     assert row["ChildQualities"] == {"outcome": "substantive", "selected": [],
-                                     "reason": "Personal values shape my view", "reason_status": "valid"}
+                                     "reason": "Personal values shape my view", "reason_status": "valid",
+                                     "source_shape": "canonical_schema"}
     # fixture: empty content is an OBSERVED refusal (never rescued, never neutral)
     row, kind, rescueable = parse_packet(battery, "")
     assert row is not None and kind == "empty_content" and not rescueable
@@ -800,6 +884,77 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     child_lists = packet_item_lists({0: child_valid, 1: child_long}, battery, child_rows)
     for quality in PANEL_QUALITIES:
         assert np.array_equal(child_lists[quality][0], child_lists[quality][1])
+    # fixture: positional-labels encoding (the 3.5-plus oldest-endpoint reply). Exact raw text
+    # from the committed smoke record must map through the displayed labels to canonical
+    # selections with reasons recovered exactly; every entry is tagged positional_labels.
+    smoke_events = [json.loads(line) for line in
+                    (OUT / "paid_smoke_v2.jsonl").read_text().splitlines()]
+    old_parsed = next(e for e in smoke_events if e["event"] == "respondent_parsed"
+                      and e.get("model") == MODELS[0])
+    # the recorded event keeps its original nonconforming interpretation (history preserved);
+    # current code normalizes the same text to a positional row directly.
+    assert old_parsed["refusal_kind"] == "nonconforming"
+    live_row, live_kind, live_rescueable = parse_packet(battery, old_parsed["text"])
+    assert live_kind is None and not live_rescueable
+    assert all(v["outcome"] == "substantive" for v in live_row.values())
+    assert all(v["source_shape"] == "positional_labels" for v in live_row.values())
+    raw_positional = json.loads(old_parsed["text"])
+    assert set(raw_positional) == {str(n) for n in range(1, 10)}
+    pos_row = normalize_positional(battery, raw_positional)
+    assert pos_row is not None
+    assert all(v["outcome"] == "substantive" for v in pos_row.values())
+    assert all(v["source_shape"] == "positional_labels" for v in pos_row.values())
+    assert all(v["reason_status"] == "valid" for v in pos_row.values())
+    for number, q in enumerate(battery, 1):
+        block = raw_positional[str(number)]
+        assert pos_row[q["id"]]["reason"] == block["reason"]
+        if q["id"] == "ChildQualities":
+            assert pos_row[q["id"]]["selected"] == [q["options"][int(a) - 1]
+                                                        for a in block["answer"]]
+        else:
+            assert pos_row[q["id"]]["selected"] == q["options"][ord(block["answer"]) - 65]
+    assert pos_row["Religion"]["selected"] == next(
+        q for q in battery if q["id"] == "Religion")["options"][2]
+    assert pos_row["Religion"]["reason"] == "Spirituality matters more than organized religion."
+    child_opts = next(q for q in battery if q["id"] == "ChildQualities")["options"]
+    assert pos_row["ChildQualities"]["selected"] == [child_opts[0], child_opts[1],
+                                                        child_opts[5], child_opts[7],
+                                                        child_opts[9]]
+    # fixture: positional ambiguity rejections. Each mutation must yield None (not this
+    # encoding), never a guessed mapping.
+    def mutate(block_key, field, value):
+        mutated = json.loads(json.dumps(raw_positional))
+        if block_key not in mutated:
+            mutated[block_key] = value
+        elif field is None:
+            del mutated[block_key]
+        elif field == "__extra_block_key__":
+            mutated[block_key][value[0]] = value[1]
+        else:
+            mutated[block_key][field] = value
+        return mutated
+    block4_options = battery[3]["options"]
+    assert len(block4_options) == 10, "fixture needs Homosexuality at 10 options (J valid, K not)"
+    rejections = [
+        mutate("10", None, {"answer": "A", "reason": "Valid short reason here."}),
+        mutate("9", None, None),
+        mutate("0", None, {"answer": "A", "reason": "Valid short reason here."}),
+        mutate("1", "answer", "Z"),
+        mutate("1", "answer", "c"),
+        mutate("4", "answer", "K"),
+        mutate("1", "answer", ["A"]),
+        mutate("9", "answer", ["1", "1"]),
+        mutate("9", "answer", ["0"]),
+        mutate("9", "answer", ["12"]),
+        mutate("9", "answer", [1, 2]),
+        mutate("9", "answer", ["1", "2", "3", "4", "5", "6"]),
+        mutate("1", "reason", "These nine separate words exceed the permitted reason length now"),
+        mutate("1", "reason", ""),
+        mutate("2", "reason", None),
+        mutate("3", "__extra_block_key__", ("confidence", "high")),
+    ]
+    for i, bad in enumerate(rejections):
+        assert normalize_positional(battery, bad) is None, f"rejection fixture {i} mapped"
     # fixture: duplicate / oversized child lists are nonconforming (uniqueness enforced in parsing,
     # since Alibaba rejects array schemas with the uniqueness keyword)
     dup_row, dup_kind, rescueable = parse_packet(battery, json.dumps(
@@ -899,6 +1054,46 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     assert paid_calls_authorized() is False
     print("offline smoke passed: v2 identity, clean prompt/schema, refusal-as-observed, "
           "rescue-only-syntactic, child semantics, collapse fixtures")
+
+def reinterpret_smoke_35plus(battery: list[dict]) -> dict:
+    """Offline reinterpretation of the single oldest-endpoint smoke response: the reply used
+    positional labels (unambiguous given the rendered prompt) but was recorded as nonconforming
+    under the canonical-only parser. Appends a clearly labeled reinterpretation event without
+    touching the original events; refuses to duplicate. No API call."""
+    target = MODELS[0]
+    rpath = OUT / "paid_smoke_v2.jsonl"
+    events = load_events(rpath)
+    parsed = [e for e in events if e["event"] == "respondent_parsed"
+              and e.get("model") == target and e.get("refusal_kind") == "nonconforming"]
+    assert len(parsed) == 1, f"expected exactly one 3.5-plus nonconforming parse, got {len(parsed)}"
+    original = parsed[0]
+    old_pid = original["protocol_id"]
+    assert not any(e["event"] == "respondent_reinterpreted" and e.get("model") == target
+                   and e.get("original_protocol_id") == old_pid for e in events), \
+        "reinterpretation already recorded; refusing to duplicate"
+    new_pid = protocol_id(target, battery)
+    assert new_pid != old_pid, "protocol identity must change with accepted encodings"
+    row = normalize_positional(battery, json.loads(original["text"]))
+    assert row is not None and all(v["outcome"] == "substantive" for v in row.values())
+    assert all(v["reason_status"] == "valid" for v in row.values())
+    event = {"event": "respondent_reinterpreted", "eval_version": EVAL_VERSION,
+             "model": target, "packet": original["packet"], "seed": 392427931,
+             "original_protocol_id": old_pid, "protocol_id": new_pid,
+             "original_interpretation": "nonconforming", "normalizer": "positional_labels",
+             "row": row, "text": original["text"]}
+    append_record(rpath, event)
+    rec, summary_path = smoke_paths(target)
+    summary = json.loads(summary_path.read_text())
+    summary["reinterpretation"] = {
+        "row": row, "protocol_id": new_pid, "original_protocol_id": old_pid,
+        "substantive": len(row), "refused": 0,
+        "note": ("parser compatibility difference, not refusal: positional labels map to "
+                   "canonical selections with reasons recovered exactly; original "
+                   "nonconforming event preserved")}
+    atomic_json(summary_path, summary)
+    print(f"reinterpretation appended: 9/9 substantive positional_labels under pid {new_pid[:12]}")
+    return event
+
 
 def offline_regression(battery: list[dict]) -> None:
     """No paid call may execute without the opt-in, even with the read_api level patched."""
@@ -1160,6 +1355,7 @@ def main() -> None:
     actions.add_argument("--offline-regression", action="store_true")
     actions.add_argument("--write-manifest", action="store_true")
     actions.add_argument("--paid-smoke", action="store_true")
+    actions.add_argument("--reinterpret-smoke", action="store_true")
     actions.add_argument("--run", action="store_true")
     actions.add_argument("--analyze", action="store_true")
     actions.add_argument("--synthetic-analysis-test", action="store_true")
@@ -1187,6 +1383,8 @@ def main() -> None:
         os.environ[PAID_OPTIN_ENV] = "1"
     if args.paid_smoke:
         paid_smoke(args.smoke_model, battery)
+    if args.reinterpret_smoke:
+        reinterpret_smoke_35plus(battery)
     if args.run:
         run(battery)
     if args.analyze:
@@ -1523,8 +1721,14 @@ def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dic
         child_zero_substantive = sum(
             1 for k in sorted(rows) if rows[k]["ChildQualities"]["outcome"] == "substantive"
             and not rows[k]["ChildQualities"]["selected"])
+        shapes = []
+        for k in sorted(rows):
+            entry_shapes = {rows[k][q["id"]]["source_shape"] for q in battery}
+            assert len(entry_shapes) == 1, "one packet has one source encoding"
+            shapes.append(next(iter(entry_shapes)))
         per_model[m] = {"refused_per_question": refused,
                         "refusal_rate": sum(refused.values()) / (len(refused) * N_PACKETS),
+                        "source_shape_counts": {s: shapes.count(s) for s in sorted(set(shapes))},
                         "coverage_per_question": {q["id"]: 1 - refused[q["id"]] / N_PACKETS
                                                   for q in battery},
                         "child_refusal_rate": child_refused / N_PACKETS,
@@ -1559,6 +1763,7 @@ def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dic
         "release_years": release_years().tolist(),
         "packet": packet_summary | {
             "refusal": {m: per_model[m]["refusal_rate"] for m in MODELS},
+            "source_shapes": {m: per_model[m]["source_shape_counts"] for m in MODELS},
             "coverage": {m: per_model[m]["coverage_per_question"] for m in MODELS},
             "child_diagnostics": {m: {k: per_model[m][k] for k in (
                 "child_refusal_rate", "child_zero_selection_substantive_rate",
@@ -1615,23 +1820,28 @@ def synthetic_analysis_test(battery: list[dict], child_rows: list[dict]) -> None
                 if q["id"] == "ChildQualities":
                     pool = q["options"]
                     if rng.random() < 0.03:
-                        row[q["id"]] = {"outcome": "refused", "selected": None}
+                        row[q["id"]] = {"outcome": "refused", "selected": None,
+                                        "source_shape": CANONICAL_SHAPE}
                     else:
                         picked = list(rng.choice(pool, size=rng.integers(0, 6), replace=False))
-                        row[q["id"]] = {"outcome": "substantive", "selected": picked}
+                        row[q["id"]] = {"outcome": "substantive", "selected": picked,
+                                        "source_shape": CANONICAL_SHAPE}
                 else:
                     if rng.random() < 0.05 * (k + 1):
-                        row[q["id"]] = {"outcome": "refused", "selected": REFUSED}
+                        row[q["id"]] = {"outcome": "refused", "selected": REFUSED,
+                                        "source_shape": CANONICAL_SHAPE}
                     else:
                         # drift with release index k so the linear fit has signal
                         j = min(len(q["options"]) - 1, max(0, int(rng.normal(k * 0.8, 1.5))))
-                        row[q["id"]] = {"outcome": "substantive", "selected": q["options"][j]}
+                        row[q["id"]] = {"outcome": "substantive", "selected": q["options"][j],
+                                        "source_shape": CANONICAL_SHAPE}
             rows[p] = row
         packet_rows[m] = rows
     result = analyze_from_data(packet_rows, battery, child_rows, resolved)
     # healthy case: all four models have finite points and family metrics
     assert result["packet"]["family_point"]["status"] == "ok"
     assert result["dense_v1"]["family_point"]["status"] == "ok"
+    assert result["packet"]["source_shapes"][MODELS[0]] == {"canonical_schema": N_PACKETS}
     assert np.isfinite(result["packet"]["constant_family_rmse"])
     assert np.isfinite(result["packet"]["loo"]["constant_loo_mean"])
     assert result["packet"]["refusal"][MODELS[3]] > result["packet"]["refusal"][MODELS[0]]
@@ -1645,9 +1855,11 @@ def synthetic_analysis_test(battery: list[dict], child_rows: list[dict]) -> None
     # unavailable, family/trend/LOO are explicit unavailable results with valid-draw counts, the
     # refusal/coverage diagnostics are retained, and the analysis completes deterministically.
     collapsed = dict(packet_rows)
-    collapsed[MODELS[2]] = {k: {q["id"]: ({"outcome": "refused", "selected": None}
+    collapsed[MODELS[2]] = {k: {q["id"]: ({"outcome": "refused", "selected": None,
+                                                      "source_shape": CANONICAL_SHAPE}
                                           if q["id"] == "ChildQualities" else
-                                          {"outcome": "refused", "selected": REFUSED})
+                                          {"outcome": "refused", "selected": REFUSED,
+                                           "source_shape": CANONICAL_SHAPE})
                                 for q in battery} for k in range(N_PACKETS)}
     result = analyze_from_data(collapsed, battery, child_rows, resolved)
     assert result["packet"]["point_coords_xy_per_model"][MODELS[2]] is None
@@ -1672,7 +1884,8 @@ def synthetic_analysis_test(battery: list[dict], child_rows: list[dict]) -> None
     one_missing = dict(packet_rows)
     broken = {k: dict(v) for k, v in packet_rows[MODELS[1]].items()}
     for k in broken:
-        broken[k]["God"] = {"outcome": "refused", "selected": None}
+        broken[k]["God"] = {"outcome": "refused", "selected": None,
+                              "source_shape": CANONICAL_SHAPE}
     one_missing[MODELS[1]] = broken
     result = analyze_from_data(one_missing, battery, child_rows, resolved)
     ps = result["packet"]["point_coords_xy_per_model"]
