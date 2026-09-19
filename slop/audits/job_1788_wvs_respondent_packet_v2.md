@@ -65,7 +65,7 @@ A fresh read-only reviewer separately audited every raw structure and identified
 
 ## Reanalysis
 
-Coordinates are `[Survival <-> Self-expression, Traditional <-> Secular-Rational]`. Packet CIs and SEs use B=1,000 whole-respondent-row bootstrap draws. Dense-v1 uses its existing per-item rating samples, so packet-minus-dense shifts use independent bootstrap draws.
+Coordinates are `[Survival <-> Self-expression, Traditional <-> Secular-Rational]`. Both comparisons score the same 12 recovered WVS axis rows: 8 ordinary items plus the four child-quality coefficient rows in `PANEL_QUALITIES`, Obedience, Independence, Determination/perseverance, and Imagination. The packet asks all 11 human child qualities. The other seven selections, including Religious faith, remain in every raw respondent packet but do not enter these recovered coordinates because no axis coefficients are used for them here. Packet CIs and SEs use B=1,000 whole-respondent-row bootstrap draws. Dense-v1 uses its existing per-item rating samples, so packet-minus-dense shifts use independent bootstrap draws.
 
 | release | packet coordinate, SE | packet CI95 | dense-v1 coordinate, SE | packet minus dense, CI95 |
 |---|---|---|---|---|
@@ -214,4 +214,4 @@ Two full deterministic analysis executions produced the same SHA-256s:
 
 Map diff exit code was 0. Map SHA-256 values are `c03b5104a9a31482fa547a8a2996e33d3d3d59453d5189f94e95d9d451bf63d1` for JSON, `a7164901ff69e1e51696ade8fb9dd9c62d81af5cfa0c94a49ddf5598c68b4103` for PNG, and `d35cb80a70d34472e967ac1453aa54d43c24418b8b74fe71e726d2a927771aa2` for SVG.
 
--- PI[unknown]
+-- PI[gpt-5.6-terra]

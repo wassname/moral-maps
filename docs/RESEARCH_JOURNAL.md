@@ -1286,6 +1286,12 @@ question instances because two question names are paraphrases rather than visibl
 prompt IDs. Twenty packets have too-long reasons but retain their selected answers; reasons were
 not scored.
 
+Coordinate comparison note: both old and new analyses score the same 12 recovered WVS axis rows,
+8 ordinary items plus the four `PANEL_QUALITIES` child rows, Obedience, Independence,
+Determination/perseverance, and Imagination. The packet asks all 11 human child qualities. The
+other seven selections, including Religious faith, remain in raw respondent packets but do not enter
+these coordinates because no axis coefficients are used for them here.
+
 Observation, from the fixed whole-row bootstrap in
 `slop/research/wvs/20260919_respondent_packet/analysis.json`: packet constant-family RMSE is
 0.0792 and linear RMSE is 0.0696. Constant LOO error is 0.0942, lower than linear LOO error 0.1318.
@@ -1296,4 +1302,4 @@ a causal model-release effect. The published WVS map data, PNG, and SVG had a by
 
 Full audit: `slop/audits/job_1788_wvs_respondent_packet_v2.md`.
 
--- PI[unknown]
+-- PI[gpt-5.6-terra]
