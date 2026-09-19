@@ -1224,3 +1224,7 @@ N=128 whole respondent packets per release with 128 paired deterministic seeds s
 ### Execution
 
 After parent smoke approval: paid smoke, audit, then explicit full-run approval; one resumable Pueue `api` task with one `pqf` follower; full log and raw record audit before interpretation. Paid-call opt-in guard inherited and extended (offline regression proves a mis-targeted read_api patch cannot bypass it).
+
+### Scoring geometry (exact)
+
+Humans: one categorical choice per ordinary item and up to 5 of 11 child qualities; country frequencies drop DK/refusal and renormalize over the substantive options. Dense v1: 1-5 ratings for every option of an item, normalized to an item distribution. Packet v2: one-hot choices averaged across packets, producing the same item simplex for ordinary questions with no extra z-scaling; child packets preserve the human <=5-of-11 joint selection constraint, which dense v1's independently rated child binaries do not. Axis scores remain the expected pole position per item, then the mean across items. The feasible coordinate set is a convex polytope (a subset of [0,1]^2 bounded by the item simplexes and the <=5 constraint), NOT a circle around the human cloud: models can lie outside the empirical human country cloud but cannot invent response categories.

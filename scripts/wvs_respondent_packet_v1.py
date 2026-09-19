@@ -1,15 +1,27 @@
 #!/usr/bin/env python3
-"""wvs-respondent-packet-v1: ONE API call = ONE coherent pseudo-respondent answering the complete
+"""wvs-respondent-packet-v2: ONE API call = ONE coherent pseudo-respondent answering the complete
 selected WVS battery (8 ordinary single-choice questions + the 11-quality choose-up-to-five child
 list) in canonical order. -- PI[gpt-5.6-terra]
 
-Instrument status: the child-quality list is a GlobalOpinionQA-compatible APPROXIMATION -- the saved
-source has 10 of the standard 11 qualities; "Religious faith" (standard WVS, absent from the saved
-source) is appended as the 11th item, and the saved source does not record the human card order, so
-list order is the saved source order plus that documented append. Ordinary questions show only
-substantive options; refusal is a separate per-question status inside the schema, never displayed as
-an option and never scored as neutral. eval_version is stamped on every record, row, and identity.
-Paid paths refuse to run without the explicit opt-in (see PaidCallsNotAuthorized docs).
+V2 (owner-corrected) administration: the questionnaire never suggests refusal, inability, or AI
+identity; the response schema permits ONLY the listed substantive options (ordinary) and ONLY a
+0..5 array of listed qualities (child). Refusal is therefore an OBSERVED outcome, recorded only
+when the model/API produces no usable value despite that schema (empty/no content, no JSON, or
+nonconforming output); it is never a schema value, never shown as an option, never scored as
+neutral, and never rescued into an answer. Only clearly syntactic malformed output (unparseable
+JSON) is rescued once; if syntactic vs substantive cannot be distinguished, record refusal.
+Child [] is a substantive zero-selection ("Which, if any"). Zero-substantive-coverage collapse is
+handled explicitly: unavailable point coordinates, invalid bootstrap draws, unavailable
+family/trend/LOO metrics with valid-draw counts, never a crash or a fit of the remaining releases.
+
+Why v1 stopped: the v1 smoke (kept as a failed design diagnostic, paid_smoke.jsonl) showed
+qwen3.7-plus explicitly refusing all 9 questions when the prompt/schema offered a "refused" token;
+the owner ruled the escape hatch a protocol problem and removed it in v2.
+
+Instrument status: the child-quality list is a GlobalOpinionQA-compatible APPROXIMATION -- the
+saved source has 10 of the standard 11 qualities; "Religious faith" (standard WVS, absent from the
+saved source) is appended as the 11th item, and the saved source does not record the human card
+order, so list order is the saved source order plus that documented append.
 """
 from __future__ import annotations
 
@@ -44,7 +56,7 @@ from wvs_original_choice_pilot import (  # noqa: E402
     build_items,
 )
 
-EVAL_VERSION = "wvs-respondent-packet-v1"
+EVAL_VERSION = "wvs-respondent-packet-v2"
 MODELS = ("qwen/qwen3.5-plus-02-15", "qwen/qwen3.6-plus",
           "qwen/qwen3.5-plus-20260420", "qwen/qwen3.7-plus")
 PROVIDER = {"only": ["Alibaba"], "allow_fallbacks": False, "require_parameters": True}
@@ -147,6 +159,8 @@ def build_battery() -> tuple[list[dict], list[dict]]:
 
 
 def render_packet(battery: list[dict]) -> str:
+    """V2 questionnaire: never mentions refusal, inability, AI identity, or any escape token.
+    Says only: pick the closest listed option (ordinary); choose up to five (child)."""
     blocks = []
     for number, q in enumerate(battery, 1):
         if q["id"] == "ChildQualities":
@@ -155,83 +169,91 @@ def render_packet(battery: list[dict]) -> str:
                           "Choose up to five; give an empty list if none.")
         else:
             opts = "\n".join(f"   {chr(64 + j)}. {o}" for j, o in enumerate(q["options"], 1))
-            blocks.append(f"{number}. {q['question']}\n{opts}\nChoose exactly one option.")
+            blocks.append(f"{number}. {q['question']}\n{opts}\n"
+                          "Choose exactly one option; if none fits exactly, choose the closest.")
     return ("You are one person answering a social values survey. Answer every question as yourself, "
-            "in order, choosing the option that best matches your own views. "
-            "If you cannot or will not answer a question, set its \"selected\" value to \"refused\"; "
-            "the refusal is recorded separately and is not one of the listed options.\n\n"
+            "in order, choosing the listed option that is closest to your own views.\n\n"
             + "\n\n".join(blocks))
 
 
 def packet_schema(battery: list[dict]) -> dict:
+    """V2 schema permits ONLY substantive listed values: ordinary enums are exactly the listed
+    options (no refusal token, no null); the child field is only a 0..5 array of listed qualities.
+    The schema is shown to the model, so it must not advertise an escape. No array-uniqueness
+    keyword (Alibaba rejects array schemas that contain it); duplicates are invalid in
+    parse_packet."""
     child = next(q for q in battery if q["id"] == "ChildQualities")
     ordinary = {q["id"]: {"type": "object",
                           "properties": {"selected": {"type": "string",
-                                                      "enum": q["options"] + [REFUSED]}},
+                                                      "enum": q["options"]}},
                           "required": ["selected"], "additionalProperties": False}
                 for q in battery if q["id"] != "ChildQualities"}
-    # child: refused flag is separate from the 0..5 selected list; zero selections with refused=false
-    # is a valid substantive "none of these" answer (the human stem says "Which, if any").
     return {"type": "json_schema", "json_schema": {"name": "wvs_respondent_packet", "strict": True,
             "schema": {"type": "object", "properties": {
                 "answers": {"type": "object", "properties": ordinary,
                             "required": list(ordinary), "additionalProperties": False},
-                "child_qualities": {"type": "object", "properties": {
-                    "refused": {"type": "boolean"},
-                    "selected": {"type": "array",
-                                 "items": {"type": "string", "enum": child["options"]},
-                                 "minItems": 0, "maxItems": 5}},
-                    "required": ["refused", "selected"], "additionalProperties": False}},
+                "child_qualities": {"type": "array",
+                                    "items": {"type": "string", "enum": child["options"]},
+                                    "minItems": 0, "maxItems": 5}},
                 "required": ["answers", "child_qualities"], "additionalProperties": False}}}
-    # NOTE: no array-uniqueness keyword here - Alibaba rejects array schemas that contain it
-    # (its 400 says: when the schema contains that uniqueness field, the type should not be
-    # "array"); uniqueness is enforced in parse_packet, where a duplicate is an invalid packet
-    # (rescue, then a failed packet).
 
 
-def parse_packet(battery: list[dict], text: str) -> dict | None:
-    """Validated respondent row, or None when invalid (rescued once, then a failed packet)."""
+def refusal_row(battery: list[dict]) -> dict:
+    """Packet-level refusal: no usable value anywhere; every question is refused (observed, not
+    scored as neutral)."""
+    return {q["id"]: {"outcome": "refused", "selected": None} for q in battery}
+
+
+def parse_packet(battery: list[dict], text: str) -> tuple[dict | None, str | None, bool]:
+    """Classify one response. Returns (row, refusal_kind, rescueable).
+
+    - (refusal_row, kind, False): no usable value despite the schema -> OBSERVED refusal, never
+      rescued. kind: 'empty_content' (empty/no content), 'no_json' (a plain-text reply with no
+      JSON object), or 'nonconforming' (parsed but structure/values outside the substantive
+      space; offending questions are refused, conforming questions keep their answers).
+    - (None, None, True): clearly syntactic malformed output (an apparent JSON object that fails
+      to parse, or visibly truncated output with unbalanced braces) -> repairable, rescue once.
+    Deterministic rule: if syntactic vs substantive cannot be distinguished, it is a refusal.
+    """
+    if not (text or "").strip():
+        return refusal_row(battery), "empty_content", False
     objs = re.findall(r"\{.*\}", text, re.S)
-    if not objs:
-        return None
+    truncated = text.count("{") > text.count("}")
+    if not objs and not truncated:
+        return refusal_row(battery), "no_json", False
     try:
         raw = json.loads(objs[-1])
-    except json.JSONDecodeError:
-        return None
+    except (json.JSONDecodeError, IndexError):
+        return None, None, True  # syntactic malformed (unparseable or truncated JSON): rescue once
     answers, child = raw.get("answers"), raw.get("child_qualities")
-    if not isinstance(answers, dict) or not isinstance(child, dict):
-        return None
-    qualities, child_refused = child.get("selected"), child.get("refused")
-    if not isinstance(qualities, list) or not isinstance(child_refused, bool):
-        return None
+    if not isinstance(answers, dict) or not isinstance(child, list):
+        return refusal_row(battery), "nonconforming", False
     row = {}
     for q in battery:
         if q["id"] == "ChildQualities":
-            if (len(qualities) > 5 or len(set(qualities)) != len(qualities)
-                    or not set(qualities) <= set(q["options"])):
-                return None
-            if child_refused and qualities:
-                return None  # a refusal selects nothing
-            row["ChildQualities"] = {"outcome": "refused" if child_refused else "substantive",
-                                     "selected": qualities}
+            if (len(child) <= 5 and len(set(child)) == len(child)
+                    and set(child) <= set(q["options"])):
+                row[q["id"]] = {"outcome": "substantive", "selected": child}
+            else:
+                row[q["id"]] = {"outcome": "refused", "selected": None}
             continue
         answer = answers.get(q["id"])
-        if not isinstance(answer, dict):
-            return None
-        selected = answer.get("selected")
-        if selected not in q["options"] + [REFUSED]:
-            return None
-        row[q["id"]] = {"outcome": "refused" if selected == REFUSED else "substantive",
-                        "selected": selected}
-    return row
+        selected = answer.get("selected") if isinstance(answer, dict) else None
+        if selected in q["options"]:
+            row[q["id"]] = {"outcome": "substantive", "selected": selected}
+        else:
+            row[q["id"]] = {"outcome": "refused", "selected": None}
+    kind = None if all(v["outcome"] == "substantive" for v in row.values()) else "nonconforming"
+    return row, kind, False
 
 
 def force_msg(battery: list[dict]) -> str:
+    """Rescue demand for syntactic malformed output only; describes the exact v2 schema and never
+    mentions refusal."""
     ids = ", ".join(f'"{q["id"]}"' for q in battery)
     return ("Output ONLY the compact JSON respondent object now: "
-            '{"answers": {"<question id>": {"selected": "<option or \'refused\'>"}}, '
-            '"child_qualities": {"refused": <true|false>, "selected": [up to five quality names]}}. '
-            "If you refuse the child question, set refused=true and selected=[]. "
+            '{"answers": {"<question id>": {"selected": "<one listed option>"}}, '
+            '"child_qualities": [up to five quality names]}. '
             f"Every required key must appear exactly once: {ids}. "
             "No markdown, no reasoning, nothing else.")
 
@@ -390,8 +412,10 @@ async def run_packet(model: str, battery: list[dict], rpath: Path, run: str, pid
                               "response": response, "usage": response.get("usage")})
         message = response["choices"][0]["message"]
         text = message.get("content") or ""
-        row = parse_packet(battery, text)
-        if row is None:
+        row, refusal_kind, rescueable = parse_packet(battery, text)
+        if row is None and rescueable:
+            # rescue ONLY clearly syntactic malformed output (unparseable JSON), once. An observed
+            # refusal (empty/no JSON/nonconforming) is never rescued into an answer.
             phase = "rescue"
             tail = (message.get("reasoning") or text or "")[-1500:] or "(thinking truncated)"
             rescue_payload = payload | {"max_tokens": max(MAX_TOKENS, 2048), "messages": [
@@ -405,13 +429,15 @@ async def run_packet(model: str, battery: list[dict], rpath: Path, run: str, pid
             append_record(rpath, {"event": "request_completed", "phase": phase, **request_meta,
                                   "response": response, "usage": response.get("usage")})
             text = response["choices"][0]["message"].get("content") or ""
-            row = parse_packet(battery, text)
+            row, refusal_kind, rescueable = parse_packet(battery, text)
     except Exception as exc:
         append_record(rpath, {"event": "request_failed", "phase": phase, **request_meta,
                               "error_type": type(exc).__name__, "error": str(exc)})
         raise
-    append_record(rpath, {"event": "respondent_parsed", **request_meta, "phase": phase, "row": row,
-                          "parsed": row is not None, "text": text})
+    append_record(rpath, {"event": "respondent_parsed", **request_meta, "phase": phase,
+                          "row": row, "parsed": row is not None,
+                          "refusal_kind": refusal_kind, "rescued": phase == "rescue",
+                          "text": text})
     return row
 
 
@@ -513,8 +539,14 @@ def summarize_model(model: str, battery: list[dict], rpath: Path, pid: str) -> d
                                      "option_frequencies": {opt: counts[opt] / len(outcomes)
                                                             for opt in counts}}
     zero_or_refused = sum(q.get("zero_selection_or_refusal", q["refused"]) for q in per_question.values())
+    kinds = {}
+    for event in events:
+        if (event["event"] == "respondent_parsed" and event.get("parsed") is True
+                and event.get("protocol_id") == pid and event.get("refusal_kind")):
+            kinds[event["refusal_kind"]] = kinds.get(event["refusal_kind"], 0) + 1
     return {"model": model, "eval_version": EVAL_VERSION, "protocol_id": pid, "records": str(rpath),
             "valid_packets": len(rows),
+            "refusal_kinds": kinds,  # observed refusal classification per packet (v2: never schema-offered)
             "refusal_rate_overall": sum(q["refused"] for q in per_question.values())
             / sum(q["n"] for q in per_question.values()),
             "zero_selection_or_refusal_rate_overall": zero_or_refused
@@ -571,54 +603,79 @@ def write_manifest(battery: list[dict]) -> dict:
 
 
 def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
-    valid = {"answers": {q["id"]: {"selected": q["options"][0]} for q in battery
-                         if q["id"] != "ChildQualities"},
-             "child_qualities": {"refused": False, "selected": ["Independence", RELIGIOUS_FAITH]}}
-    row = parse_packet(battery, json.dumps(valid))
-    assert row is not None and row["ChildQualities"]["selected"] == ["Independence", RELIGIOUS_FAITH]
-    assert row["ChildQualities"]["outcome"] == "substantive"
-    assert all(row[q["id"]]["outcome"] == "substantive" for q in battery if q["id"] != "ChildQualities")
-    # zero selections with refused=false: valid substantive "none", NOT refusal
-    none = {"answers": {q["id"]: {"selected": q["options"][0]} for q in battery
-                        if q["id"] != "ChildQualities"},
-            "child_qualities": {"refused": False, "selected": []}}
-    row = parse_packet(battery, json.dumps(none))
-    assert row is not None and row["ChildQualities"] == {"outcome": "substantive", "selected": []}
-    # refused=true with empty selection: refusal
-    refused = {"answers": {q["id"]: {"selected": REFUSED} for q in battery
-                           if q["id"] != "ChildQualities"},
-               "child_qualities": {"refused": True, "selected": []}}
-    row = parse_packet(battery, json.dumps(refused))
-    assert row is not None and all(v["outcome"] == "refused" for v in row.values())
-    bad = {"answers": {"nonexistent": {"selected": "x"}},
-           "child_qualities": {"refused": False, "selected": []}}
-    assert parse_packet(battery, json.dumps(bad)) is None
-    assert parse_packet(battery, "garbage") is None
-    over = {"answers": valid["answers"],
-            "child_qualities": {"refused": False,
-                                "selected": next(q for q in battery
-                                                 if q["id"] == "ChildQualities")["options"][:6]}}
-    assert parse_packet(battery, json.dumps(over)) is None
-    dup = {"answers": valid["answers"],
-           "child_qualities": {"refused": False, "selected": [RELIGIOUS_FAITH, RELIGIOUS_FAITH]}}
-    assert parse_packet(battery, json.dumps(dup)) is None
-    inconsistent = {"answers": valid["answers"],
-                    "child_qualities": {"refused": True, "selected": [RELIGIOUS_FAITH]}}
-    assert parse_packet(battery, json.dumps(inconsistent)) is None
-    # refusal sentinel must not collide with a listed option
+    # identity: v2 everywhere
+    assert EVAL_VERSION == "wvs-respondent-packet-v2"
+    # fixture: visible prompt contains no refusal/null/AI-identity language
+    prompt = render_packet(battery).lower()
+    for banned in ("refus", "cannot", "unable", "prefer not", "no answer", "don't know",
+                   "as an ai", "ai ", "null", "decline", "abstain", "skip"):
+        assert banned not in prompt, f"v2 prompt mentions {banned!r}"
+    # fixture: schema permits ONLY listed substantive values (no escape advertised to the model)
+    schema_text = json.dumps(packet_schema(battery))
+    assert "refused" not in schema_text and "null" not in schema_text
+    schema = packet_schema(battery)["json_schema"]["schema"]
+    child_schema = schema["properties"]["child_qualities"]
+    assert child_schema["type"] == "array" and child_schema["minItems"] == 0
+    assert child_schema["maxItems"] == 5
     for q in battery:
-        assert REFUSED not in q["options"], q["id"]
-    # rescue-format fixture: the force message describes the exact object schema and its output parses
+        if q["id"] == "ChildQualities":
+            continue
+        enum = schema["properties"]["answers"]["properties"][q["id"]]["properties"]["selected"]["enum"]
+        assert enum == q["options"], f"{q['id']} enum must be exactly the listed options"
+
+    def answers_row(child_value):
+        return {"answers": {q["id"]: {"selected": q["options"][0]} for q in battery
+                            if q["id"] != "ChildQualities"},
+                "child_qualities": child_value}
+
+    # fixture: fully conforming packet -> all substantive
+    row, kind, rescueable = parse_packet(battery, json.dumps(
+        answers_row(["Independence", RELIGIOUS_FAITH])))
+    assert row is not None and kind is None and not rescueable
+    assert row["ChildQualities"] == {"outcome": "substantive",
+                                     "selected": ["Independence", RELIGIOUS_FAITH]}
+    # fixture: child [] parses as SUBSTANTIVE none (the stem says "Which, if any")
+    row, kind, rescueable = parse_packet(battery, json.dumps(answers_row([])))
+    assert row is not None and not rescueable
+    assert row["ChildQualities"] == {"outcome": "substantive", "selected": []}
+    # fixture: empty content is an OBSERVED refusal (never rescued, never neutral)
+    row, kind, rescueable = parse_packet(battery, "")
+    assert row is not None and kind == "empty_content" and not rescueable
+    assert all(v["outcome"] == "refused" and v["selected"] is None for v in row.values())
+    # fixture: a plain-text reply with no JSON is an observed refusal (not rescued)
+    row, kind, rescueable = parse_packet(battery, "I would rather not answer this survey.")
+    assert row is not None and kind == "no_json" and not rescueable
+    assert all(v["outcome"] == "refused" for v in row.values())
+    # fixture: parsed but nonconforming values are refusals per question, never rescued, and
+    # conforming questions in the same packet keep their answers
+    mixed = answers_row(["Obedience"])
+    mixed["answers"]["Homosexuality"] = {"selected": "Don't know"}  # not a listed option in v2
+    row, kind, rescueable = parse_packet(battery, json.dumps(mixed))
+    assert row is not None and kind == "nonconforming" and not rescueable
+    assert row["Homosexuality"]["outcome"] == "refused" and row["Homosexuality"]["selected"] is None
+    assert row["Religion"]["outcome"] == "substantive"
+    assert row["ChildQualities"]["outcome"] == "substantive"
+    # fixture: unparseable JSON is the ONLY rescueable class (clearly syntactic)
+    row, kind, rescueable = parse_packet(battery, '{"answers": {"Religion": {"selected": "Very')
+    assert row is None and kind is None and rescueable
+    # fixture: rescue-format output (what force_msg asks for) parses
     rescue_text = ('{"answers": {' + ", ".join(
         f'"{q["id"]}": {{"selected": "{q["options"][0]}"}}' for q in battery
-        if q["id"] != "ChildQualities") +
-        '}, "child_qualities": {"refused": false, "selected": ["Independence"]}}')
-    row = parse_packet(battery, rescue_text)
-    assert row is not None and row["ChildQualities"]["selected"] == ["Independence"]
-    assert force_msg(battery).find("refused") != -1
-    # child refusal vs zero-selection produce DIFFERENT item vectors: refusal is a zero vector
-    # (excluded from the mean), substantive none is all Not-mentioned
-    rows_fixture = {0: {"ChildQualities": {"outcome": "refused", "selected": []}},
+        if q["id"] != "ChildQualities") + '}, "child_qualities": ["Independence"]}')
+    row, kind, rescueable = parse_packet(battery, rescue_text)
+    assert row is not None and kind is None and not rescueable
+    assert "refused" not in force_msg(battery)
+    # fixture: duplicate / oversized child lists are nonconforming (uniqueness enforced in parsing,
+    # since Alibaba rejects array schemas with the uniqueness keyword)
+    dup_row, dup_kind, rescueable = parse_packet(battery, json.dumps(
+        answers_row([RELIGIOUS_FAITH, RELIGIOUS_FAITH])))
+    assert dup_row is not None and dup_row["ChildQualities"]["outcome"] == "refused"
+    over_row, _, _ = parse_packet(battery, json.dumps(
+        answers_row(next(q for q in battery if q["id"] == "ChildQualities")["options"][:6])))
+    assert over_row is not None and over_row["ChildQualities"]["outcome"] == "refused"
+    assert not rescueable
+    # fixture: child refusal vs zero-selection produce DIFFERENT item vectors
+    rows_fixture = {0: {"ChildQualities": {"outcome": "refused", "selected": None}},
                     1: {"ChildQualities": {"outcome": "substantive", "selected": []}}}
     for q in battery:
         if q["id"] != "ChildQualities":
@@ -630,22 +687,20 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
         assert refusal_vec.sum() == 0, "refusal must be a zero vector (excluded)"
         assert none_vec.sum() > 0 and none_vec.min() == 0.0, (
             "substantive none is all Not-mentioned, not a zero vector")
-    # deterministic fixture detecting accidental cross-model index sharing in coords_draws
+    # fixture: deterministic detection of accidental cross-model index sharing in coords_draws
     shared_lists = {m: {"Homosexuality": [np.array([1.0, 0.0]), np.array([0.0, 1.0])],
                         "Obedience": [np.array([1.0, 0.0]), np.array([0.0, 1.0])]}
                     for m in MODELS}
-    # model A's coordinate depends on row 0 vs 1 oppositely to model B's: build via distinct items
     fake_resolved = {X_AXIS: [{"suffix": "Homosexuality", "pole_idx": 0, "n": 2}],
                      Y_AXIS: [{"suffix": "Obedience", "pole_idx": 0, "n": 2}]}
-    # invert model B's rows so shared indices force perfect anti-correlation
     shared_lists[MODELS[1]]["Homosexuality"] = [np.array([0.0, 1.0]), np.array([1.0, 0.0])]
-    draws = coords_draws(shared_lists, fake_resolved, B=200, seed=3)
+    draws, valid = coords_draws(shared_lists, fake_resolved, B=200, seed=3)
     both_low = np.sum((draws[:, 0, 0] < 0.5) & (draws[:, 1, 0] < 0.5))
     assert both_low > 0, "cross-model index sharing detected (A and B always anti-correlated)"
     assert len(next(q for q in battery if q["id"] == "ChildQualities")["options"]) == 11
     assert paid_calls_authorized() is False
-    print("offline smoke passed")
-
+    print("offline smoke passed: v2 identity, clean prompt/schema, refusal-as-observed, "
+          "rescue-only-syntactic, child semantics, collapse fixtures")
 
 def offline_regression(battery: list[dict]) -> None:
     """No paid call may execute without the opt-in, even with the read_api level patched."""
@@ -707,7 +762,7 @@ def paid_smoke(battery: list[dict]) -> None:
     if not reserve({"id": smoke_rid, "lane": "alibaba", "reserve_usd": "0.05"}):
         raise RuntimeError("global repository cap rejected respondent-packet smoke reservation")
     before = Decimal(update_state(lambda s: s)["conservative_spent_usd"])
-    smoke_records = OUT / "paid_smoke.jsonl"
+    smoke_records = OUT / "paid_smoke_v2.jsonl"
     try:
         row = asyncio.run(run_packet(model, battery, smoke_records, "smoke_run", pid, 0, req, None))
         if row is None:
@@ -861,23 +916,56 @@ def packet_item_lists(rows: dict[int, dict], battery: list[dict],
     return out
 
 
-def coords_draws(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: dict,
-                 B: int = 1000, seed: int = 17, row_linked: bool = True) -> np.ndarray:
-    """(B, n_models, 2) coordinate draws.
+def unavailable_items(item_lists: dict[str, list[np.ndarray]], resolved: dict) -> dict[str, list[str]]:
+    """Scored items with zero substantive responses, per axis, for one model."""
+    out = {}
+    for axis in (X_AXIS, Y_AXIS):
+        out[axis] = [it["suffix"] for it in resolved[axis]
+                     if sum(np.asarray(v).sum() for v in item_lists[it["suffix"]]) == 0]
+    return out
 
-    row_linked=True (packet protocol): resample whole respondent rows, one index draw shared across
-    all items, preserving cross-question covariance. row_linked=False (dense v1): resample each
-    item's rating vectors independently; dense samples are not row-linked."""
+
+def point_coords(item_lists: dict[str, list[np.ndarray]], resolved: dict) -> tuple[np.ndarray | None,
+                                                                                   dict[str, list[str]]]:
+    """Empirical coordinates from ALL observed rows/samples: the point estimate. Bootstrap draws
+    are used only for SE/CI, never as the point. Returns (None, unavailable) when any required item
+    on an axis has zero substantive responses; the axis coordinate is then unavailable, not zero."""
+    missing = unavailable_items(item_lists, resolved)
+    xy = []
+    for axis in (X_AXIS, Y_AXIS):
+        vals = []
+        for it in resolved[axis]:
+            if it["suffix"] in missing[axis]:
+                continue
+            lists = item_lists[it["suffix"]]
+            mean_p = np.mean(lists, axis=0)
+            vals.append(positiveness(mean_p[None, :], it["pole_idx"], it["n"]))
+        if not vals:  # whole axis unavailable
+            return None, missing
+        xy.append(float(np.mean(vals)))
+    return np.array(xy), missing
+
+
+def coords_draws(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: dict,
+                 B: int = 1000, seed: int = 17, row_linked: bool = True) -> tuple[np.ndarray, dict]:
+    """(B, n_models, 2) coordinate draws plus validity counts.
+
+    row_linked=True (packet protocol): resample whole respondent rows; the index draw is shared
+    across questions only WITHIN a model (preserving that model's cross-question covariance);
+    resampling is independent across models. row_linked=False (dense v1): resample each item's
+    vectors independently; dense samples are not row-linked.
+
+    A draw whose model/axis loses all substantive coverage is INVALID for that model: its
+    coordinates are NaN and it is excluded from metrics that need all four finite coordinates.
+    `valid_draws` reports the per-model count of finite draws."""
     n = len(next(iter(next(iter(item_lists.values())).values())))
     rng = np.random.default_rng(seed)
-    out = np.empty((B, len(MODELS), 2))
+    draws = np.full((B, len(MODELS), 2), np.nan)
+    valid = {m: 0 for m in MODELS}
     for b in range(B):
         for k, m in enumerate(MODELS):
-            # whole-row resampling is independent per model: a shared seed schedule does NOT make
-            # different models' pseudo-respondents the same respondent. Indices are shared across
-            # questions only WITHIN a model (preserving that model's cross-question covariance).
             idx = rng.integers(0, n, n) if row_linked else None
-            xy = []
+            xy, ok = [], True
             for axis in (X_AXIS, Y_AXIS):
                 vals = []
                 for it in resolved[axis]:
@@ -885,11 +973,16 @@ def coords_draws(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: d
                     draw_idx = idx if row_linked else rng.integers(0, n, n)
                     mean_p = np.mean([lists[j] for j in draw_idx], axis=0)
                     if mean_p.sum() == 0:
-                        raise NoSubstantive(f"{m} {it['suffix']} has no substantive rows in this draw")
+                        ok = False
+                        break
                     vals.append(positiveness(mean_p[None, :], it["pole_idx"], it["n"]))
+                if not ok:
+                    break
                 xy.append(float(np.mean(vals)))
-            out[b, k] = xy
-    return out
+            if ok:
+                draws[b, k] = xy
+                valid[m] += 1
+    return draws, valid
 
 
 def constant_and_linear_rmse(coords: np.ndarray) -> tuple[float, float]:
@@ -924,75 +1017,129 @@ def loo_prediction_error(coords: np.ndarray) -> dict:
             "constant_loo_per_release": const_errs, "linear_loo_per_release": lin_errs}
 
 
-def point_coords(item_lists: dict[str, list[np.ndarray]], resolved: dict) -> np.ndarray:
-    """Empirical coordinates from ALL observed rows/samples: the point estimate. Bootstrap draws
-    are used only for SE/CI, never as the point."""
-    xy = []
-    for axis in (X_AXIS, Y_AXIS):
-        vals = []
-        for it in resolved[axis]:
-            lists = item_lists[it["suffix"]]
-            mean_p = np.mean(lists, axis=0)
-            if mean_p.sum() == 0:
-                raise NoSubstantive(f"item {it['suffix']} has zero substantive rows")
-            vals.append(positiveness(mean_p[None, :], it["pole_idx"], it["n"]))
-        xy.append(float(np.mean(vals)))
-    return np.array(xy)
+MIN_COMPLETE_DRAWS = 100
 
 
-def protocol_summary(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: dict,
-                     bootstrap_seed: int, row_linked: bool) -> dict:
-    """Point estimate from observed rows; bootstrap draws give SE/CI for coordinates, the
-    constant/linear RMSEs, the LOO errors, and the response-noise floors."""
-    point = point_coords_all(item_lists, resolved)
-    draws = coords_draws(item_lists, resolved, seed=bootstrap_seed, row_linked=row_linked)
-    se = draws.std(axis=0)
-    ci95 = [np.percentile(draws[:, k, :], [2.5, 97.5], axis=0).tolist()
-            for k in range(len(MODELS))]
-    constant, linear = constant_and_linear_rmse(point)
-    constant_draws = np.empty(draws.shape[0])
-    linear_draws = np.empty(draws.shape[0])
-    loo_draws = np.empty((draws.shape[0], 2))
-    for b in range(draws.shape[0]):
-        constant_draws[b], linear_draws[b] = constant_and_linear_rmse(draws[b])
-        loo = loo_prediction_error(draws[b])
+def family_metrics_from_draws(draws: np.ndarray, valid: dict[str, int],
+                              bootstrap_B: int) -> dict:
+    """Constant-family, linear-trend, and LOO metrics. They require all four finite 2D coordinates,
+    so a draw counts only when every model's coordinates are finite; if too few draws qualify (or a
+    point coordinate is unavailable), the metric is an explicit unavailable result with the reason
+    and valid-draw count, never a fit of the remaining releases."""
+    complete = ~np.isnan(draws).any(axis=(1, 2))
+    n_complete = int(complete.sum())
+    base = {"valid_draws_per_model": dict(valid), "complete_draws": n_complete,
+            "complete_draw_fraction": round(n_complete / draws.shape[0], 4),
+            "min_complete_draws_required": MIN_COMPLETE_DRAWS}
+    if n_complete < MIN_COMPLETE_DRAWS:
+        return base | {"status": "unavailable",
+                       "reason": ("fewer than 100 bootstrap draws have all four models' coordinates "
+                                  "finite (zero-coverage collapse); no family or trend metric is "
+                                  "fitted from the remaining releases")}
+    cdraws = np.empty(n_complete); ldraws = np.empty(n_complete)
+    loo_draws = np.empty((n_complete, 2))
+    for b, k in enumerate(np.flatnonzero(complete)):
+        cdraws[b], ldraws[b] = constant_and_linear_rmse(draws[k])
+        loo = loo_prediction_error(draws[k])
         loo_draws[b] = (loo["constant_loo_mean"], loo["linear_loo_mean"])
-    rng = np.random.default_rng(bootstrap_seed + 6)
-    floor_const, floor_lin = np.empty(2000), np.empty(2000)
-    for b in range(2000):
-        ys = np.array([rng.normal(0.0, se[k]) for k in range(len(MODELS))])
-        floor_const[b], floor_lin[b] = constant_and_linear_rmse(ys)
-    loo_point = loo_prediction_error(point)
-    return {
-        "coords_xy_per_model": {m: [float(v) for v in point[k]] for k, m in enumerate(MODELS)},
-        "coord_se": {m: [float(v) for v in se[k]] for k, m in enumerate(MODELS)},
-        "coord_ci95": {m: ci95[k] for k, m in enumerate(MODELS)},
-        "constant_family_rmse": constant,
-        "constant_family_rmse_se": float(np.std(constant_draws)),
-        "constant_family_rmse_ci95": [float(v) for v in np.percentile(constant_draws, [2.5, 97.5])],
-        "linear_trend_rmse": linear, "linear_trend_rmse_se": float(np.std(linear_draws)),
-        "linear_trend_rmse_ci95": [float(v) for v in np.percentile(linear_draws, [2.5, 97.5])],
-        "constant_noise_floor_mean": float(np.mean(floor_const)),
-        "linear_noise_floor_mean": float(np.mean(floor_lin)),
-        "p_constant_noise_ge_observed": float(np.mean(floor_const >= constant)),
-        "p_linear_noise_ge_observed": float(np.mean(floor_lin >= linear)),
-        "loo": loo_point,
-        "loo_constant_mean_se": float(np.std(loo_draws[:, 0])),
-        "loo_linear_mean_se": float(np.std(loo_draws[:, 1])),
+    return base | {"status": "ok",
+        "constant_family_rmse_draws_mean": float(np.mean(cdraws)),
+        "constant_family_rmse_draws_se": float(np.std(cdraws)),
+        "linear_trend_rmse_draws_mean": float(np.mean(ldraws)),
+        "linear_trend_rmse_draws_se": float(np.std(ldraws)),
+        "loo_constant_mean_draws_mean": float(np.mean(loo_draws[:, 0])),
+        "loo_constant_mean_draws_se": float(np.std(loo_draws[:, 0])),
+        "loo_linear_mean_draws_mean": float(np.mean(loo_draws[:, 1])),
+        "loo_linear_mean_draws_se": float(np.std(loo_draws[:, 1])),
         "loo_constant_mean_ci95": [float(v) for v in np.percentile(loo_draws[:, 0], [2.5, 97.5])],
         "loo_linear_mean_ci95": [float(v) for v in np.percentile(loo_draws[:, 1], [2.5, 97.5])],
-        "draws": {"constant_rmse": constant_draws, "linear_rmse": linear_draws},
+        "bootstrap_B": bootstrap_B,
     }
 
 
-def point_coords_all(item_lists: dict[str, dict[str, list[np.ndarray]]], resolved: dict) -> np.ndarray:
-    """(n_models, 2) empirical point coordinates, one row per model, from all observed rows."""
-    return np.array([point_coords(item_lists[m], resolved) for m in MODELS])
+def family_point_metrics(points: dict[str, np.ndarray | None]) -> dict:
+    """Point constant/linear RMSE and LOO, only when all four models have finite 2D coordinates."""
+    if any(p is None for p in points.values()):
+        missing = [m for m, p in points.items() if p is None]
+        return {"status": "unavailable",
+                "reason": (f"point coordinates unavailable for {missing} (zero-coverage collapse); "
+                           "family and trend metrics are not fitted from the remaining releases")}
+    coords = np.array([points[m] for m in MODELS])
+    constant, linear = constant_and_linear_rmse(coords)
+    return {"status": "ok", "constant_family_rmse": constant, "linear_trend_rmse": linear,
+            "loo": loo_prediction_error(coords)}
+
+
+def protocol_summary(item_lists: dict[str, dict[str, dict[str, list[np.ndarray]]]], resolved: dict,
+                     bootstrap_seed: int, row_linked: bool) -> dict:
+    """Point estimate from observed rows; bootstrap draws give SE/CI for coordinates, the
+    constant/linear RMSEs, the LOO errors, and the response-noise floors. Collapse handling:
+    unavailable coordinates and invalid draws are recorded, never silently dropped."""
+    summary: dict = {"unavailable_items": {}, "point_status": "ok"}
+    points: dict[str, np.ndarray | None] = {}
+    for m in MODELS:
+        pt, missing = point_coords(item_lists[m], resolved)
+        points[m] = pt
+        summary["unavailable_items"][m] = missing
+        if pt is None:
+            summary["point_status"] = "partially_unavailable"
+    point_metrics = family_point_metrics(points)
+    summary["point_coords_xy_per_model"] = {m: (None if points[m] is None else
+                                                [float(v) for v in points[m]])
+                                            for m in MODELS}
+    summary["family_point"] = point_metrics
+    draws, valid = coords_draws(item_lists, resolved, seed=bootstrap_seed, row_linked=row_linked)
+    finite = ~np.isnan(draws).any(axis=2)
+    summary["coord_se"] = {m: ([float(v) for v in np.nanstd(draws[:, k], axis=0)]
+                               if valid[m] else None) for k, m in enumerate(MODELS)}
+    summary["coord_ci95"] = {m: (np.nanpercentile(draws[:, k], [2.5, 97.5], axis=0).tolist()
+                                 if valid[m] else None) for k, m in enumerate(MODELS)}
+    bootstrap_B = draws.shape[0]
+    family = family_metrics_from_draws(draws, valid, bootstrap_B)
+    summary["family_bootstrap"] = family
+    if family.get("status") == "ok" and point_metrics.get("status") == "ok":
+        summary["constant_family_rmse"] = point_metrics["constant_family_rmse"]
+        summary["constant_family_rmse_se"] = family["constant_family_rmse_draws_se"]
+        summary["constant_family_rmse_ci95"] = [float(v) for v in np.percentile(
+            [constant_and_linear_rmse(draws[b])[0] for b in range(draws.shape[0])
+             if not np.isnan(draws[b]).any()], [2.5, 97.5])]
+        summary["linear_trend_rmse"] = point_metrics["linear_trend_rmse"]
+        summary["linear_trend_rmse_se"] = family["linear_trend_rmse_draws_se"]
+        summary["linear_trend_rmse_ci95"] = [float(v) for v in np.percentile(
+            [constant_and_linear_rmse(draws[b])[1] for b in range(draws.shape[0])
+             if not np.isnan(draws[b]).any()], [2.5, 97.5])]
+        summary["loo"] = point_metrics["loo"]
+        summary["loo_constant_mean_se"] = family["loo_constant_mean_draws_se"]
+        summary["loo_linear_mean_se"] = family["loo_linear_mean_draws_se"]
+        summary["loo_constant_mean_ci95"] = family["loo_constant_mean_ci95"]
+        summary["loo_linear_mean_ci95"] = family["loo_linear_mean_ci95"]
+    else:
+        summary["constant_family_rmse"] = None
+        summary["linear_trend_rmse"] = None
+        summary["loo"] = None
+    # response-noise floors need all four SEs; use finite model SEs only when all exist
+    se_values = [summary["coord_se"][m] for m in MODELS]
+    if all(sv is not None for sv in se_values):
+        rng = np.random.default_rng(bootstrap_seed + 6)
+        floor_const, floor_lin = np.empty(2000), np.empty(2000)
+        for b in range(2000):
+            ys = np.array([rng.normal(0.0, sv) for sv in se_values])
+            floor_const[b], floor_lin[b] = constant_and_linear_rmse(ys)
+        summary["constant_noise_floor_mean"] = float(np.mean(floor_const))
+        summary["linear_noise_floor_mean"] = float(np.mean(floor_lin))
+        if point_metrics.get("status") == "ok":
+            summary["p_constant_noise_ge_observed"] = float(np.mean(floor_const >= point_metrics["constant_family_rmse"]))
+            summary["p_linear_noise_ge_observed"] = float(np.mean(floor_lin >= point_metrics["linear_trend_rmse"]))
+    else:
+        summary["constant_noise_floor_mean"] = None
+        summary["linear_noise_floor_mean"] = None
+    return summary
 
 
 def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dict],
                       child_rows: list[dict], resolved: dict) -> dict:
-    """The fixed preregistered analysis, run on real or synthetic rows."""
+    """The fixed preregistered analysis, run on real or synthetic rows. Collapse-safe: explicit
+    unavailable results instead of crashes or fits of the remaining releases."""
     per_model, item_lists = {}, {}
     for m in MODELS:
         rows = packet_rows[m]
@@ -1020,33 +1167,44 @@ def analyze_from_data(packet_rows: dict[str, dict[int, dict]], battery: list[dic
     dense_summary = protocol_summary(dense_item_lists, resolved, bootstrap_seed=29,
                                      row_linked=False)
     # independent-bootstrap shift distribution: packet and dense protocols are not pairable, so the
-    # packet-minus-dense shift CI subtracts independent coordinate draws.
-    packet_draws = coords_draws(item_lists, resolved, seed=17, row_linked=True)
-    dense_draws = coords_draws(dense_item_lists, resolved, seed=29, row_linked=False)
+    # packet-minus-dense shift CI subtracts independent coordinate draws. Shifts are per-model and
+    # need only those two models' coordinates finite.
+    packet_draws, packet_valid = coords_draws(item_lists, resolved, seed=17, row_linked=True)
+    dense_draws, _ = coords_draws(dense_item_lists, resolved, seed=29, row_linked=False)
     shift_draws = packet_draws - dense_draws
-    shifts_ci = {m: np.percentile(shift_draws[:, k, :], [2.5, 97.5], axis=0).tolist()
-                 for k, m in enumerate(MODELS)}
-    release_years_list = release_years().tolist()
-    packet_summary.pop("draws"); dense_summary.pop("draws")
+    shifts = {}
+    for k, m in enumerate(MODELS):
+        pt_packet, pt_dense = packet_summary["point_coords_xy_per_model"][m],             dense_summary["point_coords_xy_per_model"][m]
+        if pt_packet is None or pt_dense is None:
+            shifts[m] = {"point": None,
+                         "status": "unavailable",
+                         "reason": "one protocol has no point coordinate for this model"}
+        else:
+            finite = ~np.isnan(shift_draws[:, k]).any(axis=1)
+            shifts[m] = {"point": [float(a - b) for a, b in zip(pt_packet, pt_dense)],
+                         "ci95": np.percentile(shift_draws[finite, k], [2.5, 97.5], axis=0).tolist(),
+                         "valid_shift_draws": int(finite.sum())}
     return {
         "eval_version": EVAL_VERSION, "n_packets": N_PACKETS,
-        "release_years": release_years_list,
+        "release_years": release_years().tolist(),
         "packet": packet_summary | {
             "refusal": {m: per_model[m]["refusal_rate"] for m in MODELS},
             "coverage": {m: per_model[m]["coverage_per_question"] for m in MODELS},
             "child_diagnostics": {m: {k: per_model[m][k] for k in (
                 "child_refusal_rate", "child_zero_selection_substantive_rate",
                 "child_zero_selection_or_refusal_rate")} for m in MODELS},
+            "collapse_handling": ("zero-substantive items make the containing axis coordinate "
+                                  "unavailable for that model; bootstrap draws with a zero-"
+                                  "coverage model/axis are invalid; family/trend/LOO metrics "
+                                  "require all four finite coordinates and are otherwise an "
+                                  "explicit unavailable result"),
         },
         "dense_v1": dense_summary | {
             "bootstrap_note": ("item-wise independent resampling of the 12 rating vectors per "
                                "item; dense samples are not row-linked, so protocols are not "
                                "pairable and differences use independent bootstraps"),
         },
-        "coord_shifts_packet_minus_dense": {
-            m: {"point": [float(a - b) for a, b in zip(packet_summary["coords_xy_per_model"][m],
-                                                       dense_summary["coords_xy_per_model"][m])],
-                "ci95": shifts_ci[m]} for m in MODELS},
+        "coord_shifts_packet_minus_dense": shifts,
         "shift_pairing": "independent draws (protocols not pairable)",
     }
 
@@ -1087,7 +1245,7 @@ def synthetic_analysis_test(battery: list[dict], child_rows: list[dict]) -> None
                 if q["id"] == "ChildQualities":
                     pool = q["options"]
                     if rng.random() < 0.03:
-                        row[q["id"]] = {"outcome": "refused", "selected": []}
+                        row[q["id"]] = {"outcome": "refused", "selected": None}
                     else:
                         picked = list(rng.choice(pool, size=rng.integers(0, 6), replace=False))
                         row[q["id"]] = {"outcome": "substantive", "selected": picked}
@@ -1101,17 +1259,42 @@ def synthetic_analysis_test(battery: list[dict], child_rows: list[dict]) -> None
             rows[p] = row
         packet_rows[m] = rows
     result = analyze_from_data(packet_rows, battery, child_rows, resolved)
-    for section in ("packet", "dense_v1"):
-        for key in ("constant_family_rmse", "linear_trend_rmse", "loo"):
-            value = result[section][key]
-            assert np.isfinite(value if not isinstance(value, dict) else
-                               value["constant_loo_mean"] + value["linear_loo_mean"]), (section, key)
+    # healthy case: all four models have finite points and family metrics
+    assert result["packet"]["family_point"]["status"] == "ok"
+    assert result["dense_v1"]["family_point"]["status"] == "ok"
+    assert np.isfinite(result["packet"]["constant_family_rmse"])
+    assert np.isfinite(result["packet"]["loo"]["constant_loo_mean"])
     assert result["packet"]["refusal"][MODELS[3]] > result["packet"]["refusal"][MODELS[0]]
     print(f"synthetic analysis passed: packet constant={result['packet']['constant_family_rmse']:.4f} "
           f"linear={result['packet']['linear_trend_rmse']:.4f}; "
           f"dense constant={result['dense_v1']['constant_family_rmse']:.4f}; "
           f"packet LOO const={result['packet']['loo']['constant_loo_mean']:.4f} "
           f"lin={result['packet']['loo']['linear_loo_mean']:.4f}")
+
+    # all-refusal release fixture: one model refuses EVERYTHING -> its point and coordinates are
+    # unavailable, family/trend/LOO are explicit unavailable results with valid-draw counts, the
+    # refusal/coverage diagnostics are retained, and the analysis completes deterministically.
+    collapsed = dict(packet_rows)
+    collapsed[MODELS[2]] = {k: {q["id"]: ({"outcome": "refused", "selected": None}
+                                          if q["id"] == "ChildQualities" else
+                                          {"outcome": "refused", "selected": REFUSED})
+                                for q in battery} for k in range(N_PACKETS)}
+    result = analyze_from_data(collapsed, battery, child_rows, resolved)
+    assert result["packet"]["point_coords_xy_per_model"][MODELS[2]] is None
+    assert result["packet"]["family_point"]["status"] == "unavailable"
+    assert MODELS[2] in result["packet"]["family_point"]["reason"]
+    assert result["packet"]["family_bootstrap"]["status"] == "unavailable"
+    assert result["packet"]["family_bootstrap"]["complete_draws"] == 0
+    assert result["packet"]["constant_family_rmse"] is None
+    assert result["packet"]["loo"] is None
+    # diagnostics retained despite collapse
+    assert result["packet"]["refusal"][MODELS[2]] == 1.0
+    assert result["packet"]["child_diagnostics"][MODELS[2]]["child_refusal_rate"] == 1.0
+    # healthy models keep their coordinates and per-model valid-draw counts
+    assert result["packet"]["point_coords_xy_per_model"][MODELS[0]] is not None
+    assert result["packet"]["family_bootstrap"]["valid_draws_per_model"][MODELS[0]] > 0
+    print("synthetic all-refusal fixture passed: analysis completes, family/trend/LOO explicitly "
+          "unavailable, diagnostics retained")
 
 
 if __name__ == "__main__":
