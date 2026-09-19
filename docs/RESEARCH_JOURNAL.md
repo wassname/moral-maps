@@ -1240,3 +1240,15 @@ refusals, no rescue, all reasons 6-7 words and valid. Cost USD 0.00079616 (bound
 reservation settled. Full audit: `slop/audits/20260919_resp_packet_smoke_v2.md`. The v1
 all-nine-refusal smoke stays preserved as the stopped design diagnostic. n=1 establishes
 no refusal rate; the 512-call panel needs separate approval.
+
+### Off-target smoke repeat (2026-09-19, worker error)
+
+The compatibility smoke approved for qwen/qwen3.5-plus-02-15 was mis-executed against
+qwen/qwen3.7-plus: `paid_smoke()` hardcodes the 3.7-plus model and I invoked it without
+checking the target. Cost USD 0.00078752; 9/9 substantive, no rescue, under the new
+transport-sentence prompt (so the added JSON sentence does not break 3.7-plus parsing,
+but the 3.5-plus compatibility question is UNANSWERED). Raw events appended to
+`paid_smoke_v2.jsonl`; summary file now describes this repeat (the prior v2 3.7-plus
+summary stays in git history at 0b4238f). No further paid call until the parent decides,
+including the still-pending oldest-endpoint smoke, which needs a code change to the
+hardcoded smoke model.

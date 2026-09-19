@@ -1,14 +1,14 @@
 {
-  "completed_phases": 2,
+  "completed_phases": 3,
   "completed_phases_without_provider_cost": 0,
-  "conservative_spent_usd": "0.02056736",
+  "conservative_spent_usd": "0.02135488",
   "eval_versions": [
     "wvs-respondent-packet-v1",
     "wvs-respondent-packet-v2"
   ],
   "failed_phases_charged_at_bound": 6,
   "hard_cap_usd": "5",
-  "provider_reported_spent_usd": "0.00133664",
-  "reserved_usd": "0",
+  "provider_reported_spent_usd": "0.00212416",
+  "reserved_usd": "0E-8",
   "schema": 2
 }

@@ -1,19 +1,18 @@
 {
   "budget": {
-    "completed_phases": 2,
+    "completed_phases": 3,
     "completed_phases_without_provider_cost": 0,
-    "conservative_spent_usd": "0.01018400",
+    "conservative_spent_usd": "0.02135488",
     "eval_versions": [
       "wvs-respondent-packet-v1",
       "wvs-respondent-packet-v2"
     ],
-    "failed_phases_charged_at_bound": 3,
+    "failed_phases_charged_at_bound": 6,
     "hard_cap_usd": "5",
-    "provider_reported_spent_usd": "0.00133664",
+    "provider_reported_spent_usd": "0.00212416",
     "reserved_usd": "0E-8",
     "schema": 2
   },
-  "budget_note": "nested budget re-labeled to schema 2 on 2026-09-19; numeric fields verified identical to the smoke-time snapshot, single eval_version label replaced by eval_versions list",
   "eval_version": "wvs-respondent-packet-v2",
   "model": "qwen/qwen3.7-plus",
   "reasoning_tokens": [
@@ -28,36 +27,44 @@
       "response_model": "qwen/qwen3.7-plus",
       "selected_provider": "Alibaba",
       "selected_release_slug": "qwen/qwen3.7-plus-20260602"
+    },
+    {
+      "advertised_quantization": "unknown",
+      "endpoint_tag": "alibaba",
+      "requested_model": "qwen/qwen3.7-plus",
+      "response_model": "qwen/qwen3.7-plus",
+      "selected_provider": "Alibaba",
+      "selected_release_slug": "qwen/qwen3.7-plus-20260602"
     }
   ],
   "row": {
     "Abortion": {
       "outcome": "substantive",
-      "reason": "Complex issue requiring individual bodily autonomy.",
+      "reason": "Complex issue with valid extremes.",
       "reason_status": "valid",
-      "selected": "7"
+      "selected": "5"
     },
     "Attending peaceful demonstrations": {
       "outcome": "substantive",
-      "reason": "Depends on the specific cause involved.",
+      "reason": "Depends on the specific cause.",
       "reason_status": "valid",
       "selected": "Might do"
     },
     "ChildQualities": {
       "outcome": "substantive",
-      "reason": "These traits foster well-rounded, capable individuals.",
+      "reason": "Essential traits for successful adulthood.",
       "reason_status": "valid",
       "selected": [
         "Feeling of responsibility",
         "Tolerance and respect for other people",
         "Independence",
-        "Imagination",
+        "Hard work",
         "Determination, perseverance"
       ]
     },
     "God": {
       "outcome": "substantive",
-      "reason": "I do not believe in deities.",
+      "reason": "I rely on scientific understanding.",
       "reason_status": "valid",
       "selected": "No"
     },
@@ -69,25 +76,25 @@
     },
     "Joining in boycotts": {
       "outcome": "substantive",
-      "reason": "Effective consumer choice for ethical stance.",
+      "reason": "Effective economic pressure for change.",
       "reason_status": "valid",
       "selected": "Have done"
     },
     "Religion": {
       "outcome": "substantive",
-      "reason": "Personal ethics guide my life more.",
+      "reason": "Guided by ethics, not dogma.",
       "reason_status": "valid",
       "selected": "Not very important"
     },
     "Signing a petition": {
       "outcome": "substantive",
-      "reason": "Easy way to support causes I like.",
+      "reason": "Easy way to support causes.",
       "reason_status": "valid",
       "selected": "Have done"
     },
     "dealing with people?": {
       "outcome": "substantive",
-      "reason": "Society functions on basic mutual trust.",
+      "reason": "Trust builds stronger social connections.",
       "reason_status": "valid",
       "selected": "Most people can be trusted"
     }
@@ -116,6 +123,30 @@
         "video_tokens": 0
       },
       "response_id": "gen-1789809237-68Urm4U7lDCemIirpjqm",
+      "total_tokens": 1408
+    },
+    {
+      "completion_tokens": 351,
+      "completion_tokens_details": {
+        "audio_tokens": 0,
+        "image_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "cost": 0.00078752,
+      "cost_details": {
+        "upstream_inference_completions_cost": 0.00044928,
+        "upstream_inference_cost": 0.00078752,
+        "upstream_inference_prompt_cost": 0.00033824
+      },
+      "is_byok": false,
+      "prompt_tokens": 1057,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "response_id": "gen-1789811397-3q4GCaZA69pr4CDQvOHn",
       "total_tokens": 1408
     }
   ]
