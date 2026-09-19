@@ -60,3 +60,64 @@ Filled path points satisfy pooled `pmass(dose) / pmass(vanilla) >= 0.96`. The fi
 | -0.5C  |          0.134 |           15 |
 | +0.5C  |          0.128 |           16 |
 | +1C    |          0.215 |            9 |
+
+## Per-seed answer-mass evidence
+
+The figure follows the specified pooled condition. This audit table retains each saved seed so a pooled pass cannot hide disagreement.
+
+| method    |   seed | dose   |   pmass/base | per-seed result   |
+|:----------|-------:|:-------|-------------:|:------------------|
+| vjp_delta |      0 | -2C    |        0.999 | pass              |
+| vjp_delta |      0 | -1C    |        0.959 | fail              |
+| vjp_delta |      0 | -0.5C  |        0.655 | fail              |
+| vjp_delta |      0 | +0.5C  |        1.007 | pass              |
+| vjp_delta |      0 | +1C    |        1.007 | pass              |
+| vjp_delta |      0 | +2C    |        1.001 | pass              |
+| vjp_delta |      1 | -2C    |        0.996 | pass              |
+| vjp_delta |      1 | -1C    |        0.956 | fail              |
+| vjp_delta |      1 | -0.5C  |        0.622 | fail              |
+| vjp_delta |      1 | +0.5C  |        1.005 | pass              |
+| vjp_delta |      1 | +1C    |        1.005 | pass              |
+| vjp_delta |      1 | +2C    |        1     | pass              |
+| vjp_delta |      2 | -2C    |        1.01  | pass              |
+| vjp_delta |      2 | -1C    |        0.973 | pass              |
+| vjp_delta |      2 | -0.5C  |        0.632 | fail              |
+| vjp_delta |      2 | +0.5C  |        1.017 | pass              |
+| vjp_delta |      2 | +1C    |        1.017 | pass              |
+| vjp_delta |      2 | +2C    |        1.012 | pass              |
+| mean_diff |      0 | -2C    |        0.864 | fail              |
+| mean_diff |      0 | -1C    |        0.988 | pass              |
+| mean_diff |      0 | -0.5C  |        1.006 | pass              |
+| mean_diff |      0 | +0.5C  |        0.991 | pass              |
+| mean_diff |      0 | +1C    |        1     | pass              |
+| mean_diff |      0 | +2C    |        0.977 | pass              |
+| mean_diff |      1 | -2C    |        0.813 | fail              |
+| mean_diff |      1 | -1C    |        0.974 | pass              |
+| mean_diff |      1 | -0.5C  |        0.995 | pass              |
+| mean_diff |      1 | +0.5C  |        0.99  | pass              |
+| mean_diff |      1 | +1C    |        0.984 | pass              |
+| mean_diff |      1 | +2C    |        0.972 | pass              |
+| mean_diff |      2 | -2C    |        0.856 | fail              |
+| mean_diff |      2 | -1C    |        1     | pass              |
+| mean_diff |      2 | -0.5C  |        1.008 | pass              |
+| mean_diff |      2 | +0.5C  |        1.011 | pass              |
+| mean_diff |      2 | +1C    |        1.005 | pass              |
+| mean_diff |      2 | +2C    |        0.984 | pass              |
+| pca       |      0 | -2C    |        0.814 | fail              |
+| pca       |      0 | -1C    |        0.984 | pass              |
+| pca       |      0 | -0.5C  |        0.986 | pass              |
+| pca       |      0 | +0.5C  |        1.009 | pass              |
+| pca       |      0 | +1C    |        1.01  | pass              |
+| pca       |      0 | +2C    |        0.943 | fail              |
+| pca       |      1 | -2C    |        0.795 | fail              |
+| pca       |      1 | -1C    |        0.969 | pass              |
+| pca       |      1 | -0.5C  |        0.969 | pass              |
+| pca       |      1 | +0.5C  |        1.003 | pass              |
+| pca       |      1 | +1C    |        0.999 | pass              |
+| pca       |      1 | +2C    |        0.932 | fail              |
+| pca       |      2 | -2C    |        0.819 | fail              |
+| pca       |      2 | -1C    |        0.98  | pass              |
+| pca       |      2 | -0.5C  |        0.97  | pass              |
+| pca       |      2 | +0.5C  |        1.016 | pass              |
+| pca       |      2 | +1C    |        1.011 | pass              |
+| pca       |      2 | +2C    |        0.947 | fail              |

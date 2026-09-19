@@ -164,7 +164,7 @@ def add_path(ax, path: list[dict], sign: int, color: str, scale_x: float, scale_
             ax.add_patch(FancyArrowPatch(
                 (start["x"] * scale_x, start["y"] * scale_y),
                 (end["x"] * scale_x, end["y"] * scale_y),
-                arrowstyle="-|>", mutation_scale=10, linewidth=1.1, linestyle="--", color=color, alpha=0.45, zorder=4,
+                arrowstyle="-|>", mutation_scale=18, linewidth=1.4, linestyle="--", color=color, alpha=0.70, zorder=4,
             ))
             continue
         if state != "connected":
@@ -173,7 +173,7 @@ def add_path(ax, path: list[dict], sign: int, color: str, scale_x: float, scale_
         arrow = FancyArrowPatch(
             (start["x"] * scale_x, start["y"] * scale_y),
             (end["x"] * scale_x, end["y"] * scale_y),
-            arrowstyle="-|>", mutation_scale=11, linewidth=2, color=color, alpha=0.82, zorder=5,
+            arrowstyle="-|>", mutation_scale=18, linewidth=2.2, color=color, alpha=0.95, zorder=5,
         )
         ax.add_patch(arrow)
     for dose, state in zip(path, states):
@@ -184,12 +184,6 @@ def add_path(ax, path: list[dict], sign: int, color: str, scale_x: float, scale_
             ax.scatter(x, y, s=34, facecolors="none", edgecolors=color, linewidths=1.4, alpha=0.48, zorder=5)
         else:
             ax.scatter(x, y, s=28, marker="s", facecolors="none", edgecolors=color, linewidths=1.2, alpha=0.45, zorder=4)
-        if show_uncertainty and dose["mult"] != 0.0:
-            _, _, dx_se, dy_se = paired_coordinate_ci(path[0], dose, resolved)
-            ax.errorbar(
-                x, y, xerr=1.96 * dx_se * abs(scale_x), yerr=1.96 * dy_se * abs(scale_y),
-                fmt="none", ecolor=color, elinewidth=0.8, capsize=1.8, alpha=0.38, zorder=2,
-            )
         if dose_labels:
             text = "vanilla" if dose["mult"] == 0.0 else f"{dose['mult']:+g}C"
             ax.annotate(text, (x, y), xytext=label_offset, textcoords="offset points", fontsize=6.3, color=color)
@@ -256,7 +250,38 @@ def render_table(pooled: dict[str, list[dict]], groups: dict[str, list[dict]], r
     for mult, (p95, n) in sorted(null.items()):
         random_rows.append([f"{mult:+g}C", f"{p95:.3f}", n])
     sections.extend(["", "## Dose-matched random controls", "", tabulate(random_rows, headers=["dose", "movement p95", "coherent n"], tablefmt="pipe")])
+    per_seed_rows = []
+    for method in MAIN_METHODS:
+        for run in groups[method]:
+            base = next(dose for dose in run["doses"] if dose["mult"] == 0.0)
+            for dose in sorted((dose for dose in run["doses"] if dose["mult"] != 0.0), key=lambda dose: dose["mult"]):
+                ratio = dose["mean_pmass"] / base["mean_pmass"]
+                per_seed_rows.append([method, run["seed"], f"{dose['mult']:+g}C", f"{ratio:.3f}", "pass" if ratio >= PMASS_RATIO_FLOOR else "fail"])
+    sections.extend([
+        "", "## Per-seed answer-mass evidence", "",
+        "The figure follows the specified pooled condition. This audit table retains each saved seed so a pooled pass cannot hide disagreement.", "",
+        tabulate(per_seed_rows, headers=["method", "seed", "dose", "pmass/base", "per-seed result"], tablefmt="pipe"),
+    ])
     return "\n".join(sections) + "\n"
+
+
+def random_passing_points(groups: dict[str, list[dict]]) -> tuple[np.ndarray, np.ndarray]:
+    """Return saved random observations that individually pass their own 0.96 mass condition."""
+    xs, ys = [], []
+    for run in groups["random"]:
+        base = next(dose for dose in run["doses"] if dose["mult"] == 0.0)
+        for dose in run["doses"]:
+            if dose["mult"] and dose["mean_pmass"] / base["mean_pmass"] >= PMASS_RATIO_FLOOR:
+                xs.append(dose["x"])
+                ys.append(dose["y"])
+    return np.asarray(xs), np.asarray(ys)
+
+
+def add_random_zone(ax, groups: dict[str, list[dict]], scale_x: float, scale_y: float) -> None:
+    """Show the saved random reference observations without implying a matched-dose null."""
+    xs, ys = random_passing_points(groups)
+    ax.scatter(xs * scale_x, ys * scale_y, s=15, color="#777777", alpha=0.12, marker="s", zorder=1,
+               label="saved random directions, individual pmass-passing doses")
 
 
 def map_axes(runs: list[dict], pooled: dict[str, list[dict]], *, title: str, note: str):
@@ -293,13 +318,14 @@ def save_figure(figure, out: Path) -> None:
     svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
 
 
-def render_main(runs: list[dict], pooled: dict[str, list[dict]], out: Path) -> None:
+def render_main(runs: list[dict], pooled: dict[str, list[dict]], groups: dict[str, list[dict]], out: Path) -> None:
     """Render all saved real methods with separately traversed signed paths."""
     figure, ax, resolved, scale_x, scale_y = map_axes(
         runs, pooled, title="Saved WVS steering paths, Qwen3-14B",
         note="",
     )
     offsets = {"vjp_delta": (3, 4), "mean_diff": (3, -8), "pca": (3, 10)}
+    add_random_zone(ax, groups, scale_x, scale_y)
     for method in MAIN_METHODS:
         if method not in pooled:
             continue
@@ -307,9 +333,9 @@ def render_main(runs: list[dict], pooled: dict[str, list[dict]], out: Path) -> N
             label = f"{method}: {name} ({'+' if sign == 1 else '-'})"
             add_path(ax, side_path(pooled[method], sign), sign, COLORS[method], scale_x, scale_y,
                      label=label, dose_labels=method == "vjp_delta", resolved=resolved,
-                     show_uncertainty=method == "vjp_delta", label_offset=offsets[method])
-    ax.set_position([0.06, 0.10, 0.64, 0.82])
-    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), fontsize=7, framealpha=0.9)
+                     show_uncertainty=False, label_offset=offsets[method])
+    ax.set_position([0.06, 0.10, 0.88, 0.82])
+    ax.legend(loc="upper right", bbox_to_anchor=(0.99, 0.99), fontsize=6.3, framealpha=0.88)
     out.parent.mkdir(parents=True, exist_ok=True)
     save_figure(figure, out)
     plt.close(figure)
@@ -342,7 +368,7 @@ def metric_path(ax, path: list[dict], sign: int, value: str, color: str, *, labe
     ax.plot([], [], color=color, label=label)
 
 
-def render_vjp(runs: list[dict], pooled: dict[str, list[dict]], out: Path) -> None:
+def render_vjp(runs: list[dict], pooled: dict[str, list[dict]], groups: dict[str, list[dict]], out: Path) -> None:
     """Render a readable VJP-only map plus answer-mass and saturation diagnostics."""
     figure, ax, resolved, scale_x, scale_y = map_axes(
         runs, pooled, title="VJP delta, saved Qwen3-14B WVS observations", note="",
@@ -351,17 +377,17 @@ def render_vjp(runs: list[dict], pooled: dict[str, list[dict]], out: Path) -> No
     ax.set_position([0.04, 0.12, 0.56, 0.79])
     positive = side_path(pooled["vjp_delta"], 1)
     negative = side_path(pooled["vjp_delta"], -1)
+    add_random_zone(ax, groups, scale_x, scale_y)
     positive_color, negative_color = "#147d64", "#a13a3a"
     add_path(ax, positive, 1, positive_color, scale_x, scale_y, label="intended honest-persona direction (+)",
-             dose_labels=True, resolved=resolved, show_uncertainty=True)
+             dose_labels=True, resolved=resolved, show_uncertainty=False)
     add_path(ax, negative, -1, negative_color, scale_x, scale_y, label="intended dishonest-persona direction (-)",
-             dose_labels=True, resolved=resolved, show_uncertainty=True, label_offset=(4, -9))
-    ax.text(0.02, 0.95, "Faint crossbars: paired 95% coordinate intervals", transform=ax.transAxes, fontsize=6.5)
+             dose_labels=True, resolved=resolved, show_uncertainty=False, label_offset=(4, -9))
     ax.annotate("first negative failure: -0.5C", xy=(negative[1]["x"] * scale_x, negative[1]["y"] * scale_y),
                 xytext=(18, -20), textcoords="offset points", fontsize=7, arrowprops={"arrowstyle": "-", "color": "#555555"})
     ax.annotate("later recovery observations\n(disconnected)", xy=(negative[-1]["x"] * scale_x, negative[-1]["y"] * scale_y),
                 xytext=(8, 18), textcoords="offset points", fontsize=7, arrowprops={"arrowstyle": "-", "color": "#555555"})
-    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), fontsize=7)
+    ax.legend(loc="lower left", bbox_to_anchor=(0.01, 0.01), fontsize=6.2, framealpha=0.88)
 
     pmass_ax = figure.add_axes([0.68, 0.58, 0.28, 0.28])
     metric_path(pmass_ax, positive, 1, "pmass_ratio", positive_color, label="intended honest (+)")
@@ -407,8 +433,8 @@ def main() -> None:
     resolved = resolve_items(load_wvs_all())
     table_path.parent.mkdir(parents=True, exist_ok=True)
     table_path.write_text(render_table(pooled, groups, resolved))
-    render_main(runs, pooled, args.out)
-    render_vjp(runs, pooled, args.out.with_name(args.out.stem + "_vjp.png"))
+    render_main(runs, pooled, groups, args.out)
+    render_vjp(runs, pooled, groups, args.out.with_name(args.out.stem + "_vjp.png"))
     logger.info(f"wrote {args.out}, {args.out.with_suffix('.svg')}, {table_path}")
     logger.info(f"wrote {args.out.with_name(args.out.stem + '_vjp.png')}")
 
