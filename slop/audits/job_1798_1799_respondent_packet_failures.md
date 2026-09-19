@@ -31,13 +31,13 @@ failed_phases 6, reserved 0, global reservations empty.
 `qwen/qwen3.5-plus-20260216`):
 > `'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.`
 > (`invalid_parameter_error`; the v2 smoke on `qwen/qwen3.7-plus-20260602` accepted the
-> identical shape, so the gate is per-endpoint, not per-payload.)
+> identical shape, so the JSON-word requirement is enforced per-endpoint, not per-payload.)
 
 ## Provenance
 
 - 1798: pre-existing `append_record` never created parent dirs (the smoke wrote to the
   existing OUT root; the panel writes per-model subdirs). Nothing reached the network.
-- 1799: deterministic endpoint contract; the triple charge came from the vendored
+- 1799: deterministic endpoint rejection (the JSON-word requirement); the triple charge came from the vendored
   `is_retryable_error`, which retries ANY "Provider returned error" message regardless of
   status (`RETRYABLE_ERROR_PATTERNS` in `openrouter_wrapper/retry.py`, verified in the
   cached source). The leaked hold came from `asyncio` teardown cancelling packet 1 between

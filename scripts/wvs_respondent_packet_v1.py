@@ -833,6 +833,39 @@ def offline_smoke(battery: list[dict], child_rows: list[dict]) -> None:
     both_low = np.sum((draws[:, 0, 0] < 0.5) & (draws[:, 1, 0] < 0.5))
     assert both_low > 0, "cross-model index sharing detected (A and B always anti-correlated)"
     assert len(next(q for q in battery if q["id"] == "ChildQualities")["options"]) == 11
+    # fixture: --smoke-model target plumbing (the off-target 3.7 repeat must not recur). The
+    # requested model reaches the artifact paths, the payload, route validation, and the
+    # protocol identity; every release gets a distinct protocol_id and summary path.
+    from unittest import mock as mock_smoke
+    for m in MODELS:
+        rec_path, sum_path = smoke_paths(m)
+        assert rec_path.name == "paid_smoke_v2.jsonl"
+        assert m.replace("/", "__") in sum_path.name
+    assert len({protocol_id(m, battery) for m in MODELS}) == len(MODELS)
+    target = MODELS[0]
+    captured = {}
+
+    async def capturing(model, payload, timeout=60.0, **kwargs):
+        captured.update(payload)
+        raise RuntimeError("no HTTP in offline fixture")
+    import tempfile as tempfile_smoke
+    with tempfile_smoke.TemporaryDirectory() as tmp:
+        with mock_smoke.patch.object(sys.modules[__name__], "budgeted_request", capturing):
+            try:
+                asyncio.run(run_packet(target, battery, Path(tmp) / "r.jsonl", "run",
+                                       protocol_id(target, battery), 0,
+                                       {"packet": 0, "seed": 1, "prompt": "p"}, None))
+            except RuntimeError:
+                pass
+    assert captured["model"] == target, "payload must carry the requested smoke target"
+    assert captured["response_format"]["json_schema"]["name"] == "wvs_respondent_packet"
+    endpoint = standard_endpoint(target)
+    slug = endpoint["name"].removeprefix(f"{endpoint['provider_name']} | ")
+    route = validate_route({"id": "fixture", "model": target, "openrouter_metadata": {
+        "requested": target, "endpoints": {"available": [
+            {"selected": True, "provider": "Alibaba", "model": slug}]}}}, target)
+    assert route["selected_provider"] == "Alibaba"
+    assert route["selected_release_slug"] == slug
     assert paid_calls_authorized() is False
     print("offline smoke passed: v2 identity, clean prompt/schema, refusal-as-observed, "
           "rescue-only-syntactic, child semantics, collapse fixtures")
@@ -900,12 +933,25 @@ def offline_regression(battery: list[dict]) -> None:
         assert dotenv_mock.call_count == 0, "dotenv loaded without authorization"
         assert smoke_stub.call_count == 0 and run_stub.call_count == 0
         with mock.patch.object(sys, "argv", ["wvs_respondent_packet_v1.py", "--paid-smoke",
-                                                "--i-authorize-paid-calls"]):
+                                                "--i-authorize-paid-calls",
+                                                "--smoke-model", MODELS[0]]):
             main()
         assert dotenv_mock.call_count == 1, "authorized paid path must load runtime credentials"
         assert smoke_stub.call_count == 1 and run_stub.call_count == 0
+        assert smoke_stub.call_args[0][0] == MODELS[0], "smoke must run the requested target"
         assert os.environ.get(PAID_OPTIN_ENV) == "1"
         os.environ.pop(PAID_OPTIN_ENV, None)
+        # omitted --smoke-model fails fast (the off-target 3.7 repeat): no dotenv, no runner.
+        with mock.patch.object(sys, "argv", ["wvs_respondent_packet_v1.py", "--paid-smoke",
+                                                "--i-authorize-paid-calls"]):
+            missing = False
+            try:
+                main()
+            except SystemExit:
+                missing = True
+            assert missing, "paid smoke without --smoke-model must fail fast"
+        assert dotenv_mock.call_count == 1
+        assert smoke_stub.call_count == 1 and run_stub.call_count == 0
     # fixture: ledger migration labels both eval versions and preserves every numeric field
     v1_ledger = {"schema": 1, "eval_version": "wvs-respondent-packet-v1",
                  "hard_cap_usd": "5", "provider_reported_spent_usd": "0.00054048",
@@ -1014,19 +1060,30 @@ def offline_regression(battery: list[dict]) -> None:
           "dotenv paid-path gating, and ledger migration all hold")
 
 
-def paid_smoke(battery: list[dict]) -> None:
-    """One paid packet on qwen/qwen3.7-plus with reasoning disabled, matching the panel payload."""
-    model = "qwen/qwen3.7-plus"
+def smoke_paths(model: str) -> tuple[Path, Path]:
+    """Smoke artifacts: one shared versioned records file (every event carries model and
+    protocol_id) plus a per-release summary, so smoke repeats on different releases never
+    overwrite each other."""
+    slug = model.replace("/", "__")
+    return OUT / "paid_smoke_v2.jsonl", OUT / f"paid_smoke_summary_{slug}.json"
+
+
+def paid_smoke(model: str, battery: list[dict]) -> None:
+    """One paid packet on the given MODELS release with reasoning disabled, matching the
+    panel payload. The model is an explicit argument (CLI --smoke-model, no default)."""
+    if model not in MODELS:
+        raise ValueError(f"smoke target must be one of {MODELS}, got {model}")
     pid = protocol_id(model, battery)
     req = {"packet": 0, "seed": paired_seeds(N_PACKETS)[0], "prompt": render_packet(battery)}
     if not paid_calls_authorized():
         raise SystemExit("paid smoke requires --i-authorize-paid-calls")
     from wvs_score_all_options_refresh import reserve, settle_external_reservation
-    smoke_rid = f"pilot/resp-packet-smoke/{datetime.now(UTC).strftime('%Y%m%dT%H%M%S.%fZ')}"
+    smoke_rid = (f"pilot/resp-packet-smoke/{model.replace('/', '__')}/"
+                 f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%S.%fZ')}")
     if not reserve({"id": smoke_rid, "lane": "alibaba", "reserve_usd": "0.05"}):
         raise RuntimeError("global repository cap rejected respondent-packet smoke reservation")
     before = Decimal(update_state(lambda s: s)["conservative_spent_usd"])
-    smoke_records = OUT / "paid_smoke_v2.jsonl"
+    smoke_records, smoke_summary = smoke_paths(model)
     try:
         row = asyncio.run(run_packet(model, battery, smoke_records, "smoke_run", pid, 0, req, None))
         if row is None:
@@ -1044,7 +1101,7 @@ def paid_smoke(battery: list[dict]) -> None:
             raise RuntimeError("smoke response missing usage.cost")
         routes.append(route)
     message = completed[-1]["response"]["choices"][0]["message"]
-    atomic_json(OUT / "paid_smoke_summary.json", {
+    atomic_json(smoke_summary, {
         "status": "passed", "eval_version": EVAL_VERSION, "model": model,
         "row": row, "routes": routes,
         "usage": [(e.get("usage") or {}) | {"response_id": e["response"].get("id")} for e in completed],
@@ -1067,6 +1124,9 @@ def main() -> None:
     actions.add_argument("--synthetic-analysis-test", action="store_true")
     parser.add_argument("--i-authorize-paid-calls", action="store_true",
                         help="required for --paid-smoke/--run; sets the paid-call opt-in")
+    parser.add_argument("--smoke-model", choices=MODELS, default=None,
+                        help="required for --paid-smoke: which MODELS release to smoke (no default, "
+                             "an omitted target fails fast so a repeat can never hit the wrong model)")
     args = parser.parse_args()
     battery, child_rows = build_battery()
     if args.offline_smoke:
@@ -1075,6 +1135,8 @@ def main() -> None:
         offline_regression(battery)
     if args.write_manifest:
         write_manifest(battery)
+    if args.paid_smoke and args.smoke_model is None:
+        raise SystemExit("--paid-smoke requires --smoke-model (one of MODELS); no default")
     if args.paid_smoke or args.run:
         if not args.i_authorize_paid_calls:
             raise SystemExit("--paid-smoke/--run cost money and require --i-authorize-paid-calls")
@@ -1083,7 +1145,7 @@ def main() -> None:
         dotenv.load_dotenv()
         os.environ[PAID_OPTIN_ENV] = "1"
     if args.paid_smoke:
-        paid_smoke(battery)
+        paid_smoke(args.smoke_model, battery)
     if args.run:
         run(battery)
     if args.analyze:
