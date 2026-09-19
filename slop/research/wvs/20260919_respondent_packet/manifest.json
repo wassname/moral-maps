@@ -103,7 +103,7 @@
       "question": "Here is a list of qualities that children can be encouraged to learn at home. Which, if any, do you consider to be especially important? Please choose up to five."
     }
   ],
-  "created_utc": "2026-09-19T05:27:42.578523+00:00",
+  "created_utc": "2026-09-19T05:40:03.922770+00:00",
   "endpoint_provenance": "endpoints and pricing from the authenticated 2026-09-18 snapshot; the unauthenticated live models GET returns endpoints=null, so the paid smoke is the current live route test",
   "eval_version": "wvs-respondent-packet-v1",
   "instrument_status": "GlobalOpinionQA-compatible approximation; 11th quality Religious faith appended; card order not recorded in source",

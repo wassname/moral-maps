@@ -1,0 +1,94 @@
+{
+  "budget": {
+    "completed_phases": 1,
+    "completed_phases_without_provider_cost": 0,
+    "conservative_spent_usd": "0.00938784",
+    "eval_version": "wvs-respondent-packet-v1",
+    "failed_phases_charged_at_bound": 3,
+    "hard_cap_usd": "5",
+    "provider_reported_spent_usd": "0.00054048",
+    "reserved_usd": "0E-8",
+    "schema": 1
+  },
+  "eval_version": "wvs-respondent-packet-v1",
+  "model": "qwen/qwen3.7-plus",
+  "reasoning_tokens": [
+    null
+  ],
+  "records": "slop/research/wvs/20260919_respondent_packet/paid_smoke.jsonl",
+  "routes": [
+    {
+      "advertised_quantization": "unknown",
+      "endpoint_tag": "alibaba",
+      "requested_model": "qwen/qwen3.7-plus",
+      "response_model": "qwen/qwen3.7-plus",
+      "selected_provider": "Alibaba",
+      "selected_release_slug": "qwen/qwen3.7-plus-20260602"
+    }
+  ],
+  "row": {
+    "Abortion": {
+      "outcome": "refused",
+      "selected": "refused"
+    },
+    "Attending peaceful demonstrations": {
+      "outcome": "refused",
+      "selected": "refused"
+    },
+    "ChildQualities": {
+      "outcome": "refused",
+      "selected": []
+    },
+    "God": {
+      "outcome": "refused",
+      "selected": "refused"
+    },
+    "Homosexuality": {
+      "outcome": "refused",
+      "selected": "refused"
+    },
+    "Joining in boycotts": {
+      "outcome": "refused",
+      "selected": "refused"
+    },
+    "Religion": {
+      "outcome": "refused",
+      "selected": "refused"
+    },
+    "Signing a petition": {
+      "outcome": "refused",
+      "selected": "refused"
+    },
+    "dealing with people?": {
+      "outcome": "refused",
+      "selected": "refused"
+    }
+  },
+  "status": "passed",
+  "usage": [
+    {
+      "completion_tokens": 197,
+      "completion_tokens_details": {
+        "audio_tokens": 0,
+        "image_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "cost": 0.00054048,
+      "cost_details": {
+        "upstream_inference_completions_cost": 0.00025216,
+        "upstream_inference_cost": 0.00054048,
+        "upstream_inference_prompt_cost": 0.00028832
+      },
+      "is_byok": false,
+      "prompt_tokens": 901,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cache_write_tokens": 0,
+        "cached_tokens": 0,
+        "video_tokens": 0
+      },
+      "response_id": "gen-1789796008-yDskQLQMbpFmeBXIozfU",
+      "total_tokens": 1098
+    }
+  ]
+}
